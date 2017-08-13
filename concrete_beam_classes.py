@@ -44,14 +44,17 @@ class rect_beam:
 
     def max_bars_layer(self,flexural_bar, cover_in, shear_bar, aggregate_size_in):
 
-        first_interior_bar_in = cover_in + shear_bar[0] + 2*shear_bar[0]
+        self.first_interior_bar_in = cover_in + shear_bar[0] + 2*shear_bar[0]
 
         min_spacing = max(1,flexural_bar[0],1.33*aggregate_size_in)+flexural_bar[0]
 
-        num_interior_bars = 1 + ((self.b_in - 2*first_interior_bar_in)/min_spacing)
+        num_interior_bars = 1 + ((self.b_in - 2*self.first_interior_bar_in)/min_spacing)
 
         return math.floor(num_interior_bars)
-
+        
+    def bar_spacing(self,flexural_bar, aggregate_size_in):
+        return max(1,flexural_bar[0],1.33*aggregate_size_in)+flexural_bar[0]
+        
     def min_bars_bottom_layer(self,reinf_bar,cover_in, shear_bar, fy_psi):
         fs = (2/3.0)*fy_psi
         cc = cover_in + shear_bar[0]
@@ -379,11 +382,11 @@ class t_beam:
 
     def max_bars_layer(self,flexural_bar, cover_in, shear_bar, aggregate_size_in):
 
-        first_interior_bar_in = cover_in + shear_bar[0] + 2*shear_bar[0]
+        self.first_interior_bar_in = cover_in + shear_bar[0] + 2*shear_bar[0]
 
         min_spacing = max(1,flexural_bar[0],1.33*aggregate_size_in)+flexural_bar[0]
 
-        num_interior_bars = 1 + ((self.bw_in - 2*first_interior_bar_in)/min_spacing)
+        num_interior_bars = 1 + ((self.bw_in - 2*self.first_interior_bar_in)/min_spacing)
 
         return math.floor(num_interior_bars)
 
@@ -671,13 +674,15 @@ class t_beam:
         self.cmi_c_y = []
         self.cmi_s_x = []
         self.cmi_s_y = []
+        self.cmi_s_text = []
+        self.cmi_c_text = []
         n = Es_psi/self.Ec_psi
 
         a=0
         b=max(bars_d_array)
         c=0
         mna = 0
-        na = 0
+        self.crackna = 0
 
         loop_max = 10000
         tol = 0.0000000000001
@@ -703,33 +708,37 @@ class t_beam:
                     mna = mna + ((n-1)*bars_as_array[i]*(c-bars_d_array[i]))
 
             if mna == 0 or (b-a)/2 <= tol:
-                na = c
+                self.crackna = c
                 loop = loop_max
             elif mna > 1:
                 b = c
             else:
                 a = c
             loop+=1
-        if na <= self.hf_in:
-            i_crack_in4 = (self.bf_in*na**3)/3
-            self.cmi_c_x.append([0-self.bf_in,self.bf_in,self.bf_in,0-self.bf_in,0-self.bf_in])
-            self.cmi_c_y.append([self.h_in - (self.hf_in-na),self.h_in - (self.hf_in-na),self.h_in,self.h_in,self.h_in - (self.hf_in-na)])
+        if self.crackna <= self.hf_in:
+            i_crack_in4 = (self.bf_in*self.crackna**3)/3
+            self.cmi_c_x.append([0-self.bf_left_in,0+self.bw_in+self.bf_right_in,0+self.bw_in+self.bf_right_in,0-self.bf_left_in,0-self.bf_left_in])
+            self.cmi_c_y.append([self.h_in - self.crackna,self.h_in - self.crackna,self.h_in,self.h_in,self.h_in - self.crackna])
+            self.cmi_c_text.append(['Ac = {0:.3f} in2, Ec = {1:.2f} psi, Es = {2:0.2f} psi, n = Es/Ec = {3:0.4f}'.format(compression_block_in2, self.Ec_psi, Es_psi, n),0-self.bf_left_in,self.h_in+0.25])
         else:
-            i_crack_in4 = (self.bw_in*(na-self.hf_in)**3)/3 + (self.bf_in*self.hf_in**3/3) + (self.bf_in*self.hf_in)*(na-self.hf_in)**2
-            self.cmi_c_x.append([0-self.bf_in,0-self.bf_in,0,0,self.bw_in,self.bw_in,self.bf_in,self.bf_in,0-self.bf_in])
-            self.cmi_c_y.append([self.h_in,self.hw_in,self.hw_in,self.hf_in-na,self.hf_in-na,self.hw_in,self.h_in,self.h_in])
+            i_crack_in4 = (self.bw_in*(self.crackna-self.hf_in)**3)/3 + (self.bf_in*self.hf_in**3/3) + (self.bf_in*self.hf_in)*(self.crackna-self.hf_in)**2
+            self.cmi_c_x.append([0-self.bf_left_in,0-self.bf_left_in,0,0,self.bw_in,self.bw_in,self.bw_in+self.bf_right_in,self.bw_in+self.bf_right_in,0-self.bf_left_in])
+            self.cmi_c_y.append([self.h_in,self.hw_in,self.hw_in,self.h_in-self.crackna,self.h_in-self.crackna,self.hw_in,self.hw_in,self.h_in,self.h_in])
+            self.cmi_c_text.append(['Ac = {0:.3f} in2, Ec = {1:.2f} psi, Es = {2:0.2f} psi, n = Es/Ec = {3:0.4f}'.format(compression_block_in2, self.Ec_psi, Es_psi, n),0-self.bf_left_in,self.h_in+0.25])
         for i in range(len(bars_as_array)):
-            if na < bars_d_array[i]:
-               i_crack_in4 = i_crack_in4 + (n*bars_as_array[i]*(bars_d_array[i]-na)**2)
+            if self.crackna < bars_d_array[i]:
+               i_crack_in4 = i_crack_in4 + (n*bars_as_array[i]*(bars_d_array[i]-self.crackna)**2)
                self.cmi_s_x.append([(self.bw_in/2.0)-(n*bars_as_array[i]/2.0),(self.bw_in/2.0)+(n*bars_as_array[i]/2.0),(self.bw_in/2.0)+(n*bars_as_array[i]/2.0),(self.bw_in/2.0)-(n*bars_as_array[i]/2.0),(self.bw_in/2.0)-(n*bars_as_array[i]/2.0)])
                self.cmi_s_y.append([self.h_in - (bars_d_array[i]-0.5),self.h_in - (bars_d_array[i]-0.5),self.h_in - (bars_d_array[i]+0.5),self.h_in - (bars_d_array[i]+0.5),self.h_in - (bars_d_array[i]-0.5)])
+               self.cmi_s_text.append(['nAs = {0:.3f} in2'.format(n*bars_as_array[i]),((self.bw_in/2.0)+(n*bars_as_array[i]/2.0))+0.25,self.h_in - (bars_d_array[i]+0.25)])
             else:
-                i_crack_in4 = i_crack_in4 + ((n-1)*bars_as_array[i]*(na-bars_d_array[i])**2)
+                i_crack_in4 = i_crack_in4 + ((n-1)*bars_as_array[i]*(self.crackna-bars_d_array[i])**2)
                 self.cmi_s_x.append([(self.bw_in/2.0)-(n*bars_as_array[i]/2.0),(self.bw_in/2.0)+(n*bars_as_array[i]/2.0),(self.bw_in/2.0)+(n*bars_as_array[i]/2.0),(self.bw_in/2.0)-(n*bars_as_array[i]/2.0),(self.bw_in/2.0)-(n*bars_as_array[i]/2.0)])
                 self.cmi_s_y.append([self.h_in - (bars_d_array[i]-0.5),self.h_in - (bars_d_array[i]-0.5),self.h_in - (bars_d_array[i]+0.5),self.h_in - (bars_d_array[i]+0.5),self.h_in - (bars_d_array[i]-0.5)])
                 self.cmi_s_x.append([(self.bw_in/2.0)-(bars_as_array[i]/2.0),(self.bw_in/2.0)+(bars_as_array[i]/2.0),(self.bw_in/2.0)+(bars_as_array[i]/2.0),(self.bw_in/2.0)-(bars_as_array[i]/2.0),(self.bw_in/2.0)-(bars_as_array[i]/2.0)])
                 self.cmi_s_y.append([self.h_in - (bars_d_array[i]-0.5),self.h_in - (bars_d_array[i]-0.5),self.h_in - (bars_d_array[i]+0.5),self.h_in - (bars_d_array[i]+0.5),self.h_in - (bars_d_array[i]-0.5)])
-        return i_crack_in4
+                self.cmi_s_text.append(['(n-1)As = {0:.3f} in2'.format((n-1)*bars_as_array[i]),((self.bw_in/2.0)+(n*bars_as_array[i]/2.0))+0.25,self.h_in - (bars_d_array[i]+0.25)])
+        return i_crack_in4, self.crackna
 
 
 # cover_in = 1.44

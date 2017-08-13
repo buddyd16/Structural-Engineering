@@ -9,6 +9,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolb
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import Tkinter as tk
+import tkFileDialog
 import math
 import tkFont
 import os
@@ -25,11 +26,11 @@ class Main_window:
         self.menubar = tk.Menu(self.master)
         self.menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label = "File", menu=self.menu)
-        self.menu.add_command(label="Open")
+        self.menu.add_command(label="Open", command=self.file_open)
         self.menu.add_separator()
-        self.menu.add_command(label="Save Inputs")
+        self.menu.add_command(label="Save Inputs", state="disabled", command=self.save_file)
         self.menu.add_command(label="Run")
-        self.menu.add_command(label="Save Results")
+        self.menu.add_command(label="Export DXF", state="disabled", command=self.print_dxf)
         self.menu.add_separator()
         self.menu.add_command(label="Exit", command=self.quit_app)
 
@@ -725,6 +726,7 @@ class Main_window:
             flexural_bars_array = []
             flexural_bars_as_array = []
             flexural_bars_d_array = []
+            flexural_bars_per_layer_array = []
 
             bottom_bars_moment_ftkips_array = []
 
@@ -743,11 +745,11 @@ class Main_window:
             for line in bottom_bars_num_raw:
                 bottom_bars_per_layer_array.append(float(line))
 
-            bottom_bars_as_array, bottom_bars_d_array,bottom_bars_cg = self.beamsection.flexural_bottom_bars_automatic_by_layers(bottom_bars_array,bottom_bars_per_layer_array,self.cover_in,self.shear_bar)
+            bottom_bars_as_array, bottom_bars_d_array,self.bottom_bars_cg = self.beamsection.flexural_bottom_bars_automatic_by_layers(bottom_bars_array,bottom_bars_per_layer_array,self.cover_in,self.shear_bar)
 
-            self.tension_steel_centroid_graph.set_data(self.b_in/2,self.h_in - bottom_bars_cg)
+            self.tension_steel_centroid_graph.set_data(self.b_in/2,self.h_in - self.bottom_bars_cg)
             self.tension_steel_cg_graph_label.remove()
-            self.tension_steel_cg_graph_label = self.FigSubPlot.annotate('(Tension Steel CG: {0:.3f} in.)'.format(bottom_bars_cg),xy=(self.b_in/2,self.h_in - bottom_bars_cg), xytext=(0,-10), ha='center',textcoords='offset points', fontsize=8)
+            self.tension_steel_cg_graph_label = self.FigSubPlot.annotate('(Tension Steel CG: {0:.3f} in.)'.format(self.bottom_bars_cg),xy=(self.b_in/2,self.h_in - self.bottom_bars_cg), xytext=(0,-10), ha='center',textcoords='offset points', fontsize=8)
 
             i=0
             for i in range(len(bottom_bars_as_array)):
@@ -777,24 +779,33 @@ class Main_window:
                 flexural_bars_array = bottom_bars_array
                 flexural_bars_as_array = bottom_bars_as_array
                 flexural_bars_d_array = bottom_bars_d_array
+                flexural_bars_per_layer_array = bottom_bars_per_layer_array
             else:
                 flexural_bars_array = bottom_bars_array + top_bars_array
                 flexural_bars_as_array = bottom_bars_as_array + top_bars_as_array
                 flexural_bars_d_array = bottom_bars_d_array + top_bars_d_array
-
+                flexural_bars_per_layer_array = bottom_bars_per_layer_array + top_bars_per_layer_array
+                
+            self.flexural_bars_array_dxf = []
+            self.flexural_bars_array_dxf.append(flexural_bars_array) #[0] bar size
+            self.flexural_bars_array_dxf.append(flexural_bars_per_layer_array) #[1] number of bars in layer
+            self.flexural_bars_array_dxf.append(flexural_bars_as_array) #[2] As per layer
+            self.flexural_bars_array_dxf.append(flexural_bars_d_array) #[3] d per bar layer
+            
+            
             total_as = sum(flexural_bars_as_array)
             total_as_d = 0
             i=0
             for i in range(len(flexural_bars_as_array)):
                 total_as_d = total_as_d + (flexural_bars_as_array[i]*flexural_bars_d_array[i])
 
-            flexural_bars_cg = total_as_d/total_as
+            self.flexural_bars_cg = total_as_d/total_as
 
-            self.steel_centroid_graph.set_data(self.b_in/2,self.h_in - flexural_bars_cg)
+            self.steel_centroid_graph.set_data(self.b_in/2,self.h_in - self.flexural_bars_cg)
             self.steel_cg_graph_label.remove()
-            self.steel_cg_graph_label = self.FigSubPlot.annotate('(Steel CG: {0:.3f} in.)'.format(flexural_bars_cg),xy=(self.b_in/2,self.h_in - flexural_bars_cg), xytext=(0,5), ha='center',textcoords='offset points', fontsize=8)
+            self.steel_cg_graph_label = self.FigSubPlot.annotate('(Steel CG: {0:.3f} in.)'.format(self.flexural_bars_cg),xy=(self.b_in/2,self.h_in - self.flexural_bars_cg), xytext=(0,5), ha='center',textcoords='offset points', fontsize=8)
 
-            self.minas = self.beamsection.as_min(bottom_bars_cg,fy_psi)
+            self.minas = self.beamsection.as_min(self.bottom_bars_cg,fy_psi)
             if self.minas <= sum(bottom_bars_as_array):
                 status = 'OK'
             else:
@@ -821,6 +832,8 @@ class Main_window:
 
             if top_bars_array[0]==0:
                 total_top_force = 0
+                top_bars_strain_array = [0]
+                top_bars_stress_psi_array = [0]
                 top_bars_force_lbs_array = [0]
                 pass
             else:
@@ -833,9 +846,16 @@ class Main_window:
                     self.top_bars_axial.insert(tk.END,'{0:0.3f}'.format(top_bars_force_lbs_array[i]))
                     self.top_bars_moment.insert(tk.END,'{0:0.3f}'.format((top_bars_force_lbs_array[i]*(top_bars_d_array[i]-flexural_bars_cg))/(12*1000)))
 
-
+            self.flexural_bars_array_dxf.append(bottom_bars_strain_array+top_bars_strain_array) #[4] strain per bar layer
+            self.flexural_bars_array_dxf.append(bottom_bars_stress_psi_array+top_bars_stress_psi_array) #[5] stress per bar layer
+            self.flexural_bars_array_dxf.append(bottom_bars_force_lbs_array+top_bars_force_lbs_array) #[6] force per bar layer
+            
             concrete_compression_force_lbs, concrete_compression_force_cg_in = self.beamsection.strain_compatibility_concrete(self.PNA)
-
+            
+            self.concrete_dxf = []
+            self.concrete_dxf.append(concrete_compression_force_lbs) #[0] force in compression block
+            self.concrete_dxf.append(concrete_compression_force_cg_in) #[1] centroid elevation of compression block from top
+            
             if 1 - (abs(concrete_compression_force_lbs) / abs(total_top_force + total_bottom_force)) <= 0.00001:
                 status_force = 'OK'
                 if self.error_check == 0:
@@ -859,7 +879,7 @@ class Main_window:
                 self.error_check = 1
             else:
                 phi, nominal_moment, ultimate_moment = self.beamsection.moment_capacity_inlbs(flexural_bars_as_array,flexural_bars_d_array,flexural_bars_cg,self.PNA,fy_psi,Es_psi)
-                phiv, vc, phivc, vsmax, vnmax, phivnmax = self.beamsection.concrete_shear_capacity_lbs(bottom_bars_cg,self.shear_bars_fy.fy_psi,self.shear_bar[1])
+                phiv, vc, phivc, vsmax, vnmax, phivnmax = self.beamsection.concrete_shear_capacity_lbs(self.bottom_bars_cg,self.shear_bars_fy.fy_psi,self.shear_bar[1])
                 phit, Acp, Pcp, t_threshold, phit_threshold, aop_status = self.beamsection.concrete_threshold_torsion_inlbs()
 
                 a = self.beamsection.beta1 * self.PNA
@@ -886,8 +906,9 @@ class Main_window:
                         self.line6 = '\n\nSHEAR REINFORCEMENT:\n\n Max Spacing : {0:.3f} in\n Max Spacing if Vs,req = 0.5*Vs,max : {9:.3f} in\n --s = spacing in inches--\n Av,min = {1:.3f} * s in^2 = {2:.3f} in^2 @ max spacing\n 2-VERT LEGS:\n Vs = {3:.3f} / s * (1 kip/1000 lbs) = {4:.3f} kips @ max spacing\n 4-VERT LEGS:\n Vs = {5:.3f} / s * (1 kip/1000 lbs) = {6:.3f} kips @ max spacing\n 6-VERT LEGS:\n Vs = {7:.3f} / s * (1 kip/1000 lbs) = {8:.3f} kips @ max spacing'.format(self.beamsection.max_shear_spacing_in,self.beamsection.av_min_s,self.beamsection.max_shear_spacing_in*self.beamsection.av_min_s,self.beamsection.s_Vs_2_legs,(self.beamsection.s_Vs_2_legs/self.beamsection.max_shear_spacing_in)/1000,self.beamsection.s_Vs_4_legs,(self.beamsection.s_Vs_4_legs/self.beamsection.max_shear_spacing_in)/1000,self.beamsection.s_Vs_6_legs,(self.beamsection.s_Vs_6_legs/self.beamsection.max_shear_spacing_in)/1000,0.5*self.beamsection.max_shear_spacing_in)
                         self.line7 = '\n\nTHRESHOLD TORSION:\n\n Phi = {0:.3f}\n Acp = {1:.3f} in^2 \n Pcp = {2:.3f} in \n {3} \n Tu,threshold = {4:.3f} in-lbs = {5:.3f} ft-lbs = {6:.3f} ft-kips \n Phi*Tu,threshold = {7:.3f} in-lbs = {8:.3f} ft-lbs = {9:.3f} ft-kips'.format(phit, Acp, Pcp, aop_status, t_threshold, t_threshold/12.0, t_threshold/(12.0*1000), phit_threshold, phit_threshold/12.0, phit_threshold/(12.0*1000))
                         
-                        i_cracked_in4 = self.beamsection.cracked_moment_of_inertia_in4(flexural_bars_as_array,flexural_bars_d_array,Es_psi)
-                        self.line2 = '\nFr = {0:.2f} psi\nCracking Moment, Mcr = {1:0.2f} in-lbs = {2:0.2f} ft-lbs = {3:0.2f} ft-kips\nI cracked = {4:0.3f} in^4'.format(self.beamsection.fr_psi,self.beamsection.Mcrack_inlbs,self.beamsection.Mcrack_ftlbs,self.beamsection.Mcrack_ftkips,i_cracked_in4)
+                        i_cracked_in4, cracked_na = self.beamsection.cracked_moment_of_inertia_in4(flexural_bars_as_array,flexural_bars_d_array,Es_psi)
+                        self.ie_at_mn = (((self.beamsection.Mcrack_inlbs/ultimate_moment)**3)*self.beamsection.Ig_in4)+((1-((self.beamsection.Mcrack_inlbs/ultimate_moment)**3))*i_cracked_in4)
+                        self.line2 = '\nFr = {0:.2f} psi\nCracking Moment, Mcr = {1:0.2f} in-lbs = {2:0.2f} ft-lbs = {3:0.2f} ft-kips\nI cracked = {4:0.3f} in^4   Cracked NA = {5:0.3f} in from top\nIcr/Ig = {6:0.3f}   Ie @ phi*Mn = {7:0.3f} in^4'.format(self.beamsection.fr_psi,self.beamsection.Mcrack_inlbs,self.beamsection.Mcrack_ftlbs,self.beamsection.Mcrack_ftkips,i_cracked_in4, cracked_na,i_cracked_in4/self.beamsection.Ig_in4,self.ie_at_mn)
                     else:
                         pass
                 if self.error_check == 1:
@@ -905,24 +926,249 @@ class Main_window:
                     self.results_text_box.insert(tk.END, self.line6)
                     self.results_text_box.insert(tk.END, self.line7)
                     self.label_error.configure(text = 'Analysis Complete!')
+                    self.menu.entryconfig(4, state="normal")
+                    self.menu.entryconfig(2, state="normal")
 
-                    # path = os.path.join(os.path.expanduser('~'),'Desktop','RESULTS', 'T_Beam')
+    def print_dxf(self):
+        #create DXF file of analyzed section
+        label = self.section_info.get()
+        path = os.path.join(os.path.expanduser('~'),'Desktop','RESULTS','Conc_Beam', label)
+        self.path_exists(path)
+        
+        file = open(os.path.join(path,label+'_Results_CAD.dxf'),'w')
+        file.write('  0\nSECTION\n  2\nENTITIES\n')
+        #cross section
+        file.write('  0\nPOLYLINE\n 62\n10\n  8\nsection\n 66\n1\n 10\n0.0\n 20\n0.0\n 30\n0.0\n 70\n8\n')
+        for i in range(0,len(self.beamsection.section_x_coords_in)):
+            file.write('  0\nVERTEX\n  8\nsection\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n'.format(self.beamsection.section_x_coords_in[i],self.beamsection.section_y_coords_in[i]))
+        file.write('  0\nSEQEND\n')
+        #bars
+        for i in range(0, len(self.flexural_bars_array_dxf[0])):
+            for y in range(0,int(self.flexural_bars_array_dxf[1][i])):
+                num_interior = int(self.flexural_bars_array_dxf[1][i]) - 2
+                num_interior_spaces = num_interior + 1
+                interior_space = (self.beamsection.bw_in - self.beamsection.first_interior_bar_in) - self.beamsection.first_interior_bar_in
+                spacing = interior_space/(1.00*num_interior_spaces)
+                if self.flexural_bars_array_dxf[6][i] <0:
+                    color = 10
+                else:
+                    color = 5
+                    
+                if y == 0:
+                    bar_x = self.beamsection.first_interior_bar_in
+                elif y == self.flexural_bars_array_dxf[1][i]-1:
+                    bar_x = self.beamsection.bw_in - self.beamsection.first_interior_bar_in
+                else:
+                    bar_x = self.beamsection.first_interior_bar_in + (spacing*(y))
+                    
+                file.write('  0\nCIRCLE\n  8\ntest\n 10\n{1:.3f}\n 20\n{2:.3f}\n 30\n0.0\n 40\n{3:.3f}\n 62\n{0}\n'.format(color,bar_x,self.h_in - self.flexural_bars_array_dxf[3][i],self.flexural_bars_array_dxf[0][i][0]/2))
+        #strain diagram
+        start_x_strain = max(self.beamsection.section_x_coords_in)+12 #offset digram from cross section
+        file.write('  0\nPOLYLINE\n 62\n7\n  8\nstrain\n 66\n1\n 10\n0.0\n 20\n0.0\n 30\n0.0\n 70\n8\n')
+        file.write('  0\nVERTEX\n  8\nstrain\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n'.format(start_x_strain,self.h_in))
+        file.write('  0\nVERTEX\n  8\nstrain\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n'.format(start_x_strain,0))
+        file.write('  0\nSEQEND\n')
+        file.write('  0\nPOLYLINE\n 62\n10\n  8\nstrain\n 66\n1\n 10\n0.0\n 20\n0.0\n 30\n0.0\n 70\n8\n')
+        file.write('  0\nVERTEX\n  8\nstrain\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n'.format(start_x_strain,self.h_in))
+        file.write('  0\nVERTEX\n  8\nstrain\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n'.format(start_x_strain+(self.beamsection.x_strain[1]*1000),self.h_in))
+        file.write('  0\nVERTEX\n  8\nstrain\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n'.format(start_x_strain,self.h_in-self.PNA))
+        file.write('  0\nSEQEND\n')
+        file.write('  0\nPOLYLINE\n 62\n5\n  8\nstrain\n 66\n1\n 10\n0.0\n 20\n0.0\n 30\n0.0\n 70\n8\n')
+        file.write('  0\nVERTEX\n  8\nstrain\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n'.format(start_x_strain,self.h_in-self.PNA))
+        file.write('  0\nVERTEX\n  8\nstrain\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n'.format(start_x_strain+(max(self.beamsection.x_strain)*1000),min(self.beamsection.y_strain)))
+        file.write('  0\nVERTEX\n  8\nstrain\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n'.format(start_x_strain,min(self.beamsection.y_strain)))
+        file.write('  0\nSEQEND\n')
+        #strain bars
+        for i in range(0,len(self.flexural_bars_array_dxf[0])):
+            if self.flexural_bars_array_dxf[3][i] == max(self.flexural_bars_array_dxf[3]):
+                file.write('  0\nTEXT\n 62\n{0}\n  8\nstrain\n 10\n{1:.3f}\n 20\n{2:.3f}\n 30\n0.0\n 40\n0.5\n  1\nes = {3:.3f} in\n 50\n0.0\n'.format(5,start_x_strain,self.h_in - max(self.flexural_bars_array_dxf[3]),max(self.flexural_bars_array_dxf[4])))
+            else:
+                if self.flexural_bars_array_dxf[6][i] <0:
+                    color = 10
+                else:
+                    color = 5
+                file.write('  0\nPOLYLINE\n 62\n{0}\n  8\nstrain\n 66\n1\n 10\n0.0\n 20\n0.0\n 30\n0.0\n 70\n8\n'.format(color))
+                file.write('  0\nVERTEX\n  8\nstrain\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n'.format(start_x_strain,self.h_in - self.flexural_bars_array_dxf[3][i]))
+                file.write('  0\nVERTEX\n  8\nstrain\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n'.format(start_x_strain+(self.flexural_bars_array_dxf[4][i]*1000),self.h_in - self.flexural_bars_array_dxf[3][i]))
+                file.write('  0\nSEQEND\n')
+                file.write('  0\nTEXT\n 62\n{0}\n  8\nstrain\n 10\n{1:.3f}\n 20\n{2:.3f}\n 30\n0.0\n 40\n0.5\n  1\nes = {3:.5f} in\n 50\n0.0\n'.format(color,start_x_strain,self.h_in - self.flexural_bars_array_dxf[3][i],self.flexural_bars_array_dxf[4][i]))
+        #stress/force diagram
+        start_x_stress = start_x_strain+(max(self.beamsection.x_strain)*1000)+12+((max(self.concrete_dxf[0],max(self.flexural_bars_array_dxf[6]),abs(min(self.flexural_bars_array_dxf[6]))))/10000) 
+        file.write('  0\nPOLYLINE\n 62\n7\n  8\nstress_force\n 66\n1\n 10\n0.0\n 20\n0.0\n 30\n0.0\n 70\n8\n')
+        file.write('  0\nVERTEX\n  8\nstress_force\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n'.format(start_x_stress,self.h_in))
+        file.write('  0\nVERTEX\n  8\nstress_force\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n'.format(start_x_stress,0))
+        file.write('  0\nSEQEND\n')
+        #concrete stress block
+        file.write('  0\nPOLYLINE\n 62\n10\n  8\nstress_force\n 66\n1\n 10\n0.0\n 20\n0.0\n 30\n0.0\n 70\n8\n')
+        file.write('  0\nVERTEX\n  8\nstress_force\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n'.format(start_x_stress,self.h_in))
+        file.write('  0\nVERTEX\n  8\nstress_force\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n'.format(start_x_stress-(0.85*(self.beamsection.f_prime_c_psi/1000)),self.h_in))
+        file.write('  0\nVERTEX\n  8\nstress_force\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n'.format(start_x_stress-(0.85*(self.beamsection.f_prime_c_psi/1000)),self.h_in-(self.beamsection.beta1 * self.PNA)))
+        file.write('  0\nVERTEX\n  8\nstress_force\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n'.format(start_x_stress,self.h_in-(self.beamsection.beta1 * self.PNA)))
+        file.write('  0\nSEQEND\n')
+        #force bars
+        for i in range(0,len(self.flexural_bars_array_dxf[0])):
+            if self.flexural_bars_array_dxf[6][i] <0:
+                color = 10
+                label = 'Cs '
+            else:
+                color = 5
+                label = 'Ts '
+            file.write('  0\nPOLYLINE\n 62\n{0}\n  8\nstress_force\n 66\n1\n 10\n0.0\n 20\n0.0\n 30\n0.0\n 70\n8\n'.format(color))
+            file.write('  0\nVERTEX\n  8\nstress_force\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n'.format(start_x_stress,self.h_in - self.flexural_bars_array_dxf[3][i]))
+            file.write('  0\nVERTEX\n  8\nstress_force\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n'.format(start_x_stress+(self.flexural_bars_array_dxf[6][i]/10000),self.h_in - self.flexural_bars_array_dxf[3][i]))
+            file.write('  0\nSEQEND\n')
+            file.write('  0\nTEXT\n 62\n{0}\n  8\nstress_force\n 10\n{1:.3f}\n 20\n{2:.3f}\n 30\n0.0\n 40\n0.5\n  1\n{4}= {3:.3f} kips\n 50\n0.0\n'.format(color,start_x_stress,self.h_in - self.flexural_bars_array_dxf[3][i],self.flexural_bars_array_dxf[6][i]/1000, label))
+        #force concrete
+        color = 10
+        file.write('  0\nPOLYLINE\n 62\n{0}\n  8\nstress_force\n 66\n1\n 10\n0.0\n 20\n0.0\n 30\n0.0\n 70\n8\n'.format(color))
+        file.write('  0\nVERTEX\n  8\nstress_force\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n'.format(start_x_stress,self.h_in - self.concrete_dxf[1]))
+        file.write('  0\nVERTEX\n  8\nstress_force\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n'.format(start_x_stress-(self.concrete_dxf[0]/10000),self.h_in - self.concrete_dxf[1]))
+        file.write('  0\nSEQEND\n')
+        file.write('  0\nTEXT\n 62\n{0}\n  8\nstress_force\n 10\n{1:.3f}\n 20\n{2:.3f}\n 30\n0.0\n 40\n0.5\n  1\nCc = {3:.3f} kips\n 50\n0.0\n'.format(color,start_x_stress-(self.concrete_dxf[0]/10000),self.h_in - self.concrete_dxf[1],-1*self.concrete_dxf[0]/1000))
+        #PNA
+        end_x_pna = start_x_stress + 20 #revise to max of compression/tension force above
+        file.write('  0\nPOLYLINE\n 62\n9\n  8\nPNA\n 66\n1\n 10\n0.0\n 20\n0.0\n 30\n0.0\n 70\n8\n')
+        file.write('  0\nVERTEX\n  8\nPNA\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n'.format(min(self.beamsection.section_x_coords_in)-14,self.h_in - self.PNA))
+        file.write('  0\nVERTEX\n  8\nPNA\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n'.format(end_x_pna,self.h_in - self.PNA))
+        file.write('  0\nSEQEND\n')
+        file.write('  0\nTEXT\n 62\n9\n  8\nsection\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n 40\n1.0\n  1\nPNA = {2:.3f} in\n 50\n0.0\n'.format(min(self.beamsection.section_x_coords_in)-14,self.h_in - self.PNA,self.PNA))
+        #Cracked Section
+        start_y_cracked = 0 - 12 - self.h_in
+        #effective concrete
+        file.write('  0\nPOLYLINE\n 62\n10\n  8\ncracked_section\n 66\n1\n 10\n0.0\n 20\n0.0\n 30\n0.0\n 70\n8\n')
+        for i in range(0,len(self.beamsection.cmi_c_x[0])):
+            file.write('  0\nVERTEX\n  8\ncracked_section\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n'.format(self.beamsection.cmi_c_x[0][i],self.beamsection.cmi_c_y[0][i]+start_y_cracked))
+        file.write('  0\nSEQEND\n')
+        #transformed steel
+        for i in range(0,len(self.beamsection.cmi_s_x)):
+            file.write('  0\nPOLYLINE\n 62\n5\n  8\ncracked_section\n 66\n1\n 10\n0.0\n 20\n0.0\n 30\n0.0\n 70\n8\n')
+            for y in range(0,len(self.beamsection.cmi_s_x[i])):
+                file.write('  0\nVERTEX\n  8\ncracked_section\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n'.format(self.beamsection.cmi_s_x[i][y],self.beamsection.cmi_s_y[i][y]+start_y_cracked))
+            file.write('  0\nSEQEND\n')
+        for i in range(0,len(self.flexural_bars_array_dxf[0])):
+            file.write('  0\nTEXT\n 62\n5\n  8\ncracked_section\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n 40\n0.5\n  1\n{2}\n 50\n0.0\n'.format(self.beamsection.cmi_s_text[i][1],self.beamsection.cmi_s_text[i][2]+start_y_cracked,self.beamsection.cmi_s_text[i][0]))
+        #cracked NA
+        file.write('  0\nPOLYLINE\n 62\n9\n  8\ncracked_section\n 66\n1\n 10\n0.0\n 20\n0.0\n 30\n0.0\n 70\n8\n')
+        file.write('  0\nVERTEX\n  8\ncracked_section\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n'.format(min(self.beamsection.section_x_coords_in)-22,start_y_cracked + self.h_in - self.beamsection.crackna))
+        file.write('  0\nVERTEX\n  8\ncracked_section\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n'.format(max(self.beamsection.section_x_coords_in)+14,start_y_cracked + self.h_in - self.beamsection.crackna))
+        file.write('  0\nSEQEND\n')
+        file.write('  0\nTEXT\n 62\n10\n  8\ncracked_section\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n 40\n0.5\n  1\n{2}\n 50\n0.0\n'.format(self.beamsection.cmi_c_text[0][1],self.beamsection.cmi_c_text[0][2]+start_y_cracked,self.beamsection.cmi_c_text[0][0]))
+        file.write('  0\nTEXT\n 62\n9\n  8\ncracked_section\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n 40\n1.0\n  1\nCracked NA = {2:.3f} in\n 50\n0.0\n'.format(min(self.beamsection.section_x_coords_in)-22,start_y_cracked + self.h_in - self.beamsection.crackna,self.beamsection.crackna))
+        file.write('  0\nENDSEC\n  0\nEOF')
+        file.close()
+        self.label_error.configure(text ='DXF exported to - '+ path)
+    def save_file(self):
+        #create csv file of inputs
+        label = self.section_info.get()
+        path = os.path.join(os.path.expanduser('~'),'Desktop','RESULTS','Conc_Beam', label)
+        self.path_exists(path)
 
-                    # self.path_exists(path)
-                    # file = open(os.path.join(path,'_T_Beam_Results.csv'),'w')
-                    # file.write('Strain')
-                    # for i in range(len(self.beamsection.x_strain)):
-                        # file.write('\n{0:.3f},{1:.3f}'.format(self.beamsection.x_strain[i],self.beamsection.y_strain[i]))
-                    # file.write('\nIcracked in^4:')
-                    # file.write('\nConcrete Component:')
-                    # for i in range(len(self.beamsection.cmi_c_x[0])):
-                        # file.write('\n{0:.3f},{1:.3f}'.format(self.beamsection.cmi_c_x[0][i],self.beamsection.cmi_c_y[0][i]))
-                    # for i in range(len(self.beamsection.cmi_s_x)):
-                        # file.write('\nSteel Component {0}:'.format(i))
-                        # for y in range(len(self.beamsection.cmi_s_x[i])):
-                            # file.write('\n{0:.3f},{1:.3f}'.format(self.beamsection.cmi_s_x[i][y],self.beamsection.cmi_s_y[i][y]))
-                    # file.close()
+        file = open(os.path.join(path,label+'_inputs.tbmnew'),'w')
+        file.write('{0}\n'.format(label))
+        for item in self.inputs:
+            file.write('{0}\n'.format(item))
+        for item in self.t_inputs:
+            file.write('{0}\n'.format(item))
+        if self.bottom_bars.size()==0:
+            pass
+        else:
+            bottom_bars_raw = self.bottom_bars.get(0,tk.END)
+            bottom_bars_num_raw = self.bottom_bars_count.get(0,tk.END)
+            bottom_bars_d_raw = self.bottom_bars_d.get(0,tk.END)
+            bottom_bars_as_raw = self.bottom_bars_as.get(0,tk.END)
+            for i in range(0,len(bottom_bars_raw)):
+                file.write('B,{0},{1},{2},{3}\n'.format(bottom_bars_raw[i],bottom_bars_num_raw[i],bottom_bars_as_raw[i],bottom_bars_d_raw[i]))
+        if self.top_bars.size()==0:
+            pass
+        else:
+            top_bars_raw = self.top_bars.get(0,tk.END)
+            top_bars_num_raw = self.top_bars_count.get(0,tk.END)
+            top_bars_d_raw = self.top_bars_d.get(0,tk.END)
+            top_bars_as_raw = self.top_bars_as.get(0,tk.END)
+            for i in range(0,len(top_bars_raw)):
+                file.write('T,{0},{1},{2},{3}\n'.format(top_bars_raw[i],top_bars_num_raw[i],top_bars_as_raw[i],top_bars_d_raw[i]))
+        file.close()
+        
+        file = open(os.path.join(path,label+'_results.txt'),'w')
+        file.write(self.line1)
+        file.write(self.line2)
+        file.write(self.line3)
+        file.write(self.line4)
+        file.write(self.line5)
+        file.write(self.line6)
+        file.write(self.line7)
+        file.write('\n\nCONCRETE RESULTS:\n(Moments taken about the overall steel center of gravity)')
+        file.write('\nConcrete Compression: {0:.3f} kips\nCompression Block Centroid: {1:.3f} in from top'.format(self.concrete_dxf[0]/1000,self.concrete_dxf[1]))
+        file.write('\n\nREINFORCEMENT RESULTS:\n(Moments taken about the overall steel center of gravity)')
+        file.write('\nSteel Centroid: {0:.3f} in from top\nTension Steel Centroid: {1:.3f} in from top\n'.format(self.flexural_bars_cg,self.bottom_bars_cg))
+        file.write('{0:^30}{1:^30}{2:^30}{3:^30}{4:^30}{5:^30}{6:^30}{7:^30}\n'.format('Bar #', 'Num. of Bars', 'As (in^2)', 'd (in)','es (in)','fs (psi)','Fs (lbs)', 'Ms (ft-lbs)'))
+        if self.bottom_bars.size()==0:
+            pass
+        else:
+            bottom_bars_raw = self.bottom_bars.get(0,tk.END)
+            bottom_bars_num_raw = self.bottom_bars_count.get(0,tk.END)
+            bottom_bars_d_raw = self.bottom_bars_d.get(0,tk.END)
+            bottom_bars_as_raw = self.bottom_bars_as.get(0,tk.END)
+            bottom_bars_es_raw = self.bottom_bars_strain.get(0,tk.END)
+            bottom_bars_fs_raw = self.bottom_bars_stress.get(0,tk.END)
+            bottom_bars_force_raw = self.bottom_bars_axial.get(0,tk.END)
+            bottom_bars_m_raw = self.bottom_bars_moment.get(0,tk.END)
+            for i in range(0,len(bottom_bars_raw)):
+                file.write('{0:^30}{1:^30}{2:^30}{3:^30}{4:^30}{5:^30}{6:^30}{7:^30}\n'.format(bottom_bars_raw[i],bottom_bars_num_raw[i],bottom_bars_as_raw[i],bottom_bars_d_raw[i],bottom_bars_es_raw[i],bottom_bars_fs_raw[i],bottom_bars_force_raw[i],bottom_bars_m_raw[i]))
+        if self.top_bars.size()==0:
+            pass
+        else:
+            top_bars_raw = self.top_bars.get(0,tk.END)
+            top_bars_num_raw = self.top_bars_count.get(0,tk.END)
+            top_bars_d_raw = self.top_bars_d.get(0,tk.END)
+            top_bars_as_raw = self.top_bars_as.get(0,tk.END)
+            top_bars_es_raw = self.top_bars_strain.get(0,tk.END)
+            top_bars_fs_raw = self.top_bars_stress.get(0,tk.END)
+            top_bars_force_raw = self.top_bars_axial.get(0,tk.END)
+            top_bars_m_raw = self.top_bars_moment.get(0,tk.END)
+            for i in range(0,len(top_bars_raw)):
+                file.write('{0:^30}{1:^30}{2:^30}{3:^30}{4:^30}{5:^30}{6:^30}{7:^30}\n'.format(top_bars_raw[i],top_bars_num_raw[i],top_bars_as_raw[i],top_bars_d_raw[i],top_bars_es_raw[i],top_bars_fs_raw[i],top_bars_force_raw[i],top_bars_m_raw[i]))
+        file.write('\nNote: Program calculated steel elevations - d')
+        file.close()
+        
+        self.label_error.configure(text ='Inputs and Results saved to - '+ path)
+        
+    def file_open(self):
+        filename = tkFileDialog.askopenfilename()
+        calc_file = open(filename,'r')
+        calc_data = calc_file.readlines()
+        calc_file.close()
 
+
+        self.section_info.set(calc_data[0].rstrip('\n'))
+        self.section_b.set(calc_data[1].rstrip('\n'))
+        self.section_h.set(calc_data[2].rstrip('\n'))
+        self.section_cover.set(calc_data[3].rstrip('\n'))
+        self.section_agg.set(calc_data[4].rstrip('\n'))
+        self.section_fprimec.set(calc_data[5].rstrip('\n'))
+        self.section_density.set(calc_data[6].rstrip('\n'))
+        self.section_shear_bar.set(calc_data[7].rstrip('\n'))
+        self.section_shear_bar_size.set(calc_data[8].rstrip('\n'))
+        self.section_flexural_bar.set(calc_data[9].rstrip('\n'))
+        self.section_span.set(calc_data[10].rstrip('\n'))
+        self.section_slab_thickness.set(calc_data[11].rstrip('\n'))
+        self.section_span_slab_left.set(calc_data[12].rstrip('\n'))
+        self.section_span_slab_right.set(calc_data[13].rstrip('\n'))
+        self.section_bf.set(calc_data[14].rstrip('\n'))
+        self.section_hf.set(calc_data[15].rstrip('\n'))
+        
+        for i in range(16,len(calc_data)):
+            bars = calc_data[i].split(',')
+            if bars[0] == 'B':
+                self.bottom_bars.insert(tk.END,bars[1])
+                self.bottom_bars_count.insert(tk.END,bars[2].rstrip('\n'))
+            else:
+                self.top_bars.insert(tk.END,bars[1])
+                self.top_bars_count.insert(tk.END,bars[2].rstrip('\n'))
+
+        self.create_section()
+        self.run_file()
+        self.label_error.configure(text ='File opened from - '+ filename)
 def main():
     root = tk.Tk()
     root.title("Concrete T Beam")
