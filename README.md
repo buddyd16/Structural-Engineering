@@ -12,7 +12,7 @@ Provides various code defined capacities based on strain compatibility. Allows f
 layers. Does not check or provide for min spacing of tension layer bars nor maximum amount of bars that fit in a layer.
 
 ## Three Moment Method
-Contains a class for the Three Moment Method for continuous beam analysis.
+Contains a class for the Three Moment Method for continuous beam analysis. Refer to the comments in the py file for additional information.
 
 ## Beam Patterning - depends on having the point and udl GIF files in same directory as the py file
 A Tkinter GUI based Python program implimenting IBC 2012 load combinations and load patterning. Analysis is done using the Three moment method. Results are displayed on screen and CSV and DXF files are created and placed in RESULTS folder on the users desktop. NOTE: When using the prescribed support displacement option the beam slope diagram and values are incorrect. Deflection values have been corrected using small angle approximations. The effect of the support displacement can be toggled on and off in the results window for shear, moment, slope and deflection charts. Limit to 8 spans or less, based on testing will run into a memory limit at 9 spans with patterning considered this is due to exponetial increase in number of patterns to solve and the results arrays generated.
