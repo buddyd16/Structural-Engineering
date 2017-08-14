@@ -18,7 +18,7 @@ Beam Patterning
 A Tkinter GUI based Python program implimenting IBC 2012 load combinations and load patterning. Analysis is done using the Three moment method. Results are displayed on screen and CSV and DXF files are created and placed in RESULTS folder on the users desktop. NOTE: When using the prescribed support displacement option the beam slope diagram and values are incorrect. Deflection values have been corrected using small angle approximations. The effect of the support displacement can be toggled on and off in the results window for shear, moment, slope and deflection charts.
 
 ASIC Shapes Database - depends on having the excel file in the same directory as the py file
-A Tkinter GUI based Python program to sort and filter steel shapes built off the freely avaiable excel file provided by AISC, https://www.aisc.org/publications/steel-construction-manual-resources/
+A Tkinter GUI based Python program to sort and filter steel shapes built off the freely available excel file provided by AISC, https://www.aisc.org/publications/steel-construction-manual-resources/
 
 ASIC Shapes Historic Database - depends on having the excel file in the same directory as the py file
-A Tkinter GUI based Python program to sort and filter historic steel shapes built off the freely avaiable excel file provided by AISC, https://www.aisc.org/publications/steel-construction-manual-resources/
+A Tkinter GUI based Python program to sort and filter historic steel shapes built off the freely available excel file provided by AISC, https://www.aisc.org/publications/steel-construction-manual-resources/
