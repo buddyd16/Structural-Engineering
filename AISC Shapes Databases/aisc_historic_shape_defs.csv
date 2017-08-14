@@ -1,0 +1,101 @@
+A-Cross-sectional area, in.2
+d-Overall depth of member (longer leg for angles), in.
+tw-Web thickness, in.
+tw/2-Web half-thickness, in.
+bf-Flange width, in.
+tf-Flange thickness, in.
+T-Detailing depth between the web toes of the fillets, in.
+k-Detailing distance from outer face of flange to web toe of fillet, in.
+k1-Detailing distance from center of web to flange toe of fillet, in.
+W-Weight, lb/ft
+bf/2tf-Slenderness ratio,-
+h/tw-Slenderness ratio,-
+Fy'''-The theoretical maximum yield stress based on the web depth-thickness ratio (h / tw) above which the web of a column is considered a slender element, ksi
+X1-Beam buckling factor, ksi 
+X2-Beam buckling factor, (1/ksi^2 × 10^6)
+Ix-Moment of inertia about the x-axis, in.4
+Zx-Plastic section modulus about the x-axis, in.3
+Sx-Elastic section modulus about the x-axis, in.3 
+rx-Radius of gyration about the x-axis, in.
+y-Vertical distance from designated member edge as defined in the AISC Steel Construction Manual to centroidal axis, in.
+yp –Vertical distance from designated member edge as defined in the AISC Steel Construction Manual to plastic neutral axis, in.
+Iy-Moment of inertia about the y-axis, in.4
+Zy-Plastic section modulus about the y-axis, in.3
+Sy-Elastic section modulus about the y-axis, in.3
+ry-Radius of gyration about the y-axis, in.
+x-Horizontal distance from designated member edge as defined in the AISC Steel Construction Manual to centroidal axis, in.
+xp-Horizontal distance from designated member edge as defined in the AISC Steel Construction Manual to plastic neutral axis, in.
+rz-Radius of gyration about the z-axis, in.
+maxf-Maximum flange fastener, in.
+Grip-Grip, in.
+eo-Horizontal distance from designated edge of member to shear center location, in.
+Qs36-Reduction factor for slender unstiffened compression elements in members other than double angles for 36 ksi material,-
+Qs50-Reduction factor for slender unstiffened compression elements in members other than double angles for 50 ksi material,-
+Qs36c*-Reduction factor for slender unstiffened compression elements for 36 ksi material with angles in contact.*Where no value of Qs is shown for applicable sections the angles comply with the noncompact section criteria of the AISC Specification and may be considered fully effective.,-
+Qs50c*-Reduction factor for slender unstiffened compression elements for 50 ksi material with angles in contact.*Where no value of Qs is shown for applicable sections the angles comply with the noncompact section criteria of the AISC Specification and may be considered fully effective.,-
+Qs36s*-Reduction factor for slender unstiffened compression elements for 36 ksi material with angles separated.*Where no value of Qs is shown for applicable sections the angles comply with the noncompact section criteria of the AISC Specification and may be considered fully effective.,-
+Qs50s*-Reduction factor for slender unstiffened compression elements for 50 ksi material with angles separated.*Where no value of Qs is shown for applicable sections the angles comply with the noncompact section criteria of the AISC Specification and may be considered fully effective.,-
+Astem-Stem cross-sectional area for a tee, in.2
+tan(alpha)-Tangent of the angle between the y-y and z-z axes for single angles,-
+twstem-Stem thickness for a tee or Z-section, in.
+twstem/2-Stem half-thickness for a tee, in.
+OD-Outside diameter, in.
+ID-Inside diameter, in.
+twall-Wall thickness, in.
+J-Torsional moment of inertia, in.4 
+t-Thickness, in.
+Iy'-Moment of inertia about the y-y axis for bearing piles, in.4
+Sy'-Elastic section modulus about the y-y axis for bearing piles, in.3
+ry'-Radius of gyration about the y-y axis for bearing piles, in.
+sched-ASA Schedule Number,-
+Anet36-Theoretical net area for ASTM A36 material based on Section 1.9.1 of the AISC Specification in the 6th Edition AISC Manual, in.2
+d1A36-Theoretical depth of tee for ASTM A36 material based on Section 1.9.1 of the AISC Specification in the 6th Edition AISC Manual, in.
+IxA36-Theoretical moment of inertia about the x-x axis for ASTM A36 material based on Section 1.9.1 of the AISC Specification in the 6th Edition AISC Manual, in.4
+SxA36-Elastic section modulus about the x-x axis based on Section 1.9.1 of the AISC Specification in the 6th Edition AISC Manual, in.3
+rxA36-Theoretical radius of gyration about the x-x axis for ASTM A36 material based on Section 1.9.1 of the AISC Specification in the 6th Edition AISC Manual, in.
+y1A36-Theoretical distance from the neutral axis to the centroid of a section about the x-x axis for ASTM A36 material based on Section 1.9.1 of the AISC Specification in the 6th Edition AISC Manual, in.
+ryA36-Theoretical radius of gyration about the y-y axis for ASTM A36 material based on Section 1.9.1 of the AISC Specification in the 6th Edition AISC Manual, in.
+AnetASTM-Theoretical net area for ASTM A242 A440 and A441 materials based on Section 1.9.1 of the AISC Specification in the 6th Edition AISC Manual, in.2
+d1ASTM-Theoretical depth of tee for ASTM A242 A440 and A441 materials based on Section 1.9.1 of the AISC Specification in the 6th Edition AISC Manual, in.
+IxASTM-Theoretical moment of inertia about the x-x axis for ASTM A242 A440 and A441 materials based on Section 1.9.1 of the AISC Specification in the 6th Edition AISC Manual, in.4
+SxASTM-Theoretical section modulus about the x-x axis for ASTM A242 A440 and A441 materials based on Section 1.9.1 of the AISC Specification in the 6th Edition AISC Manual, in.3
+rxASTM-Theoretical radius of gyration about the x-x axis for ASTM A242 A440 and A441 materials based on Section 1.9.1 of the AISC Specification in the 6th Edition AISC Manual, in.
+y1ASTM-Theoretical distance from the neutral axis to the centroid of a section about the x-x axis for ASTM A242 A440 and A441 materials based on Section 1.9.1 of the AISC Specification in the 6th Edition AISC  Steel Construction Manual, in.
+ryASTM-Theoretical radius of gyration about the y-y axis for ASTM A242 A440 and A441 materials based on Section 1.9.1 of the AISC Specification in the 6th Edition AISC Steel Construction Manual, in.
+d/t-Slenderness ratio,-
+ry0-Polar radius of gyration, in.
+ry1_4-Radius of gyration about the y-y axis for angles separated by 4 in., in.
+ry3_8-Radius of gyration about the y-y axis for angles separated by a in., in.
+ry1_2-Radius of gyration about the y-y axis for angles separated by 2 in., in.
+ry5_8-Radius of gyration about the y-y axis for angles separated by a in., in.
+ry3_4-Radius of gyration about the y-y axis for angles separated by w in., in.
+d/Af-Depth divided by flange area, in.-1
+rT-Radius of gyration of a section comprising the compression flange plus one-third of the compression web area taken about an axis in the plane of the web, in.
+Fy''-Theoretical maximum yield stress based on the width-thickness ratio of the web beyond which a particular shape is not "compact", ksi
+Cw-Warping constant for a section, in.6
+Fy'-Theoretical maximum yield stress based on the width-thickness ratio of one-half the unstiffened compression flange beyond which a particular shape is not "compact", ksi
+Cc50'-Column slenderness ratio dividing elastic and inelastic buckling modified to account for effective width of wide compression elements for 50 ksi material,-
+Cc36'-Column slenderness ratio dividing elastic and inelastic buckling modified to account for effective width of wide compression elements for 36 ksi material,-
+a-Torsion property (a = sqrt(E*Cw/G*J)), in.
+Wno-Normalized warping constant, in.2
+Sw-Warping statical moment, in.4
+Qf-Statical moment at point in flange, in.3
+Qw-Statical moment at mid-depth of the section, in.3
+B-Overall width of member (shorter leg for angles), in.
+Ht/t-Slenderness ratio for HSS,-
+Ht-Depth of HSS, in.
+tnom-HSS nominal wall thickness, in.
+tdes-HSS design wall thickness, in.
+b/t-Slenderness ratio for HSS,-
+C-HSS torsional constant, in.3
+ro-Polar radius of gyration about the shear center, in.
+H-Flexural constant,-
+ddet-Detailing value of member depth, in.
+bfdet-Detailing value of flange width, in.
+twdet-Detailing value of web thickness, in.
+tfdet-Detailing value of flange thickness, in.
+kdes-Design distance from outer face,-
+kdet – Detailing distance from outer face of flange to web toe of fillet, in.
+B/t-Slenderness ratio for HSS,-
+Sz-Elastic section modulus about the z-axis for single angles, in.3
+Qs-Reduction factor for slender unstiffened compression elements,-
