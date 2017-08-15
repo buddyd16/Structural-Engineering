@@ -12,13 +12,13 @@ bf/2tf-Slenderness ratio,-
 h/tw-Slenderness ratio,-
 Fy'''-The theoretical maximum yield stress based on the web depth-thickness ratio (h / tw) above which the web of a column is considered a slender element, ksi
 X1-Beam buckling factor, ksi 
-X2-Beam buckling factor, (1/ksi^2 × 10^6)
+X2-Beam buckling factor, (1/ksi^2 Ã— 10^6)
 Ix-Moment of inertia about the x-axis, in.4
 Zx-Plastic section modulus about the x-axis, in.3
 Sx-Elastic section modulus about the x-axis, in.3 
 rx-Radius of gyration about the x-axis, in.
 y-Vertical distance from designated member edge as defined in the AISC Steel Construction Manual to centroidal axis, in.
-yp –Vertical distance from designated member edge as defined in the AISC Steel Construction Manual to plastic neutral axis, in.
+yp â€“Vertical distance from designated member edge as defined in the AISC Steel Construction Manual to plastic neutral axis, in.
 Iy-Moment of inertia about the y-axis, in.4
 Zy-Plastic section modulus about the y-axis, in.3
 Sy-Elastic section modulus about the y-axis, in.3
@@ -95,7 +95,7 @@ bfdet-Detailing value of flange width, in.
 twdet-Detailing value of web thickness, in.
 tfdet-Detailing value of flange thickness, in.
 kdes-Design distance from outer face,-
-kdet – Detailing distance from outer face of flange to web toe of fillet, in.
+kdet â€“ Detailing distance from outer face of flange to web toe of fillet, in.
 B/t-Slenderness ratio for HSS,-
 Sz-Elastic section modulus about the z-axis for single angles, in.3
 Qs-Reduction factor for slender unstiffened compression elements,-
