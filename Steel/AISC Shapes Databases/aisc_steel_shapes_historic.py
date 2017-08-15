@@ -395,7 +395,7 @@ class Master_window:
         
 def main():
     root = tk.Tk()
-    root.title("AISC 14th Edition - Shape Database")
+    root.title("AISC Historic - Shape Database")
     app = Master_window(root)
     root.minsize(800,600)
     root.mainloop()
