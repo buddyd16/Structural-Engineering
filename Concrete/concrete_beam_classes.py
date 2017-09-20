@@ -480,7 +480,7 @@ class t_beam:
 
     def find_pna(self,bars_as_array,bars_d_array,bars_cg,fy_psi,Es_psi):
         a=0
-        b=bars_d_array[0]
+        b=max(bars_d_array)
         c=0
         pna = 0
 
