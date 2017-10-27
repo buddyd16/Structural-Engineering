@@ -649,6 +649,7 @@ class Results_window():
         self.lrfd_type = tk.Radiobutton(self.type_frame_select, text = "LRFD", variable=self.combo_type, value=3, command= self.lrfd).pack(side=tk.LEFT, anchor=tk.NW, padx= 5, pady= 1)
         self.combo_type.set(1)
         self.type_frame_select.pack(side=tk.TOP, anchor=tk.NW, fill=tk.BOTH)
+        
         self.combo_pattern_frame = tk.Frame(self.frame_selection)
         self.combo_frame = tk.LabelFrame(self.combo_pattern_frame, text='Combo', relief='sunken', padx=5, pady=5)
 
@@ -689,6 +690,20 @@ class Results_window():
         self.pattern_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.pattern_frame.pack(side = tk.LEFT)
         self.combo_pattern_frame.pack(side = tk.TOP)
+        
+        self.per_span_res_frame = tk.Frame(self.frame_selection,relief='sunken')
+        stations = Main_window.stations
+        print stations
+        self.span_res_scale = tk.Scale(self.per_span_res_frame, from_=0, to=stations, orient=tk.HORIZONTAL, label = "Location in Span:", length = 300, command=self.span_res_run)
+        self.span_res_scale.pack(side=tk.TOP, padx=5, pady=5)
+        self.span_res_b_plus = tk.Button(self.per_span_res_frame,text='+', command = self.set_span_res_plus)
+        self.span_res_b_plus.pack(side=tk.RIGHT)
+        self.span_res_b_minus = tk.Button(self.per_span_res_frame,text='-', command = self.set_span_res_minus)
+        self.span_res_b_minus.pack(side=tk.RIGHT)
+        self.span_res_label = tk.Label(self.per_span_res_frame, text="per span results here")
+        self.span_res_label.pack(side=tk.TOP)
+        self.per_span_res_frame.pack(side = tk.TOP)
+        
         self.frame_selection.pack(side=tk.LEFT, fill=tk.BOTH)
 
         ## Chart Frame and selection frames
@@ -728,11 +743,14 @@ class Results_window():
         self.linebm = []
         self.clabels = []
         self.clabels_pts = []
+        self.x = 0
+        self.y = 0
+        self.ymax = 0
         for i in range(Main_window.xs.shape[1]):
             self.linebm.append(self.FigSubPlot.plot(Main_window.xs[:,i],Main_window.bm[:,i]))
             self.linevmsd.append(self.FigSubPlot.plot(Main_window.xs[:,i],Main_window.bm[:,i]))
             self.lineenvmin.append(self.FigSubPlot.plot(Main_window.xs[:,i],Main_window.bm[:,i]))
-
+        self.res_points = self.FigSubPlot.plot(0,0,'k+', markersize=15)
         self.canvas = matplotlib.backends.backend_tkagg.FigureCanvasTkAgg(self.Fig, master=self.chart_frame)
         self.canvas.show()
         self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
@@ -795,6 +813,7 @@ class Results_window():
             self.drun()
         else:
             pass
+            
     def sup_disp_click(self, *event):
         dia = self.vmsd.get()
         self.graph_start()
@@ -910,13 +929,13 @@ class Results_window():
             basic_combo = self.combo_index
             if basic_combo in range(5,9):
                 if self.pattern_index in range(0,len(Main_window.pats)):
-                    R = Main_window.load_results[basic_combo][6][1][self.pattern_index]
-                    M = Main_window.load_results[basic_combo][7][1][self.pattern_index]
+                    R = Main_window.load_results[basic_combo][6][1][self.pattern_index]+ Main_window.load_results[basic_combo][6][0]
+                    M = Main_window.load_results[basic_combo][7][1][self.pattern_index]+ Main_window.load_results[basic_combo][7][0]
                 else:
-                    R = np.maximum.reduce(Main_window.load_results[basic_combo][6][1])
-                    M = np.maximum.reduce(Main_window.load_results[basic_combo][7][1])
-                    Rmin = np.minimum.reduce(Main_window.load_results[basic_combo][6][1])
-                    Mmin = np.minimum.reduce(Main_window.load_results[basic_combo][7][1])
+                    R = np.maximum.reduce(Main_window.load_results[basic_combo][6][1])+ Main_window.load_results[basic_combo][6][0]
+                    M = np.maximum.reduce(Main_window.load_results[basic_combo][7][1])+ Main_window.load_results[basic_combo][7][0]
+                    Rmin = np.minimum.reduce(Main_window.load_results[basic_combo][6][1])+ Main_window.load_results[basic_combo][6][0]
+                    Mmin = np.minimum.reduce(Main_window.load_results[basic_combo][7][1])+ Main_window.load_results[basic_combo][7][0]
             else:
                 if basic_combo == 11:
                     R = Main_window.displace_initial_results[4]
@@ -952,8 +971,92 @@ class Results_window():
         self.res_M.configure(text=m_string)
         self.res_combo.configure(text=self.combo_string)
 
+    def span_res_run(self, *event):
+        dia = self.vmsd.get()
+        station = self.span_res_scale.get()
+        text_res = ''
+        x=[]
+        y=[]
+        for j in range(self.x.shape[1]):
+            if self.combo_string == 'LRFD Envelope' or self.combo_string == 'ASD/Basic Envelope' or self.pattern_string == 'Envelope':
+                if j==0:
+                    if dia == 1:
+                        text_res = text_res + 'Span {2}: Vmax = {0:.3f} kips @ {1} ft\n'.format(self.y[station,j],self.x[station,j], j+1)
+                        text_res = text_res + 'Span {2}: Vmin = {0:.3f} kips @ {1} ft\n'.format(self.ymin[station,j],self.x[station,j], j+1)
+                    elif dia == 2:
+                        text_res = text_res + 'Span {2}: Mmax = {0:.3f} ft-kips @ {1} ft\n'.format(self.y[station,j],self.x[station,j], j+1)
+                        text_res = text_res + 'Span {2}: Mmin = {0:.3f} ft-kips @ {1} ft\n'.format(self.ymin[station,j],self.x[station,j], j+1)
+                    elif dia == 3:
+                        text_res = text_res + 'Span {2}: Smax = {0:.5f} rads @ {1} ft\n'.format(self.y[station,j],self.x[station,j], j+1)
+                        text_res = text_res + 'Span {2}: Smin = {0:.5f} rads @ {1} ft\n'.format(self.ymin[station,j],self.x[station,j], j+1)
+                    elif dia == 4:
+                        text_res = text_res + 'Span {2}: Delta max = {0:.4f} in @ {1} ft\n'.format(self.y[station,j],self.x[station,j], j+1)
+                        text_res = text_res + 'Span {2}: Delta min = {0:.4f} in @ {1} ft\n'.format(self.ymin[station,j],self.x[station,j], j+1)
+                    else:
+                        pass
+                else:
+                    if dia == 1:
+                        text_res = text_res + 'Span {2}: Vmax = {0:.3f} kips @ {1} ft ({3} ft)\n'.format(self.y[station,j],self.x[station,j], j+1,self.x[station,j]-self.x[-1,j-1])
+                        text_res = text_res + 'Span {2}: Vmin = {0:.3f} kips @ {1} ft ({3} ft)\n'.format(self.ymin[station,j],self.x[station,j], j+1,self.x[station,j]-self.x[-1,j-1])
+                    elif dia == 2:
+                        text_res = text_res + 'Span {2}: Mmax = {0:.3f} ft-kips @ {1} ft ({3} ft)\n'.format(self.y[station,j],self.x[station,j], j+1,self.x[station,j]-self.x[-1,j-1])
+                        text_res = text_res + 'Span {2}: Mmin = {0:.3f} ft-kips @ {1} ft ({3} ft)\n'.format(self.ymin[station,j],self.x[station,j], j+1,self.x[station,j]-self.x[-1,j-1])
+                    elif dia == 3:
+                        text_res = text_res + 'Span {2}: Smax = {0:.5f} rads @ {1} ft ({3} ft)\n'.format(self.y[station,j],self.x[station,j], j+1,self.x[station,j]-self.x[-1,j-1])
+                        text_res = text_res + 'Span {2}: Smin = {0:.5f} rads @ {1} ft ({3} ft)\n'.format(self.ymin[station,j],self.x[station,j], j+1,self.x[station,j]-self.x[-1,j-1])
+                    elif dia == 4:
+                        text_res = text_res + 'Span {2}: Delta max = {0:.4f} in @ {1} ft ({3} ft)\n'.format(self.y[station,j],self.x[station,j], j+1,self.x[station,j]-self.x[-1,j-1])
+                        text_res = text_res + 'Span {2}: Delta min = {0:.4f} in @ {1} ft ({3} ft)\n'.format(self.ymin[station,j],self.x[station,j], j+1,self.x[station,j]-self.x[-1,j-1])
+                    else:
+                        pass
+                x.append(self.x[station,j])
+                y.append(self.y[station,j])
+                x.append(self.x[station,j])
+                y.append(self.ymin[station,j])
+            else:
+                if j==0:
+                    if dia == 1:
+                        text_res = text_res + 'Span {2}: V = {0:.3f} kips @ {1} ft\n'.format(self.y[station,j],self.x[station,j], j+1)
+                    elif dia == 2:
+                        text_res = text_res + 'Span {2}: M = {0:.3f} ft-kips @ {1} ft\n'.format(self.y[station,j],self.x[station,j], j+1)
+                    elif dia == 3:
+                        text_res = text_res + 'Span {2}: S = {0:.5f} rads @ {1} ft\n'.format(self.y[station,j],self.x[station,j], j+1)
+                    elif dia == 4:
+                        text_res = text_res + 'Span {2}: Delta = {0:.4f} in @ {1} ft\n'.format(self.y[station,j],self.x[station,j], j+1)
+                    else:
+                        pass
+                else:
+                    if dia == 1:
+                        text_res = text_res + 'Span {2}: V = {0:.3f} kips @ {1} ft ({3} ft)\n'.format(self.y[station,j],self.x[station,j], j+1,self.x[station,j]-self.x[-1,j-1])
+                    elif dia == 2:
+                        text_res = text_res + 'Span {2}: M = {0:.3f} ft-kips @ {1} ft ({3} ft)\n'.format(self.y[station,j],self.x[station,j], j+1,self.x[station,j]-self.x[-1,j-1])
+                    elif dia == 3:
+                        text_res = text_res + 'Span {2}: S = {0:.5f} rads @ {1} ft ({3} ft)\n'.format(self.y[station,j],self.x[station,j], j+1,self.x[station,j]-self.x[-1,j-1])
+                    elif dia == 4:
+                        text_res = text_res + 'Span {2}: Delta = {0:.4f} in @ {1} ft ({3} ft)\n'.format(self.y[station,j],self.x[station,j], j+1,self.x[station,j]-self.x[-1,j-1])
+                    else:
+                        pass
+                x.append(self.x[station,j])
+                y.append(self.y[station,j])
+            
+        self.span_res_label.config(text = text_res)
+        
+        self.res_points[0].set_xdata(x)
+        self.res_points[0].set_ydata(y)
+        self.canvas.draw()
 
+    def set_span_res_plus(self):
+        station = self.span_res_scale.get()
+        self.span_res_scale.set(station+1)
+        
+    def set_span_res_minus(self):
+        station = self.span_res_scale.get()
+        self.span_res_scale.set(station-1)
+        
     def refreshFigure(self, x, y, yenv, dia, dec):
+        self.x = x
+        self.y = y
+        self.ymin = yenv
         combo = self.combo_type.get()
         for i in range(x.shape[1]):
             self.linevmsd[i][0].set_ydata(y[:,i])
@@ -1016,6 +1119,7 @@ class Results_window():
         self.FigSubPlot.set_ylabel(dia)
         self.FigSubPlot.set_title(Main_window.calc_label+'\n'+self.combo_string+'\n'+self.pattern_string)
         self.canvas.draw()
+        self.span_res_run()
 
     def vrun(self):
         combo = self.combo_type.get()
