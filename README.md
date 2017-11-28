@@ -21,7 +21,7 @@ A Tkinter GUI based Python program implimenting IBC 2012 load combinations and l
 ## ASIC Shapes Database - depends on having the excel file in the same directory as the py file
 A Tkinter GUI based Python program to sort and filter steel shapes built off the freely available excel file provided by AISC, https://www.aisc.org/publications/steel-construction-manual-resources/
 
-## ASIC Shapes Historic Database - depends on having the excel file in the same directory as the py file
+## AISC Shapes Historic Database - depends on having the excel file in the same directory as the py file
 A Tkinter GUI based Python program to sort and filter historic steel shapes built off the freely available excel file provided by AISC, https://www.aisc.org/publications/steel-construction-manual-resources/
 
 ## Section Props - GUI
