@@ -20,11 +20,11 @@ A Tkinter GUI based Python program implimenting IBC 2012 load combinations and l
 
 ## 14th Edition AISC Shapes Database - depends on having the excel file in the same directory as the py file
 A Tkinter GUI based Python program to sort and filter steel shapes built off the freely available excel file provided by AISC, https://www.aisc.org/publications/steel-construction-manual-resources/
-11.30.2017: AISC now offers the 15th edition as excel files
+#11.30.2017: AISC now offers the 15th edition as excel files
 
 ## 14th Edition AISC Shapes Historic Database - depends on having the excel file in the same directory as the py file
 A Tkinter GUI based Python program to sort and filter historic steel shapes built off the freely available excel file provided by AISC, https://www.aisc.org/publications/steel-construction-manual-resources/
-11.30.2017: AISC now offers the 15th edition as excel files
+#11.30.2017: AISC now offers the 15th edition as excel files
 
 ## Section Props - GUI
 A Tkinter GUI based Python program implementing Green's Theorem on a set of user input vertex points. **Note: Scrutenize results where the defined shape centroid is 0,0 implemented a fix in the code but generally Sx or Sy is per I/x or y which would result in a divide by zero error if either coordinate of the centroid was at 0. The "fix" implemented takes the distance from the furthest vertex point in either the x or y direction for the claculation of Sx or Sy.
