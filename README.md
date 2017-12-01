@@ -19,6 +19,7 @@ Contains a class for the Three Moment Method for continuous beam analysis. Refer
 A Tkinter GUI based Python program implimenting IBC 2012 load combinations and load patterning. Analysis is done using the Three moment method. Results are displayed on screen and CSV and DXF files are created and placed in RESULTS folder on the users desktop. NOTE: When using the prescribed support displacement option the beam slope diagram and values are incorrect. Deflection values have been corrected using small angle approximations. The effect of the support displacement can be toggled on and off in the results window for shear, moment, slope and deflection charts. Limit to 8 spans or less, based on testing will run into a memory limit at 9 spans with patterning considered this is due to exponetial increase in number of patterns to solve and the results arrays generated.
 
 ## 14th Edition AISC Shapes Database - depends on having the excel file in the same directory as the py file
+**This is in no way affiliated or endorsed in whole or in part by AISC this is a personal project being provided for anyone's general use at no cost.
 A Tkinter GUI based Python program to sort and filter steel shapes built off the freely available excel file provided by AISC, https://www.aisc.org/publications/steel-construction-manual-resources/
 
 #11.30.2017: AISC now offers the 15th edition as excel files
@@ -26,6 +27,7 @@ A Tkinter GUI based Python program to sort and filter steel shapes built off the
 #11.30.2017: zip file in directory contains a compiled version for windows, no installation required simply run the .exe
 
 ## 14th Edition AISC Shapes Historic Database - depends on having the excel file in the same directory as the py file
+**This is in no way affiliated or endorsed in whole or in part by AISC this is a personal project being provided for anyone's general use at no cost.
 A Tkinter GUI based Python program to sort and filter historic steel shapes built off the freely available excel file provided by AISC, https://www.aisc.org/publications/steel-construction-manual-resources/
 
 #11.30.2017: AISC now offers the 15th edition as excel files
