@@ -210,6 +210,9 @@ class three_moment_method(object):
         #               a = Load location from left support -- Expected Units: in
         #               'POINT' = Loading type as string and in all caps options are: 'POINT', 'UDL', or 'TRAP'
         #               span = integer indicating what span the load is in -- 0 for first span
+        #                     P
+        #               ___a__|_____
+        #               ^           ^
         #           Uniform loads:
         #           [w,w,a,b,'UDL',span]
         #               w = Load -- Expected Units: lbs per in
@@ -217,6 +220,9 @@ class three_moment_method(object):
         #               b = Load width -- Expected Units: in -- a + b = end location from left support be careful to make sure this is not greater than the span length
         #               'UDL' = Loading type as string and in all caps options are: 'POINT', 'UDL', or 'TRAP'
         #               span = integer indicating what span the load is in -- 0 for first span
+        #                    ____w__
+        #               ___a_|__b__|_____
+        #               ^               ^
         #           Trapezoidal Loads:
         #           [w1,w2,a,b,'TRAP',span]
         #               w1 = Start Load -- Expected Units: lbs per in
@@ -225,6 +231,10 @@ class three_moment_method(object):
         #               b = Load width -- Expected Units: in -- a + b = end location from left support be careful to make sure this is not greater than the span length
         #               'TRAP' = Loading type as string and in all caps options are: 'POINT', 'UDL', or 'TRAP'
         #               span = integer indicating what span the load is in -- 0 for first span
+        #                     w1
+        #                     |     w2
+        #               ___a__|__b__|___
+        #               ^               ^
         #   E = modulus of elasticity assumed to be constant over all spans as a float -- Expected Units: psi
         #   iters = Integer number of stations to create per span
         #   displace = list of support displacements -- Expected Units: in -- Example: if you have N spans you should have N+1 displacement values inclusive of cantilever ends
