@@ -231,7 +231,7 @@ class wood_stud_wall:
         
         if ratio_status == 1.0:
             #FcE = 0.822 * Emin' / (Le/d)^2 - NDS 2005 Section 3.7.1
-            self.fcE_psi = (0.822 * self.Emin_prime_psi)/max(leb / self.b_in,led/self.d_in)
+            self.fcE_psi = (0.822 * self.Emin_prime_psi)/(max(leb/self.b_in,led/self.d_in))**2
             
             #Cp = ([1 + (FcE / Fc*)] / 2c ) - sqrt[ [1 + (FcE / Fc*) / 2c]^2 - (FcE / Fc*) / c] - NDS 2005 Section 3.7.1
             self.cp = ((1+(self.fcE_psi/self.fc_star_psi))/(2*self.c_cp))-((((1+(self.fcE_psi/self.fc_star_psi))/(2*self.c_cp))**2)-((self.fcE_psi/self.fc_star_psi)/self.c_cp))**0.5
@@ -324,7 +324,7 @@ class wood_stud_wall:
         # fc = P/a
         # P = a * Fc'
         
-        self.p_lbs_limit = self.area_in2 * self.fb_prime_calc(cd)
+        self.p_lbs_limit = self.area_in2 * self.fc_prime_calc(cd)
         
         points = 50
         step = self.w_psf_limit/points
@@ -355,6 +355,9 @@ class wood_stud_wall:
 cd = [0.9,1.0,1.15,1.25,1.6,2.0]        
 
 wall = wood_stud_wall()
+fc_prime = wall.fc_prime_calc(1.0)
+cp = wall.cp
+
 fig, ax1 = plt.subplots()
 ax1.minorticks_on()
 ax1.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
@@ -364,6 +367,8 @@ for x in cd:
     w,p,d = wall.wall_interaction_diagram_cd(x)
     ax1.plot(w,p)
 
+#ax1.plot([0,max(w)],[wall.crushing_limit_lbs,wall.crushing_limit_lbs])
+#ax1.plot([0,max(w)],[wall.crushing_limit_lbs_no_cb,wall.crushing_limit_lbs_no_cb])
 ax2.plot(w,d)
     
 ax1.set_ylabel('Axial (lbs)')
