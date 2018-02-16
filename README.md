@@ -38,4 +38,4 @@ A Tkinter GUI based Python program to sort and filter historic steel shapes buil
 A Tkinter GUI based Python program implementing Green's Theorem on a set of user input vertex points. **Note: Scrutenize results where the defined shape centroid is 0,0 implemented a fix in the code but generally Sx or Sy is per I/x or y which would result in a divide by zero error if either coordinate of the centroid was at 0. The "fix" implemented takes the distance from the furthest vertex point in either the x or y direction for the claculation of Sx or Sy.
 
 ## Wood Classes
-Currently only contains a method for wood stud walls. routine outside of the class will generate a P-M curve for a wall.
+Currently only contains a method for wood stud walls. routine outside of the class will generate a P vs Lateral Pressure curve for a wall, generates a curver for each load duration factor. Also plots plate crushing with and without Cb and l/180, l/240, and l/360 cut off lines.
