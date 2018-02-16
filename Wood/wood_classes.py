@@ -50,7 +50,7 @@ class wood_stud_wall:
         #Size Factor, Cf
         #NDS 2005 section 4.3.6 and Table 4A
         #NOTE ASSUMES STUDS ARE VISUALLY GRADED DIMENSION LUMBER 2"-4" AND NOT SOUTHERN PINE AND NORTH AMERICAN SPECIES
-        self.assumptions = 'Size Factor,Cf - Wall Studs are visually graded dimensional lumber 2" to 4" North American Species and not Southern Pine\n'
+        self.assumptions = self.assumptions + 'Size Factor,Cf - Wall Studs are visually graded dimensional lumber 2" to 4" North American Species and not Southern Pine\n'
         if grade == "Stud":
             if self.d_in > 5.5:
                 pass
@@ -271,7 +271,7 @@ class wood_stud_wall:
             #[fc/Fc]'^2 + fb / Fb' [ 1- (fc / FcE)] <= 1.0
             ratio = (fc_psi/fc_prime)**2 + (fb_psi / (fb_prime*(1-(fc_psi/self.fcE_psi))))
             if ratio > 1.0:
-                self.warning=self.warning + 'Combined Axial and Bending ration > 1.0'
+                self.warning=self.warning + 'Combined Axial and Bending ratio > 1.0'
                 return 'NG'
             else:
                 return 'OK'
@@ -363,9 +363,13 @@ class wood_stud_wall:
 #Cd - NDS 2005 Table 2.3.2
 cd = [0.9,1.0,1.15,1.25,1.6,2.0]        
 
-wall = wood_stud_wall()
+wall = wood_stud_wall(1.5,5.5,18,16,"No.2",875,1150,1400000,510000,200,19,90,0,0)
 fc_prime = wall.fc_prime_calc(1.0)
 cp = wall.cp
+
+print '---Warnings--\n'
+print wall.warning
+print wall.assumptions
 
 fig, ax1 = plt.subplots()
 ax1.minorticks_on()
@@ -376,8 +380,8 @@ for x in cd:
     w,p,d = wall.wall_interaction_diagram_cd(x)
     ax1.plot(w,p)
 
-#ax1.plot([0,max(w)],[wall.crushing_limit_lbs,wall.crushing_limit_lbs])
-#ax1.plot([0,max(w)],[wall.crushing_limit_lbs_no_cb,wall.crushing_limit_lbs_no_cb])
+ax1.plot([0,max(w)],[wall.crushing_limit_lbs,wall.crushing_limit_lbs])
+ax1.plot([0,max(w)],[wall.crushing_limit_lbs_no_cb,wall.crushing_limit_lbs_no_cb])
 ax2.plot(w,d)
 ax2.plot([wall.defl_180_w_psf,wall.defl_180_w_psf],[0,max(d)])
 ax2.plot([wall.defl_240_w_psf,wall.defl_240_w_psf],[0,max(d)])
@@ -386,6 +390,8 @@ ax1.set_ylabel('Axial (lbs)')
 ax1.set_xlabel('Pressure (psf)')
 ax2.set_ylabel('Deflection (in)')
 
-plt.title('2x4 SPF No.2 - 10 ft tall - 12" spacing')
+plt.title('2x6 SPF No.2 - 18 ft tall - 16" spacing')
 fig.tight_layout()
 plt.show()
+
+
