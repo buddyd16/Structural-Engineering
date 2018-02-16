@@ -27,6 +27,10 @@ class wood_stud_wall:
         self.Emin_psi = Emin_psi
         self.E_psi = E_psi
         self.fc_perp_pl_psi = fc_perp_pl_psi
+        self.defl_180 = self.height_in/180.0
+        self.defl_240 = self.height_in/240.0
+        self.defl_360 = self.height_in/360.0
+        
 
         #initialize warning log
         self.warning = ''
@@ -202,6 +206,11 @@ class wood_stud_wall:
         #E' = E * Cm * Ct * Ci - NDS 2005 Table 4.3.1
         self.E_prime_psi = self.E_psi * self.cm_E * self.ct_E * self.ci_E
         
+        #Pressure to reach deflection limits
+        self.defl_180_w_psf = ((self.defl_180 * 384 * self.E_prime_psi * self.I_in4) / (1728 * 5 * (self.height_in/12.0)**4))/(self.spacing_in/12.0)
+        self.defl_240_w_psf= ((self.defl_240 * 384 * self.E_prime_psi * self.I_in4) / (1728 * 5 * (self.height_in/12.0)**4))/(self.spacing_in/12.0)
+        self.defl_360_w_psf = ((self.defl_360 * 384 * self.E_prime_psi * self.I_in4) / (1728 * 5 * (self.height_in/12.0)**4))/(self.spacing_in/12.0)
+        
         #Fc,perp' = Fc,perp * Cm * Ct * Ci * Cb- NDS 2005 Table 4.3.1
         self.fc_perp_pl_prime_psi = self.fc_perp_pl_psi * self.cm_fc_perp * self.ct_fc_perp * self.ci_fc_perp * self.cb_fc_perp
         
@@ -370,7 +379,9 @@ for x in cd:
 #ax1.plot([0,max(w)],[wall.crushing_limit_lbs,wall.crushing_limit_lbs])
 #ax1.plot([0,max(w)],[wall.crushing_limit_lbs_no_cb,wall.crushing_limit_lbs_no_cb])
 ax2.plot(w,d)
-    
+ax2.plot([wall.defl_180_w_psf,wall.defl_180_w_psf],[0,max(d)])
+ax2.plot([wall.defl_240_w_psf,wall.defl_240_w_psf],[0,max(d)])
+ax2.plot([wall.defl_360_w_psf,wall.defl_360_w_psf],[0,max(d)])
 ax1.set_ylabel('Axial (lbs)')
 ax1.set_xlabel('Pressure (psf)')
 ax2.set_ylabel('Deflection (in)')
