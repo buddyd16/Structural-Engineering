@@ -8,7 +8,7 @@ from __future__ import division
 import matplotlib.pyplot as plt
 
 class wood_stud_wall:
-    def __init__(self,b_in=1.5,d_in=3.5,height_ft=10, spacing_in=12, grade="No.2", fb_psi=875, fc_psi=1150, E_psi=1400000, Emin_psi=510000, fc_perp_pl_psi=565, moisture_percent = 19, temp = 90, incised = 0,  num_plates = 0):
+    def __init__(self,b_in=1.5,d_in=3.5,height_ft=10, spacing_in=12, grade="No.2", fb_psi=875, fv_psi= 150, fc_psi=1150, E_psi=1400000, Emin_psi=510000, fc_perp_pl_psi=565, moisture_percent = 19, temp = 90, incised = 0,  num_plates = 0, c_frt=[1,1,1,1,1,1]):
         self.b_in = b_in
         self.d_in = d_in
         
@@ -16,17 +16,19 @@ class wood_stud_wall:
         self.height_in = height_ft * 12.0
         if num_plates == 0:
             self.height_in = self.height_in
-            self.assumptions = '--ASSUMPTIONS--\n Wall Height inclusive of top and bottom plates\n'
+            self.assumptions = '\n\n--ASSUMPTIONS--\nWall Height inclusive of top and bottom plates\n'
         else:
             self.height_in = self.height_in - (num_plates * 1.5)
-            self.assumptions = '--ASSUMPTIONS--\n Wall Height - ({1}) 1.5" wall plates\n'.format(num_plates)
+            self.assumptions = '\n\n--ASSUMPTIONS--\nWall Height - ({0}) 1.5" wall plates\n'.format(num_plates)
             
         self.spacing_in = spacing_in
         self.fb_psi = fb_psi
+        self.fv_psi = fv_psi
         self.fc_psi = fc_psi
         self.Emin_psi = Emin_psi
         self.E_psi = E_psi
         self.fc_perp_pl_psi = fc_perp_pl_psi
+        self.c_frt = c_frt
         self.defl_180 = self.height_in/180.0
         self.defl_240 = self.height_in/240.0
         self.defl_360 = self.height_in/360.0
@@ -115,6 +117,7 @@ class wood_stud_wall:
         if moisture_percent > 19:
             self.cm_fc_perp = 0.67
             self.cm_E = 0.9
+            self.cm_fv = 0.97
             if self.fb_psi*self.cf_fb <= 1150:
                 self.cm_fb = 1.0
             else:
@@ -129,6 +132,7 @@ class wood_stud_wall:
             self.cm_fc = 1.0
             self.cm_fc_perp = 1.0
             self.cm_E = 1.0
+            self.cm_fv = 1.0
 
         #Temperature Factor, Ct
         #NDS 2005 section 4.3.4
@@ -138,31 +142,37 @@ class wood_stud_wall:
             self.ct_fb = 0.01
             self.ct_fc = 0.01
             self.ct_fc_perp = 0.01
+            self.ct_fv = 0.01
         elif temp <= 100:
             self.ct_E = 1.0
             self.ct_fb = 1.0
             self.ct_fc = 1.0
             self.ct_fc_perp = 1.0
+            self.ct_fv = 1.0
         elif temp <= 125:
             self.ct_E = 0.9
             if moisture_percent > 19:           
                 self.ct_fb = 0.7
                 self.ct_fc = 0.7
                 self.ct_fc_perp = 0.7
+                self.ct_fv = 0.7
             else:
                 self.ct_fb = 0.8
                 self.ct_fc = 0.8
                 self.ct_fc_perp = 0.8
+                self.ct_fv = 0.8
         else:
             self.ct_E = 0.9
             if moisture_percent > 19:           
                 self.ct_fb = 0.5
                 self.ct_fc = 0.5
                 self.ct_fc_perp = 0.5
+                self.ct_fv = 0.5
             else:
                 self.ct_fb = 0.7
                 self.ct_fc = 0.7
                 self.ct_fc_perp = 0.7
+                self.ct_fv = 0.7
                 
         #Beam Stability Factor, CL
         #NDS 2005 section 4.3.5
@@ -180,12 +190,14 @@ class wood_stud_wall:
             self.ci_E = 0.95
             self.ci_fb = 0.8
             self.ci_fc = 0.8
+            self.ci_fv = 0.8
             self.ci_fc_perp = 1.0
         else:
             self.ci_E = 1.0
             self.ci_fb = 1.0
             self.ci_fc = 1.0
             self.ci_fc_perp = 1.0
+            self.ci_fv = 1.0
         
         #Buckling Siffness Factor, CT
         #NDS 2005 4.3.11
@@ -200,11 +212,13 @@ class wood_stud_wall:
         else:
             self.cb_fc_perp = 1.0
         
+        #Fv' = Fv * Cm * Ct * Ci - apply Cd in Fc and Fb functions
+        self.fv_prime_psi = self.fv_psi * self.cm_fv * self.ct_fv * self.ci_fv* self.c_frt[1]
         #Emin' = Emin * Cm * Ct * Ci * CT - NDS 2005 Table 4.3.1
-        self.Emin_prime_psi = self.Emin_psi * self.cm_E * self.ct_E * self.ci_E * self.cT
+        self.Emin_prime_psi = self.Emin_psi * self.cm_E * self.ct_E * self.ci_E * self.cT * self.c_frt[5]
         
         #E' = E * Cm * Ct * Ci - NDS 2005 Table 4.3.1
-        self.E_prime_psi = self.E_psi * self.cm_E * self.ct_E * self.ci_E
+        self.E_prime_psi = self.E_psi * self.cm_E * self.ct_E * self.ci_E * self.c_frt[4]
         
         #Pressure to reach deflection limits
         self.defl_180_w_psf = ((self.defl_180 * 384 * self.E_prime_psi * self.I_in4) / (1728 * 5 * (self.height_in/12.0)**4))/(self.spacing_in/12.0)
@@ -212,24 +226,26 @@ class wood_stud_wall:
         self.defl_360_w_psf = ((self.defl_360 * 384 * self.E_prime_psi * self.I_in4) / (1728 * 5 * (self.height_in/12.0)**4))/(self.spacing_in/12.0)
         
         #Fc,perp' = Fc,perp * Cm * Ct * Ci * Cb- NDS 2005 Table 4.3.1
-        self.fc_perp_pl_prime_psi = self.fc_perp_pl_psi * self.cm_fc_perp * self.ct_fc_perp * self.ci_fc_perp * self.cb_fc_perp
+        self.fc_perp_pl_prime_psi = self.fc_perp_pl_psi * self.cm_fc_perp * self.ct_fc_perp * self.ci_fc_perp * self.cb_fc_perp * self.c_frt[3]
         
         self.crushing_limit_lbs = self.area_in2 * self.fc_perp_pl_prime_psi
         self.crushing_limit_lbs_no_cb = self.area_in2 * (self.fc_perp_pl_prime_psi/self.cb_fc_perp)
         
     def fc_prime_calc(self, cd):
+        #apply cd to Fv'
+        self.fv_prime_psi_cd = self.fv_prime_psi * cd
         #Fc* = reference compression design value parallel to grain multiplied by all applicable adjusment factors except Cp
-        self.fc_star_psi = self.fc_psi * cd * self.cm_fc * self.ct_fc * self.cf_fc * self.ci_fc
+        self.fc_star_psi = self.fc_psi * cd * self.cm_fc * self.ct_fc * self.cf_fc * self.ci_fc * self.c_frt[2]
         
         self.c_cp = 0.8
-        self.assumptions = self.assumptions + 'c for Cp calc based on sawn lumber - NDS 2005 3.7.1\n'
+        self.assumptions_c = 'c for Cp calc based on sawn lumber - NDS 2005 3.7.1\n'
         
-        #Slenderness Ration check per NDS 2005 sections 3.7.1.2 thru 3.7.1.4
+        #Slenderness Ratio check per NDS 2005 sections 3.7.1.2 thru 3.7.1.4
         kb = 1.0
         kd = 1.0
-        self.assumptions = self.assumptions + 'Ke = 1.0 for both depth and breadth of studs, Ref NDS 2005 appendix G pin top and bottom\n'
+        self.assumptions_ke = 'Ke = 1.0 for both depth and breadth of studs, Ref NDS 2005 appendix G pin top and bottom\n'
         leb = 12 * kb
-        self.assumptions = self.assumptions + 'Le,b = 12.0, continously braced by sheathing 12" field nailing assumed\n'
+        self.assumptions_leb = 'Le,b = 12.0, continously braced by sheathing 12" field nailing assumed\n'
         led = self.height_in * kd
         
         #Check Le/d,b ratios less than 50 - NDS 2005 Section 3.7.1.4
@@ -246,7 +262,7 @@ class wood_stud_wall:
             self.cp = ((1+(self.fcE_psi/self.fc_star_psi))/(2*self.c_cp))-((((1+(self.fcE_psi/self.fc_star_psi))/(2*self.c_cp))**2)-((self.fcE_psi/self.fc_star_psi)/self.c_cp))**0.5
             
             self.fc_prime_psi = self.fc_star_psi * self.cp
-            self.assumptions = self.assumptions + 'Wall studs are not tapered and not subject to NDS 2005 - 3.7.2\n'
+            self.assumptions_cp = 'Wall studs are not tapered and not subject to NDS 2005 - 3.7.2\n'
         else:
             self.fc_prime_psi = 0
             self.warning=self.warning + 'Slenderness ratio greater than 50, suggest increase stud size or reducing wall height'
@@ -254,7 +270,10 @@ class wood_stud_wall:
         return self.fc_prime_psi
     
     def fb_prime_calc(self, cd):
-        self.fb_prime_psi = self.fb_psi * cd * self.cm_fb * self.ct_fb * self.cl * self.cf_fb * self.cfu * self.ci_fb * self.cr
+        #apply cd to Fv'
+        self.fv_prime_psi_cd = self.fv_prime_psi * cd
+        
+        self.fb_prime_psi = self.fb_psi * cd * self.cm_fb * self.ct_fb * self.cl * self.cf_fb * self.cfu * self.ci_fb * self.cr * self.c_frt[0]
         
         return self.fb_prime_psi
     
@@ -279,7 +298,7 @@ class wood_stud_wall:
             self.warning=self.warning + 'fc is greater than FcE'
             return 'NG'
         
-    def axial_capacity_w_moment(self,cd,m_inlbs):
+    def axial_capacity_w_moment(self,cd,m_inlbs,e_in):
         #solve for the allowable axial load using the bisection method
         a=0
         b=self.area_in2 * self.fc_prime_calc(cd) #upper bound limit on axial strength
@@ -293,7 +312,7 @@ class wood_stud_wall:
             c = (a+b)/2.0
             
             fc_psi = c / self.area_in2
-            fb_psi = m_inlbs/self.s_in3
+            fb_psi = (m_inlbs + (c*e_in))/self.s_in3
           
             fc_prime = self.fc_prime_calc(cd)       
             fb_prime = self.fb_prime_calc(cd)
@@ -319,7 +338,7 @@ class wood_stud_wall:
         
         return p_lbs
     
-    def wall_interaction_diagram_cd(self, cd):
+    def wall_interaction_diagram_cd(self, cd, e_in):
         
         # Find bending limit pressure for each Cd ie where fb = Fb'
         # fb = M/s , M in in-lbs and s in in^3
@@ -332,9 +351,11 @@ class wood_stud_wall:
         # Determine pure axial compression capacity ie where fc = Fc' - withou consideration for plate crushing
         # fc = P/a
         # P = a * Fc'
-        
-        self.p_lbs_limit = self.area_in2 * self.fc_prime_calc(cd)
-        
+        if e_in == 0:
+            self.p_lbs_limit = self.area_in2 * self.fc_prime_calc(cd)
+        else:
+            self.p_lbs_limit = self.axial_capacity_w_moment(cd,0, e_in)
+            
         points = 50
         step = self.w_psf_limit/points
         
@@ -351,7 +372,7 @@ class wood_stud_wall:
             deflection = (5 * (w_plf) * (self.height_in/12)**4)/(384*self.E_prime_psi*self.I_in4)*1728
             d.append(deflection)
             
-            p_lbs = self.axial_capacity_w_moment(cd,moment_inlbs)
+            p_lbs = self.axial_capacity_w_moment(cd,moment_inlbs, e_in)
             y.append(p_lbs)
         
         x.append(self.w_psf_limit)
@@ -359,11 +380,11 @@ class wood_stud_wall:
         d.append((5 * (self.w_plf_limit) * (self.height_in/12)**4)/(384*self.E_prime_psi*self.I_in4)*1728)
         return x,y,d
             
-       
+'''
 #Cd - NDS 2005 Table 2.3.2
 cd = [0.9,1.0,1.15,1.25,1.6,2.0]        
 
-wall = wood_stud_wall(1.5,5.5,18,16,"No.2",875,1150,1400000,510000,200,19,90,0,0)
+wall = wood_stud_wall(1.5,5.5,18,16,"No.2",875,150,1150,1400000,510000,200,19,90,0,0,[1,1,1,1,1,1])
 fc_prime = wall.fc_prime_calc(1.0)
 cp = wall.cp
 
@@ -377,7 +398,7 @@ ax1.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
 ax1.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
 ax2 = ax1.twinx()
 for x in cd: 
-    w,p,d = wall.wall_interaction_diagram_cd(x)
+    w,p,d = wall.wall_interaction_diagram_cd(x,5.5/6.0)
     ax1.plot(w,p)
 
 ax1.plot([0,max(w)],[wall.crushing_limit_lbs,wall.crushing_limit_lbs])
@@ -393,5 +414,5 @@ ax2.set_ylabel('Deflection (in)')
 plt.title('2x6 SPF No.2 - 18 ft tall - 16" spacing')
 fig.tight_layout()
 plt.show()
-
+'''
 
