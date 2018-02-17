@@ -282,10 +282,10 @@ class wood_stud_wall:
     def axial_capacity_w_moment(self,cd,m_inlbs):
         #solve for the allowable axial load using the bisection method
         a=0
-        b=self.area_in2 * self.fb_prime_calc(cd) #upper bound limit on axial strength
+        b=self.area_in2 * self.fc_prime_calc(cd) #upper bound limit on axial strength
         c=0
         
-        loop_max = 50
+        loop_max = 500
         tol = 0.00001
         loop = 0
         p_lbs = 0
