@@ -5,7 +5,7 @@ Created on Fri Feb 16 09:37:43 2018
 @author: DonB
 """
 from __future__ import division
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 class wood_stud_wall:
     def __init__(self,b_in=1.5,d_in=3.5,height_ft=10, spacing_in=12, grade="No.2", fb_psi=875, fv_psi= 150, fc_psi=1150, E_psi=1400000, Emin_psi=510000, fc_perp_pl_psi=565, moisture_percent = 19, temp = 90, incised = 0,  num_plates = 0, c_frt=[1,1,1,1,1,1]):

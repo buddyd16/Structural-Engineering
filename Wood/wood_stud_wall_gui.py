@@ -3,6 +3,10 @@ import Tkinter as tk
 import ttk
 import tkFont
 import wood_classes as wood
+import matplotlib
+matplotlib.use('TKAgg')
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
+from matplotlib.figure import Figure
 
 class Master_window:
 
@@ -254,6 +258,8 @@ class Master_window:
         
         self.b_run = tk.Button(self.input_frame,text="Calc", command=self.run, font=helv)
         self.b_run.pack(side=tk.RIGHT)
+        self.b_build_chart = tk.Button(self.input_frame,text="Build Interaction Chart", command=self.generate_interaction_graph, font=helv, state = tk.DISABLED)
+        self.b_build_chart.pack(side=tk.RIGHT)
         
         self.input_frame.pack(side=tk.LEFT, padx=5, pady=5)
                 
@@ -302,8 +308,47 @@ class Master_window:
         self.nb.add(self.page2, text='P-Lateral Pressure Diagram', state = tk.DISABLED)
         
         self.pg2_frame = tk.Frame(self.page2, bd=2, relief='sunken', padx=1,pady=1)
-        self.pg2_frame.pack(fill=tk.X, padx=5, pady=5)
+        self.pg2_frame.pack(fill=tk.BOTH, padx=5, pady=5)
         
+        self.chart_frame = tk.Frame(self.pg2_frame, padx=5, pady=5)
+
+        self.Fig = matplotlib.figure.Figure(figsize=(9,5),dpi=100)
+        self.ax1 = self.Fig.add_subplot(111)
+        self.ax1.minorticks_on()
+        self.ax1.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
+        self.ax1.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
+        self.ax2=self.ax1.twinx()
+        #Prebuild chart lines so data can be refreshed to cut down on render time
+        #['0.9','1.0','1.15','1.25','1.6','2.0']
+        self.line_cd009, = self.ax1.plot([0,10],[10,0], label='Cd = 0.9')
+        self.line_cd100, = self.ax1.plot([0,15],[15,0], label='Cd = 1.0')
+        self.line_cd115, = self.ax1.plot([0,25],[25,0], label='Cd = 1.15')
+        self.line_cd125, = self.ax1.plot([0,35],[35,0], label='Cd = 1.25')
+        self.line_cd160, = self.ax1.plot([0,50],[50,0], label='Cd = 1.6')
+        self.line_cd200, = self.ax1.plot([0,75],[75,0], label='Cd = 2.0')
+        self.line_pl_cb, = self.ax1.plot([0,10],[3,3], label='PL Crushing')
+        self.line_pl_wo_cb, = self.ax1.plot([0,10],[1.5,1.5], label='PL Crushing w/o Cb')
+        self.line_delta, = self.ax2.plot([0,10],[0,13], label='D')
+        self.line_delta_180, = self.ax2.plot([6,6],[0,13], label='H/180')
+        self.line_delta_240, = self.ax2.plot([4,4],[0,13], label='H/240')
+        self.line_delta_360, = self.ax2.plot([1,1],[0,13], label='H/360')
+        
+        self.legend_ax1 = self.ax1.legend(loc=1, fontsize='x-small')
+        self.legend_ax2 = self.ax2.legend(loc=4, fontsize='x-small')        
+        
+        self.ax1.set_ylabel('Axial (lbs)')
+        self.ax1.set_xlabel('Lateral Pressure (psf)')
+        self.ax2.set_ylabel('Mid Height Deflection (in)')
+        
+        self.canvas = matplotlib.backends.backend_tkagg.FigureCanvasTkAgg(self.Fig, master=self.chart_frame)
+        self.canvas.show()
+        self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+
+        self.toolbar = NavigationToolbar2TkAgg(self.canvas, self.chart_frame)
+        self.toolbar.update()
+        self.canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+
+        self.chart_frame.pack(side=tk.TOP, fill=tk.BOTH)
         
         self.b_quit = tk.Button(self.base_frame,text="Quit", command=self.quit_app, font=helv)
         self.b_quit.pack(side=tk.RIGHT)
@@ -468,7 +513,49 @@ class Master_window:
         self.res_labels[109].configure(text='{0:.2f}'.format(cfrt[5]))
         self.res_labels[110].configure(text='{0:.2f}'.format(self.wall.Emin_prime_psi))
         
+        self.b_build_chart.configure(state=tk.NORMAL)
         
+    def generate_interaction_graph(self,*event):        
+        e_in = self.e_in
+        #Refresh chart data for each Cd
+        #Cd - NDS 2005 Table 2.3.2
+        #cd = [0.9,1.0,1.15,1.25,1.6,2.0]
+        w,p,d = self.wall.wall_interaction_diagram_cd(0.9,e_in)
+        self.line_cd009.set_data(w,p)
+        
+        w,p,d = self.wall.wall_interaction_diagram_cd(1.0,e_in)
+        self.line_cd100.set_data(w,p)
+        
+        w,p,d = self.wall.wall_interaction_diagram_cd(1.15,e_in)
+        self.line_cd115.set_data(w,p)
+        
+        w,p,d = self.wall.wall_interaction_diagram_cd(1.25,e_in)
+        self.line_cd125.set_data(w,p)
+        
+        w,p,d = self.wall.wall_interaction_diagram_cd(1.6,e_in)
+        self.line_cd160.set_data(w,p)
+        
+        w,p,d = self.wall.wall_interaction_diagram_cd(2.0,e_in)
+        self.line_cd200.set_data(w,p)
+        
+        if self.wall.crushing_limit_lbs > 1.2*max(p):
+            self.line_pl_cb.set_data([0,0],[0,0])
+            self.line_pl_wo_cb.set_data([0,0],[0,0])        
+        else:
+            self.line_pl_cb.set_data([0,max(w)],[self.wall.crushing_limit_lbs,self.wall.crushing_limit_lbs])
+            self.line_pl_wo_cb.set_data([0,max(w)],[self.wall.crushing_limit_lbs_no_cb,self.wall.crushing_limit_lbs_no_cb])
+        
+        self.line_delta.set_data(w,d)
+        self.line_delta_180.set_data([self.wall.defl_180_w_psf,self.wall.defl_180_w_psf],[0,max(d)])
+        self.line_delta_240.set_data([self.wall.defl_240_w_psf,self.wall.defl_240_w_psf],[0,max(d)])
+        self.line_delta_360.set_data([self.wall.defl_360_w_psf,self.wall.defl_360_w_psf],[0,max(d)])        
+        
+        self.ax1.set_xlim(0, max(w)+20)
+        self.ax1.set_ylim(0, max(p)+200)
+        self.ax2.set_ylim(0, max(d)+0.75)
+        
+        self.ax1.set_title(self.title)
+        self.canvas.draw()
         
 def main():            
     root = tk.Tk()
