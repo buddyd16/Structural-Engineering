@@ -491,19 +491,25 @@ class Master_window:
         
         #Applied Loads - Axial
         self.loads_string = '\n\n--Applied Loads--\nPressure: {0:.2f} psf x Spacing x 1 ft / 12 in = {1:.2f} plf'.format(pressure_psf,pressure_psf * (spacing/12.0))
+        w_plf = pressure_psf * (spacing/12.0)            
+        deflection_lat = (5 * (w_plf) * (self.wall.height_in/12)**4)/(384*self.wall.E_prime_psi*self.wall.I_in4)*1728        
         if min_ecc == 1:
             self.ecc_moment_inlbs = p_lbs * self.e_in
             self.ecc_shear_lbs = self.ecc_moment_inlbs / self.wall.height_in
+            deflection_axial = (((self.ecc_moment_inlbs)*self.wall.height_in**2)/(16.0*self.wall.E_prime_psi*self.wall.I_in4))
+            deflection = deflection_lat + deflection_axial
             applied_shear_string = '\nLateral Shear: {0:.2f} lbs + Gravity Shear: {1:.2f} lbs = Total Shear: {2:.2f} lbs'.format(self.pressure_shear_lbs, self.ecc_shear_lbs,self.pressure_shear_lbs+self.ecc_shear_lbs)
             applied_moment_string = '\nLateral Moment: {0:.2f} in-lbs + Gravity Moment: {1:.2f} in-lbs = Total Moment: {2:.2f} in-lbs'.format(self.pressure_moment_inlbs, self.ecc_moment_inlbs,self.pressure_moment_inlbs+self.ecc_moment_inlbs)
+            deflection_string = '\nLateral Delta: {0:.3f} in + Gravity Delta: {1:.3f} in = Delta: {2:.3f} in - H / {3:.1f}'.format(deflection_lat, deflection_axial, deflection, self.wall.height_in/deflection)
         else:
             self.ecc_moment_inlbs = 0.0
             self.ecc_shear_lbs = 0.0
             applied_shear_string = '\nLateral Shear: {0:.2f} lbs'.format(self.pressure_shear_lbs)
             applied_moment_string = '\nLateral Moment: {0:.2f} in-lbs'.format(self.pressure_moment_inlbs)
-        
-        self.loads_string = self.loads_string + applied_shear_string + applied_moment_string
+            deflection_string = '\nLateral Delta: {0:.3f} - H / {1:.1f}'.format(deflection_lat, self.wall.height_in/deflection_lat)
+        self.loads_string = self.loads_string + applied_shear_string + applied_moment_string + deflection_string
         self.results_text_box.insert(tk.END, self.loads_string)
+        
         ##Stresses
         self.stress_string = '\n\n--Stresses--'
         axial_stress = p_lbs/self.wall.area_in2
