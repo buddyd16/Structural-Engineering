@@ -286,7 +286,7 @@ class wood_stud_wall:
         
         #Check that fc is less than FcE per NDS 2005 - Section 3.9.2
         if fc_psi < self.fcE_psi:
-            #Combine ration per NDS 2005 equation (3.9-3)
+            #Combine ratio per NDS 2005 equation (3.9-3)
             #[fc/Fc]'^2 + fb / Fb' [ 1- (fc / FcE)] <= 1.0
             ratio = (fc_psi/fc_prime)**2 + (fb_psi / (fb_prime*(1-(fc_psi/self.fcE_psi))))
             if ratio > 1.0:

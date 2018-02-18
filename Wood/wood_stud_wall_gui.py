@@ -428,7 +428,8 @@ class Master_window:
         p_lbs = self.wall.axial_capacity_w_moment(cd,self.pressure_moment_inlbs,self.e_in)
         
         ##Create Text String and write Axial result to text box        
-        axial_string = '\n\n-- Pmax,allow = {0:.3f} lbs {1} --'.format(p_lbs,e_string)
+        axial_string = '\n\n-- Pmax,allow = {0:.2f} lbs ({2:.2f} plf) {1} --'.format(p_lbs,e_string, p_lbs/(self.wall.spacing_in/12.0))
+        axial_string = axial_string + '\n-- PL Crushing (Cb): {0:.2f} lbs ({2:.2f} plf) --\n-- PL Crushing (w/o Cb): {1:.2f} lbs ({3:.2f} plf) --'.format(self.wall.crushing_limit_lbs,self.wall.crushing_limit_lbs_no_cb,self.wall.crushing_limit_lbs/(self.wall.spacing_in/12.0),self.wall.crushing_limit_lbs_no_cb/(self.wall.spacing_in/12.0))
         self.results_text_box.insert(tk.END, axial_string)
         
         ##Pull Section properties from wall class and write out to results text box
@@ -443,14 +444,40 @@ class Master_window:
             applied_shear_string = '\nLateral Shear: {0:.2f} lbs + Gravity Shear: {1:.2f} lbs = Total Shear: {2:.2f} lbs'.format(self.pressure_shear_lbs, self.ecc_shear_lbs,self.pressure_shear_lbs+self.ecc_shear_lbs)
             applied_moment_string = '\nLateral Moment: {0:.2f} in-lbs + Gravity Moment: {1:.2f} in-lbs = Total Moment: {2:.2f} in-lbs'.format(self.pressure_moment_inlbs, self.ecc_moment_inlbs,self.pressure_moment_inlbs+self.ecc_moment_inlbs)
         else:
+            self.ecc_moment_inlbs = 0.0
+            self.ecc_shear_lbs = 0.0
             applied_shear_string = '\nLateral Shear: {0:.2f} lbs'.format(self.pressure_shear_lbs)
             applied_moment_string = '\nLateral Moment: {0:.2f} in-lbs'.format(self.pressure_moment_inlbs)
         
         self.loads_string = self.loads_string + applied_shear_string + applied_moment_string
         self.results_text_box.insert(tk.END, self.loads_string)
+        ##Stresses
+        self.stress_string = '\n\n--Stresses--'
+        axial_stress = p_lbs/self.wall.area_in2
+        self.stress_string = self.stress_string+'\nfc = P/A = {0:.3f} psi'.format(axial_stress)
+        shear = self.pressure_shear_lbs + self.ecc_shear_lbs
+        shear_stress = (3.0*shear)/(2.0*b*d)
+        self.stress_string = self.stress_string+'\nfv = VQ/Ib = 3V/2bd = {0:.3f} psi'.format(shear_stress)
+        moment = self.pressure_moment_inlbs + self.ecc_moment_inlbs
+        bending_stress = moment/self.wall.s_in3
+        self.stress_string = self.stress_string+'\nfb = Mc/I = M/s = 6M/bd^2 = {0:.3f} psi'.format(bending_stress)
+        #Combine ratio per NDS 2005 equation (3.9-3)
+        #[fc/Fc]'^2 + fb / Fb' [ 1- (fc / FcE)] <= 1.0
+        ratio = (axial_stress/self.wall.fc_prime_psi)**2 + (bending_stress / (self.wall.fb_prime_calc(cd)*(1-(axial_stress/self.wall.fcE_psi))))
+        self.stress_string = self.stress_string+"\nCombined Axial+Bending:\n[fc/Fc]'^2 + fb / Fb' [ 1- (fc / FcE)] = {0:.3f} <= 1.0".format(ratio)        
+        self.results_text_box.insert(tk.END, self.stress_string)
+        
+        ##Calculation of Cp
+        self.cp_string = '\n\n--Calculation of Cp--'
+        self.cp_string=self.cp_string + '\nFc* = reference compression design value parallel to grain multiplied by all applicable adjusment factors except Cp\nFc* = {0:.2f} psi\nc = 0.8 - NDS 2005 3.7.1'.format(self.wall.fc_star_psi)
+        self.cp_string=self.cp_string + self.wall.assumptions_ke + self.wall.assumptions_leb
+        self.cp_string = self.cp_string + 'Ke * le,d / d = {0:.3f} in < 50'.format(self.wall.height_in/d)
+        self.cp_string = self.cp_string + "\nFcE = 0.822 * Emin' / (Le/d)^2 - NDS 2005 Section 3.7.1\nFcE = {0:.3f} psi".format(self.wall.fcE_psi)
+        self.cp_string = self.cp_string + "\nCp = ([1 + (FcE / Fc*)] / 2c ) - sqrt[ [1 + (FcE / Fc*) / 2c]^2 - (FcE / Fc*) / c] = {0:.3f} - NDS 2005 Section 3.7.1".format(self.wall.cp)
+        self.results_text_box.insert(tk.END, self.cp_string)
         
         ##write out assumption from wall creation - see wood_classes.py
-        assumptions_string = self.wall.assumptions + self.wall.assumptions_c + self.wall.assumptions_ke + self.wall.assumptions_leb + self.wall.assumptions_cp
+        assumptions_string = self.wall.assumptions + self.wall.assumptions_c+self.wall.assumptions_cp
         self.results_text_box.insert(tk.END, assumptions_string)
         
         ##Fill in reduction factor table
