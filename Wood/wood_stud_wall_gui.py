@@ -312,7 +312,7 @@ class Master_window:
         
         self.chart_frame = tk.Frame(self.pg2_frame, padx=5, pady=5)
 
-        self.Fig = matplotlib.figure.Figure(figsize=(9,5),dpi=100)
+        self.Fig = matplotlib.figure.Figure(figsize=(12,6),dpi=96)
         self.ax1 = self.Fig.add_subplot(111)
         self.ax1.minorticks_on()
         self.ax1.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
@@ -554,6 +554,14 @@ class Master_window:
         self.ax1.set_ylim(0, max(p)+200)
         self.ax2.set_ylim(0, max(d)+0.75)
         
+        min_ecc = self.min_ecc_yn.get()
+        if min_ecc == 1:
+            e_string = ' at min d/6 = {0:.3f} in eccentricity '.format(self.e_in)
+        else:
+            e_string =''        
+        
+        self.ax1.set_ylabel('Axial (lbs)'+e_string)
+        
         self.ax1.set_title(self.title)
         self.canvas.draw()
         
@@ -561,7 +569,7 @@ def main():
     root = tk.Tk()
     root.title("Wood Stud Wall - 2-4x Studs - North American Species (Not Southern Pine)")
     Master_window(root)
-    root.minsize(800,600)
+    root.minsize(1024,768)
     root.mainloop()
 
 if __name__ == '__main__':
