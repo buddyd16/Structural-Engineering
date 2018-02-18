@@ -260,6 +260,8 @@ class Master_window:
         self.b_run.pack(side=tk.RIGHT)
         self.b_build_chart = tk.Button(self.input_frame,text="Build Interaction Chart", command=self.generate_interaction_graph, font=helv, state = tk.DISABLED)
         self.b_build_chart.pack(side=tk.RIGHT)
+        self.b_build_pm = tk.Button(self.input_frame,text="Build P-M Chart", command=self.generate_pm_graph, font=helv, state = tk.DISABLED)
+        self.b_build_pm.pack(side=tk.RIGHT) 
         
         self.input_frame.pack(side=tk.LEFT, padx=5, pady=5)
                 
@@ -350,6 +352,56 @@ class Master_window:
 
         self.chart_frame.pack(side=tk.TOP, fill=tk.BOTH)
         
+        #Tab 3 -P vs Pressure Curve
+        self.page3 = ttk.Frame(self.nb)
+        self.nb.add(self.page3, text='P-M Diagram', state = tk.DISABLED)
+        
+        self.pg3_frame = tk.Frame(self.page3, bd=2, relief='sunken', padx=1,pady=1)
+        self.pg3_frame.pack(fill=tk.BOTH, padx=5, pady=5)
+        
+        self.chart_frameB = tk.Frame(self.pg3_frame, padx=5, pady=5)
+
+        self.FigB = matplotlib.figure.Figure(figsize=(12,6),dpi=96)
+        self.ax1B = self.FigB.add_subplot(111)
+        self.ax1B.minorticks_on()
+        self.ax1B.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
+        self.ax1B.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
+        self.ax2B=self.ax1B.twinx()
+        #Prebuild chart lines so data can be refreshed to cut down on render time
+        #['0.9','1.0','1.15','1.25','1.6','2.0']
+        self.line_cd009B, = self.ax1B.plot([0,10],[10,0], label='Cd = 0.9')
+        self.line_cd100B, = self.ax1B.plot([0,15],[15,0], label='Cd = 1.0')
+        self.line_cd115B, = self.ax1B.plot([0,25],[25,0], label='Cd = 1.15')
+        self.line_cd125B, = self.ax1B.plot([0,35],[35,0], label='Cd = 1.25')
+        self.line_cd160B, = self.ax1B.plot([0,50],[50,0], label='Cd = 1.6')
+        self.line_cd200B, = self.ax1B.plot([0,75],[75,0], label='Cd = 2.0')
+        self.line_pl_cbB, = self.ax1B.plot([0,10],[3,3], label='PL Crushing')
+        self.line_pl_wo_cbB, = self.ax1B.plot([0,10],[1.5,1.5], label='PL Crushing w/o Cb')
+        self.line_delta_cd009B, = self.ax2B.plot([0,10],[0,13], label='D - Cd = 0.9')
+        self.line_delta_cd100B, = self.ax2B.plot([0,15],[15,0], label='D - Cd = 1.0')
+        self.line_delta_cd115B, = self.ax2B.plot([0,25],[25,0], label='D - Cd = 1.15')
+        self.line_delta_cd125B, = self.ax2B.plot([0,35],[35,0], label='D - Cd = 1.25')
+        self.line_delta_cd160B, = self.ax2B.plot([0,50],[50,0], label='D - Cd = 1.6')
+        self.line_delta_cd200B, = self.ax2B.plot([0,75],[75,0], label='D - Cd = 2.0')
+
+        
+        self.legend_ax1B = self.ax1B.legend(loc=1, fontsize='x-small')
+        self.legend_ax2B = self.ax2B.legend(loc=4, fontsize='x-small')        
+        
+        self.ax1B.set_ylabel('Axial (lbs)')
+        self.ax1B.set_xlabel('Moment (in-lbs)')
+        self.ax2B.set_ylabel('Mid Height Deflection (in)')
+        
+        self.canvasB = matplotlib.backends.backend_tkagg.FigureCanvasTkAgg(self.FigB, master=self.chart_frameB)
+        self.canvasB.show()
+        self.canvasB.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+
+        self.toolbarB = NavigationToolbar2TkAgg(self.canvasB, self.chart_frameB)
+        self.toolbarB.update()
+        self.canvasB._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+
+        self.chart_frameB.pack(side=tk.TOP, fill=tk.BOTH)
+        
         self.b_quit = tk.Button(self.base_frame,text="Quit", command=self.quit_app, font=helv)
         self.b_quit.pack(side=tk.RIGHT)
             
@@ -359,6 +411,7 @@ class Master_window:
         
     def enable_tab2(self):
         self.nb.tab(1,state=tk.NORMAL)
+        self.nb.tab(2,state=tk.NORMAL)
     
     def actual_stud_size(self, *event):
         b = float(self.b_nom.get())
@@ -541,6 +594,7 @@ class Master_window:
         self.res_labels[110].configure(text='{0:.2f}'.format(self.wall.Emin_prime_psi))
         
         self.b_build_chart.configure(state=tk.NORMAL)
+        self.b_build_pm.configure(state=tk.NORMAL)
         
     def generate_interaction_graph(self,*event):        
         e_in = self.e_in
@@ -592,6 +646,56 @@ class Master_window:
         self.ax1.set_title(self.title)
         self.canvas.draw()
         
+    def generate_pm_graph(self,*event):        
+        e_in = self.e_in
+        #Refresh chart data for each Cd
+        #Cd - NDS 2005 Table 2.3.2
+        #cd = [0.9,1.0,1.15,1.25,1.6,2.0]
+        w,p,d = self.wall.wall_pm_diagram_cd(0.9,e_in)
+        self.line_cd009B.set_data(w,p)
+        self.line_delta_cd009B.set_data(w,d)
+        
+        w,p,d = self.wall.wall_pm_diagram_cd(1.0,e_in)
+        self.line_cd100B.set_data(w,p)
+        self.line_delta_cd100B.set_data(w,d)
+        
+        w,p,d = self.wall.wall_pm_diagram_cd(1.15,e_in)
+        self.line_cd115B.set_data(w,p)
+        self.line_delta_cd115B.set_data(w,d)
+        
+        w,p,d = self.wall.wall_pm_diagram_cd(1.25,e_in)
+        self.line_cd125B.set_data(w,p)
+        self.line_delta_cd125B.set_data(w,d)
+        
+        w,p,d = self.wall.wall_pm_diagram_cd(1.6,e_in)
+        self.line_cd160B.set_data(w,p)
+        self.line_delta_cd160B.set_data(w,d)
+        
+        w,p,d = self.wall.wall_pm_diagram_cd(2.0,e_in)
+        self.line_cd200B.set_data(w,p)
+        self.line_delta_cd200B.set_data(w,d)
+        
+        if self.wall.crushing_limit_lbs > 1.2*max(p):
+            self.line_pl_cbB.set_data([0,0],[0,0])
+            self.line_pl_wo_cbB.set_data([0,0],[0,0])        
+        else:
+            self.line_pl_cbB.set_data([0,max(w)],[self.wall.crushing_limit_lbs,self.wall.crushing_limit_lbs])
+            self.line_pl_wo_cbB.set_data([0,max(w)],[self.wall.crushing_limit_lbs_no_cb,self.wall.crushing_limit_lbs_no_cb])
+        
+        self.ax1B.set_xlim(0, max(w)+500)
+        self.ax1B.set_ylim(0, max(p)+200)
+        self.ax2B.set_ylim(0, max(d)+0.75)
+        
+        min_ecc = self.min_ecc_yn.get()
+        if min_ecc == 1:
+            e_string = ' at min d/6 = {0:.3f} in eccentricity '.format(self.e_in)
+        else:
+            e_string =''        
+        
+        self.ax1B.set_ylabel('Axial (lbs)'+e_string)
+        
+        self.ax1B.set_title(self.title)
+        self.canvasB.draw()        
 def main():            
     root = tk.Tk()
     root.title("Wood Stud Wall - 2-4x Studs - North American Species (Not Southern Pine)")
