@@ -67,7 +67,7 @@ class Master_window:
         self.spacing_label = tk.Label(self.geo_frame, text='Stud Spacing: ')
         self.spacing_label.grid(row=3,column=1)
         self.stud_spacing = tk.StringVar()
-        self.spacing_entry = tk.Entry(self.geo_frame, textvariable=self.stud_spacing, width=5)
+        self.spacing_entry = tk.Entry(self.geo_frame, textvariable=self.stud_spacing, width=10)
         self.spacing_entry.grid(row=3,column=2)
         tk.Label(self.geo_frame, text='in').grid(row=3,column=3)
         
@@ -75,7 +75,7 @@ class Master_window:
         self.height_label = tk.Label(self.geo_frame, text='Wall Height: ')
         self.height_label.grid(row=4,column=1)
         self.wall_height = tk.StringVar()
-        self.height_entry = tk.Entry(self.geo_frame, textvariable=self.wall_height, width=5)
+        self.height_entry = tk.Entry(self.geo_frame, textvariable=self.wall_height, width=10)
         self.height_entry.grid(row=4,column=2)
         tk.Label(self.geo_frame, text='ft').grid(row=4,column=3)
         
