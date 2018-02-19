@@ -7,6 +7,7 @@ import matplotlib
 matplotlib.use('TKAgg')
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 from matplotlib.figure import Figure
+import tkFileDialog
 import os
 
 class Master_window:
@@ -20,6 +21,8 @@ class Master_window:
         self.menu = tk.Menu(self.menubar, tearoff=0)
         self.menu_props = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label = "File", menu=self.menu)
+        self.menu.add_command(label="Open", command=self.file_open)
+        self.menu.add_separator()
         self.menu.add_command(label="Quit", command=self.quit_app)
         try:
             self.master.config(menu=self.menubar)
@@ -90,6 +93,7 @@ class Master_window:
         self.plates_label = tk.Label(self.geo_frame, text='# of 1.5" Plates to subtract: ')
         self.plates_label.grid(row=4,column=4)        
         self.num_plates = tk.StringVar()
+        self.num_plates.set(0)
         self.num_plates_entry = tk.Entry(self.geo_frame, textvariable=self.num_plates, width=5)
         self.num_plates_entry.grid(row=4,column=5)
         
@@ -415,6 +419,8 @@ class Master_window:
         
         self.b_quit = tk.Button(self.base_frame,text="Quit", command=self.quit_app, font=helv)
         self.b_quit.pack(side=tk.RIGHT)
+        self.b_save = tk.Button(self.base_frame,text="Save Inputs", command=self.save_inputs, font=helv, state = tk.DISABLED)
+        self.b_save.pack(side=tk.RIGHT)
             
     def quit_app(self):
         self.master.destroy()
@@ -662,6 +668,7 @@ class Master_window:
         self.b_build_chart.configure(state=tk.NORMAL)
         self.b_build_pm.configure(state=tk.NORMAL)
         self.b_output_res.configure(state=tk.NORMAL)
+        self.b_save.configure(state=tk.NORMAL)
         
     def generate_interaction_graph(self,*event):        
         e_in = self.e_in
@@ -777,18 +784,183 @@ class Master_window:
         return 'Directory created'
         
     def save_inputs(self,*event):
-        self.run()
-        
+        self.run()        
         ##Create a file containing user inputs to be read back in
         #all inputs are single values so write a single input per line
-        
+        string = ''
         #Gather inputs
+        #geometry
         b = self.b_nom.get()
+        string = string + '{0}\n'.format(b)
         d = self.d_nom.get()
+        string = string + '{0}\n'.format(d)
+        spacing = self.stud_spacing.get()
+        string = string + '{0}\n'.format(spacing)
         h = self.wall_height.get()
+        string = string + '{0}\n'.format(h)
+        sub_pl = self.sub_plates.get()
+        string = string + '{0}\n'.format(sub_pl)
+        plates = self.num_plates.get()
+        string = string + '{0}\n'.format(plates)
         
-        a = 1+1
-    
+        #Reference Stud Values
+        grade = self.grade.get()
+        string = string + '{0}\n'.format(grade)
+
+        #Fb
+        fb = self.fb_psi.get()
+        string = string + '{0}\n'.format(fb)
+        #Fv
+        fv = self.fv_psi.get()
+        string = string + '{0}\n'.format(fv)
+        #Fc
+        fc = self.fc_psi.get()
+        string = string + '{0}\n'.format(fc)
+        #E
+        E = self.E_psi.get()
+        string = string + '{0}\n'.format(E)
+        #Emin
+        Emin = self.Emin_psi.get()
+        string = string + '{0}\n'.format(Emin)        
+        #Fc_perp_pl
+        fcperp = self.fc_perp_psi.get()
+        string = string + '{0}\n'.format(fcperp)       
+        #FRT?
+        frtyn = self.frt_yn.get()
+        string = string + '{0}\n'.format(frtyn)
+        frtfb = self.frt_fb.get()
+        string = string + '{0}\n'.format(frtfb)
+        frtfv = self.frt_fv.get()
+        string = string + '{0}\n'.format(frtfv)
+        frtfc = self.frt_fc.get()
+        string = string + '{0}\n'.format(frtfc)
+        frtfperp = self.frt_fc_perp.get()
+        string = string + '{0}\n'.format(frtfperp)
+        frtE = self.frt_E.get()
+        string = string + '{0}\n'.format(frtE)
+        frtEmin = self.frt_Emin.get()
+        string = string + '{0}\n'.format(frtEmin)
+        species = self.species .get()
+        string = string + '{0}\n'.format(species)
+        #Moisture %
+        moist = self.moisture.get()   
+        string = string + '{0}\n'.format(moist)       
+        #Temp F
+        temp= self.temp.get()
+        string = string + '{0}\n'.format(temp)        
+        #Incised?
+        inc = self.incised_yn.get()
+        string = string + '{0}\n'.format(inc)
+        
+        p = self.pressure.get()
+        string = string + '{0}\n'.format(p)
+        cd = self.cd.get()
+        string = string + '{0}\n'.format(cd)
+        e = self.min_ecc_yn.get()
+        string = string + '{0}\n'.format(e)
+        
+        label = '{0}x{1}_height-{2}_ft_pressure-{3}_psf_Cd-{4}'.format(b,d,h,p,cd)
+        path = os.path.join(os.path.expanduser('~'),'Desktop','RESULTS','Wood_Walls', label)
+        self.path_exists(path)
+        
+        name = label+'_inputs.wdwall'
+        
+        file = open(os.path.join(path,name),'w')
+        file.write(string)
+        file.close()
+        
+    def file_open(self):
+        filename = tkFileDialog.askopenfilename()
+        in_file = open(filename,'r')
+        in_data = in_file.readlines()
+        in_file.close()
+        
+        b = in_data[0].rstrip('\n')
+        self.b_nom.set(b)
+        d = in_data[1].rstrip('\n')
+        self.d_nom.set(d)
+        spacing = in_data[2].rstrip('\n')
+        self.stud_spacing.set(spacing)
+        h = in_data[3].rstrip('\n')
+        self.wall_height.set(h)
+        sub_pl = in_data[4].rstrip('\n')
+        self.sub_plates.set(sub_pl)
+        plates = in_data[5].rstrip('\n')
+        self.num_plates.set(plates)
+        
+        #Reference Stud Values
+        grade = in_data[6].rstrip('\n')
+        self.grade.set(grade)
+
+        #Fb
+        fb = in_data[7].rstrip('\n')
+        self.fb_psi.set(fb)
+        #Fv
+        fv = in_data[8].rstrip('\n')
+        self.fv_psi.set(fv)
+        #Fc
+        fc = in_data[9].rstrip('\n')
+        self.fc_psi.set(fc)
+        #E
+        E = in_data[10].rstrip('\n')
+        self.E_psi.set(E)
+
+        #Emin
+        Emin = in_data[11].rstrip('\n')
+        self.Emin_psi.set(Emin)        
+        #Fc_perp_pl
+        fcperp = in_data[12].rstrip('\n')
+        self.fc_perp_psi.set(fcperp)
+       
+        #FRT?
+        frtyn = in_data[13].rstrip('\n')
+        self.frt_yn.set(frtyn)
+
+        frtfb = in_data[14].rstrip('\n')
+        self.frt_fb.set(frtfb)
+
+        frtfv = in_data[15].rstrip('\n')
+        self.frt_fv.set(frtfv)
+
+        frtfc = in_data[16].rstrip('\n')
+        self.frt_fc.set(frtfc)
+
+        frtfperp = in_data[17].rstrip('\n')
+        self.frt_fc_perp.set(frtfperp)
+
+        frtE = in_data[18].rstrip('\n')
+        self.frt_E.set(frtE)
+
+        frtEmin = in_data[19].rstrip('\n')
+        self.frt_Emin.set(frtEmin)
+
+        species = in_data[20].rstrip('\n')
+        self.species.set(species)
+
+        #Moisture %
+        moist = in_data[21].rstrip('\n')
+        self.moisture.set(moist)   
+       
+        #Temp F
+        temp= in_data[22].rstrip('\n')
+        self.temp.set(temp)
+       
+        #Incised?
+        inc = in_data[23].rstrip('\n')
+        self.incised_yn.set(inc)
+
+        
+        p = in_data[24].rstrip('\n')
+        self.pressure.set(p)
+
+        cd = in_data[25].rstrip('\n')
+        self.cd.set(cd)
+
+        e = in_data[26].rstrip('\n')
+        self.min_ecc_yn.set(e)
+        
+        self.run()
+        
     def write_text_results_to_file(self,*event):
         #generate file name and confirm path exists if not create it
         b = self.b_nom.get()
