@@ -7,6 +7,7 @@ import matplotlib
 matplotlib.use('TKAgg')
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 from matplotlib.figure import Figure
+import os
 
 class Master_window:
 
@@ -269,29 +270,38 @@ class Master_window:
         self.results_frame = tk.LabelFrame(self.pg1_frame, text="Results", bd=2, relief='sunken', padx=5, pady=5)
         self.nds_table_frame = tk.LabelFrame(self.results_frame, text="NDS 2005 - Table 4.3.1", bd=2, relief='sunken', padx=5, pady=5)
         self.res_labels = []
+        self.res_nds_table_output = []
         for y in range(0,7):
             for i in range(0,16):
                 label = tk.Label(self.nds_table_frame, text='--')
                 label.grid(row=y+1,column=i+1)
                 self.res_labels.append(label)
+                self.res_nds_table_output.append('-')
         self.res_labels[0].configure(text='')
+        self.res_nds_table_output[0] = ''
         self.res_labels[1].configure(text='')
+        self.res_nds_table_output[1] = ''
         self.res_labels[14].configure(text='')
+        self.res_nds_table_output[14] = ''
         self.res_labels[15].configure(text='')
+        self.res_nds_table_output[15] = '\n'
         factors = ['Cd','Cm','Ct','CL','Cf','Cfu','Ci','Cr','Cp','CT','Cb','Cfrt']
         i=2
         for c in factors:
             self.res_labels[i].configure(text=c)
+            self.res_nds_table_output[i] = c
             i+=1
         row_headers = ["Fb' = Fb ","Fv' = Fv ","Fc' = Fc ","Fc,perp' = Fc,perp ","E' = E ","Emin' = Emin "]
         i=16
         for header in row_headers:
             self.res_labels[i].configure(text=header)
+            self.res_nds_table_output[i] = header
             i+=16
         
         i=31
         for y in range(1,7):
             self.res_labels[i].configure(text='psi')
+            self.res_nds_table_output[i] = 'psi\n'
             i+=16
         self.nds_table_frame.pack(side=tk.TOP, padx=5, pady=5)
         
@@ -302,7 +312,8 @@ class Master_window:
         self.results_text_box.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
         self.text_results_frame.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
-        
+        self.b_output_res= tk.Button(self.results_frame,text="Export Results", command=self.write_text_results_to_file, font=helv, state = tk.DISABLED)
+        self.b_output_res.pack(side=tk.RIGHT)        
         self.results_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
         
         #Tab 2 -P vs Pressure Curve
@@ -544,65 +555,113 @@ class Master_window:
         ##Fill in reduction factor table
         #Fb
         self.res_labels[17].configure(text='{0:.2f}'.format(fb))
+        self.res_nds_table_output[17] = '{0:.2f}'.format(fb)
         self.res_labels[18].configure(text='{0:.2f}'.format(cd))
+        self.res_nds_table_output[18] = '{0:.2f}'.format(cd)
         self.res_labels[19].configure(text='{0:.2f}'.format(self.wall.cm_fb))
+        self.res_nds_table_output[19] = '{0:.2f}'.format(self.wall.cm_fb)
         self.res_labels[20].configure(text='{0:.2f}'.format(self.wall.ct_fb))
+        self.res_nds_table_output[20] = '{0:.2f}'.format(self.wall.ct_fb)
         self.res_labels[21].configure(text='{0:.2f}'.format(self.wall.cl))
+        self.res_nds_table_output[21] = '{0:.2f}'.format(self.wall.cl)        
         self.res_labels[22].configure(text='{0:.2f}'.format(self.wall.cf_fb))
+        self.res_nds_table_output[22] = '{0:.2f}'.format(self.wall.cf_fb)
         self.res_labels[23].configure(text='{0:.2f}'.format(self.wall.cfu))
+        self.res_nds_table_output[23] = '{0:.2f}'.format(self.wall.cfu)
         self.res_labels[24].configure(text='{0:.2f}'.format(self.wall.ci_fb))
+        self.res_nds_table_output[24] = '{0:.2f}'.format(self.wall.ci_fb)
         self.res_labels[25].configure(text='{0:.2f}'.format(self.wall.cr))
+        self.res_nds_table_output[25] = '{0:.2f}'.format(self.wall.cr)
         self.res_labels[29].configure(text='{0:.2f}'.format(cfrt[0]))
+        self.res_nds_table_output[29] = '{0:.2f}'.format(cfrt[0])
         self.res_labels[30].configure(text='{0:.2f}'.format(self.wall.fb_prime_calc(cd)))
+        self.res_nds_table_output[30] = '{0:.2f}'.format(self.wall.fb_prime_calc(cd))
         
         #Fv
         self.res_labels[33].configure(text='{0:.2f}'.format(fv))
+        self.res_nds_table_output[33] = '{0:.2f}'.format(fv)
         self.res_labels[34].configure(text='{0:.2f}'.format(cd))
+        self.res_nds_table_output[34] = '{0:.2f}'.format(cd)
         self.res_labels[35].configure(text='{0:.2f}'.format(self.wall.cm_fv))
+        self.res_nds_table_output[35] = '{0:.2f}'.format(self.wall.cm_fv)
         self.res_labels[36].configure(text='{0:.2f}'.format(self.wall.ct_fv))
+        self.res_nds_table_output[36] = '{0:.2f}'.format(self.wall.ct_fv)
         self.res_labels[40].configure(text='{0:.2f}'.format(self.wall.ci_fv))
+        self.res_nds_table_output[40] = '{0:.2f}'.format(self.wall.ci_fv)
         self.res_labels[45].configure(text='{0:.2f}'.format(cfrt[1]))
+        self.res_nds_table_output[45] = '{0:.2f}'.format(cfrt[1])
         self.res_labels[46].configure(text='{0:.2f}'.format(self.wall.fv_prime_psi_cd))
+        self.res_nds_table_output[46] = '{0:.2f}'.format(self.wall.fv_prime_psi_cd)
         
         #Fc
         self.res_labels[49].configure(text='{0:.2f}'.format(fc))
+        self.res_nds_table_output[49] = '{0:.2f}'.format(fc)
         self.res_labels[50].configure(text='{0:.2f}'.format(cd))
+        self.res_nds_table_output[50] = '{0:.2f}'.format(cd)
         self.res_labels[51].configure(text='{0:.2f}'.format(self.wall.cm_fc))
+        self.res_nds_table_output[51] = '{0:.2f}'.format(self.wall.cm_fc)
         self.res_labels[52].configure(text='{0:.2f}'.format(self.wall.ct_fc))
+        self.res_nds_table_output[52] = '{0:.2f}'.format(self.wall.ct_fc)
         self.res_labels[54].configure(text='{0:.2f}'.format(self.wall.cf_fc))
+        self.res_nds_table_output[54] = '{0:.2f}'.format(self.wall.cf_fc)
         self.res_labels[56].configure(text='{0:.2f}'.format(self.wall.ci_fc))
+        self.res_nds_table_output[56] = '{0:.2f}'.format(self.wall.ci_fc)
         self.res_labels[58].configure(text='{0:.3f}'.format(self.wall.cp))
+        self.res_nds_table_output[58] = '{0:.3f}'.format(self.wall.cp)
         self.res_labels[61].configure(text='{0:.2f}'.format(cfrt[2]))
+        self.res_nds_table_output[61] = '{0:.2f}'.format(cfrt[2])
         self.res_labels[62].configure(text='{0:.2f}'.format(self.wall.fc_prime_psi))
+        self.res_nds_table_output[62] = '{0:.2f}'.format(self.wall.fc_prime_psi)
         
         #fc_perp
         self.res_labels[65].configure(text='{0:.2f}'.format(fc_perp))
+        self.res_nds_table_output[65] = '{0:.2f}'.format(fc_perp)
         self.res_labels[67].configure(text='{0:.2f}'.format(self.wall.cm_fc_perp))
+        self.res_nds_table_output[67] = '{0:.2f}'.format(self.wall.cm_fc_perp)
         self.res_labels[68].configure(text='{0:.2f}'.format(self.wall.ct_fc_perp))
+        self.res_nds_table_output[68] = '{0:.2f}'.format(self.wall.ct_fc_perp)
         self.res_labels[72].configure(text='{0:.2f}'.format(self.wall.ci_fc_perp))
+        self.res_nds_table_output[72] = '{0:.2f}'.format(self.wall.ci_fc_perp)
         self.res_labels[76].configure(text='{0:.2f}'.format(self.wall.cb_fc_perp))
+        self.res_nds_table_output[76] = '{0:.2f}'.format(self.wall.cb_fc_perp)
         self.res_labels[77].configure(text='{0:.2f}'.format(cfrt[3]))
+        self.res_nds_table_output[77] = '{0:.2f}'.format(cfrt[3])
         self.res_labels[78].configure(text='{0:.2f}'.format(self.wall.fc_perp_pl_prime_psi))
+        self.res_nds_table_output[78] = '{0:.2f}'.format(self.wall.fc_perp_pl_prime_psi)
         
         #E
         self.res_labels[81].configure(text='{0:.2f}'.format(E))
+        self.res_nds_table_output[81] = '{0:.2f}'.format(E)
         self.res_labels[83].configure(text='{0:.2f}'.format(self.wall.cm_E))
+        self.res_nds_table_output[83] = '{0:.2f}'.format(self.wall.cm_E)
         self.res_labels[84].configure(text='{0:.2f}'.format(self.wall.ct_E))
+        self.res_nds_table_output[84] = '{0:.2f}'.format(self.wall.ct_E)
         self.res_labels[88].configure(text='{0:.2f}'.format(self.wall.ci_E))
+        self.res_nds_table_output[88] = '{0:.2f}'.format(self.wall.ci_E)
         self.res_labels[93].configure(text='{0:.2f}'.format(cfrt[4]))
+        self.res_nds_table_output[93] = '{0:.2f}'.format(cfrt[4])
         self.res_labels[94].configure(text='{0:.2f}'.format(self.wall.E_prime_psi))
+        self.res_nds_table_output[94] = '{0:.2f}'.format(self.wall.E_prime_psi)
         
         #Emin
         self.res_labels[97].configure(text='{0:.2f}'.format(Emin))
+        self.res_nds_table_output[97] = '{0:.2f}'.format(Emin)
         self.res_labels[99].configure(text='{0:.2f}'.format(self.wall.cm_E))
+        self.res_nds_table_output[99] = '{0:.2f}'.format(self.wall.cm_E)
         self.res_labels[100].configure(text='{0:.2f}'.format(self.wall.ct_E))
+        self.res_nds_table_output[100] = '{0:.2f}'.format(self.wall.ct_E)
         self.res_labels[104].configure(text='{0:.2f}'.format(self.wall.ci_E))
+        self.res_nds_table_output[104] = '{0:.2f}'.format(self.wall.ci_E)
         self.res_labels[107].configure(text='{0:.2f}'.format(self.wall.cT))
+        self.res_nds_table_output[107] = '{0:.2f}'.format(self.wall.cT)
         self.res_labels[109].configure(text='{0:.2f}'.format(cfrt[5]))
+        self.res_nds_table_output[109] = '{0:.2f}'.format(cfrt[5])
         self.res_labels[110].configure(text='{0:.2f}'.format(self.wall.Emin_prime_psi))
+        self.res_nds_table_output[110] = '{0:.2f}'.format(self.wall.Emin_prime_psi)
         
         self.b_build_chart.configure(state=tk.NORMAL)
         self.b_build_pm.configure(state=tk.NORMAL)
+        self.b_output_res.configure(state=tk.NORMAL)
         
     def generate_interaction_graph(self,*event):        
         e_in = self.e_in
@@ -703,7 +762,51 @@ class Master_window:
         self.ax1B.set_ylabel('Axial (lbs)'+e_string)
         
         self.ax1B.set_title(self.title)
-        self.canvasB.draw()        
+        self.canvasB.draw()
+    
+    def path_exists(self,path):
+        res_folder_exist = os.path.isdir(path)
+
+        if res_folder_exist is False:
+
+            os.makedirs(path)
+
+        else:
+            pass
+
+        return 'Directory created'
+        
+    def save_inputs(self,*event):
+        self.run()
+        
+        ##Create a file containing user inputs to be read back in
+        #all inputs are single values so write a single input per line
+        
+        a = 1+1
+    
+    def write_text_results_to_file(self,*event):
+        #generate file name and confirm path exists if not create it
+        b = self.b_nom.get()
+        d = self.d_nom.get()
+        h = self.wall_height.get()
+        label = '{0}x{1}_height_{2}'.format(b,d,h)
+        path = os.path.join(os.path.expanduser('~'),'Desktop','RESULTS','Wood_Walls', label)
+        self.path_exists(path)
+        
+        name = label+'_results.txt'
+        output = self.results_text_box.get(1.0,tk.END)
+        file = open(os.path.join(path,name),'w')
+        file.write(output)
+        file.close()
+        
+        name_nds_table = label+'_nds_load_factor_table.csv'
+        string = ''
+        for i in range(len(self.res_nds_table_output)):
+            string = string + '{0},'.format(self.res_nds_table_output[i])
+        file = open(os.path.join(path,name_nds_table),'w')
+        file.write(string)
+        file.close()
+        
 def main():            
     root = tk.Tk()
     root.title("Wood Stud Wall - 2-4x Studs - North American Species (Not Southern Pine)")

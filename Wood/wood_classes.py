@@ -243,7 +243,7 @@ class wood_stud_wall:
         #Slenderness Ratio check per NDS 2005 sections 3.7.1.2 thru 3.7.1.4
         kb = 1.0
         kd = 1.0
-        self.assumptions_ke = 'Ke = 1.0 for both depth and breadth of studs, Ref NDS 2005 appendix G pin top and bottom\n'
+        self.assumptions_ke = '\nKe = 1.0 for both depth and breadth of studs, Ref NDS 2005 appendix G pin top and bottom\n'
         leb = 12 * kb
         self.assumptions_leb = 'Le,b = 12.0, continously braced by sheathing 12" field nailing assumed\n'
         led = self.height_in * kd
