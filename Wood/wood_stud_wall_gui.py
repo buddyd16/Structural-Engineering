@@ -794,7 +794,9 @@ class Master_window:
         b = self.b_nom.get()
         d = self.d_nom.get()
         h = self.wall_height.get()
-        label = '{0}x{1}_height_{2}'.format(b,d,h)
+        p = self.pressure.get()
+        cd = self.cd.get()
+        label = '{0}x{1}_height-{2}_ft_pressure-{3}_psf_Cd-{4}'.format(b,d,h,p,cd)
         path = os.path.join(os.path.expanduser('~'),'Desktop','RESULTS','Wood_Walls', label)
         self.path_exists(path)
         
