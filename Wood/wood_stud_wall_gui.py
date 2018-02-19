@@ -436,7 +436,7 @@ class Master_window:
         height = float(self.wall_height.get())
         spacing = float(self.stud_spacing.get())
         grade = self.grade.get()
-        self.title = '{0}x{1} ({2:.2f}x{3:.2f})- Height:{4} ft - Species: {7} - Grade: {5} - Spacing:{6} in'.format(self.b_nom.get(),self.d_nom.get(),b,d,height,grade,spacing, self.species.get())
+        self.title = '{0}x{1} ({2:.2f}x{3:.2f})- Height:{4} ft - Species: {7} - Grade: {5} - Spacing: {6} in'.format(self.b_nom.get(),self.d_nom.get(),b,d,height,grade,spacing, self.species.get())
         self.results_text_box.insert(tk.END, self.title)
         
         fb = float(self.fb_psi.get())
@@ -483,6 +483,8 @@ class Master_window:
         ##Create Text String and write Axial result to text box        
         axial_string = '\n\n-- Pmax,allow = {0:.2f} lbs ({2:.2f} plf) {1} --'.format(p_lbs,e_string, p_lbs/(self.wall.spacing_in/12.0))
         axial_string = axial_string + '\n-- PL Crushing (Cb): {0:.2f} lbs ({2:.2f} plf) --\n-- PL Crushing (w/o Cb): {1:.2f} lbs ({3:.2f} plf) --'.format(self.wall.crushing_limit_lbs,self.wall.crushing_limit_lbs_no_cb,self.wall.crushing_limit_lbs/(self.wall.spacing_in/12.0),self.wall.crushing_limit_lbs_no_cb/(self.wall.spacing_in/12.0))
+        common_capacities = self.wall.cap_at_common_spacing(cd,pressure_psf,self.e_in)
+        axial_string = axial_string + '\n\n--Common Spacing Capacities--\n' + common_capacities
         self.results_text_box.insert(tk.END, axial_string)
         
         ##Pull Section properties from wall class and write out to results text box

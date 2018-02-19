@@ -427,7 +427,38 @@ class wood_stud_wall:
         y.append(0)
         w_plf = (((self.m_inlbs_limit * 8.0) / (self.height_in**2)) * 12.0)* (self.spacing_in/12)
         d.append((5 * (w_plf) * (self.height_in/12)**4)/(384*self.E_prime_psi*self.I_in4)*1728)
-        return x,y,d            
+        return x,y,d
+
+    def cap_at_common_spacing(self, cd,lateral_w_psf, e_in):
+        spacings = [4,6,8,12,16,24]
+        res_string = 'Axial Capacity at 4", 6", 8", 12", 16", and 24" spacings:\n'
+        self.cap_at_common = []
+        
+        for s in spacings:
+            w_plf = lateral_w_psf * (s/12.0)
+            m_inlbs =  ((w_plf * (self.height_in/12.0)**2)/8.0)*12
+            deflection = (5 * (w_plf) * (self.height_in/12)**4)/(384*self.E_prime_psi*self.I_in4)*1728
+            
+            p_lbs = self.axial_capacity_w_moment(cd,m_inlbs,e_in)
+            p_plf = p_lbs / (s/12.0)
+            
+            if e_in ==0:
+                deflection = deflection
+            else:
+                deflection = deflection + (((p_lbs*e_in)*self.height_in**2)/(16.0*self.E_prime_psi*self.I_in4))
+            
+            d_ratio = self.height_in / deflection
+            d_string = 'H/{0:.1f}'.format(d_ratio)
+            
+            res_string = res_string + '{0:.3f} ft - {1}" O.C. - {2:.2f} Lbs ({3:.2f} plf) - {4}\n'.format(self.height_in/12.0,s,p_lbs,p_plf,d_string)
+            res_list = [s,p_lbs,p_plf,d_string]
+            self.cap_at_common.append(res_list)
+        
+        return res_string
+            
+            
+
+                
 '''
 #Cd - NDS 2005 Table 2.3.2
 cd = [0.9,1.0,1.15,1.25,1.6,2.0]        
