@@ -280,9 +280,9 @@ class Master_window:
         self.res_labels[0].configure(text='')
         self.res_nds_table_output[0] = ''
         self.res_labels[1].configure(text='')
-        self.res_nds_table_output[1] = ''
+        self.res_nds_table_output[1] = ','
         self.res_labels[14].configure(text='')
-        self.res_nds_table_output[14] = ''
+        self.res_nds_table_output[14] = ','
         self.res_labels[15].configure(text='')
         self.res_nds_table_output[15] = '\n'
         factors = ['Cd','Cm','Ct','CL','Cf','Cfu','Ci','Cr','Cp','CT','Cb','Cfrt']
@@ -291,7 +291,7 @@ class Master_window:
             self.res_labels[i].configure(text=c)
             self.res_nds_table_output[i] = c
             i+=1
-        row_headers = ["Fb' = Fb ","Fv' = Fv ","Fc' = Fc ","Fc,perp' = Fc,perp ","E' = E ","Emin' = Emin "]
+        row_headers = ["Fb' = Fb ","Fv' = Fv ","Fc' = Fc ","Fc_perp' = Fc_perp ","E' = E ","Emin' = Emin "]
         i=16
         for header in row_headers:
             self.res_labels[i].configure(text=header)
@@ -781,6 +781,11 @@ class Master_window:
         
         ##Create a file containing user inputs to be read back in
         #all inputs are single values so write a single input per line
+        
+        #Gather inputs
+        b = self.b_nom.get()
+        d = self.d_nom.get()
+        h = self.wall_height.get()
         
         a = 1+1
     
