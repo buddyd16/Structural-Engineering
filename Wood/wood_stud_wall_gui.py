@@ -7,6 +7,7 @@ import matplotlib
 matplotlib.use('TKAgg')
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
 import tkFileDialog
 import os
 
@@ -263,7 +264,7 @@ class Master_window:
         
         self.b_run = tk.Button(self.input_frame,text="Calc", command=self.run, font=helv)
         self.b_run.pack(side=tk.RIGHT)
-        self.b_build_chart = tk.Button(self.input_frame,text="Build Interaction Chart", command=self.generate_interaction_graph, font=helv, state = tk.DISABLED)
+        self.b_build_chart = tk.Button(self.input_frame,text="Build P-Lateral Pressure Chart", command=self.generate_interaction_graph, font=helv, state = tk.DISABLED)
         self.b_build_chart.pack(side=tk.RIGHT)
         self.b_build_pm = tk.Button(self.input_frame,text="Build P-M Chart", command=self.generate_pm_graph, font=helv, state = tk.DISABLED)
         self.b_build_pm.pack(side=tk.RIGHT) 
@@ -317,7 +318,11 @@ class Master_window:
 
         self.text_results_frame.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
         self.b_output_res= tk.Button(self.results_frame,text="Export Results", command=self.write_text_results_to_file, font=helv, state = tk.DISABLED)
-        self.b_output_res.pack(side=tk.RIGHT)        
+        self.b_output_res.pack(side=tk.RIGHT)
+        self.b_output_pp= tk.Button(self.results_frame,text="Export P-Pressure Curves", command=self.print_pp_graph_common, font=helv, state = tk.DISABLED)
+        self.b_output_pp.pack(side=tk.RIGHT)
+        self.b_output_pm= tk.Button(self.results_frame,text="Export P-M Curves", command=self.print_pm_graph_common, font=helv, state = tk.DISABLED)
+        self.b_output_pm.pack(side=tk.RIGHT)
         self.results_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
         
         #Tab 2 -P vs Pressure Curve
@@ -367,7 +372,7 @@ class Master_window:
 
         self.chart_frame.pack(side=tk.TOP, fill=tk.BOTH)
         
-        #Tab 3 -P vs Pressure Curve
+        #Tab 3 -P vs M Curve
         self.page3 = ttk.Frame(self.nb)
         self.nb.add(self.page3, text='P-M Diagram', state = tk.DISABLED)
         
@@ -668,6 +673,8 @@ class Master_window:
         self.b_build_chart.configure(state=tk.NORMAL)
         self.b_build_pm.configure(state=tk.NORMAL)
         self.b_output_res.configure(state=tk.NORMAL)
+        self.b_output_pm.configure(state=tk.NORMAL)
+        self.b_output_pp.configure(state=tk.NORMAL)
         self.b_save.configure(state=tk.NORMAL)
         
     def generate_interaction_graph(self,*event):        
@@ -675,22 +682,22 @@ class Master_window:
         #Refresh chart data for each Cd
         #Cd - NDS 2005 Table 2.3.2
         #cd = [0.9,1.0,1.15,1.25,1.6,2.0]
-        w,p,d = self.wall.wall_interaction_diagram_cd(0.9,e_in)
+        w,p,d = self.wall.wall_interaction_diagram_cd(0.9,e_in,0)
         self.line_cd009.set_data(w,p)
         
-        w,p,d = self.wall.wall_interaction_diagram_cd(1.0,e_in)
+        w,p,d = self.wall.wall_interaction_diagram_cd(1.0,e_in,0)
         self.line_cd100.set_data(w,p)
         
-        w,p,d = self.wall.wall_interaction_diagram_cd(1.15,e_in)
+        w,p,d = self.wall.wall_interaction_diagram_cd(1.15,e_in,0)
         self.line_cd115.set_data(w,p)
         
-        w,p,d = self.wall.wall_interaction_diagram_cd(1.25,e_in)
+        w,p,d = self.wall.wall_interaction_diagram_cd(1.25,e_in,0)
         self.line_cd125.set_data(w,p)
         
-        w,p,d = self.wall.wall_interaction_diagram_cd(1.6,e_in)
+        w,p,d = self.wall.wall_interaction_diagram_cd(1.6,e_in,0)
         self.line_cd160.set_data(w,p)
         
-        w,p,d = self.wall.wall_interaction_diagram_cd(2.0,e_in)
+        w,p,d = self.wall.wall_interaction_diagram_cd(2.0,e_in,0)
         self.line_cd200.set_data(w,p)
         
         if self.wall.crushing_limit_lbs > 1.2*max(p):
@@ -725,27 +732,27 @@ class Master_window:
         #Refresh chart data for each Cd
         #Cd - NDS 2005 Table 2.3.2
         #cd = [0.9,1.0,1.15,1.25,1.6,2.0]
-        w,p,d = self.wall.wall_pm_diagram_cd(0.9,e_in)
+        w,p,d = self.wall.wall_pm_diagram_cd(0.9,e_in,0)
         self.line_cd009B.set_data(w,p)
         self.line_delta_cd009B.set_data(w,d)
         
-        w,p,d = self.wall.wall_pm_diagram_cd(1.0,e_in)
+        w,p,d = self.wall.wall_pm_diagram_cd(1.0,e_in,0)
         self.line_cd100B.set_data(w,p)
         self.line_delta_cd100B.set_data(w,d)
         
-        w,p,d = self.wall.wall_pm_diagram_cd(1.15,e_in)
+        w,p,d = self.wall.wall_pm_diagram_cd(1.15,e_in,0)
         self.line_cd115B.set_data(w,p)
         self.line_delta_cd115B.set_data(w,d)
         
-        w,p,d = self.wall.wall_pm_diagram_cd(1.25,e_in)
+        w,p,d = self.wall.wall_pm_diagram_cd(1.25,e_in,0)
         self.line_cd125B.set_data(w,p)
         self.line_delta_cd125B.set_data(w,d)
         
-        w,p,d = self.wall.wall_pm_diagram_cd(1.6,e_in)
+        w,p,d = self.wall.wall_pm_diagram_cd(1.6,e_in,0)
         self.line_cd160B.set_data(w,p)
         self.line_delta_cd160B.set_data(w,d)
         
-        w,p,d = self.wall.wall_pm_diagram_cd(2.0,e_in)
+        w,p,d = self.wall.wall_pm_diagram_cd(2.0,e_in,0)
         self.line_cd200B.set_data(w,p)
         self.line_delta_cd200B.set_data(w,d)
         
@@ -985,6 +992,204 @@ class Master_window:
         file = open(os.path.join(path,name_nds_table),'w')
         file.write(string)
         file.close()
+    
+    def print_pm_graph_common(self,*event):
+        b = self.b_actual
+        d = self.d_actual
+        h = self.wall_height.get()
+        p = self.pressure.get()
+        cd = self.cd.get()
+        grade = self.grade.get()
+        label = '{0}x{1}_height-{2}_ft_pressure-{3}_psf_Cd-{4}'.format(self.b_nom.get(),self.d_nom.get(),h,p,cd)
+        path = os.path.join(os.path.expanduser('~'),'Desktop','RESULTS','Wood_Walls', label,'PvM_Charts')
+        self.path_exists(path)
+        
+        #initialize plot
+        pmfig, ax1C = plt.subplots(figsize=(17,11), dpi=600)
+        ax1C.minorticks_on()
+        ax1C.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
+        ax1C.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
+        ax2C=ax1C.twinx()
+        #Prebuild chart lines so data can be refreshed to cut down on render time
+        #['0.9','1.0','1.15','1.25','1.6','2.0']
+        line_cd009C, = ax1C.plot([0,10],[10,0], label='Cd = 0.9')
+        line_cd100C, = ax1C.plot([0,15],[15,0], label='Cd = 1.0')
+        line_cd115C, = ax1C.plot([0,25],[25,0], label='Cd = 1.15')
+        line_cd125C, = ax1C.plot([0,35],[35,0], label='Cd = 1.25')
+        line_cd160C, = ax1C.plot([0,50],[50,0], label='Cd = 1.6')
+        line_cd200C, = ax1C.plot([0,75],[75,0], label='Cd = 2.0')
+        line_pl_cbC, = ax1C.plot([0,10],[3,3], label='PL Crushing')
+        line_pl_wo_cbC, = ax1C.plot([0,10],[1.5,1.5], label='PL Crushing w/o Cb')
+        line_delta_cd009C, = ax2C.plot([0,10],[0,13], label='D - Cd = 0.9')
+        line_delta_cd100C, = ax2C.plot([0,15],[15,0], label='D - Cd = 1.0')
+        line_delta_cd115C, = ax2C.plot([0,25],[25,0], label='D - Cd = 1.15')
+        line_delta_cd125C, = ax2C.plot([0,35],[35,0], label='D - Cd = 1.25')
+        line_delta_cd160C, = ax2C.plot([0,50],[50,0], label='D - Cd = 1.6')
+        line_delta_cd200C, = ax2C.plot([0,75],[75,0], label='D - Cd = 2.0')
+
+        legend_ax1C = ax1C.legend(loc=1, fontsize='x-small')
+        legend_ax2C = ax2C.legend(loc=4, fontsize='x-small')
+        
+        min_ecc = self.min_ecc_yn.get()
+        if min_ecc == 1:
+            e_string = ' at min d/6 = {0:.3f} in eccentricity '.format(self.e_in)
+            e_string_file = '-Axial_Ecc_Included'
+        else:
+            e_string =''
+            e_string_file =''
+            
+        ax1C.set_ylabel('Axial (lbs)'+e_string)
+        ax1C.set_xlabel('Moment (in-lbs)')
+        ax2C.set_ylabel('Mid Height Deflection (in)')
+        
+        
+        spacings = [4,6,8,12,16,24]
+        for s in spacings:
+            file = '{0}x{1}_height-{2}_ft_pressure-{3}_psf_Cd-{4}_Spacing_{5}_in-PvM_chart_11x17{6}.pdf'.format(self.b_nom.get(),self.d_nom.get(),h,self.pressure.get(),cd,s,e_string_file)
+            title = '{0}x{1} ({2:.2f}x{3:.2f})- Height:{4} ft - Species: {7} - Grade: {5} - Spacing: {6} in'.format(self.b_nom.get(),self.d_nom.get(),self.b_actual,self.d_actual,h,grade,s, self.species.get())
+            e_in = self.e_in
+            #Refresh chart data for each Cd
+            #Cd - NDS 2005 Table 2.3.2
+            #cd = [0.9,1.0,1.15,1.25,1.6,2.0]
+            w,p,d = self.wall.wall_pm_diagram_cd(0.9,e_in,s)
+            line_cd009C.set_data(w,p)
+            line_delta_cd009C.set_data(w,d)
+            
+            w,p,d = self.wall.wall_pm_diagram_cd(1.0,e_in,s)
+            line_cd100C.set_data(w,p)
+            line_delta_cd100C.set_data(w,d)
+            
+            w,p,d = self.wall.wall_pm_diagram_cd(1.15,e_in,s)
+            line_cd115C.set_data(w,p)
+            line_delta_cd115C.set_data(w,d)
+            
+            w,p,d = self.wall.wall_pm_diagram_cd(1.25,e_in,s)
+            line_cd125C.set_data(w,p)
+            line_delta_cd125C.set_data(w,d)
+            
+            w,p,d = self.wall.wall_pm_diagram_cd(1.6,e_in,s)
+            line_cd160C.set_data(w,p)
+            line_delta_cd160C.set_data(w,d)
+            
+            w,p,d = self.wall.wall_pm_diagram_cd(2.0,e_in,s)
+            line_cd200C.set_data(w,p)
+            line_delta_cd200C.set_data(w,d)
+            
+            if self.wall.crushing_limit_lbs > 1.2*max(p):
+                line_pl_cbC.set_data([0,0],[0,0])
+                line_pl_wo_cbC.set_data([0,0],[0,0])        
+            else:
+                line_pl_cbC.set_data([0,max(w)],[self.wall.crushing_limit_lbs,self.wall.crushing_limit_lbs])
+                line_pl_wo_cbC.set_data([0,max(w)],[self.wall.crushing_limit_lbs_no_cb,self.wall.crushing_limit_lbs_no_cb])
+            
+            ax1C.set_xlim(0, max(w)+500)
+            ax1C.set_ylim(0, max(p)+200)
+            ax2C.set_ylim(0, max(d)+0.75)
+            
+            ax1C.set_title(title)
+            
+            pmfig.savefig(os.path.join(path,file))
+        
+        plt.close('all')
+        
+    def print_pp_graph_common(self,*event):
+        b = self.b_actual
+        d = self.d_actual
+        h = self.wall_height.get()
+        p = self.pressure.get()
+        cd = self.cd.get()
+        grade = self.grade.get()
+        label = '{0}x{1}_height-{2}_ft_pressure-{3}_psf_Cd-{4}'.format(self.b_nom.get(),self.d_nom.get(),h,p,cd)
+        path = os.path.join(os.path.expanduser('~'),'Desktop','RESULTS','Wood_Walls', label,'PvPressure_Charts')
+        self.path_exists(path)
+        
+        #initialize plot
+        pmfig, ax1C = plt.subplots(figsize=(17,11), dpi=600)
+        ax1C.minorticks_on()
+        ax1C.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
+        ax1C.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
+        ax2C=ax1C.twinx()
+        #Prebuild chart lines so data can be refreshed to cut down on render time
+        #['0.9','1.0','1.15','1.25','1.6','2.0']
+        line_cd009C, = ax1C.plot([0,10],[10,0], label='Cd = 0.9')
+        line_cd100C, = ax1C.plot([0,15],[15,0], label='Cd = 1.0')
+        line_cd115C, = ax1C.plot([0,25],[25,0], label='Cd = 1.15')
+        line_cd125C, = ax1C.plot([0,35],[35,0], label='Cd = 1.25')
+        line_cd160C, = ax1C.plot([0,50],[50,0], label='Cd = 1.6')
+        line_cd200C, = ax1C.plot([0,75],[75,0], label='Cd = 2.0')
+        line_pl_cbC, = ax1C.plot([0,10],[3,3], label='PL Crushing')
+        line_pl_wo_cbC, = ax1C.plot([0,10],[1.5,1.5], label='PL Crushing w/o Cb')
+        line_delta_cd009C, = ax2C.plot([0,10],[0,13], label='D - Cd = 0.9')
+        line_delta_cd100C, = ax2C.plot([0,15],[15,0], label='D - Cd = 1.0')
+        line_delta_cd115C, = ax2C.plot([0,25],[25,0], label='D - Cd = 1.15')
+        line_delta_cd125C, = ax2C.plot([0,35],[35,0], label='D - Cd = 1.25')
+        line_delta_cd160C, = ax2C.plot([0,50],[50,0], label='D - Cd = 1.6')
+        line_delta_cd200C, = ax2C.plot([0,75],[75,0], label='D - Cd = 2.0')
+
+        legend_ax1C = ax1C.legend(loc=1, fontsize='x-small')
+        legend_ax2C = ax2C.legend(loc=4, fontsize='x-small')
+        
+        min_ecc = self.min_ecc_yn.get()
+        if min_ecc == 1:
+            e_string = ' at min d/6 = {0:.3f} in eccentricity '.format(self.e_in)
+            e_string_file = '-Axial_Ecc_Included'
+        else:
+            e_string =''
+            e_string_file =''
+            
+        ax1C.set_ylabel('Axial (lbs)'+e_string)
+        ax1C.set_xlabel('Pressure (psf)')
+        ax2C.set_ylabel('Mid Height Deflection (in)')
+        
+        
+        spacings = [4,6,8,12,16,24]
+        for s in spacings:
+            file = '{0}x{1}_height-{2}_ft_Cd-{3}_Spacing_{4}_in-PvP_chart_11x17{5}.pdf'.format(self.b_nom.get(),self.d_nom.get(),h,cd,s,e_string_file)
+            title = '{0}x{1} ({2:.2f}x{3:.2f})- Height:{4} ft - Species: {7} - Grade: {5} - Spacing: {6} in'.format(self.b_nom.get(),self.d_nom.get(),self.b_actual,self.d_actual,h,grade,s, self.species.get())
+            e_in = self.e_in
+            #Refresh chart data for each Cd
+            #Cd - NDS 2005 Table 2.3.2
+            #cd = [0.9,1.0,1.15,1.25,1.6,2.0]
+            w,p,d = self.wall.wall_interaction_diagram_cd(0.9,e_in,s)
+            line_cd009C.set_data(w,p)
+            line_delta_cd009C.set_data(w,d)
+            
+            w,p,d = self.wall.wall_interaction_diagram_cd(1.0,e_in,s)
+            line_cd100C.set_data(w,p)
+            line_delta_cd100C.set_data(w,d)
+            
+            w,p,d = self.wall.wall_interaction_diagram_cd(1.15,e_in,s)
+            line_cd115C.set_data(w,p)
+            line_delta_cd115C.set_data(w,d)
+            
+            w,p,d = self.wall.wall_interaction_diagram_cd(1.25,e_in,s)
+            line_cd125C.set_data(w,p)
+            line_delta_cd125C.set_data(w,d)
+            
+            w,p,d = self.wall.wall_interaction_diagram_cd(1.6,e_in,s)
+            line_cd160C.set_data(w,p)
+            line_delta_cd160C.set_data(w,d)
+            
+            w,p,d = self.wall.wall_interaction_diagram_cd(2.0,e_in,s)
+            line_cd200C.set_data(w,p)
+            line_delta_cd200C.set_data(w,d)
+            
+            if self.wall.crushing_limit_lbs > 1.2*max(p):
+                line_pl_cbC.set_data([0,0],[0,0])
+                line_pl_wo_cbC.set_data([0,0],[0,0])        
+            else:
+                line_pl_cbC.set_data([0,max(w)],[self.wall.crushing_limit_lbs,self.wall.crushing_limit_lbs])
+                line_pl_wo_cbC.set_data([0,max(w)],[self.wall.crushing_limit_lbs_no_cb,self.wall.crushing_limit_lbs_no_cb])
+            
+            ax1C.set_xlim(0, max(w)+20)
+            ax1C.set_ylim(0, max(p)+200)
+            ax2C.set_ylim(0, max(d)+0.75)
+            
+            ax1C.set_title(title)
+            
+            pmfig.savefig(os.path.join(path,file))
+        
+        plt.close('all')
         
 def main():            
     root = tk.Tk()

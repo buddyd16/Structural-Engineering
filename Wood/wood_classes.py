@@ -361,7 +361,12 @@ class wood_stud_wall:
         
         return p_lbs
     
-    def wall_interaction_diagram_cd(self, cd, e_in):
+    def wall_interaction_diagram_cd(self, cd, e_in,s_in):
+        
+        if s_in == 0:
+           diag_spacing_in  = self.spacing_in
+        else:
+           diag_spacing_in = s_in
         
         # Find bending limit pressure for each Cd ie where fb = Fb'
         # fb = M/s , M in in-lbs and s in in^3
@@ -369,15 +374,17 @@ class wood_stud_wall:
         # w = Fb' * s * 8 / stud height^2 * (12 in / 1 ft)
         
         self.w_plf_limit = ((self.fb_prime_calc(cd) * self.s_in3 * 8.0) / (self.height_in**2)) * 12.0
-        self.w_psf_limit = self.w_plf_limit/(self.spacing_in/12.0)
+        self.w_psf_limit = self.w_plf_limit/(diag_spacing_in/12.0)
 
         # Determine pure axial compression capacity ie where fc = Fc' - withou consideration for plate crushing
         # fc = P/a
         # P = a * Fc'
         if e_in == 0:
             self.p_lbs_limit = self.area_in2 * self.fc_prime_calc(cd)
+            d=[0] #deflection at pressure x
         else:
             self.p_lbs_limit = self.axial_capacity_w_moment(cd,0, e_in)
+            d=[(((self.p_lbs_limit*e_in)*self.height_in**2)/(16.0*self.E_prime_psi*self.I_in4))]
             
         points = 50
         step = self.w_psf_limit/points
@@ -385,14 +392,14 @@ class wood_stud_wall:
         w=0
         x=[0] #pressure on x-axis
         y=[self.p_lbs_limit] #axial force on y-axis
-        d=[0] #deflection at pressure x
+
         
         for i in range(1,points):
             w = step*i
             x.append(w)
-            w_plf = w * (self.spacing_in/12)
+            w_plf = w * (diag_spacing_in/12)
             moment_inlbs = (((w_plf) * (self.height_in/12)**2) / 8.0)*12
-            deflection = (5 * (w_plf) * (self.height_in/12)**4)/(384*self.E_prime_psi*self.I_in4)*1728
+            deflection = (5 * (w_plf) * (self.height_in/12)**4)/(384*self.E_prime_psi*self.I_in4)*1728 + d[0]
             d.append(deflection)
             
             p_lbs = self.axial_capacity_w_moment(cd,moment_inlbs, e_in)
@@ -400,11 +407,16 @@ class wood_stud_wall:
         
         x.append(self.w_psf_limit)
         y.append(0)
-        d.append((5 * (self.w_plf_limit) * (self.height_in/12)**4)/(384*self.E_prime_psi*self.I_in4)*1728)
+        d.append((5 * (self.w_plf_limit) * (self.height_in/12)**4)/(384*self.E_prime_psi*self.I_in4)*1728 + d[0])
         return x,y,d
         
-    def wall_pm_diagram_cd(self, cd, e_in):
+    def wall_pm_diagram_cd(self, cd, e_in, s_in):
         
+        if s_in == 0:
+           diag_spacing_in  = self.spacing_in
+        else:
+           diag_spacing_in = s_in
+           
         # Find bending limit pressure for each Cd ie where fb = Fb'
         # fb = M/s , M in in-lbs and s in in^3
         
@@ -433,7 +445,7 @@ class wood_stud_wall:
             m = step*i
             moment_inlbs = m
             x.append(m)
-            w_plf = (((m * 8.0) / (self.height_in**2)) * 12.0)* (self.spacing_in/12)
+            w_plf = (((m * 8.0) / (self.height_in**2)) * 12.0)* (diag_spacing_in/12)
             deflection = (5 * (w_plf) * (self.height_in/12)**4)/(384*self.E_prime_psi*self.I_in4)*1728
             p_lbs = self.axial_capacity_w_moment(cd,moment_inlbs, e_in)
             y.append(p_lbs)
@@ -448,7 +460,7 @@ class wood_stud_wall:
         
         x.append(self.m_inlbs_limit)
         y.append(0)
-        w_plf = (((self.m_inlbs_limit * 8.0) / (self.height_in**2)) * 12.0)* (self.spacing_in/12)
+        w_plf = (((self.m_inlbs_limit * 8.0) / (self.height_in**2)) * 12.0)* (diag_spacing_in/12)
         d.append((5 * (w_plf) * (self.height_in/12)**4)/(384*self.E_prime_psi*self.I_in4)*1728)
         return x,y,d
 
