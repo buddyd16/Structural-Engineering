@@ -350,10 +350,16 @@ class Master_window:
         self.line_cd200, = self.ax1.plot([0,75],[75,0], label='Cd = 2.0')
         self.line_pl_cb, = self.ax1.plot([0,10],[3,3], label='PL Crushing')
         self.line_pl_wo_cb, = self.ax1.plot([0,10],[1.5,1.5], label='PL Crushing w/o Cb')
-        self.line_delta, = self.ax2.plot([0,10],[0,13], label='D')
-        self.line_delta_180, = self.ax2.plot([6,6],[0,13], label='H/180')
-        self.line_delta_240, = self.ax2.plot([4,4],[0,13], label='H/240')
-        self.line_delta_360, = self.ax2.plot([1,1],[0,13], label='H/360')
+        self.line_delta_cd009, = self.ax2.plot([0,10],[0,13], label='D - Cd = 0.9')
+        self.line_delta_cd100, = self.ax2.plot([0,15],[15,0], label='D - Cd = 1.0')
+        self.line_delta_cd115, = self.ax2.plot([0,25],[25,0], label='D - Cd = 1.15')
+        self.line_delta_cd125, = self.ax2.plot([0,35],[35,0], label='D - Cd = 1.25')
+        self.line_delta_cd160, = self.ax2.plot([0,50],[50,0], label='D - Cd = 1.6')
+        self.line_delta_cd200, = self.ax2.plot([0,75],[75,0], label='D - Cd = 2.0')
+        self.line_delta_180, = self.ax2.plot([6,6],[0,13], label='H/180', linestyle=':')
+        self.line_delta_240, = self.ax2.plot([4,4],[0,13], label='H/240', linestyle=':')
+        self.line_delta_360, = self.ax2.plot([1,1],[0,13], label='H/360', linestyle=':')
+        self.line_delta_600, = self.ax2.plot([1,1],[0,13], label='H/600', linestyle=':')
         
         self.legend_ax1 = self.ax1.legend(loc=1, fontsize='x-small')
         self.legend_ax2 = self.ax2.legend(loc=4, fontsize='x-small')        
@@ -403,6 +409,10 @@ class Master_window:
         self.line_delta_cd125B, = self.ax2B.plot([0,35],[35,0], label='D - Cd = 1.25')
         self.line_delta_cd160B, = self.ax2B.plot([0,50],[50,0], label='D - Cd = 1.6')
         self.line_delta_cd200B, = self.ax2B.plot([0,75],[75,0], label='D - Cd = 2.0')
+        self.line_delta_180B, = self.ax2B.plot([6,6],[0,13], label='H/180', linestyle=':')
+        self.line_delta_240B, = self.ax2B.plot([4,4],[0,13], label='H/240', linestyle=':')
+        self.line_delta_360B, = self.ax2B.plot([1,1],[0,13], label='H/360', linestyle=':')
+        self.line_delta_600B, = self.ax2B.plot([1,1],[0,13], label='H/600', linestyle=':')
 
         
         self.legend_ax1B = self.ax1B.legend(loc=1, fontsize='x-small')
@@ -684,21 +694,27 @@ class Master_window:
         #cd = [0.9,1.0,1.15,1.25,1.6,2.0]
         w,p,d = self.wall.wall_interaction_diagram_cd(0.9,e_in,0)
         self.line_cd009.set_data(w,p)
+        self.line_delta_cd009.set_data(w,d)
         
         w,p,d = self.wall.wall_interaction_diagram_cd(1.0,e_in,0)
         self.line_cd100.set_data(w,p)
+        self.line_delta_cd100.set_data(w,d)
         
         w,p,d = self.wall.wall_interaction_diagram_cd(1.15,e_in,0)
         self.line_cd115.set_data(w,p)
+        self.line_delta_cd115.set_data(w,d)
         
         w,p,d = self.wall.wall_interaction_diagram_cd(1.25,e_in,0)
         self.line_cd125.set_data(w,p)
+        self.line_delta_cd125.set_data(w,d)
         
         w,p,d = self.wall.wall_interaction_diagram_cd(1.6,e_in,0)
         self.line_cd160.set_data(w,p)
+        self.line_delta_cd160.set_data(w,d)
         
         w,p,d = self.wall.wall_interaction_diagram_cd(2.0,e_in,0)
         self.line_cd200.set_data(w,p)
+        self.line_delta_cd200.set_data(w,d)
         
         if self.wall.crushing_limit_lbs > 1.2*max(p):
             self.line_pl_cb.set_data([0,0],[0,0])
@@ -707,10 +723,10 @@ class Master_window:
             self.line_pl_cb.set_data([0,max(w)],[self.wall.crushing_limit_lbs,self.wall.crushing_limit_lbs])
             self.line_pl_wo_cb.set_data([0,max(w)],[self.wall.crushing_limit_lbs_no_cb,self.wall.crushing_limit_lbs_no_cb])
         
-        self.line_delta.set_data(w,d)
-        self.line_delta_180.set_data([self.wall.defl_180_w_psf,self.wall.defl_180_w_psf],[0,max(d)])
-        self.line_delta_240.set_data([self.wall.defl_240_w_psf,self.wall.defl_240_w_psf],[0,max(d)])
-        self.line_delta_360.set_data([self.wall.defl_360_w_psf,self.wall.defl_360_w_psf],[0,max(d)])        
+        self.line_delta_180.set_data([0,max(w)],[self.wall.height_in/180.0,self.wall.height_in/180.0])
+        self.line_delta_240.set_data([0,max(w)],[self.wall.height_in/240.0,self.wall.height_in/240.0])
+        self.line_delta_360.set_data([0,max(w)],[self.wall.height_in/360.0,self.wall.height_in/360.0])
+        self.line_delta_600.set_data([0,max(w)],[self.wall.height_in/600.0,self.wall.height_in/600.0])
         
         self.ax1.set_xlim(0, max(w)+20)
         self.ax1.set_ylim(0, max(p)+200)
@@ -762,6 +778,11 @@ class Master_window:
         else:
             self.line_pl_cbB.set_data([0,max(w)],[self.wall.crushing_limit_lbs,self.wall.crushing_limit_lbs])
             self.line_pl_wo_cbB.set_data([0,max(w)],[self.wall.crushing_limit_lbs_no_cb,self.wall.crushing_limit_lbs_no_cb])
+        
+        self.line_delta_180B.set_data([0,max(w)],[self.wall.height_in/180.0,self.wall.height_in/180.0])
+        self.line_delta_240B.set_data([0,max(w)],[self.wall.height_in/240.0,self.wall.height_in/240.0])
+        self.line_delta_360B.set_data([0,max(w)],[self.wall.height_in/360.0,self.wall.height_in/360.0])
+        self.line_delta_600B.set_data([0,max(w)],[self.wall.height_in/600.0,self.wall.height_in/600.0])
         
         self.ax1B.set_xlim(0, max(w)+500)
         self.ax1B.set_ylim(0, max(p)+200)
@@ -1032,6 +1053,10 @@ class Master_window:
         line_delta_cd125C, = ax2C.plot([0,35],[35,0], label='D - Cd = 1.25')
         line_delta_cd160C, = ax2C.plot([0,50],[50,0], label='D - Cd = 1.6')
         line_delta_cd200C, = ax2C.plot([0,75],[75,0], label='D - Cd = 2.0')
+        self.line_delta_180C, = ax2C.plot([6,6],[0,13], label='H/180', linestyle=':')
+        self.line_delta_240C, = ax2C.plot([4,4],[0,13], label='H/240', linestyle=':')
+        self.line_delta_360C, = ax2C.plot([1,1],[0,13], label='H/360', linestyle=':')
+        self.line_delta_600C, = ax2C.plot([1,1],[0,13], label='H/600', linestyle=':')
 
         legend_ax1C = ax1C.legend(loc=1, fontsize='x-small')
         legend_ax2C = ax2C.legend(loc=4, fontsize='x-small')
@@ -1088,6 +1113,11 @@ class Master_window:
                 line_pl_cbC.set_data([0,max(w)],[self.wall.crushing_limit_lbs,self.wall.crushing_limit_lbs])
                 line_pl_wo_cbC.set_data([0,max(w)],[self.wall.crushing_limit_lbs_no_cb,self.wall.crushing_limit_lbs_no_cb])
             
+            self.line_delta_180C.set_data([0,max(w)],[self.wall.height_in/180.0,self.wall.height_in/180.0])
+            self.line_delta_240C.set_data([0,max(w)],[self.wall.height_in/240.0,self.wall.height_in/240.0])
+            self.line_delta_360C.set_data([0,max(w)],[self.wall.height_in/360.0,self.wall.height_in/360.0])
+            self.line_delta_600C.set_data([0,max(w)],[self.wall.height_in/600.0,self.wall.height_in/600.0])
+            
             ax1C.set_xlim(0, max(w)+500)
             ax1C.set_ylim(0, max(p)+200)
             ax2C.set_ylim(0, max(d)+0.75)
@@ -1131,6 +1161,10 @@ class Master_window:
         line_delta_cd125C, = ax2C.plot([0,35],[35,0], label='D - Cd = 1.25')
         line_delta_cd160C, = ax2C.plot([0,50],[50,0], label='D - Cd = 1.6')
         line_delta_cd200C, = ax2C.plot([0,75],[75,0], label='D - Cd = 2.0')
+        self.line_delta_180C, = ax2C.plot([6,6],[0,13], label='H/180', linestyle=':')
+        self.line_delta_240C, = ax2C.plot([4,4],[0,13], label='H/240', linestyle=':')
+        self.line_delta_360C, = ax2C.plot([1,1],[0,13], label='H/360', linestyle=':')
+        self.line_delta_600C, = ax2C.plot([1,1],[0,13], label='H/600', linestyle=':')
 
         legend_ax1C = ax1C.legend(loc=1, fontsize='x-small')
         legend_ax2C = ax2C.legend(loc=4, fontsize='x-small')
@@ -1186,6 +1220,11 @@ class Master_window:
             else:
                 line_pl_cbC.set_data([0,max(w)],[self.wall.crushing_limit_lbs,self.wall.crushing_limit_lbs])
                 line_pl_wo_cbC.set_data([0,max(w)],[self.wall.crushing_limit_lbs_no_cb,self.wall.crushing_limit_lbs_no_cb])
+                
+            self.line_delta_180C.set_data([0,max(w)],[self.wall.height_in/180.0,self.wall.height_in/180.0])
+            self.line_delta_240C.set_data([0,max(w)],[self.wall.height_in/240.0,self.wall.height_in/240.0])
+            self.line_delta_360C.set_data([0,max(w)],[self.wall.height_in/360.0,self.wall.height_in/360.0])
+            self.line_delta_600C.set_data([0,max(w)],[self.wall.height_in/600.0,self.wall.height_in/600.0])
             
             ax1C.set_xlim(0, max(w)+20)
             ax1C.set_ylim(0, max(p)+200)
