@@ -975,17 +975,23 @@ class Master_window:
         h = self.wall_height.get()
         p = self.pressure.get()
         cd = self.cd.get()
+        min_ecc = self.min_ecc_yn.get()
+        if min_ecc == 1:
+            e_string_file = '-Axial_Ecc_Included'
+        else:
+            e_string_file =''
+            
         label = '{0}x{1}_height-{2}_ft_pressure-{3}_psf_Cd-{4}'.format(b,d,h,p,cd)
         path = os.path.join(os.path.expanduser('~'),'Desktop','RESULTS','Wood_Walls', label)
         self.path_exists(path)
         
-        name = label+'_results.txt'
+        name = label+e_string_file+'_results.txt'
         output = self.results_text_box.get(1.0,tk.END)
         file = open(os.path.join(path,name),'w')
         file.write(output)
         file.close()
         
-        name_nds_table = label+'_nds_load_factor_table.csv'
+        name_nds_table = label+e_string_file+'_nds_load_factor_table.csv'
         string = ''
         for i in range(len(self.res_nds_table_output)):
             string = string + '{0},'.format(self.res_nds_table_output[i])
@@ -1045,7 +1051,7 @@ class Master_window:
         
         spacings = [4,6,8,12,16,24]
         for s in spacings:
-            file = '{0}x{1}_height-{2}_ft_pressure-{3}_psf_Cd-{4}_Spacing_{5}_in-PvM_chart_11x17{6}.pdf'.format(self.b_nom.get(),self.d_nom.get(),h,self.pressure.get(),cd,s,e_string_file)
+            file = '{0}x{1}_height-{2}_ft_Spacing_{3}_in-PvM_chart_11x17{4}.pdf'.format(self.b_nom.get(),self.d_nom.get(),h,s,e_string_file)
             title = '{0}x{1} ({2:.2f}x{3:.2f})- Height:{4} ft - Species: {7} - Grade: {5} - Spacing: {6} in'.format(self.b_nom.get(),self.d_nom.get(),self.b_actual,self.d_actual,h,grade,s, self.species.get())
             e_in = self.e_in
             #Refresh chart data for each Cd
@@ -1144,7 +1150,7 @@ class Master_window:
         
         spacings = [4,6,8,12,16,24]
         for s in spacings:
-            file = '{0}x{1}_height-{2}_ft_Cd-{3}_Spacing_{4}_in-PvP_chart_11x17{5}.pdf'.format(self.b_nom.get(),self.d_nom.get(),h,cd,s,e_string_file)
+            file = '{0}x{1}_height-{2}_ft_Spacing_{3}_in-PvP_chart_11x17{4}.pdf'.format(self.b_nom.get(),self.d_nom.get(),h,s,e_string_file)
             title = '{0}x{1} ({2:.2f}x{3:.2f})- Height:{4} ft - Species: {7} - Grade: {5} - Spacing: {6} in'.format(self.b_nom.get(),self.d_nom.get(),self.b_actual,self.d_actual,h,grade,s, self.species.get())
             e_in = self.e_in
             #Refresh chart data for each Cd
