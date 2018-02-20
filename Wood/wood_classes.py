@@ -54,8 +54,31 @@ class wood_stud_wall:
         #NOTE ASSUMES STUDS ARE VISUALLY GRADED DIMENSION LUMBER 2"-4" AND NOT SOUTHERN PINE AND NORTH AMERICAN SPECIES
         self.assumptions = self.assumptions + 'Size Factor,Cf - Wall Studs are visually graded dimensional lumber 2" to 4" North American Species and not Southern Pine\n'
         if grade == "Stud":
-            if self.d_in > 5.5:
-                pass
+            #Per NDS 2005 Table 4A for stud grade depth >8" use No.3 size factors
+            if self.d_in>11.25:
+                self.cf_fc = 0.9
+                if self.b_in>2.5:
+                    self.cf_fb = 1.0
+                else:
+                    self.cf_fb = 0.9
+            elif self.d_in>9.25:
+                self.cf_fc = 1.0
+                if self.b_in>2.5:
+                    self.cf_fb = 1.1
+                else:
+                    self.cf_fb = 1.0
+            elif self.d_in>7.25:
+                self.cf_fc = 1.0
+                if self.b_in>2.5:
+                    self.cf_fb = 1.2
+                else:
+                    self.cf_fb = 1.1
+            elif self.d_in>5.5:
+                self.cf_fc = 1.05
+                if self.b_in>2.5:
+                    self.cf_fb = 1.3
+                else:
+                    self.cf_fb = 1.2
             elif self.d_in > 3.5:
                 self.cf_fb = 1.0
                 self.cf_fc = 1.0
