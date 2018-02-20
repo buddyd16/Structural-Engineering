@@ -391,7 +391,7 @@ class wood_stud_wall:
         
         w=0
         x=[0] #pressure on x-axis
-        y=[self.p_lbs_limit] #axial force on y-axis
+        y=[self.p_lbs_limit/ (diag_spacing_in /12.0)] #axial force on y-axis
 
         
         for i in range(1,points):
@@ -403,6 +403,7 @@ class wood_stud_wall:
             deflection = (5 * (w_plf) * (self.height_in/12)**4)/(384*self.E_prime_psi*self.I_in4)*1728
             
             p_lbs = self.axial_capacity_w_moment(cd,moment_inlbs, e_in)
+            p_plf = p_lbs/ (diag_spacing_in /12.0)
             
             if e_in ==0:
                 deflection = deflection
@@ -410,7 +411,7 @@ class wood_stud_wall:
                 deflection = deflection + (((p_lbs*e_in)*self.height_in**2)/(16.0*self.E_prime_psi*self.I_in4))
             
             d.append(deflection)
-            y.append(p_lbs)
+            y.append(p_plf)
         
         x.append(self.w_psf_limit)
         y.append(0)
@@ -442,7 +443,7 @@ class wood_stud_wall:
         
         m=0
         x=[0] #pressure on x-axis
-        y=[self.p_lbs_limit] #axial force on y-axis
+        y=[self.p_lbs_limit/ (diag_spacing_in /12.0)] #axial force on y-axis
         if e_in==0:
             d=[0] #deflection at pressure x
         else:
@@ -455,7 +456,8 @@ class wood_stud_wall:
             w_plf = ((((m/12.0) * 8.0) / ((self.height_in/12.0)**2)))
             deflection = (5 * (w_plf) * (self.height_in/12)**4)/(384*self.E_prime_psi*self.I_in4)*1728
             p_lbs = self.axial_capacity_w_moment(cd,moment_inlbs, e_in)
-            y.append(p_lbs)
+            p_plf = p_lbs / (diag_spacing_in /12.0)
+            y.append(p_plf)
             
             if e_in ==0:
                 deflection = deflection

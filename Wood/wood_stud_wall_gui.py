@@ -716,12 +716,12 @@ class Master_window:
         self.line_cd200.set_data(w,p)
         self.line_delta_cd200.set_data(w,d)
         
-        if self.wall.crushing_limit_lbs > 1.2*max(p):
+        if (self.wall.crushing_limit_lbs/(self.wall.spacing_in/12.0)) > 1.2*max(p):
             self.line_pl_cb.set_data([0,0],[0,0])
             self.line_pl_wo_cb.set_data([0,0],[0,0])        
         else:
-            self.line_pl_cb.set_data([0,max(w)],[self.wall.crushing_limit_lbs,self.wall.crushing_limit_lbs])
-            self.line_pl_wo_cb.set_data([0,max(w)],[self.wall.crushing_limit_lbs_no_cb,self.wall.crushing_limit_lbs_no_cb])
+            self.line_pl_cb.set_data([0,max(w)],[self.wall.crushing_limit_lbs/(self.wall.spacing_in/12.0),self.wall.crushing_limit_lbs/(self.wall.spacing_in/12.0)])
+            self.line_pl_wo_cb.set_data([0,max(w)],[self.wall.crushing_limit_lbs_no_cb/(self.wall.spacing_in/12.0),self.wall.crushing_limit_lbs_no_cb/(self.wall.spacing_in/12.0)])
         
         self.line_delta_180.set_data([0,max(w)],[self.wall.height_in/180.0,self.wall.height_in/180.0])
         self.line_delta_240.set_data([0,max(w)],[self.wall.height_in/240.0,self.wall.height_in/240.0])
@@ -738,7 +738,7 @@ class Master_window:
         else:
             e_string =''        
         
-        self.ax1.set_ylabel('Axial (lbs)'+e_string)
+        self.ax1.set_ylabel('Axial (plf)'+e_string)
         
         self.ax1.set_title(self.title)
         self.canvas.draw()
@@ -772,12 +772,12 @@ class Master_window:
         self.line_cd200B.set_data(w,p)
         self.line_delta_cd200B.set_data(w,d)
         
-        if self.wall.crushing_limit_lbs > 1.2*max(p):
+        if (self.wall.crushing_limit_lbs/(self.wall.spacing_in/12.0)) > 1.2*max(p):
             self.line_pl_cbB.set_data([0,0],[0,0])
             self.line_pl_wo_cbB.set_data([0,0],[0,0])        
         else:
-            self.line_pl_cbB.set_data([0,max(w)],[self.wall.crushing_limit_lbs,self.wall.crushing_limit_lbs])
-            self.line_pl_wo_cbB.set_data([0,max(w)],[self.wall.crushing_limit_lbs_no_cb,self.wall.crushing_limit_lbs_no_cb])
+            self.line_pl_cbB.set_data([0,max(w)],[self.wall.crushing_limit_lbs/(self.wall.spacing_in/12.0),self.wall.crushing_limit_lbs/(self.wall.spacing_in/12.0)])
+            self.line_pl_wo_cbB.set_data([0,max(w)],[self.wall.crushing_limit_lbs_no_cb/(self.wall.spacing_in/12.0),self.wall.crushing_limit_lbs_no_cb/(self.wall.spacing_in/12.0)])
         
         self.line_delta_180B.set_data([0,max(w)],[self.wall.height_in/180.0,self.wall.height_in/180.0])
         self.line_delta_240B.set_data([0,max(w)],[self.wall.height_in/240.0,self.wall.height_in/240.0])
@@ -794,7 +794,7 @@ class Master_window:
         else:
             e_string =''        
         
-        self.ax1B.set_ylabel('Axial (lbs)'+e_string)
+        self.ax1B.set_ylabel('Axial (plf)'+e_string)
         
         self.ax1B.set_title(self.title)
         self.canvasB.draw()
@@ -1069,7 +1069,7 @@ class Master_window:
             e_string =''
             e_string_file =''
             
-        ax1C.set_ylabel('Axial (lbs)'+e_string)
+        ax1C.set_ylabel('Axial (plf)'+e_string)
         ax1C.set_xlabel('Moment (in-lbs)')
         ax2C.set_ylabel('Mid Height Deflection (in)')
         
@@ -1106,12 +1106,12 @@ class Master_window:
             line_cd200C.set_data(w,p)
             line_delta_cd200C.set_data(w,d)
             
-            if self.wall.crushing_limit_lbs > 1.2*max(p):
+            if (self.wall.crushing_limit_lbs/(s/12.0)) > 1.2*max(p):
                 line_pl_cbC.set_data([0,0],[0,0])
                 line_pl_wo_cbC.set_data([0,0],[0,0])        
             else:
-                line_pl_cbC.set_data([0,max(w)],[self.wall.crushing_limit_lbs,self.wall.crushing_limit_lbs])
-                line_pl_wo_cbC.set_data([0,max(w)],[self.wall.crushing_limit_lbs_no_cb,self.wall.crushing_limit_lbs_no_cb])
+                line_pl_cbC.set_data([0,max(w)],[self.wall.crushing_limit_lbs/(s/12.0),self.wall.crushing_limit_lbs/(s/12.0)])
+                line_pl_wo_cbC.set_data([0,max(w)],[self.wall.crushing_limit_lbs_no_cb/(s/12.0),self.wall.crushing_limit_lbs_no_cb/(s/12.0)])
             
             self.line_delta_180C.set_data([0,max(w)],[self.wall.height_in/180.0,self.wall.height_in/180.0])
             self.line_delta_240C.set_data([0,max(w)],[self.wall.height_in/240.0,self.wall.height_in/240.0])
@@ -1177,7 +1177,7 @@ class Master_window:
             e_string =''
             e_string_file =''
             
-        ax1C.set_ylabel('Axial (lbs)'+e_string)
+        ax1C.set_ylabel('Axial (plf)'+e_string)
         ax1C.set_xlabel('Pressure (psf)')
         ax2C.set_ylabel('Mid Height Deflection (in)')
         
@@ -1214,12 +1214,12 @@ class Master_window:
             line_cd200C.set_data(w,p)
             line_delta_cd200C.set_data(w,d)
             
-            if self.wall.crushing_limit_lbs > 1.2*max(p):
+            if (self.wall.crushing_limit_lbs/(s/12.0)) > 1.2*max(p):
                 line_pl_cbC.set_data([0,0],[0,0])
                 line_pl_wo_cbC.set_data([0,0],[0,0])        
             else:
-                line_pl_cbC.set_data([0,max(w)],[self.wall.crushing_limit_lbs,self.wall.crushing_limit_lbs])
-                line_pl_wo_cbC.set_data([0,max(w)],[self.wall.crushing_limit_lbs_no_cb,self.wall.crushing_limit_lbs_no_cb])
+                line_pl_cbC.set_data([0,max(w)],[self.wall.crushing_limit_lbs/(s/12.0),self.wall.crushing_limit_lbs/(s/12.0)])
+                line_pl_wo_cbC.set_data([0,max(w)],[self.wall.crushing_limit_lbs_no_cb/(s/12.0),self.wall.crushing_limit_lbs_no_cb/(s/12.0)])
                 
             self.line_delta_180C.set_data([0,max(w)],[self.wall.height_in/180.0,self.wall.height_in/180.0])
             self.line_delta_240C.set_data([0,max(w)],[self.wall.height_in/240.0,self.wall.height_in/240.0])
