@@ -304,7 +304,7 @@ class wood_stud_wall:
         fc_psi = p_lbs / self.area_in2
         fb_psi = m_inlbs/self.s_in3
         
-        fc_prime = self.fc_prime_calc(cd)       
+        fc_prime = self.fc_prime_calc(cd)
         fb_prime = self.fb_prime_calc(cd)
         
         #Check that fc is less than FcE per NDS 2005 - Section 3.9.2
@@ -335,16 +335,21 @@ class wood_stud_wall:
             c = (a+b)/2.0
             
             fc_psi = c / self.area_in2
-            fb_psi = (m_inlbs + (c*e_in))/self.s_in3
+            fb_psi = (m_inlbs)/self.s_in3
           
             fc_prime = self.fc_prime_calc(cd)       
             fb_prime = self.fb_prime_calc(cd)
             
             #Check that fc is less than FcE per NDS 2005 - Section 3.9.2
             if fc_psi < self.fcE_psi:
-                #Combine ration per NDS 2005 equation (3.9-3)
-                #[fc/Fc]'^2 + fb / Fb' [ 1- (fc / FcE)] <= 1.0
-                ratio = (fc_psi/fc_prime)**2 + (fb_psi / (fb_prime*(1-(fc_psi/self.fcE_psi))))
+                if e_in ==0:
+                    #Combine ration per NDS 2005 equation (3.9-3)
+                    #[fc/Fc]'^2 + fb / Fb' [ 1- (fc / FcE)] <= 1.0
+                    ratio = (fc_psi/fc_prime)**2 + (fb_psi / (fb_prime*(1-(fc_psi/self.fcE_psi))))
+                else:
+                    #Combined Ratio per NDS 2005 equation 15.4-1
+                    #[fc/Fc]'^2 + (fb + fc(6e/d)[1 + 0.234 (fc / FcE)])/ Fb' [ 1- (fc / FcE)] <= 1.0
+                    ratio = (fc_psi/fc_prime)**2 + ((fb_psi+(fc_psi*(6*e_in/self.d_in)*(1+(0.234*(fc_psi/self.fcE_psi)))))/ (fb_prime*(1-(fc_psi/self.fcE_psi))))
             else:
                 ratio = 2.0
             
