@@ -1138,7 +1138,57 @@ class Master_window:
             ax1C.set_title(title)
             
             pmfig.savefig(os.path.join(path,file))
+            
+        file = '{0}x{1}_height-{2}_ft-PvM_chart_per_Stud_11x17{3}.pdf'.format(self.b_nom.get(),self.d_nom.get(),h,e_string_file)
+        title = '{0}x{1} ({2:.2f}x{3:.2f})- Height:{4} ft - Species: {6} - Grade: {5}'.format(self.b_nom.get(),self.d_nom.get(),self.b_actual,self.d_actual,h,grade, self.species.get())
+        e_in = self.e_in
+        #Refresh chart data for each Cd
+        #Cd - NDS 2005 Table 2.3.2
+        #cd = [0.9,1.0,1.15,1.25,1.6,2.0]
+        w,p,d = self.wall.wall_pm_diagram_cd_stud(0.9,e_in)
+        line_cd009C.set_data(w,p)
+        line_delta_cd009C.set_data(w,d)
         
+        w,p,d = self.wall.wall_pm_diagram_cd_stud(1.0,e_in)
+        line_cd100C.set_data(w,p)
+        line_delta_cd100C.set_data(w,d)
+        
+        w,p,d = self.wall.wall_pm_diagram_cd_stud(1.15,e_in)
+        line_cd115C.set_data(w,p)
+        line_delta_cd115C.set_data(w,d)
+        
+        w,p,d = self.wall.wall_pm_diagram_cd_stud(1.25,e_in)
+        line_cd125C.set_data(w,p)
+        line_delta_cd125C.set_data(w,d)
+        
+        w,p,d = self.wall.wall_pm_diagram_cd_stud(1.6,e_in)
+        line_cd160C.set_data(w,p)
+        line_delta_cd160C.set_data(w,d)
+        
+        w,p,d = self.wall.wall_pm_diagram_cd_stud(2.0,e_in)
+        line_cd200C.set_data(w,p)
+        line_delta_cd200C.set_data(w,d)
+        
+        if (self.wall.crushing_limit_lbs) > 1.2*max(p):
+            line_pl_cbC.set_data([0,0],[0,0])
+            line_pl_wo_cbC.set_data([0,0],[0,0])        
+        else:
+            line_pl_cbC.set_data([0,max(w)],[self.wall.crushing_limit_lbs,self.wall.crushing_limit_lbs])
+            line_pl_wo_cbC.set_data([0,max(w)],[self.wall.crushing_limit_lbs_no_cb,self.wall.crushing_limit_lbs_no_cb])
+        
+        self.line_delta_180C.set_data([0,max(w)],[self.wall.height_in/180.0,self.wall.height_in/180.0])
+        self.line_delta_240C.set_data([0,max(w)],[self.wall.height_in/240.0,self.wall.height_in/240.0])
+        self.line_delta_360C.set_data([0,max(w)],[self.wall.height_in/360.0,self.wall.height_in/360.0])
+        self.line_delta_600C.set_data([0,max(w)],[self.wall.height_in/600.0,self.wall.height_in/600.0])
+        
+        ax1C.set_xlim(0, max(w)+500)
+        ax1C.set_ylim(0, max(p)+200)
+        ax2C.set_ylim(0, max(d)+0.75)
+        
+        ax1C.set_ylabel('Axial (lbs)'+e_string)
+        ax1C.set_title(title)
+        
+        pmfig.savefig(os.path.join(path,file))       
         plt.close('all')
         
     def print_pp_graph_common(self,*event):

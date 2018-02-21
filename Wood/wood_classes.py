@@ -447,10 +447,10 @@ class wood_stud_wall:
         step = self.m_inlbs_limit/points
         
         m=0
-        x=[0] #pressure on x-axis
+        x=[0] #moment on x-axis
         y=[self.p_lbs_limit/ (diag_spacing_in /12.0)] #axial force on y-axis
         if e_in==0:
-            d=[0] #deflection at pressure x
+            d=[0] #deflection at equivalent uniform load x
         else:
             d=[(((self.p_lbs_limit*e_in)*self.height_in**2)/(16.0*self.E_prime_psi*self.I_in4))]
         
@@ -477,7 +477,54 @@ class wood_stud_wall:
         w_plf = ((((self.m_inlbs_limit/12.0) * 8.0) / ((self.height_in/12.0)**2)))
         d.append((5 * (w_plf) * (self.height_in/12)**4)/(384*self.E_prime_psi*self.I_in4)*1728)
         return x,y,d
+        
+    def wall_pm_diagram_cd_stud(self, cd, e_in):
+           
+        # Find bending limit pressure for each Cd ie where fb = Fb'
+        # fb = M/s , M in in-lbs and s in in^3
+        
+        self.m_inlbs_limit = (self.fb_prime_calc(cd) * self.s_in3)
 
+        # Determine pure axial compression capacity ie where fc = Fc' - withou consideration for plate crushing
+        # fc = P/a
+        # P = a * Fc'
+        if e_in == 0:
+            self.p_lbs_limit = self.area_in2 * self.fc_prime_calc(cd)
+        else:
+            self.p_lbs_limit = self.axial_capacity_w_moment(cd,0, e_in)
+            
+        points = 50
+        step = self.m_inlbs_limit/points
+        
+        m=0
+        x=[0] #moment on x-axis
+        y=[self.p_lbs_limit] #axial force on y-axis
+        if e_in==0:
+            d=[0] #deflection at pressure x
+        else:
+            d=[(((self.p_lbs_limit*e_in)*self.height_in**2)/(16.0*self.E_prime_psi*self.I_in4))]
+        
+        for i in range(1,points):
+            m = step*i
+            moment_inlbs = m
+            x.append(m)
+            w_plf = ((((m/12.0) * 8.0) / ((self.height_in/12.0)**2)))
+            deflection = (5 * (w_plf) * (self.height_in/12)**4)/(384*self.E_prime_psi*self.I_in4)*1728
+            p_lbs = self.axial_capacity_w_moment(cd,moment_inlbs, e_in)
+            y.append(p_lbs)
+            
+            if e_in ==0:
+                deflection = deflection
+            else:
+                deflection = deflection + (((p_lbs*e_in)*self.height_in**2)/(16.0*self.E_prime_psi*self.I_in4))
+            d.append(deflection)
+            
+        x.append(self.m_inlbs_limit)
+        y.append(0)
+        w_plf = ((((self.m_inlbs_limit/12.0) * 8.0) / ((self.height_in/12.0)**2)))
+        d.append((5 * (w_plf) * (self.height_in/12)**4)/(384*self.E_prime_psi*self.I_in4)*1728)
+        return x,y,d
+        
     def cap_at_common_spacing(self, cd,lateral_w_psf, e_in):
         spacings = [4,6,8,12,16,24]
         res_string = 'Axial Capacity at 4", 6", 8", 12", 16", and 24" spacings:\n'
