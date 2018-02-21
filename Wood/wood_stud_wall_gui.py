@@ -551,20 +551,26 @@ class Master_window:
         shear = self.pressure_shear_lbs + self.ecc_shear_lbs
         shear_stress = (3.0*shear)/(2.0*b*d)
         self.stress_string = self.stress_string+'\nfv = VQ/Ib = 3V/2bd = {0:.3f} psi'.format(shear_stress)
-        moment = self.pressure_moment_inlbs + self.ecc_moment_inlbs
-        bending_stress = moment/self.wall.s_in3
-        self.stress_string = self.stress_string+'\nfb = Mc/I = M/s = 6M/bd^2 = {0:.3f} psi'.format(bending_stress)
         if self.e_in == 0:
+            moment = self.pressure_moment_inlbs + self.ecc_moment_inlbs
+            bending_stress_lat = self.pressure_moment_inlbs/self.wall.s_in3
+            bending_stress = moment/self.wall.s_in3
+            self.stress_string = self.stress_string+'\nfb = Mc/I = M/s = 6M/bd^2 = {0:.3f} psi'.format(bending_stress_lat)
             #Combine ratio per NDS 2005 equation (3.9-3)
             #[fc/Fc]'^2 + fb / Fb' [ 1- (fc / FcE)] <= 1.0
             ratio = (axial_stress/self.wall.fc_prime_psi)**2 + (bending_stress / (self.wall.fb_prime_calc(cd)*(1-(axial_stress/self.wall.fcE_psi))))
             self.stress_string = self.stress_string+"\nCombined Axial+Bending:\n[fc/Fc]'^2 + fb / Fb' [ 1- (fc / FcE)] = {0:.3f} <= 1.0".format(ratio)
         else:
+            moment = self.pressure_moment_inlbs + self.ecc_moment_inlbs
+            bending_stress_ecc = self.ecc_moment_inlbs/self.wall.s_in3
+            bending_stress_lat = self.pressure_moment_inlbs/self.wall.s_in3
+            bending_stress = moment/self.wall.s_in3
+            self.stress_string = self.stress_string+'\nfb,lat = Mc/I = M/s = 6M/bd^2 = {0:.3f} psi + fb,gravity = {1:.3f} = {2:.3f}'.format(bending_stress_lat,bending_stress_ecc,bending_stress)
             #Combined Ratio per NDS 2005 equation 15.4-1
             #[fc/Fc]'^2 + (fb + fc(6e/d)[1 + 0.234 (fc / FcE)])/ Fb' [ 1- (fc / FcE)] <= 1.0
             b1 = self.pressure_moment_inlbs/self.wall.s_in3
             ratio = (axial_stress/self.wall.fc_prime_psi)**2 + ((b1+(axial_stress*(6*self.e_in/d)*(1+(0.234*(axial_stress/self.wall.fcE_psi)))))/ (self.wall.fb_prime_calc(cd)*(1-(axial_stress/self.wall.fcE_psi))))
-            self.stress_string = self.stress_string+"\nCombined Axial+Bending w/ Eccentricity:\n[fc/Fc]'^2 + (fb + fc(6e/d)[1 + 0.234 (fc / FcE)])/ Fb' [ 1- (fc / FcE)] = {0:.3f} <= 1.0".format(ratio)
+            self.stress_string = self.stress_string+"\nCombined Axial+Bending w/ Eccentricity:\n[fc/Fc]'^2 + (fb,lat + fc(6e/d)[1 + 0.234 (fc / FcE)])/ Fb' [ 1- (fc / FcE)] = {0:.3f} <= 1.0".format(ratio)
         self.results_text_box.insert(tk.END, self.stress_string)
         
         ##Calculation of Cp
