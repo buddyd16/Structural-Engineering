@@ -1540,6 +1540,7 @@ class Master_window:
         loads_plf = []
         loads_lbs = []
         grav_delta = []
+        grav_shear = []
         i=0
         for load in self.user_vert_loads_psf:
             load_psf = float(load.get())
@@ -1548,47 +1549,61 @@ class Master_window:
             loads_lbs.append(loads_plf[i]*(s_in/12.0))
             self.user_load_trib_plf_label[i].configure(text='ft = {0:.3f} plf'.format(loads_plf[i]))
             grav_delta.append(((loads_lbs[i]*e)*self.wall.height_in**2)/(16.0*self.wall.E_prime_psi*self.wall.I_in4))
+            grav_shear.append((loads_lbs[i]*e) / self.wall.height_in)
             i+=1
         loads_lbs.append(0)
         grav_delta.append(0)
+        grav_shear.append(0)
         
         lat_plf = []
         lat_inlbs = []
         lat_delta = []
+        lat_shear = []
         i=0
         for lat_load in self.user_lat_loads_psf:
             lat_load_psf = float(lat_load.get())
             lat_plf.append(lat_load_psf*(s_in/12.0))
             lat_inlbs.append(((lat_plf[i]*((self.wall.height_in)/12.0)**2)/8.0)*12.0)
             lat_delta.append((1728*5*lat_plf[i]*(self.wall.height_in/12.0)**4)/(384*self.wall.E_prime_psi*self.wall.I_in4))
+            lat_shear.append((((lat_plf[i]*(self.wall.height_in))/12.0)/2.0))
             i+=1
         
         i=0
         p_plot = []
         m_plot = []
         d_plot = []
+        ratio_text = ''
         for combo in self.load_combos:
             fc_prime = self.wall.fc_prime_calc(combo[1])
             fb_prime = self.wall.fb_prime_calc(combo[1])
+            fv_prime = self.wall.fv_prime_psi_cd
             
             p = 0
             m = 0
+            v = 0
             delta = 0
             for c in range(2,8):
                 p = p + (loads_lbs[c-2]*combo[c])
                 delta = delta + (grav_delta[c-2]*combo[c])
+                v = v + (grav_shear[c-2]*combo[c])
                 
                 if c == 3:
                     m = m + (lat_inlbs[0]*combo[c])
                     delta = delta + (lat_delta[0]*combo[c])
+                    v = v + (lat_shear[0]*combo[c])
+                    
                 elif c == 7:
                     m = m + (lat_inlbs[1]*combo[c])
                     delta = delta + (lat_delta[1]*combo[c])
+                    v = v + (lat_shear[1]*combo[c])
                 else:
                     m = m
+                    delta = delta
+                    v = v
             
             fc = p / self.wall.area_in2
             fb = m / self.wall.s_in3
+            fv = (3.0 * v) / (2.0*self.wall.b_in*self.wall.d_in)
             if delta == 0:
                 delta_ratio = 0
             else:
@@ -1596,12 +1611,31 @@ class Master_window:
             if e == 0:
                 if m==0:
                     ratio = fc/fc_prime
+                    ratio_text = " (fc/Fc')"
                 elif p==0:
                     ratio = fb/fb_prime
+                    ratio_text = " (fb/Fb')"
                 else:
                     ratio = (fc/fc_prime)**2 + (fb / (fb_prime*(1-(fc/self.wall.fcE_psi))))
+                    ratio_text = " (3.9-3)"
+                
+                ratio_v = fv / fv_prime
+                
+                ratio = max(ratio,ratio_v)
+                if ratio == ratio_v:
+                    ratio_text = " (fv/Fv')"
+                else:
+                    ratio_text = ratio_text
+                
             else:
                 ratio = (fc/fc_prime)**2 + ((fb+(fc*(6*e/self.wall.d_in)*(1+(0.234*(fc/self.wall.fcE_psi)))))/ (fb_prime*(1-(fc/self.wall.fcE_psi))))
+                ratio_text = " (15.4-1)"
+                ratio_v = fv / fv_prime
+                ratio = max(ratio,ratio_v)
+                if ratio == ratio_v:
+                    ratio_text = " (fv/Fv')"
+                else:
+                    ratio_text = ratio_text
             
             if ratio > 1.0:
                 user_status = 'NG'
@@ -1614,7 +1648,7 @@ class Master_window:
             self.user_fc_res_labels[i].configure(text='{0:.3f}'.format(fc))
             self.user_m_res_labels[i].configure(text='{0:.3f}'.format(m))
             self.user_fb_res_labels[i].configure(text='{0:.3f}'.format(fb))
-            self.user_ratio_res_labels[i].configure(text='{0:.3f}'.format(ratio))
+            self.user_ratio_res_labels[i].configure(text='{0:.3f}{1}'.format(ratio,ratio_text))
             self.user_deltaratio_res_labels[i].configure(text='{1:.3f} in (H/{0:.3f})'.format(delta_ratio,delta))
             self.user_status_res_labels[i].configure(text='{0}'.format(user_status))
             
