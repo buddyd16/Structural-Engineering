@@ -1704,9 +1704,11 @@ class Master_window:
                 loop = loop_max
                 c = math.floor(c*4)/4                
                 self.user_calc_spacing.set(c)
+                self.run_user_loads()
             elif c<self.wall.b_in:
                 loop = loop_max
                 self.user_calc_spacing.set(0)
+
             else:
                 loop+=1
 def main():            
