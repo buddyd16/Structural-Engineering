@@ -469,7 +469,7 @@ class Master_window:
         self.line_delta_600D, = self.ax2D.plot([1,1],[0,13], label='H/600', linestyle=':')
         
         self.user_pmD, = self.ax1D.plot([1,1],[2,2], linestyle='None', marker= 'o')
-        self.user_mdD, = self.ax2D.plot([1,1],[2,2], linestyle='None', marker= 'o')
+        self.user_mdD, = self.ax2D.plot([1,1],[2,2], linestyle='None', marker= 'x')
 
         
         self.legend_ax1D = self.ax1D.legend(loc=1, fontsize='x-small')
@@ -1594,7 +1594,12 @@ class Master_window:
             else:
                 delta_ratio = self.wall.height_in/delta
             if e == 0:
-                ratio = (fc/fc_prime)**2 + (fb / (fb_prime*(1-(fc/self.wall.fcE_psi))))
+                if m==0:
+                    ratio = fc/fc_prime
+                elif p==0:
+                    ratio = fb/fb_prime
+                else:
+                    ratio = (fc/fc_prime)**2 + (fb / (fb_prime*(1-(fc/self.wall.fcE_psi))))
             else:
                 ratio = (fc/fc_prime)**2 + ((fb+(fc*(6*e/self.wall.d_in)*(1+(0.234*(fc/self.wall.fcE_psi)))))/ (fb_prime*(1-(fc/self.wall.fcE_psi))))
             
