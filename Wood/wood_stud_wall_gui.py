@@ -10,6 +10,7 @@ from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import tkFileDialog
 import os
+import math
 
 class Master_window:
 
@@ -1690,7 +1691,6 @@ class Master_window:
 
         while loop<loop_max:
             c = (a+b)/2.0
-            
             self.user_calc_spacing.set(c)
             
             check = self.run_user_loads()
@@ -1702,7 +1702,11 @@ class Master_window:
                 
             if (b-a)/2.0 <= tol:
                 loop = loop_max
+                c = math.floor(c*4)/4                
                 self.user_calc_spacing.set(c)
+            elif c<self.wall.b_in:
+                loop = loop_max
+                self.user_calc_spacing.set(0)
             else:
                 loop+=1
 def main():            
