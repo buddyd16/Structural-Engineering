@@ -56,7 +56,7 @@ class Master_window:
         tk.Label(self.geo_frame, text='Nominal Stud Size:').grid(row=1,column=1)
         self.b_nom = tk.StringVar()
         self.b_nom.set('2')
-        self.b_nom_selection = tk.OptionMenu(self.geo_frame, self.b_nom, '2','3','4', command=self.actual_stud_size)
+        self.b_nom_selection = tk.OptionMenu(self.geo_frame, self.b_nom, '2','3','4','(2)2','(3)2', command=self.actual_stud_size)
         self.b_nom_selection.grid(row=2,column=1)
         tk.Label(self.geo_frame, text='x').grid(row=2,column=2)
         self.d_nom = tk.StringVar()
@@ -625,10 +625,18 @@ class Master_window:
         self.nb.tab(4,state=tk.NORMAL)
     
     def actual_stud_size(self, *event):
-        b = float(self.b_nom.get())
+        w = self.b_nom.get()
+        
+        if w == '2' or w== '3' or w=='4':
+            b = float(self.b_nom.get())
+            self.b_actual = b - 0.5
+        elif w == '(2)2':
+            self.b_actual = 2.0*1.5
+        else:
+            self.b_actual = 3.0*1.5
         d = float(self.d_nom.get())
         
-        self.b_actual = b - 0.5
+        
         if d > 6.0:
             self.d_actual = d - 0.75
         else:
