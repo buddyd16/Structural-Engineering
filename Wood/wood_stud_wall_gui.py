@@ -1589,7 +1589,10 @@ class Master_window:
             
             fc = p / self.wall.area_in2
             fb = m / self.wall.s_in3
-            delta_ratio = self.wall.height_in/delta
+            if delta == 0:
+                delta_ratio = 0
+            else:
+                delta_ratio = self.wall.height_in/delta
             if e == 0:
                 ratio = (fc/fc_prime)**2 + (fb / (fb_prime*(1-(fc/self.wall.fcE_psi))))
             else:
