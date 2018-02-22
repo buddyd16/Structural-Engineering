@@ -432,6 +432,183 @@ class Master_window:
 
         self.chart_frameB.pack(side=tk.TOP, fill=tk.BOTH)
         
+        #Tab 4 -P vs M Curve
+        self.page4 = ttk.Frame(self.nb)
+        self.nb.add(self.page4, text='P-M Diagram - Stud', state = tk.DISABLED)
+        
+        self.pg4_frame = tk.Frame(self.page4, bd=2, relief='sunken', padx=1,pady=1)
+        self.pg4_frame.pack(fill=tk.BOTH, padx=5, pady=5)
+        
+        self.chart_frameD = tk.Frame(self.pg4_frame, padx=5, pady=5)
+
+        self.FigD = matplotlib.figure.Figure(figsize=(12,6),dpi=96)
+        self.ax1D = self.FigD.add_subplot(111)
+        self.ax1D.minorticks_on()
+        self.ax1D.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
+        self.ax1D.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
+        self.ax2D=self.ax1D.twinx()
+        #Prebuild chart lines so data can be refreshed to cut down on render time
+        #['0.9','1.0','1.15','1.25','1.6','2.0']
+        self.line_cd009D, = self.ax1D.plot([0,10],[10,0], label='Cd = 0.9')
+        self.line_cd100D, = self.ax1D.plot([0,15],[15,0], label='Cd = 1.0')
+        self.line_cd115D, = self.ax1D.plot([0,25],[25,0], label='Cd = 1.15')
+        self.line_cd125D, = self.ax1D.plot([0,35],[35,0], label='Cd = 1.25')
+        self.line_cd160D, = self.ax1D.plot([0,50],[50,0], label='Cd = 1.6')
+        self.line_cd200D, = self.ax1D.plot([0,75],[75,0], label='Cd = 2.0')
+        self.line_pl_cbD, = self.ax1D.plot([0,10],[3,3], label='PL Crushing')
+        self.line_pl_wo_cbD, = self.ax1D.plot([0,10],[1.5,1.5], label='PL Crushing w/o Cb')
+        self.line_delta_cd009D, = self.ax2D.plot([0,10],[0,13], label='D - Cd = 0.9')
+        self.line_delta_cd100D, = self.ax2D.plot([0,15],[15,0], label='D - Cd = 1.0')
+        self.line_delta_cd115D, = self.ax2D.plot([0,25],[25,0], label='D - Cd = 1.15')
+        self.line_delta_cd125D, = self.ax2D.plot([0,35],[35,0], label='D - Cd = 1.25')
+        self.line_delta_cd160D, = self.ax2D.plot([0,50],[50,0], label='D - Cd = 1.6')
+        self.line_delta_cd200D, = self.ax2D.plot([0,75],[75,0], label='D - Cd = 2.0')
+        self.line_delta_180D, = self.ax2D.plot([6,6],[0,13], label='H/180', linestyle=':')
+        self.line_delta_240D, = self.ax2D.plot([4,4],[0,13], label='H/240', linestyle=':')
+        self.line_delta_360D, = self.ax2D.plot([1,1],[0,13], label='H/360', linestyle=':')
+        self.line_delta_600D, = self.ax2D.plot([1,1],[0,13], label='H/600', linestyle=':')
+        
+        self.user_pmD, = self.ax1D.plot([1,1],[2,2], linestyle='None', marker= 'o')
+        self.user_mdD, = self.ax2D.plot([1,1],[2,2], linestyle='None', marker= 'o')
+
+        
+        self.legend_ax1D = self.ax1D.legend(loc=1, fontsize='x-small')
+        self.legend_ax2D = self.ax2D.legend(loc=4, fontsize='x-small')        
+        
+        self.ax1D.set_ylabel('Axial (lbs)')
+        self.ax1D.set_xlabel('Moment (in-lbs)')
+        self.ax2D.set_ylabel('Mid Height Deflection (in)')
+        
+        self.canvasD = matplotlib.backends.backend_tkagg.FigureCanvasTkAgg(self.FigD, master=self.chart_frameD)
+        self.canvasD.show()
+        self.canvasD.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+
+        self.toolbarD = NavigationToolbar2TkAgg(self.canvasD, self.chart_frameD)
+        self.toolbarD.update()
+        self.canvasD._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+
+        self.chart_frameD.pack(side=tk.TOP, fill=tk.BOTH)
+        
+        #Tab 5 - User Loads
+        self.page5 = ttk.Frame(self.nb)
+        self.nb.add(self.page5, text='User Loads', state = tk.DISABLED)
+        
+        self.pg5_frame = tk.Frame(self.page5, bd=2, relief='sunken', padx=1,pady=1)
+        self.pg5_frame.pack(fill=tk.BOTH, padx=5, pady=5)
+        
+        #user Loads input frame
+        self.user_ins_top_frame = tk.Frame(self.pg5_frame)
+        self.input_frame_loads = tk.LabelFrame(self.user_ins_top_frame, text="Loads Inputs (IBC 2012):", bd=2, relief='sunken', padx=5, pady=5)
+        #Vertical Loads - [DL,LL,Lr,S,R]
+        tk.Label(self.input_frame_loads, text='Vertical Loads: ').grid(column=1, row=1)
+        self.user_vert_load_labels = ['D: ','L: ','Lr: ','S: ','R: ']
+        self.user_load_trib_plf_label = []
+        i=1
+        for label in self.user_vert_load_labels:
+            tk.Label(self.input_frame_loads, text=label).grid(column=1, row=i+1)
+            tk.Label(self.input_frame_loads, text='psf x ').grid(column=3, row=i+1)
+            self.user_load_trib_plf_label.append(tk.Label(self.input_frame_loads, text='ft = x plf'))
+            self.user_load_trib_plf_label[i-1].grid(column=5, row=i+1)
+            i+=1
+            
+        self.user_vert_loads_psf = [tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar()]
+        self.user_vert_loads_trib = [tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar()]
+        i=1
+        for load in self.user_vert_loads_psf:
+            load.set(0.0)
+            self.user_vert_loads_trib[i-1].set(0.0)
+            tk.Entry(self.input_frame_loads, textvariable=load, width=15).grid(column=2, row=i+1)
+            tk.Entry(self.input_frame_loads, textvariable=self.user_vert_loads_trib[i-1], width=15).grid(column=4, row=i+1)
+            i+=1
+        #Lateral Pressures
+        #Lateral Loads - [L,W,ultimate]
+        tk.Label(self.input_frame_loads, text='Lateral Loads: ').grid(column=7, row=1, padx=10)
+        self.user_lat_load_labels = ['L: ','W,ultimate: ']
+        i=1
+        for label in self.user_lat_load_labels:
+            tk.Label(self.input_frame_loads, text=label).grid(column=7, row=i+1, padx=10)
+            tk.Label(self.input_frame_loads, text='psf').grid(column=9, row=i+1)
+            i+=1
+        
+        self.user_lat_loads_psf = [tk.StringVar(),tk.StringVar()]
+        i=1
+        for load in self.user_lat_loads_psf:
+            load.set(0.0)
+            tk.Entry(self.input_frame_loads, textvariable=load, width=15).grid(column=8, row=i+1)
+            i+=1
+
+        self.input_frame_loads.pack(side=tk.LEFT, padx=5, pady=5)
+        
+        #user Loads input frame
+        self.input_frame_user_wall = tk.LabelFrame(self.user_ins_top_frame, text="Wall Information:", bd=2, relief='sunken', padx=5, pady=5)
+        tk.Label(self.input_frame_user_wall, text='Wall Height: ').grid(column=1, row=1)
+        self.user_calc_wall_ht_ft = tk.Label(self.input_frame_user_wall, text='--')
+        self.user_calc_wall_ht_ft.grid(column=2, row=1)
+        tk.Label(self.input_frame_user_wall, text=' ft').grid(column=3, row=1)
+        self.user_calc_spacing = tk.StringVar()
+        self.user_calc_spacing.set(12.0)
+        tk.Label(self.input_frame_user_wall, text='Spacing: ').grid(column=1, row=2)
+        tk.Entry(self.input_frame_user_wall, textvariable=self.user_calc_spacing, width=15).grid(column=2, row=2)
+        tk.Label(self.input_frame_user_wall, text=' in o.c.').grid(column=3, row=2)
+        
+        self.b_user_run = tk.Button(self.input_frame_user_wall,text="Check User loads", command=self.run_user_loads, font=helv)
+        self.b_user_run.grid(column=4, row = 1, padx=10)
+        
+        self.b_user_solve = tk.Button(self.input_frame_user_wall,text="Optimize Spacing", command=self.solve_user_loads, font=helv)
+        self.b_user_solve.grid(column=4, row = 2, padx=10)
+        
+        self.input_frame_user_wall.pack(side=tk.LEFT, padx=5, pady=5)
+        self.user_ins_top_frame.pack(side=tk.TOP)
+        
+        self.user_res_bottom_frame = tk.LabelFrame(self.pg5_frame, text="Results (IBC 2012 - ASD):", bd=2, relief='sunken', padx=5, pady=5)
+        res_headings = ['Combo:','Cd','P (lbs)', 'fc (psi)','M,lat (in-lbs)','fb,lat (psi)','Ratio','D (H/--)','Status']
+        self.load_combos = [['D',0.9,1,0,0,0,0,0],
+                            ['D+L',1,1,1,0,0,0,0],
+                            ['D+Lr',1,1,0,1,0,0,0], 
+                            ['D+S',1.15,1,0,0,1,0,0],
+                            ['D+R',1.15,1,0,0,0,1,0],
+                            ['D+.75L+.75Lr',1,1,0.75,0.75,0,0,0],
+                            ['D+.75L+.75S',1.15,1,0.75,0,0.75,0,0],
+                            ['D+.75L+.75R',1.15,1,0.75,0,0,0.75,0],
+                            ['D+.6W',1.6,1,0,0,0,0,0.6],
+                            ['D+.75(.6W)+.75L+.75Lr',1.6,1,0.75,0.75,0,0,0.45],
+                            ['D+.75(.6W)+.75L+.75s',1.6,1,0.75,0,0.75,0,0.45],
+                            ['D+.75(.6W)+.75L+.75r',1.6,1,0.75,0,0,0.75,0.45],
+                            ['.6D + .6W',1.6,0.6,0,0,0,0,0.6]]
+        i=1
+        for heading in res_headings:
+            tk.Label(self.user_res_bottom_frame, text = heading).grid(column=i, row=1, padx=10)
+            i+=1
+        
+        i=0
+        self.user_p_res_labels=[]
+        self.user_fc_res_labels=[]
+        self.user_m_res_labels=[]
+        self.user_fb_res_labels=[]
+        self.user_ratio_res_labels=[]
+        self.user_deltaratio_res_labels=[]
+        self.user_status_res_labels=[]
+        for combo in self.load_combos:
+            tk.Label(self.user_res_bottom_frame, text = combo[0]).grid(column=1, row=i+2, padx=10)
+            tk.Label(self.user_res_bottom_frame, text = combo[1]).grid(column=2, row=i+2, padx=10)
+            self.user_p_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
+            self.user_p_res_labels[i].grid(column=3, row=i+2, padx=10)
+            self.user_fc_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
+            self.user_fc_res_labels[i].grid(column=4, row=i+2, padx=10)
+            self.user_m_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
+            self.user_m_res_labels[i].grid(column=5, row=i+2, padx=10)
+            self.user_fb_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
+            self.user_fb_res_labels[i].grid(column=6, row=i+2, padx=10)
+            self.user_ratio_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
+            self.user_ratio_res_labels[i].grid(column=7, row=i+2, padx=10)
+            self.user_deltaratio_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
+            self.user_deltaratio_res_labels[i].grid(column=8, row=i+2, padx=10)
+            self.user_status_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
+            self.user_status_res_labels[i].grid(column=9, row=i+2, padx=10)
+            i+=1
+
+        self.user_res_bottom_frame.pack(side=tk.TOP)
+        
         self.b_quit = tk.Button(self.base_frame,text="Quit", command=self.quit_app, font=helv)
         self.b_quit.pack(side=tk.RIGHT)
         self.b_save = tk.Button(self.base_frame,text="Save Inputs", command=self.save_inputs, font=helv, state = tk.DISABLED)
@@ -444,6 +621,8 @@ class Master_window:
     def enable_tab2(self):
         self.nb.tab(1,state=tk.NORMAL)
         self.nb.tab(2,state=tk.NORMAL)
+        self.nb.tab(3,state=tk.NORMAL)
+        self.nb.tab(4,state=tk.NORMAL)
     
     def actual_stud_size(self, *event):
         b = float(self.b_nom.get())
@@ -700,6 +879,10 @@ class Master_window:
         self.b_output_pp.configure(state=tk.NORMAL)
         self.b_save.configure(state=tk.NORMAL)
         
+        #Fill consistant wall information in user laod calc tab
+        #set wall height
+        self.user_calc_wall_ht_ft.configure(text='{0:.3f}'.format(self.wall.height_in/12.0))
+        
     def generate_interaction_graph(self,*event):        
         e_in = self.e_in
         #Refresh chart data for each Cd
@@ -811,7 +994,58 @@ class Master_window:
         
         self.ax1B.set_title(self.title)
         self.canvasB.draw()
-    
+        
+        w,p,d = self.wall.wall_pm_diagram_cd_stud(0.9,e_in)
+        self.line_cd009D.set_data(w,p)
+        self.line_delta_cd009D.set_data(w,d)
+        
+        w,p,d = self.wall.wall_pm_diagram_cd_stud(1.0,e_in)
+        self.line_cd100D.set_data(w,p)
+        self.line_delta_cd100D.set_data(w,d)
+        
+        w,p,d = self.wall.wall_pm_diagram_cd_stud(1.15,e_in)
+        self.line_cd115D.set_data(w,p)
+        self.line_delta_cd115D.set_data(w,d)
+        
+        w,p,d = self.wall.wall_pm_diagram_cd_stud(1.25,e_in)
+        self.line_cd125D.set_data(w,p)
+        self.line_delta_cd125D.set_data(w,d)
+        
+        w,p,d = self.wall.wall_pm_diagram_cd_stud(1.6,e_in)
+        self.line_cd160D.set_data(w,p)
+        self.line_delta_cd160D.set_data(w,d)
+        
+        w,p,d = self.wall.wall_pm_diagram_cd_stud(2.0,e_in)
+        self.line_cd200D.set_data(w,p)
+        self.line_delta_cd200D.set_data(w,d)
+        
+        if (self.wall.crushing_limit_lbs) > 1.2*max(p):
+            self.line_pl_cbD.set_data([0,0],[0,0])
+            self.line_pl_wo_cbD.set_data([0,0],[0,0])        
+        else:
+            self.line_pl_cbD.set_data([0,max(w)],[self.wall.crushing_limit_lbs,self.wall.crushing_limit_lbs])
+            self.line_pl_wo_cbD.set_data([0,max(w)],[self.wall.crushing_limit_lbs_no_cb,self.wall.crushing_limit_lbs_no_cb])
+        
+        self.line_delta_180D.set_data([0,max(w)],[self.wall.height_in/180.0,self.wall.height_in/180.0])
+        self.line_delta_240D.set_data([0,max(w)],[self.wall.height_in/240.0,self.wall.height_in/240.0])
+        self.line_delta_360D.set_data([0,max(w)],[self.wall.height_in/360.0,self.wall.height_in/360.0])
+        self.line_delta_600D.set_data([0,max(w)],[self.wall.height_in/600.0,self.wall.height_in/600.0])
+        
+        self.ax1D.set_xlim(0, max(w)+500)
+        self.ax1D.set_ylim(0, max(p)+200)
+        self.ax2D.set_ylim(0, max(d)+0.75)
+        
+        min_ecc = self.min_ecc_yn.get()
+        if min_ecc == 1:
+            e_string = ' at min d/6 = {0:.3f} in eccentricity '.format(self.e_in)
+        else:
+            e_string =''        
+        
+        self.ax1D.set_ylabel('Axial (lbs)'+e_string)
+        
+        self.ax1D.set_title(self.title)
+        self.canvasD.draw()
+        
     def path_exists(self,path):
         res_folder_exist = os.path.isdir(path)
 
@@ -1299,6 +1533,128 @@ class Master_window:
         
         plt.close('all')
         
+    def run_user_loads(self, *event):
+        ng_count = 0
+        s_in = float(self.user_calc_spacing.get())
+        e = self.e_in
+        loads_plf = []
+        loads_lbs = []
+        grav_delta = []
+        i=0
+        for load in self.user_vert_loads_psf:
+            load_psf = float(load.get())
+            load_trib = float(self.user_vert_loads_trib[i].get())
+            loads_plf.append(load_psf * load_trib)
+            loads_lbs.append(loads_plf[i]*(s_in/12.0))
+            self.user_load_trib_plf_label[i].configure(text='ft = {0:.3f} plf'.format(loads_plf[i]))
+            grav_delta.append(((loads_lbs[i]*e)*self.wall.height_in**2)/(16.0*self.wall.E_prime_psi*self.wall.I_in4))
+            i+=1
+        loads_lbs.append(0)
+        grav_delta.append(0)
+        
+        lat_plf = []
+        lat_inlbs = []
+        lat_delta = []
+        i=0
+        for lat_load in self.user_lat_loads_psf:
+            lat_load_psf = float(lat_load.get())
+            lat_plf.append(lat_load_psf*(s_in/12.0))
+            lat_inlbs.append(((lat_plf[i]*((self.wall.height_in)/12.0)**2)/8.0)*12.0)
+            lat_delta.append((1728*5*lat_plf[i]*(self.wall.height_in/12.0)**4)/(384*self.wall.E_prime_psi*self.wall.I_in4))
+            i+=1
+        
+        i=0
+        p_plot = []
+        m_plot = []
+        d_plot = []
+        for combo in self.load_combos:
+            fc_prime = self.wall.fc_prime_calc(combo[1])
+            fb_prime = self.wall.fb_prime_calc(combo[1])
+            
+            p = 0
+            m = 0
+            delta = 0
+            for c in range(2,8):
+                p = p + (loads_lbs[c-2]*combo[c])
+                delta = delta + (grav_delta[c-2]*combo[c])
+                
+                if c == 3:
+                    m = m + (lat_inlbs[0]*combo[c])
+                    delta = delta + (lat_delta[0]*combo[c])
+                elif c == 7:
+                    m = m + (lat_inlbs[1]*combo[c])
+                    delta = delta + (lat_delta[1]*combo[c])
+                else:
+                    m = m
+            
+            fc = p / self.wall.area_in2
+            fb = m / self.wall.s_in3
+            delta_ratio = self.wall.height_in/delta
+            if e == 0:
+                ratio = (fc/fc_prime)**2 + (fb / (fb_prime*(1-(fc/self.wall.fcE_psi))))
+            else:
+                ratio = (fc/fc_prime)**2 + ((fb+(fc*(6*e/self.wall.d_in)*(1+(0.234*(fc/self.wall.fcE_psi)))))/ (fb_prime*(1-(fc/self.wall.fcE_psi))))
+            
+            if ratio > 1.0:
+                user_status = 'NG'
+                ng_count = ng_count +1
+            else:
+                user_status = 'OK'
+                ng_count = ng_count
+                
+            self.user_p_res_labels[i].configure(text='{0:.3f}'.format(p))
+            self.user_fc_res_labels[i].configure(text='{0:.3f}'.format(fc))
+            self.user_m_res_labels[i].configure(text='{0:.3f}'.format(m))
+            self.user_fb_res_labels[i].configure(text='{0:.3f}'.format(fb))
+            self.user_ratio_res_labels[i].configure(text='{0:.3f}'.format(ratio))
+            self.user_deltaratio_res_labels[i].configure(text='{1:.3f} in (H/{0:.3f})'.format(delta_ratio,delta))
+            self.user_status_res_labels[i].configure(text='{0}'.format(user_status))
+            
+            p_plot.append(p)
+            m_plot.append(m)
+            d_plot.append(delta)
+            
+            i+=1
+        
+        self.user_pmD.set_data(m_plot,p_plot)
+        self.user_mdD.set_data(m_plot,d_plot)
+        
+        self.canvasD.draw()
+        
+        if ng_count > 0:
+            return 1
+        else:
+            return 0
+        
+            
+        
+    def solve_user_loads(self, *event):
+        #optimize spacing
+        a=0
+        b=24 #upper bound limit on spacing
+        c=0
+        
+        loop_max = 500
+        tol = 0.0001
+        loop = 0
+
+        while loop<loop_max:
+            c = (a+b)/2.0
+            
+            self.user_calc_spacing.set(c)
+            
+            check = self.run_user_loads()
+            
+            if check == 0 :
+                a = c
+            else:
+                b = c
+                
+            if (b-a)/2.0 <= tol:
+                loop = loop_max
+                self.user_calc_spacing.set(c)
+            else:
+                loop+=1
 def main():            
     root = tk.Tk()
     root.title("Wood Stud Wall - 2-4x Studs - North American Species (Not Southern Pine)")
