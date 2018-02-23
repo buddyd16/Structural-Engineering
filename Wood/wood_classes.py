@@ -16,10 +16,10 @@ class wood_stud_wall:
         self.height_in = height_ft * 12.0
         if num_plates == 0:
             self.height_in = self.height_in
-            self.assumptions = '\n\n--ASSUMPTIONS--\nWall Height inclusive of top and bottom plates\n'
+            self.assumptions = '\n\n--ASSUMPTIONS--\nDesign Stud Height = Wall Height inclusive of top and bottom plates\nCapacities noted are inclusive of wall self weight, true supporting capacity is (result - panel self weight)\n'
         else:
             self.height_in = self.height_in - (num_plates * 1.5)
-            self.assumptions = '\n\n--ASSUMPTIONS--\nWall Height - ({0}) 1.5" wall plates\n'.format(num_plates)
+            self.assumptions = '\n\n--ASSUMPTIONS--\nDesign Stud Height = Wall Height - ({0}) 1.5" wall plates\nCapacities noted are inclusive of wall self weight, true supporting capacity is (result - panel self weight)\n'.format(num_plates)
             
         self.spacing_in = spacing_in
         self.fb_psi = fb_psi
