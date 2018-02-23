@@ -504,22 +504,33 @@ class Master_window:
         tk.Label(self.input_frame_loads, text='Vertical Loads: ').grid(column=1, row=1)
         self.user_vert_load_labels = ['D: ','L: ','Lr: ','S: ','R: ']
         self.user_load_trib_plf_label = []
-        i=1
+        tk.Label(self.input_frame_loads, text='Self Weight: ').grid(column=1, row=2)
+        self.user_sw = tk.StringVar()
+        self.user_sw.set(0.0)
+        self.user_sw_psf_entry = tk.Entry(self.input_frame_loads, textvariable=self.user_sw, width=15).grid(column=2, row=2)
+        tk.Label(self.input_frame_loads, text='psf x ').grid(column=3, row=2)
+        self.user_sw_height_ft = tk.StringVar()
+        self.user_sw_height_ft.set(0.0)
+        self.user_sw_height_ft_entry = tk.Entry(self.input_frame_loads, textvariable=self.user_sw_height_ft, width=15).grid(column=4, row=2)
+        self.user_sw_label = tk.Label(self.input_frame_loads, text='ft = x plf')
+        self.user_sw_label.grid(column=5, row=2)
+        
+        i=2
         for label in self.user_vert_load_labels:
             tk.Label(self.input_frame_loads, text=label).grid(column=1, row=i+1)
             tk.Label(self.input_frame_loads, text='psf x ').grid(column=3, row=i+1)
             self.user_load_trib_plf_label.append(tk.Label(self.input_frame_loads, text='ft = x plf'))
-            self.user_load_trib_plf_label[i-1].grid(column=5, row=i+1)
+            self.user_load_trib_plf_label[i-2].grid(column=5, row=i+1)
             i+=1
             
         self.user_vert_loads_psf = [tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar()]
         self.user_vert_loads_trib = [tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar()]
-        i=1
+        i=2
         for load in self.user_vert_loads_psf:
             load.set(0.0)
-            self.user_vert_loads_trib[i-1].set(0.0)
+            self.user_vert_loads_trib[i-2].set(0.0)
             tk.Entry(self.input_frame_loads, textvariable=load, width=15).grid(column=2, row=i+1)
-            tk.Entry(self.input_frame_loads, textvariable=self.user_vert_loads_trib[i-1], width=15).grid(column=4, row=i+1)
+            tk.Entry(self.input_frame_loads, textvariable=self.user_vert_loads_trib[i-2], width=15).grid(column=4, row=i+1)
             i+=1
         #Lateral Pressures
         #Lateral Loads - [L,W,ultimate]
@@ -891,6 +902,7 @@ class Master_window:
         #Fill consistant wall information in user laod calc tab
         #set wall height
         self.user_calc_wall_ht_ft.configure(text='{0:.3f}'.format(self.wall.height_in/12.0))
+        self.user_sw_height_ft.set(self.wall.height_in/12.0)
         
     def generate_interaction_graph(self,*event):        
         e_in = self.e_in
@@ -1550,6 +1562,14 @@ class Master_window:
         loads_lbs = []
         grav_delta = []
         grav_shear = []
+        
+        #Wall Self Weight to be added to DL
+        sw_plf = float(self.user_sw.get())*float(self.user_sw_height_ft.get())
+        self.user_sw_label.configure(text='ft = {0:.3f} plf'.format(sw_plf))
+        sw_lbs = sw_plf*(s_in/12.0)
+        sw_delta = ((sw_lbs*e)*self.wall.height_in**2)/(16.0*self.wall.E_prime_psi*self.wall.I_in4)
+        sw_shear = (sw_lbs*e) / self.wall.height_in
+        
         i=0
         for load in self.user_vert_loads_psf:
             load_psf = float(load.get())
@@ -1563,6 +1583,10 @@ class Master_window:
         loads_lbs.append(0)
         grav_delta.append(0)
         grav_shear.append(0)
+        
+        loads_lbs[0] = loads_lbs[0] + sw_lbs
+        grav_delta[0] = grav_delta[0] + sw_delta
+        grav_shear[0] = grav_shear[0] + sw_shear
         
         lat_plf = []
         lat_inlbs = []
