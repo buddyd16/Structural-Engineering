@@ -1649,20 +1649,28 @@ class Master_window:
                     ratio = fb/fb_prime
                     ratio_text = " (fb/Fb')"
                 else:
-                    ratio = (fc/fc_prime)**2 + (fb / (fb_prime*(1-(fc/self.wall.fcE_psi))))
-                    ratio_text = " (3.9-3)"
+                    if fc/self.wall.fcE_psi > 1.0:
+                        ratio = 100
+                        ratio_text = " (fc > FcE)"
+                    else:
+                        ratio = (fc/fc_prime)**2 + (fb / (fb_prime*(1-(fc/self.wall.fcE_psi))))
+                        ratio_text = " (3.9-3)"
                 
                 ratio_v = fv / fv_prime
-                
                 ratio = max(ratio,ratio_v)
+                
                 if ratio == ratio_v:
                     ratio_text = " (fv/Fv')"
                 else:
                     ratio_text = ratio_text
                 
             else:
-                ratio = (fc/fc_prime)**2 + ((fb+(fc*(6*e/self.wall.d_in)*(1+(0.234*(fc/self.wall.fcE_psi)))))/ (fb_prime*(1-(fc/self.wall.fcE_psi))))
-                ratio_text = " (15.4-1)"
+                if fc/self.wall.fcE_psi > 1.0:
+                    ratio = 100
+                    ratio_text = " (fc > FcE)"
+                else:
+                    ratio = (fc/fc_prime)**2 + ((fb+(fc*(6*e/self.wall.d_in)*(1+(0.234*(fc/self.wall.fcE_psi)))))/ (fb_prime*(1-(fc/self.wall.fcE_psi))))
+                    ratio_text = " (15.4-1)"
                 ratio_v = fv / fv_prime
                 ratio = max(ratio,ratio_v)
                 if ratio == ratio_v:
