@@ -39,3 +39,6 @@ A Tkinter GUI based Python program implementing Green's Theorem on a set of user
 
 ## Wood Classes
 Currently only contains a method for wood stud walls. routine outside of the class will generate a P vs Lateral Pressure curve for a wall, generates a curver for each load duration factor. Also plots plate crushing with and without Cb and l/180, l/240, and l/360 cut off lines.
+
+## Wood Stud Wall Gui - depends on having wood_classes.py in the same folder
+a Tkinter graphical interface for the Wood Classes file - calculates stud wall capacities and shows pvm and pvpressure diagrams. Can take user loads and check against IBC 2012 load combinations, can also attempt to optimize wall stud spacing based on user input loads.
