@@ -573,7 +573,7 @@ class Master_window:
         self.user_ins_top_frame.pack(side=tk.TOP)
         
         self.user_res_bottom_frame = tk.LabelFrame(self.pg5_frame, text="Results (IBC 2012 - ASD):", bd=2, relief='sunken', padx=5, pady=5)
-        res_headings = ['Combo:','Cd','P (lbs)', 'fc (psi)','M,lat (in-lbs)','fb,lat (psi)','Ratio','D (H/--)','Status']
+        res_headings = ['Combo:','Cd','P (lbs)', 'fc (psi)','Ke Le,d/d','FcE (psi)','c','Cp',"Fc' (psi)","fc/Fc'",'M,lat (in-lbs)','fb,lat (psi)',"Fb' (psi)","fb/Fb'",'V (lbs)','fv (psi)',"Fv' (psi)","fv/Fv'",'Ratio','D (H/--)','Status']
         self.load_combos = [['D',0.9,1,0,0,0,0,0],
                             ['D+L',1,1,1,0,0,0,0],
                             ['D+Lr',1,1,0,1,0,0,0], 
@@ -593,13 +593,27 @@ class Master_window:
             i+=1
         
         i=0
+        
         self.user_p_res_labels=[]
         self.user_fc_res_labels=[]
+        self.user_kel_res_labels=[]
+        self.user_FcE_res_labels=[]
+        self.user_c_labels=[]
+        self.user_cp_labels=[]
+        self.user_fcprime_res_labels=[]
+        self.user_fc_fc_res_labels=[]
         self.user_m_res_labels=[]
         self.user_fb_res_labels=[]
+        self.user_fbprime_res_labels=[]
+        self.user_fb_fb_res_labels=[]
+        self.user_v_res_labels=[]
+        self.user_fv_res_labels=[]
+        self.user_fvprime_res_labels=[]
+        self.user_fv_fv_res_labels=[]
         self.user_ratio_res_labels=[]
         self.user_deltaratio_res_labels=[]
         self.user_status_res_labels=[]
+        
         for combo in self.load_combos:
             tk.Label(self.user_res_bottom_frame, text = combo[0]).grid(column=1, row=i+2, padx=10)
             tk.Label(self.user_res_bottom_frame, text = combo[1]).grid(column=2, row=i+2, padx=10)
@@ -607,18 +621,42 @@ class Master_window:
             self.user_p_res_labels[i].grid(column=3, row=i+2, padx=10)
             self.user_fc_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
             self.user_fc_res_labels[i].grid(column=4, row=i+2, padx=10)
+            self.user_kel_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
+            self.user_kel_res_labels[i].grid(column=5, row=i+2, padx=10)
+            self.user_FcE_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
+            self.user_FcE_res_labels[i].grid(column=6, row=i+2, padx=10)
+            self.user_c_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
+            self.user_c_labels[i].grid(column=7, row=i+2, padx=10)
+            self.user_cp_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
+            self.user_cp_labels[i].grid(column=8, row=i+2, padx=10)
+            self.user_fcprime_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
+            self.user_fcprime_res_labels[i].grid(column=9, row=i+2, padx=10)
+            self.user_fc_fc_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
+            self.user_fc_fc_res_labels[i].grid(column=10, row=i+2, padx=10)
             self.user_m_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
-            self.user_m_res_labels[i].grid(column=5, row=i+2, padx=10)
+            self.user_m_res_labels[i].grid(column=11, row=i+2, padx=10)
             self.user_fb_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
-            self.user_fb_res_labels[i].grid(column=6, row=i+2, padx=10)
+            self.user_fb_res_labels[i].grid(column=12, row=i+2, padx=10)
+            self.user_fbprime_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
+            self.user_fbprime_res_labels[i].grid(column=13, row=i+2, padx=10)
+            self.user_fb_fb_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
+            self.user_fb_fb_res_labels[i].grid(column=14, row=i+2, padx=10)
+            self.user_v_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
+            self.user_v_res_labels[i].grid(column=15, row=i+2, padx=10)
+            self.user_fv_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
+            self.user_fv_res_labels[i].grid(column=16, row=i+2, padx=10)
+            self.user_fvprime_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
+            self.user_fvprime_res_labels[i].grid(column=17, row=i+2, padx=10)
+            self.user_fv_fv_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
+            self.user_fv_fv_res_labels[i].grid(column=18, row=i+2, padx=10)
             self.user_ratio_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
-            self.user_ratio_res_labels[i].grid(column=7, row=i+2, padx=10)
+            self.user_ratio_res_labels[i].grid(column=19, row=i+2, padx=10)
             self.user_deltaratio_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
-            self.user_deltaratio_res_labels[i].grid(column=8, row=i+2, padx=10)
+            self.user_deltaratio_res_labels[i].grid(column=20, row=i+2, padx=10)
             self.user_status_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
-            self.user_status_res_labels[i].grid(column=9, row=i+2, padx=10)
+            self.user_status_res_labels[i].grid(column=21, row=i+2, padx=10)
             i+=1
-
+            
         self.user_res_bottom_frame.pack(side=tk.TOP)
         
         self.b_quit = tk.Button(self.base_frame,text="Quit", command=self.quit_app, font=helv)
@@ -903,6 +941,8 @@ class Master_window:
         #set wall height
         self.user_calc_wall_ht_ft.configure(text='{0:.3f}'.format(self.wall.height_in/12.0))
         self.user_sw_height_ft.set(self.wall.height_in/12.0)
+        tk.Label(self.user_res_bottom_frame, text = '* - indicates load greater than wall plate crushing w/o Cb - {0:.3f} lbs'.format(self.wall.crushing_limit_lbs_no_cb)).grid(column=1, row=15, columnspan=10)
+        tk.Label(self.user_res_bottom_frame, text = '** - indicates load greater than wall plate crushing w/ Cb - {0:.3f} lbs'.format(self.wall.crushing_limit_lbs)).grid(column=1, row=16, columnspan=10)
         
     def generate_interaction_graph(self,*event):        
         e_in = self.e_in
@@ -1563,6 +1603,7 @@ class Master_window:
         grav_delta = []
         grav_shear = []
         
+        
         #Wall Self Weight to be added to DL
         sw_plf = float(self.user_sw.get())*float(self.user_sw_height_ft.get())
         self.user_sw_label.configure(text='ft = {0:.3f} plf'.format(sw_plf))
@@ -1684,14 +1725,33 @@ class Master_window:
             else:
                 user_status = 'OK'
                 ng_count = ng_count
-                
-            self.user_p_res_labels[i].configure(text='{0:.3f}'.format(p))
+            
+            if p > self.wall.crushing_limit_lbs:
+                self.user_p_res_labels[i].configure(text='{0:.2f}**'.format(p))
+            elif p > self.wall.crushing_limit_lbs_no_cb:
+                self.user_p_res_labels[i].configure(text='{0:.2f}*'.format(p))
+            else:
+                self.user_p_res_labels[i].configure(text='{0:.2f}'.format(p))
             self.user_fc_res_labels[i].configure(text='{0:.3f}'.format(fc))
-            self.user_m_res_labels[i].configure(text='{0:.3f}'.format(m))
+            self.user_m_res_labels[i].configure(text='{0:.2f}'.format(m))
             self.user_fb_res_labels[i].configure(text='{0:.3f}'.format(fb))
             self.user_ratio_res_labels[i].configure(text='{0:.3f}{1}'.format(ratio,ratio_text))
-            self.user_deltaratio_res_labels[i].configure(text='{1:.3f} in (H/{0:.3f})'.format(delta_ratio,delta))
+            self.user_deltaratio_res_labels[i].configure(text='{1:.3f} in (H/{0:.1f})'.format(delta_ratio,delta))
             self.user_status_res_labels[i].configure(text='{0}'.format(user_status))
+            
+            self.user_kel_res_labels[i].configure(text='{0:.2f}'.format(self.wall.height_in/self.wall.d_in))
+            self.user_FcE_res_labels[i].configure(text='{0:.2f}'.format(self.wall.fcE_psi))
+            self.user_c_labels[i].configure(text='{0:.1f}'.format(self.wall.c_cp))
+            self.user_cp_labels[i].configure(text='{0:.3f}'.format(self.wall.cp))
+            self.user_fcprime_res_labels[i].configure(text='{0:.2f}'.format(fc_prime))
+            self.user_fc_fc_res_labels[i].configure(text='{0:.3f}'.format(fc/fc_prime))
+            self.user_fbprime_res_labels[i].configure(text='{0:.2f}'.format(fb_prime))
+            self.user_fb_fb_res_labels[i].configure(text='{0:.3f}'.format(fb/fb_prime))
+            
+            self.user_v_res_labels[i].configure(text='{0:.2f}'.format(v))
+            self.user_fv_res_labels[i].configure(text='{0:.2f}'.format(fv))
+            self.user_fvprime_res_labels[i].configure(text='{0:.2f}'.format(fv_prime))
+            self.user_fv_fv_res_labels[i].configure(text='{0:.3f}'.format(fv/fv_prime))
             
             p_plot.append(p)
             m_plot.append(m)
