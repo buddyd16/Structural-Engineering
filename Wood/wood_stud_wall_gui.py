@@ -1737,7 +1737,10 @@ class Master_window:
             self.user_fb_res_labels[i].configure(text='{0:.3f}'.format(fb))
             self.user_ratio_res_labels[i].configure(text='{0:.3f}{1}'.format(ratio,ratio_text))
             self.user_deltaratio_res_labels[i].configure(text='{1:.3f} in (H/{0:.1f})'.format(delta_ratio,delta))
-            self.user_status_res_labels[i].configure(text='{0}'.format(user_status))
+            if user_status == 'OK':
+                self.user_status_res_labels[i].configure(text='{0}'.format(user_status),background='green')
+            else:
+                self.user_status_res_labels[i].configure(text='{0}'.format(user_status),background='red')
             
             self.user_kel_res_labels[i].configure(text='{0:.2f}'.format(self.wall.height_in/self.wall.d_in))
             self.user_FcE_res_labels[i].configure(text='{0:.2f}'.format(self.wall.fcE_psi))
