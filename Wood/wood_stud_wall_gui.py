@@ -1777,7 +1777,7 @@ class Master_window:
     def solve_user_loads(self, *event):
         #optimize spacing
         a=0
-        b=24 #upper bound limit on spacing
+        b=24 #upper bound limit on spacing for Cr=1.15
         c=0
         
         loop_max = 500
