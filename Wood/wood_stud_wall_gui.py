@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import Tkinter as tk
+import tkMessageBox
 import ttk
 import tkFont
 import wood_classes as wood
@@ -1597,6 +1598,12 @@ class Master_window:
     def run_user_loads(self, *event):
         ng_count = 0
         s_in = float(self.user_calc_spacing.get())
+        
+        if s_in==0:
+            tkMessageBox.showerror("ERROR!!","Spacing is less than wall stud width.")
+        else:
+            pass
+        
         e = self.e_in
         loads_plf = []
         loads_lbs = []
@@ -1808,6 +1815,7 @@ class Master_window:
                 elif c<self.wall.b_in:
                     loop = loop_max
                     self.user_calc_spacing.set(0)
+                    self.run_user_loads()
 
                 else:
                     loop+=1
