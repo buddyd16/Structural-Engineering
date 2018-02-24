@@ -535,7 +535,7 @@ class Master_window:
         #Lateral Pressures
         #Lateral Loads - [L,W,ultimate]
         tk.Label(self.input_frame_loads, text='Lateral Loads: ').grid(column=7, row=1, padx=10)
-        self.user_lat_load_labels = ['L: ','W,ultimate: ']
+        self.user_lat_load_labels = ['L: ','W_ultimate: ']
         i=1
         for label in self.user_lat_load_labels:
             tk.Label(self.input_frame_loads, text=label).grid(column=7, row=i+1, padx=10)
@@ -568,6 +568,9 @@ class Master_window:
         
         self.b_user_solve = tk.Button(self.input_frame_user_wall,text="Optimize Spacing", command=self.solve_user_loads, font=helv)
         self.b_user_solve.grid(column=4, row = 2, padx=10)
+        
+        self.b_user_export = tk.Button(self.input_frame_user_wall,text="Export User Load Results", command=self.export_user_load_results, font=helv)
+        self.b_user_export.grid(column=4, row = 3, padx=10)
         
         self.input_frame_user_wall.pack(side=tk.LEFT, padx=5, pady=5)
         self.user_ins_top_frame.pack(side=tk.TOP)
@@ -613,7 +616,6 @@ class Master_window:
         self.user_ratio_res_labels=[]
         self.user_deltaratio_res_labels=[]
         self.user_status_res_labels=[]
-        
         for combo in self.load_combos:
             tk.Label(self.user_res_bottom_frame, text = combo[0]).grid(column=1, row=i+2, padx=10)
             tk.Label(self.user_res_bottom_frame, text = combo[1]).grid(column=2, row=i+2, padx=10)
@@ -1597,13 +1599,22 @@ class Master_window:
         plt.close('all')
         
     def run_user_loads(self, *event):
+        #Initialize the "No Good" Count
         ng_count = 0
+        
+        #Get New user defined spacing from user load tab
         s_in = float(self.user_calc_spacing.get())
         
+        #Check that spacing is greater than the stud width
         if s_in<self.wall.b_in:
             tkMessageBox.showerror("ERROR!!","Spacing is less than wall stud width.")
         else:
             pass
+        
+        #Initialize the output strings - used to make exporting the results easier
+        self.user_load_res_string_output = ''
+        self.user_vert_load_string = 'Vertical Loads:\n'
+        self.user_lat_load_string = 'Lateral Loads:\n'
         
         e = self.e_in
         loads_plf = []
@@ -1613,19 +1624,29 @@ class Master_window:
         
         
         #Wall Self Weight to be added to DL
+        self.user_vert_load_string = self.user_vert_load_string + 'Self Weight: ,{0}, psf * ,{1}, ft = '.format(self.user_sw.get(),self.user_sw_height_ft.get())
+        
         sw_plf = float(self.user_sw.get())*float(self.user_sw_height_ft.get())
+
         self.user_sw_label.configure(text='ft = {0:.3f} plf'.format(sw_plf))
+        self.user_vert_load_string = self.user_vert_load_string + ',{0:.2f}, plf\n'.format(sw_plf)
+        
         sw_lbs = sw_plf*(s_in/12.0)
         sw_delta = 0
         sw_shear = 0
         
         i=0
         for load in self.user_vert_loads_psf:
+            self.user_vert_load_string = self.user_vert_load_string + '{0}: ,{1}, psf * ,{2}, ft = '.format(self.user_vert_load_labels[i],load.get(),self.user_vert_loads_trib[i].get())
+            
             load_psf = float(load.get())
             load_trib = float(self.user_vert_loads_trib[i].get())
             loads_plf.append(load_psf * load_trib)
             loads_lbs.append(loads_plf[i]*(s_in/12.0))
+            
             self.user_load_trib_plf_label[i].configure(text='ft = {0:.3f} plf'.format(loads_plf[i]))
+            self.user_vert_load_string = self.user_vert_load_string + ',{0:.3f}, plf @ e = ,{1:.3f}, in\n'.format(loads_plf[i], e)
+            
             grav_delta.append(((loads_lbs[i]*e)*self.wall.height_in**2)/(16.0*self.wall.E_prime_psi*self.wall.I_in4))
             grav_shear.append((loads_lbs[i]*e) / self.wall.height_in)
             i+=1
@@ -1643,8 +1664,12 @@ class Master_window:
         lat_shear = []
         i=0
         for lat_load in self.user_lat_loads_psf:
+            
             lat_load_psf = float(lat_load.get())
             lat_plf.append(lat_load_psf*(s_in/12.0))
+            
+            self.user_lat_load_string = self.user_lat_load_string + '{0}: ,{1}, psf * ,{2:.2f}, in * 1/12 ft/in = ,{3:.2f}, plf\n'.format(self.user_lat_load_labels[i],lat_load.get(),s_in,lat_plf[i])
+            
             lat_inlbs.append(((lat_plf[i]*((self.wall.height_in)/12.0)**2)/8.0)*12.0)
             lat_delta.append((1728*5*lat_plf[i]*(self.wall.height_in/12.0)**4)/(384*self.wall.E_prime_psi*self.wall.I_in4))
             lat_shear.append((((lat_plf[i]*(self.wall.height_in))/12.0)/2.0))
@@ -1656,6 +1681,7 @@ class Master_window:
         d_plot = []
         ratio_text = ''
         for combo in self.load_combos:
+            self.user_load_res_string_output = self.user_load_res_string_output + '{0},{1},'.format(combo[0],combo[1])
             fc_prime = self.wall.fc_prime_calc(combo[1])
             fb_prime = self.wall.fb_prime_calc(combo[1])
             fv_prime = self.wall.fv_prime_psi_cd
@@ -1736,34 +1762,71 @@ class Master_window:
             
             if p > self.wall.crushing_limit_lbs:
                 self.user_p_res_labels[i].configure(text='{0:.2f}**'.format(p))
+                self.user_load_res_string_output = self.user_load_res_string_output + '{0:.2f}**,'.format(p)
             elif p > self.wall.crushing_limit_lbs_no_cb:
                 self.user_p_res_labels[i].configure(text='{0:.2f}*'.format(p))
+                self.user_load_res_string_output = self.user_load_res_string_output + '{0:.2f}*,'.format(p)
             else:
                 self.user_p_res_labels[i].configure(text='{0:.2f}'.format(p))
+                self.user_load_res_string_output = self.user_load_res_string_output + '{0:.2f},'.format(p)
+                
             self.user_fc_res_labels[i].configure(text='{0:.3f}'.format(fc))
+            self.user_load_res_string_output = self.user_load_res_string_output + '{0:.3f},'.format(fc)
+            
+            self.user_kel_res_labels[i].configure(text='{0:.2f}'.format(self.wall.height_in/self.wall.d_in))
+            self.user_load_res_string_output = self.user_load_res_string_output + '{0:.2f},'.format(self.wall.height_in/self.wall.d_in)
+            
+            self.user_FcE_res_labels[i].configure(text='{0:.2f}'.format(self.wall.fcE_psi))
+            self.user_load_res_string_output = self.user_load_res_string_output + '{0:.2f},'.format(self.wall.fcE_psi)
+            
+            self.user_c_labels[i].configure(text='{0:.1f}'.format(self.wall.c_cp))
+            self.user_load_res_string_output = self.user_load_res_string_output + '{0:.1f},'.format(self.wall.c_cp)
+            
+            self.user_cp_labels[i].configure(text='{0:.3f}'.format(self.wall.cp))
+            self.user_load_res_string_output = self.user_load_res_string_output + '{0:.3f},'.format(self.wall.cp)
+            
+            self.user_fcprime_res_labels[i].configure(text='{0:.2f}'.format(fc_prime))
+            self.user_load_res_string_output = self.user_load_res_string_output + '{0:.2f},'.format(fc_prime)
+            
+            self.user_fc_fc_res_labels[i].configure(text='{0:.3f}'.format(fc/fc_prime))
+            self.user_load_res_string_output = self.user_load_res_string_output + '{0:.3f},'.format(fc/fc_prime)
+            
             self.user_m_res_labels[i].configure(text='{0:.2f}'.format(m))
+            self.user_load_res_string_output = self.user_load_res_string_output + '{0:.2f},'.format(m)
+            
             self.user_fb_res_labels[i].configure(text='{0:.3f}'.format(fb))
+            self.user_load_res_string_output = self.user_load_res_string_output + '{0:.3f},'.format(fb)
+            
+            self.user_fbprime_res_labels[i].configure(text='{0:.2f}'.format(fb_prime))
+            self.user_load_res_string_output = self.user_load_res_string_output + '{0:.2f},'.format(fb_prime)
+            
+            self.user_fb_fb_res_labels[i].configure(text='{0:.3f}'.format(fb/fb_prime))
+            self.user_load_res_string_output = self.user_load_res_string_output + '{0:.3f},'.format(fb/fb_prime)
+            
+            self.user_v_res_labels[i].configure(text='{0:.2f}'.format(v))
+            self.user_load_res_string_output = self.user_load_res_string_output + '{0:.2f},'.format(v)
+            
+            self.user_fv_res_labels[i].configure(text='{0:.2f}'.format(fv))
+            self.user_load_res_string_output = self.user_load_res_string_output + '{0:.2f},'.format(fv)
+            
+            self.user_fvprime_res_labels[i].configure(text='{0:.2f}'.format(fv_prime))
+            self.user_load_res_string_output = self.user_load_res_string_output + '{0:.2f},'.format(fv_prime)
+            
+            self.user_fv_fv_res_labels[i].configure(text='{0:.3f}'.format(fv/fv_prime))
+            self.user_load_res_string_output = self.user_load_res_string_output + '{0:.3f},'.format(fv/fv_prime)
+            
             self.user_ratio_res_labels[i].configure(text='{0:.3f}{1}'.format(ratio,ratio_text))
+            self.user_load_res_string_output = self.user_load_res_string_output + '{0:.3f}{1},'.format(ratio,ratio_text)
+            
             self.user_deltaratio_res_labels[i].configure(text='{1:.3f} in (H/{0:.1f})'.format(delta_ratio,delta))
+            self.user_load_res_string_output = self.user_load_res_string_output +'{1:.3f} in (H/{0:.1f}),'.format(delta_ratio,delta)
+            
             if user_status == 'OK':
                 self.user_status_res_labels[i].configure(text='{0}'.format(user_status),background='green')
             else:
                 self.user_status_res_labels[i].configure(text='{0}'.format(user_status),background='red')
-            
-            self.user_kel_res_labels[i].configure(text='{0:.2f}'.format(self.wall.height_in/self.wall.d_in))
-            self.user_FcE_res_labels[i].configure(text='{0:.2f}'.format(self.wall.fcE_psi))
-            self.user_c_labels[i].configure(text='{0:.1f}'.format(self.wall.c_cp))
-            self.user_cp_labels[i].configure(text='{0:.3f}'.format(self.wall.cp))
-            self.user_fcprime_res_labels[i].configure(text='{0:.2f}'.format(fc_prime))
-            self.user_fc_fc_res_labels[i].configure(text='{0:.3f}'.format(fc/fc_prime))
-            self.user_fbprime_res_labels[i].configure(text='{0:.2f}'.format(fb_prime))
-            self.user_fb_fb_res_labels[i].configure(text='{0:.3f}'.format(fb/fb_prime))
-            
-            self.user_v_res_labels[i].configure(text='{0:.2f}'.format(v))
-            self.user_fv_res_labels[i].configure(text='{0:.2f}'.format(fv))
-            self.user_fvprime_res_labels[i].configure(text='{0:.2f}'.format(fv_prime))
-            self.user_fv_fv_res_labels[i].configure(text='{0:.3f}'.format(fv/fv_prime))
-            
+            self.user_load_res_string_output = self.user_load_res_string_output + '{0}\n'.format(user_status)
+                        
             p_plot.append(p)
             m_plot.append(m)
             d_plot.append(delta)
@@ -1820,6 +1883,44 @@ class Master_window:
 
                 else:
                     loop+=1
+    def export_user_load_results(self,*event):
+        #Run the user loads so export results are always current
+        self.run_user_loads()
+        
+        #generate file name and confirm path exists if not create it
+        b = self.b_nom.get()
+        d = self.d_nom.get()
+        h = self.wall_height.get()
+        p = self.pressure.get()
+        cd = self.cd.get()
+        grade = self.grade.get()
+        min_ecc = self.min_ecc_yn.get()
+        if min_ecc == 1:
+            e_string_file = '-Axial_Ecc_Included'
+        else:
+            e_string_file =''
+            
+        label = '{0}x{1}_height-{2}_ft_pressure-{3}_psf_Cd-{4}'.format(b,d,h,p,cd)
+        path = os.path.join(os.path.expanduser('~'),'Desktop','RESULTS','Wood_Walls', label)
+        self.path_exists(path)
+        
+        name = label+e_string_file+'_user_load_results.csv'
+        
+        title = '{0}x{1}(,{2:.2f},x,{3:.2f},)- Height:,{4}, ft - Species:, {6} ,- Grade:, {5}\n'.format(self.b_nom.get(),self.d_nom.get(),self.b_actual,self.d_actual,h,grade, self.species.get())
+        
+        file = open(os.path.join(path,name),'w')
+        file.write('User Load Results - IBC 2012 - ASD\n')
+        file.write(title)
+        file.write(self.user_vert_load_string+'\n')      
+        file.write(self.user_lat_load_string+'\n')
+        file.write("Combo:,Cd,P (lbs), fc (psi),Ke Le_d/d,FcE (psi),c,Cp,Fc' (psi),fc/Fc',M_lat (in-lbs),fb_lat (psi),Fb' (psi),fb/Fb',V (lbs),fv (psi),Fv' (psi),fv/Fv',Ratio,D (H/--),Status\n")
+        file.write(self.user_load_res_string_output)
+        file.write('* - indicates load greater than wall plate crushing w/o Cb - {0:.3f} lbs\n'.format(self.wall.crushing_limit_lbs_no_cb))
+        file.write('** - indicates load greater than wall plate crushing w/ Cb - {0:.3f} lbs\n'.format(self.wall.crushing_limit_lbs))
+        file.write('\n'+self.wall.assumptions)
+        file.close()
+        
+        
 def main():            
     root = tk.Tk()
     root.title("Wood Stud Wall - 2-4x Studs - North American Species (Not Southern Pine) - V0.9 BETA")
