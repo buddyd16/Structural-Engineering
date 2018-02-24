@@ -1644,7 +1644,7 @@ class Master_window:
             loads_plf.append(load_psf * load_trib)
             loads_lbs.append(loads_plf[i]*(s_in/12.0))
             
-            self.user_load_trib_plf_label[i].configure(text='ft = {0:.3f} plf'.format(loads_plf[i]))
+            self.user_load_trib_plf_label[i].configure(text='ft = {0:.3f} plf @ e = {1:.3f} in'.format(loads_plf[i],e))
             self.user_vert_load_string = self.user_vert_load_string + ',{0:.3f}, plf @ e = ,{1:.3f}, in\n'.format(loads_plf[i], e)
             
             grav_delta.append(((loads_lbs[i]*e)*self.wall.height_in**2)/(16.0*self.wall.E_prime_psi*self.wall.I_in4))
