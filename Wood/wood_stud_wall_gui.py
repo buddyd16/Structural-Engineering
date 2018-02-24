@@ -16,7 +16,6 @@ import math
 class Master_window:
 
     def __init__(self, master):
-        
         self.master = master
         self.f_size = 8
         helv = tkFont.Font(family='Helvetica',size=self.f_size, weight='bold')
@@ -574,7 +573,7 @@ class Master_window:
         self.user_ins_top_frame.pack(side=tk.TOP)
         
         self.user_res_bottom_frame = tk.LabelFrame(self.pg5_frame, text="Results (IBC 2012 - ASD):", bd=2, relief='sunken', padx=5, pady=5)
-        res_headings = ['Combo:','Cd','P (lbs)', 'fc (psi)','Ke Le,d/d','FcE (psi)','c','Cp',"Fc' (psi)","fc/Fc'",'M,lat (in-lbs)','fb,lat (psi)',"Fb' (psi)","fb/Fb'",'V (lbs)','fv (psi)',"Fv' (psi)","fv/Fv'",'Ratio','D (H/--)','Status']
+        res_headings = ['Combo:','Cd','P (lbs)', 'fc (psi)','Ke Le_d/d','FcE (psi)','c','Cp',"Fc' (psi)","fc/Fc'",'M_lat (in-lbs)','fb_lat (psi)',"Fb' (psi)","fb/Fb'",'V (lbs)','fv (psi)',"Fv' (psi)","fv/Fv'",'Ratio','D (H/--)','Status']
         self.load_combos = [['D',0.9,1,0,0,0,0,0],
                             ['D+L',1,1,1,0,0,0,0],
                             ['D+Lr',1,1,0,1,0,0,0], 
@@ -751,14 +750,14 @@ class Master_window:
         p_lbs = self.wall.axial_capacity_w_moment(cd,self.pressure_moment_inlbs,self.e_in)
         
         ##Create Text String and write Axial result to text box        
-        axial_string = '\n\n-- Pmax,allow = {0:.2f} lbs ({2:.2f} plf) {1} --'.format(p_lbs,e_string, p_lbs/(self.wall.spacing_in/12.0))
+        axial_string = '\n\n-- Pmax_allow = {0:.2f} lbs ({2:.2f} plf) {1} --'.format(p_lbs,e_string, p_lbs/(self.wall.spacing_in/12.0))
         axial_string = axial_string + '\n-- PL Crushing (Cb): {0:.2f} lbs ({2:.2f} plf) --\n-- PL Crushing (w/o Cb): {1:.2f} lbs ({3:.2f} plf) --'.format(self.wall.crushing_limit_lbs,self.wall.crushing_limit_lbs_no_cb,self.wall.crushing_limit_lbs/(self.wall.spacing_in/12.0),self.wall.crushing_limit_lbs_no_cb/(self.wall.spacing_in/12.0))
         common_capacities = self.wall.cap_at_common_spacing(cd,pressure_psf,self.e_in)
         axial_string = axial_string + '\n\n--Common Spacing Capacities--\n' + common_capacities
         self.results_text_box.insert(tk.END, axial_string)
         
         ##Pull Section properties from wall class and write out to results text box
-        section_props_string = '\n\n--Section Properties--\nA = {0:.3f} in^2 -- s = {1:.3f} in^3 -- I = {2:.3f} in^4'.format(self.wall.area_in2,self.wall.s_in3,self.wall.I_in4)
+        section_props_string = '\n\n--Section Properties--\nA = {0:.3f} in^2 -- S = {1:.3f} in^3 -- I = {2:.3f} in^4'.format(self.wall.area_in2,self.wall.s_in3,self.wall.I_in4)
         self.results_text_box.insert(tk.END, section_props_string)
         
         #Applied Loads - Axial
@@ -803,20 +802,20 @@ class Master_window:
             bending_stress_ecc = self.ecc_moment_inlbs/self.wall.s_in3
             bending_stress_lat = self.pressure_moment_inlbs/self.wall.s_in3
             bending_stress = moment/self.wall.s_in3
-            self.stress_string = self.stress_string+'\nfb,lat = Mc/I = M/s = 6M/bd^2 = {0:.3f} psi + fb,gravity = {1:.3f} = {2:.3f}'.format(bending_stress_lat,bending_stress_ecc,bending_stress)
+            self.stress_string = self.stress_string+'\nfb_lat = Mc/I = M/s = 6M/bd^2 = {0:.3f} psi + fb_gravity = {1:.3f} = {2:.3f}'.format(bending_stress_lat,bending_stress_ecc,bending_stress)
             #Combined Ratio per NDS 2005 equation 15.4-1
             #[fc/Fc]'^2 + (fb + fc(6e/d)[1 + 0.234 (fc / FcE)])/ Fb' [ 1- (fc / FcE)] <= 1.0
             b1 = self.pressure_moment_inlbs/self.wall.s_in3
             ratio = (axial_stress/self.wall.fc_prime_psi)**2 + ((b1+(axial_stress*(6*self.e_in/d)*(1+(0.234*(axial_stress/self.wall.fcE_psi)))))/ (self.wall.fb_prime_calc(cd)*(1-(axial_stress/self.wall.fcE_psi))))
-            self.stress_string = self.stress_string+"\nCombined Axial+Bending w/ Eccentricity:\n[fc/Fc]'^2 + (fb,lat + fc(6e/d)[1 + 0.234 (fc / FcE)])/ Fb' [ 1- (fc / FcE)] = {0:.3f} <= 1.0".format(ratio)
+            self.stress_string = self.stress_string+"\nCombined Axial+Bending w/ Eccentricity:\n[fc/Fc]'^2 + (fb_lat + fc(6e/d)[1 + 0.234 (fc / FcE)])/ Fb' [ 1- (fc / FcE)] = {0:.3f} <= 1.0".format(ratio)
         self.results_text_box.insert(tk.END, self.stress_string)
         
         ##Calculation of Cp
         self.cp_string = '\n\n--Calculation of Cp--'
         self.cp_string=self.cp_string + '\nFc* = reference compression design value parallel to grain multiplied by all applicable adjusment factors except Cp\nFc* = {0:.2f} psi\nc = 0.8 - NDS 2005 3.7.1'.format(self.wall.fc_star_psi)
         self.cp_string=self.cp_string + self.wall.assumptions_ke + self.wall.assumptions_leb
-        self.cp_string = self.cp_string + 'Ke * le,d / d = {0:.3f} in < 50'.format(self.wall.height_in/d)
-        self.cp_string = self.cp_string + "\nFcE = 0.822 * Emin' / (Le/d)^2 - NDS 2005 Section 3.7.1\nFcE = {0:.3f} psi".format(self.wall.fcE_psi)
+        self.cp_string = self.cp_string + 'Ke * Le_d / d = {0:.3f} in < 50'.format(self.wall.height_in/d)
+        self.cp_string = self.cp_string + "\nFcE = 0.822 * Emin' / (Le_d/d)^2 - NDS 2005 Section 3.7.1\nFcE = {0:.3f} psi".format(self.wall.fcE_psi)
         self.cp_string = self.cp_string + "\nCp = ([1 + (FcE / Fc*)] / 2c ) - sqrt[ [1 + (FcE / Fc*) / 2c]^2 - (FcE / Fc*) / c] = {0:.3f} - NDS 2005 Section 3.7.1".format(self.wall.cp)
         self.results_text_box.insert(tk.END, self.cp_string)
         
@@ -1317,9 +1316,9 @@ class Master_window:
         
         name = label+e_string_file+'_results.txt'
         output = self.results_text_box.get(1.0,tk.END)
-        file = open(os.path.join(path,name),'w')
-        file.write(output)
-        file.close()
+        #file = open(os.path.join(path,name),'w')
+        #file.write(output)
+        #file.close()
         
         name_nds_table = label+e_string_file+'_nds_load_factor_table.csv'
         string = ''
@@ -1327,6 +1326,8 @@ class Master_window:
             string = string + '{0},'.format(self.res_nds_table_output[i])
         file = open(os.path.join(path,name_nds_table),'w')
         file.write(string)
+        file.write('\n')
+        file.write(output)
         file.close()
     
     def print_pm_graph_common(self,*event):
@@ -1599,7 +1600,7 @@ class Master_window:
         ng_count = 0
         s_in = float(self.user_calc_spacing.get())
         
-        if s_in==0:
+        if s_in<self.wall.b_in:
             tkMessageBox.showerror("ERROR!!","Spacing is less than wall stud width.")
         else:
             pass
@@ -1821,7 +1822,7 @@ class Master_window:
                     loop+=1
 def main():            
     root = tk.Tk()
-    root.title("Wood Stud Wall - 2-4x Studs - North American Species (Not Southern Pine)")
+    root.title("Wood Stud Wall - 2-4x Studs - North American Species (Not Southern Pine) - V0.9 BETA")
     Master_window(root)
     root.minsize(1024,768)
     root.mainloop()

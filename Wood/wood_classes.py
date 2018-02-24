@@ -16,10 +16,10 @@ class wood_stud_wall:
         self.height_in = height_ft * 12.0
         if num_plates == 0:
             self.height_in = self.height_in
-            self.assumptions = '\n\n--ASSUMPTIONS--\nDesign Stud Height = Wall Height inclusive of top and bottom plates\nCapacities noted are inclusive of wall self weight, true supporting capacity is (result - panel self weight)\n'
+            self.assumptions = '\n\n--ASSUMPTIONS--\nDesign Stud Height = Wall Height inclusive of top and bottom plates\nCapacities noted are inclusive of wall self weight - true supporting capacity is (result - panel self weight)\n'
         else:
             self.height_in = self.height_in - (num_plates * 1.5)
-            self.assumptions = '\n\n--ASSUMPTIONS--\nDesign Stud Height = Wall Height - ({0}) 1.5" wall plates\nCapacities noted are inclusive of wall self weight, true supporting capacity is (result - panel self weight)\n'.format(num_plates)
+            self.assumptions = '\n\n--ASSUMPTIONS--\nDesign Stud Height = Wall Height - ({0}) 1.5" wall plates\nCapacities noted are inclusive of wall self weight - true supporting capacity is (result - panel self weight)\n'.format(num_plates)
             
         self.spacing_in = spacing_in
         self.fb_psi = fb_psi
@@ -52,7 +52,7 @@ class wood_stud_wall:
         #Size Factor, Cf
         #NDS 2005 section 4.3.6 and Table 4A
         #NOTE ASSUMES STUDS ARE VISUALLY GRADED DIMENSION LUMBER 2"-4" AND NOT SOUTHERN PINE AND NORTH AMERICAN SPECIES
-        self.assumptions = self.assumptions + 'Size Factor,Cf - Wall Studs are visually graded dimensional lumber 2" to 4" North American Species and not Southern Pine\n'
+        self.assumptions = self.assumptions + 'Size Factor_Cf - Wall Studs are visually graded dimensional lumber 2" to 4" North American Species and not Southern Pine\n'
         if grade == "Stud":
             #Per NDS 2005 Table 4A for stud grade depth >8" use No.3 size factors
             if self.d_in>11.25:
@@ -136,7 +136,7 @@ class wood_stud_wall:
         #Wet Service Factor, Cm
         #NDS 2005 section 4.3.3 and Table 4A
         #NOTE ASSUMES STUDS ARE VISUALLY GRADED DIMENSION LUMBER 2"-4" AND NOT SOUTHERN PINE AND NORTH AMERICAN SPECIES
-        self.assumptions = self.assumptions + 'Wet Service Factor,Cm - Wall Studs are visually graded dimensional lumber 2" to 4" North American Species and not Southern Pine\n'
+        self.assumptions = self.assumptions + 'Wet Service Factor_Cm - Wall Studs are visually graded dimensional lumber 2" to 4" North American Species and not Southern Pine\n'
         if moisture_percent > 19:
             self.cm_fc_perp = 0.67
             self.cm_E = 0.9
@@ -200,12 +200,12 @@ class wood_stud_wall:
         #Beam Stability Factor, CL
         #NDS 2005 section 4.3.5
         self.cl = 1.0 #Assumes stud walls are sheathed on the compression face
-        self.assumptions = self.assumptions + 'Beam Stability Factor, CL - Wall studs are continuously sheathed on the compression face\n'
+        self.assumptions = self.assumptions + 'Beam Stability Factor_CL - Wall studs are continuously sheathed on the compression face\n'
         
         #Flat Use Factor, Cfu
         #NDS 2005 section 4.3.7
         self.cfu = 1.0 #Wall studs generally not loaded on flat face
-        self.assumptions = self.assumptions + 'Flat Use Factor, Cfu - Wall studs are not loaded on the flat face\n'
+        self.assumptions = self.assumptions + 'Flat Use Factor_Cfu - Wall studs are not loaded on the flat face\n'
         
         #Incising Factor, Ci
         #NDS 2005 section 4.3.8
@@ -225,13 +225,13 @@ class wood_stud_wall:
         #Buckling Siffness Factor, CT
         #NDS 2005 4.3.11
         self.cT = 1.0 #Not a truss
-        self.assumptions = self.assumptions + 'Buckling Siffness Factor, CT - Not Applicable for stud walls\n'
+        self.assumptions = self.assumptions + 'Buckling Stiffness Factor_CT - Not Applicable for stud walls\n'
         
         #Bearing Area Factor, Cb
         #NDS 2005 4.3.12 and 3.10.4
         if self.b_in < 6 : 
             self.cb_fc_perp = (self.b_in + 0.375) / self.b_in
-            self.assumptions = self.assumptions + 'Bearing Area Factor, Cb - Stud greater than 3" from bottom plate end\n'
+            self.assumptions = self.assumptions + 'Bearing Area Factor_Cb - Stud greater than 3" from bottom plate end\n'
         else:
             self.cb_fc_perp = 1.0
         
@@ -261,14 +261,14 @@ class wood_stud_wall:
         self.fc_star_psi = self.fc_psi * cd * self.cm_fc * self.ct_fc * self.cf_fc * self.ci_fc * self.c_frt[2]
         
         self.c_cp = 0.8
-        self.assumptions_c = 'c for Cp calc based on sawn lumber - NDS 2005 3.7.1\n'
+        self.assumptions_c = 'c for Cp calculation based on sawn lumber - NDS 2005 3.7.1\n'
         
         #Slenderness Ratio check per NDS 2005 sections 3.7.1.2 thru 3.7.1.4
         kb = 1.0
         kd = 1.0
-        self.assumptions_ke = '\nKe = 1.0 for both depth and breadth of studs, Ref NDS 2005 appendix G pin top and bottom\n'
+        self.assumptions_ke = '\nKe = 1.0 for both depth and breadth of studs - Ref NDS 2005 appendix G pin top and bottom\n'
         leb = 12 * kb
-        self.assumptions_leb = 'Le,b = 12.0, continously braced by sheathing 12" field nailing assumed\n'
+        self.assumptions_leb = 'Le_b = 12.0 in. - continuously braced by sheathing 12" field nailing assumed\n'
         led = self.height_in * kd
         
         #Check Le/d,b ratios less than 50 - NDS 2005 Section 3.7.1.4
@@ -527,7 +527,7 @@ class wood_stud_wall:
         
     def cap_at_common_spacing(self, cd,lateral_w_psf, e_in):
         spacings = [4,6,8,12,16,24]
-        res_string = 'Axial Capacity at 4", 6", 8", 12", 16", and 24" spacings:\n'
+        res_string = 'Axial Capacity at 4" - 6" - 8" - 12" - 16" - 24" spacings:\n'
         self.cap_at_common = []
         
         for s in spacings:
