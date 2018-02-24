@@ -1608,8 +1608,8 @@ class Master_window:
         sw_plf = float(self.user_sw.get())*float(self.user_sw_height_ft.get())
         self.user_sw_label.configure(text='ft = {0:.3f} plf'.format(sw_plf))
         sw_lbs = sw_plf*(s_in/12.0)
-        sw_delta = ((sw_lbs*e)*self.wall.height_in**2)/(16.0*self.wall.E_prime_psi*self.wall.I_in4)
-        sw_shear = (sw_lbs*e) / self.wall.height_in
+        sw_delta = 0
+        sw_shear = 0
         
         i=0
         for load in self.user_vert_loads_psf:
@@ -1783,29 +1783,34 @@ class Master_window:
         loop_max = 500
         tol = 0.0001
         loop = 0
-
-        while loop<loop_max:
-            c = (a+b)/2.0
-            self.user_calc_spacing.set(c)
-            
-            check = self.run_user_loads()
-            
-            if check == 0 :
-                a = c
-            else:
-                b = c
-                
-            if (b-a)/2.0 <= tol:
-                loop = loop_max
-                c = math.floor(c*4)/4                
+        self.user_calc_spacing.set(b)
+        check = self.run_user_loads()
+        if check == 0:
+            self.user_calc_spacing.set(b)
+            self.run_user_loads()
+        else:
+            while loop<loop_max:
+                c = (a+b)/2.0
                 self.user_calc_spacing.set(c)
-                self.run_user_loads()
-            elif c<self.wall.b_in:
-                loop = loop_max
-                self.user_calc_spacing.set(0)
+                
+                check = self.run_user_loads()
+                
+                if check == 0 :
+                    a = c
+                else:
+                    b = c
+                    
+                if (b-a)/2.0 <= tol:
+                    loop = loop_max
+                    c = math.floor(c*4)/4                
+                    self.user_calc_spacing.set(c)
+                    self.run_user_loads()
+                elif c<self.wall.b_in:
+                    loop = loop_max
+                    self.user_calc_spacing.set(0)
 
-            else:
-                loop+=1
+                else:
+                    loop+=1
 def main():            
     root = tk.Tk()
     root.title("Wood Stud Wall - 2-4x Studs - North American Species (Not Southern Pine)")
