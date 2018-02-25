@@ -1624,7 +1624,7 @@ class Master_window:
         
         
         #Wall Self Weight to be added to DL
-        self.user_vert_load_string = self.user_vert_load_string + 'Self Weight: ,{0}, psf * ,{1}, ft = '.format(self.user_sw.get(),self.user_sw_height_ft.get())
+        self.user_vert_load_string = self.user_vert_load_string + 'Self Weight: ,{0}, psf x ,{1}, ft = '.format(self.user_sw.get(),self.user_sw_height_ft.get())
         
         sw_plf = float(self.user_sw.get())*float(self.user_sw_height_ft.get())
 
@@ -1637,7 +1637,7 @@ class Master_window:
         
         i=0
         for load in self.user_vert_loads_psf:
-            self.user_vert_load_string = self.user_vert_load_string + '{0}: ,{1}, psf * ,{2}, ft = '.format(self.user_vert_load_labels[i],load.get(),self.user_vert_loads_trib[i].get())
+            self.user_vert_load_string = self.user_vert_load_string + '{0} ,{1}, psf x ,{2}, ft = '.format(self.user_vert_load_labels[i],load.get(),self.user_vert_loads_trib[i].get())
             
             load_psf = float(load.get())
             load_trib = float(self.user_vert_loads_trib[i].get())
@@ -1668,7 +1668,7 @@ class Master_window:
             lat_load_psf = float(lat_load.get())
             lat_plf.append(lat_load_psf*(s_in/12.0))
             
-            self.user_lat_load_string = self.user_lat_load_string + '{0}: ,{1}, psf * ,{2:.2f}, in * 1/12 ft/in = ,{3:.2f}, plf\n'.format(self.user_lat_load_labels[i],lat_load.get(),s_in,lat_plf[i])
+            self.user_lat_load_string = self.user_lat_load_string + '{0} ,{1}, psf x ,{2:.2f}, in * 1/12 ft/in = ,{3:.2f}, plf\n'.format(self.user_lat_load_labels[i],lat_load.get(),s_in,lat_plf[i])
             
             lat_inlbs.append(((lat_plf[i]*((self.wall.height_in)/12.0)**2)/8.0)*12.0)
             lat_delta.append((1728*5*lat_plf[i]*(self.wall.height_in/12.0)**4)/(384*self.wall.E_prime_psi*self.wall.I_in4))
@@ -1887,6 +1887,9 @@ class Master_window:
         #Run the user loads so export results are always current
         self.run_user_loads()
         
+        #Get New user defined spacing from user load tab
+        s_in = float(self.user_calc_spacing.get())
+        
         #generate file name and confirm path exists if not create it
         b = self.b_nom.get()
         d = self.d_nom.get()
@@ -1906,11 +1909,12 @@ class Master_window:
         
         name = label+e_string_file+'_user_load_results.csv'
         
-        title = '{0}x{1}(,{2:.2f},x,{3:.2f},)- Height:,{4}, ft - Species:, {6} ,- Grade:, {5}\n'.format(self.b_nom.get(),self.d_nom.get(),self.b_actual,self.d_actual,h,grade, self.species.get())
+        title = 'Nominal: ,{0},x,{1}, Height:,{4}, ft, Species:, {6} ,Grade:, {5}\nActual: ,{2:.2f}, in x,{3:.2f}, in\n'.format(self.b_nom.get(),self.d_nom.get(),self.b_actual,self.d_actual,h,grade, self.species.get())
         
         file = open(os.path.join(path,name),'w')
         file.write('User Load Results - IBC 2012 - ASD\n')
         file.write(title)
+        file.write('Design Stud Spacing: ,{0:.3f}, in\n'.format(s_in))
         file.write(self.user_vert_load_string+'\n')      
         file.write(self.user_lat_load_string+'\n')
         file.write("Combo:,Cd,P (lbs), fc (psi),Ke Le_d/d,FcE (psi),c,Cp,Fc' (psi),fc/Fc',M_lat (in-lbs),fb_lat (psi),Fb' (psi),fb/Fb',V (lbs),fv (psi),Fv' (psi),fv/Fv',Ratio,D (H/--),Status\n")
