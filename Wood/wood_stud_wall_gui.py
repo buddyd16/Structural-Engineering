@@ -592,7 +592,7 @@ class Master_window:
                             ['.6D + .6W',1.6,0.6,0,0,0,0,0.6]]
         i=1
         for heading in res_headings:
-            tk.Label(self.user_res_bottom_frame, text = heading).grid(column=i, row=1, padx=10)
+            tk.Label(self.user_res_bottom_frame, text = heading).grid(column=i, row=1, padx=4)
             i+=1
         
         i=0
@@ -617,46 +617,46 @@ class Master_window:
         self.user_deltaratio_res_labels=[]
         self.user_status_res_labels=[]
         for combo in self.load_combos:
-            tk.Label(self.user_res_bottom_frame, text = combo[0]).grid(column=1, row=i+2, padx=10)
-            tk.Label(self.user_res_bottom_frame, text = combo[1]).grid(column=2, row=i+2, padx=10)
+            tk.Label(self.user_res_bottom_frame, text = combo[0]).grid(column=1, row=i+2, padx=4)
+            tk.Label(self.user_res_bottom_frame, text = combo[1]).grid(column=2, row=i+2, padx=4)
             self.user_p_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
-            self.user_p_res_labels[i].grid(column=3, row=i+2, padx=10)
+            self.user_p_res_labels[i].grid(column=3, row=i+2, padx=4)
             self.user_fc_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
-            self.user_fc_res_labels[i].grid(column=4, row=i+2, padx=10)
+            self.user_fc_res_labels[i].grid(column=4, row=i+2, padx=4)
             self.user_kel_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
-            self.user_kel_res_labels[i].grid(column=5, row=i+2, padx=10)
+            self.user_kel_res_labels[i].grid(column=5, row=i+2, padx=4)
             self.user_FcE_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
-            self.user_FcE_res_labels[i].grid(column=6, row=i+2, padx=10)
+            self.user_FcE_res_labels[i].grid(column=6, row=i+2, padx=4)
             self.user_c_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
-            self.user_c_labels[i].grid(column=7, row=i+2, padx=10)
+            self.user_c_labels[i].grid(column=7, row=i+2, padx=4)
             self.user_cp_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
-            self.user_cp_labels[i].grid(column=8, row=i+2, padx=10)
+            self.user_cp_labels[i].grid(column=8, row=i+2, padx=4)
             self.user_fcprime_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
-            self.user_fcprime_res_labels[i].grid(column=9, row=i+2, padx=10)
+            self.user_fcprime_res_labels[i].grid(column=9, row=i+2, padx=4)
             self.user_fc_fc_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
-            self.user_fc_fc_res_labels[i].grid(column=10, row=i+2, padx=10)
+            self.user_fc_fc_res_labels[i].grid(column=10, row=i+2, padx=4)
             self.user_m_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
-            self.user_m_res_labels[i].grid(column=11, row=i+2, padx=10)
+            self.user_m_res_labels[i].grid(column=11, row=i+2, padx=4)
             self.user_fb_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
-            self.user_fb_res_labels[i].grid(column=12, row=i+2, padx=10)
+            self.user_fb_res_labels[i].grid(column=12, row=i+2, padx=4)
             self.user_fbprime_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
-            self.user_fbprime_res_labels[i].grid(column=13, row=i+2, padx=10)
+            self.user_fbprime_res_labels[i].grid(column=13, row=i+2, padx=4)
             self.user_fb_fb_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
-            self.user_fb_fb_res_labels[i].grid(column=14, row=i+2, padx=10)
+            self.user_fb_fb_res_labels[i].grid(column=14, row=i+2, padx=4)
             self.user_v_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
-            self.user_v_res_labels[i].grid(column=15, row=i+2, padx=10)
+            self.user_v_res_labels[i].grid(column=15, row=i+2, padx=4)
             self.user_fv_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
-            self.user_fv_res_labels[i].grid(column=16, row=i+2, padx=10)
+            self.user_fv_res_labels[i].grid(column=16, row=i+2, padx=4)
             self.user_fvprime_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
-            self.user_fvprime_res_labels[i].grid(column=17, row=i+2, padx=10)
+            self.user_fvprime_res_labels[i].grid(column=17, row=i+2, padx=4)
             self.user_fv_fv_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
-            self.user_fv_fv_res_labels[i].grid(column=18, row=i+2, padx=10)
+            self.user_fv_fv_res_labels[i].grid(column=18, row=i+2, padx=4)
             self.user_ratio_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
-            self.user_ratio_res_labels[i].grid(column=19, row=i+2, padx=10)
+            self.user_ratio_res_labels[i].grid(column=19, row=i+2, padx=4)
             self.user_deltaratio_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
-            self.user_deltaratio_res_labels[i].grid(column=20, row=i+2, padx=10)
+            self.user_deltaratio_res_labels[i].grid(column=20, row=i+2, padx=4)
             self.user_status_res_labels.append(tk.Label(self.user_res_bottom_frame, text = '--'))
-            self.user_status_res_labels[i].grid(column=21, row=i+2, padx=10)
+            self.user_status_res_labels[i].grid(column=21, row=i+2, padx=4)
             i+=1
             
         self.user_res_bottom_frame.pack(side=tk.TOP)
@@ -1753,7 +1753,7 @@ class Master_window:
                 else:
                     ratio_text = ratio_text
             
-            if ratio > 1.0:
+            if ratio > 1.0 or s_in<self.wall.b_in:
                 user_status = 'NG'
                 ng_count = ng_count +1
             else:
