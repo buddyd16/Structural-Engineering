@@ -708,6 +708,7 @@ class Master_window:
         spacing = float(self.stud_spacing.get())
         grade = self.grade.get()
         self.title = '{0}x{1} ({2:.2f}x{3:.2f})- Height:{4} ft - Species: {7} - Grade: {5} - Spacing: {6} in'.format(self.b_nom.get(),self.d_nom.get(),b,d,height,grade,spacing, self.species.get())
+        self.title_pm_stud = '{0}x{1} ({2:.2f}x{3:.2f})- Height:{4} ft - Species: {6} - Grade: {5}'.format(self.b_nom.get(),self.d_nom.get(),b,d,height,grade, self.species.get())
         self.results_text_box.insert(tk.END, self.title)
         
         fb = float(self.fb_psi.get())
@@ -1106,7 +1107,7 @@ class Master_window:
         
         self.ax1D.set_ylabel('Axial (lbs)'+e_string)
         
-        self.ax1D.set_title(self.title)
+        self.ax1D.set_title(self.title_pm_stud)
         self.canvasD.draw()
         
     def path_exists(self,path):
