@@ -1613,7 +1613,7 @@ class Master_window:
         
         #Initialize the output strings - used to make exporting the results easier
         self.user_load_res_string_output = ''
-        self.user_vert_load_string = 'Vertical Loads:\n'
+        self.user_vert_load_string = '\nVertical Loads:\n'
         self.user_lat_load_string = 'Lateral Loads:\n'
         
         e = self.e_in
@@ -1668,7 +1668,7 @@ class Master_window:
             lat_load_psf = float(lat_load.get())
             lat_plf.append(lat_load_psf*(s_in/12.0))
             
-            self.user_lat_load_string = self.user_lat_load_string + '{0} ,{1}, psf x ,{2:.2f}, in * 1/12 ft/in = ,{3:.2f}, plf\n'.format(self.user_lat_load_labels[i],lat_load.get(),s_in,lat_plf[i])
+            self.user_lat_load_string = self.user_lat_load_string + '{0} ,{1}, psf x ,{2:.2f}, in x 1/12 ft/in = ,{3:.2f}, plf\n'.format(self.user_lat_load_labels[i],lat_load.get(),s_in,lat_plf[i])
             
             lat_inlbs.append(((lat_plf[i]*((self.wall.height_in)/12.0)**2)/8.0)*12.0)
             lat_delta.append((1728*5*lat_plf[i]*(self.wall.height_in/12.0)**4)/(384*self.wall.E_prime_psi*self.wall.I_in4))
@@ -1908,6 +1908,9 @@ class Master_window:
         self.path_exists(path)
         
         name = label+e_string_file+'_user_load_results.csv'
+        chart = label+e_string_file+'_user_load_results_nomograph.jpg'
+        
+        self.FigD.savefig(os.path.join(path,chart))
         
         title = 'Nominal: ,{0},x,{1}, Height:,{4}, ft, Species:, {6} ,Grade:, {5}\nActual: ,{2:.2f}, in x,{3:.2f}, in\n'.format(self.b_nom.get(),self.d_nom.get(),self.b_actual,self.d_actual,h,grade, self.species.get())
         
