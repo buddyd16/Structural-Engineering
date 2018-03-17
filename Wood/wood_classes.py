@@ -252,6 +252,7 @@ class wood_stud_wall:
             
             self.Rb_cl = (self.cl_le*self.d_in/self.b_in**2)**0.5
             self.Fbe_cl = (1.20 * self.Emin_prime_psi)/self.Rb_cl**2
+            self.assumptions = self.assumptions + 'Beam Stability Factor_CL - Wall studs are not braced on compression face - CL per design stud height\n'
             #see Fb' function for remainder of CL calculation as it depends on Cd
             
         #E' = E * Cm * Ct * Ci - NDS 2005 Table 4.3.1
@@ -318,7 +319,8 @@ class wood_stud_wall:
             #NDS equation 3.3-6
             self.cl = ((1+self.fbe_fbstar)/1.9) - ((((1+self.fbe_fbstar)/1.9)**2) - (self.fbe_fbstar)/0.95)**0.5
             self.fb_prime_psi = self.fb_psi * cd * self.cm_fb * self.ct_fb * self.cl * self.cf_fb * self.cfu * self.ci_fb * self.cr * self.c_frt[0]
-        
+            self.cl_calc_text = "\n\n--Calculation of CL--\nLe = {0:.3f} in - per NDS Table 3.3.3 footnote 1 \nRb = sqrt(Le*d / b^2) = {1:.3f}\nFbE = 1.20 * Emin' /Rb^2 = {2:.3f} psi\nFb* = reference bending design value multiplied by all applicable adjustment factors except Cfu, Cv, and CL\nFb* = {3:.3f} psi\nFbE/Fb* = {4:.3f}\nNDS Eq. 3.3-6\nCL = [1 + (FbE / Fb*)] / 1.9 - ( [ [1 + (FbE / Fb*)] / 1.9 ]^2 - (FbE / Fb*) / 0.95 ) ^ 1/2 = {5:.3f}".format(self.cl_le, self.Rb_cl, self.Fbe_cl, self.fb_star_psi, self.fbe_fbstar, self.cl)
+            
         return self.fb_prime_psi
     
     def axial_and_bending(self, cd, p_lbs, m_inlbs):

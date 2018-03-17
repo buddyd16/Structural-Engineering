@@ -827,6 +827,12 @@ class Master_window:
         self.cp_string = self.cp_string + "\nCp = ([1 + (FcE / Fc*)] / 2c ) - sqrt[ [1 + (FcE / Fc*) / 2c]^2 - (FcE / Fc*) / c] = {0:.3f} - NDS 2005 Section 3.7.1".format(self.wall.cp)
         self.results_text_box.insert(tk.END, self.cp_string)
         
+        ##Calculation of CL
+        if self.com_lat_brace_yn.get() == 1:
+            pass
+        else:
+            self.results_text_box.insert(tk.END, self.wall.cl_calc_text)
+        
         ##write out assumption from wall creation - see wood_classes.py
         assumptions_string = self.wall.assumptions + self.wall.assumptions_c+self.wall.assumptions_cp
         self.results_text_box.insert(tk.END, assumptions_string)
