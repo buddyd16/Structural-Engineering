@@ -261,6 +261,11 @@ class Master_window:
         #Min Eccentricity?
         self.min_ecc_yn = tk.IntVar()
         tk.Checkbutton(self.lateral_frame, text=': Min. Eccentricty of d/6 (y/n)', variable=self.min_ecc_yn).grid(row=3, column=1) 
+        
+        #Stud Lateral Braced on Compression Face
+        self.com_lat_brace_yn = tk.IntVar()
+        self.com_lat_brace_yn.set(1)
+        tk.Checkbutton(self.lateral_frame, text=': Stud laterally braced on compression face (y/n)', variable=self.com_lat_brace_yn).grid(row=4, column=1) 
         self.lateral_frame.pack(fill=tk.X, padx=5, pady=5)
         
         self.b_run = tk.Button(self.input_frame,text="Calc", command=self.run, font=helv)
@@ -741,7 +746,7 @@ class Master_window:
             self.e_in = 0
             e_string =''
         
-        self.wall = wood.wood_stud_wall(b,d,height,spacing,grade,fb,fv,fc,E,Emin,fc_perp,moisture,temp,incise,num_pl, cfrt)
+        self.wall = wood.wood_stud_wall(b,d,height,spacing,grade,fb,fv,fc,E,Emin,fc_perp,moisture,temp,incise,num_pl, cfrt, self.com_lat_brace_yn.get())
         
         pressure_psf = float(self.pressure.get())
         

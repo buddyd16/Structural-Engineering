@@ -8,7 +8,7 @@ from __future__ import division
 #import matplotlib.pyplot as plt
 
 class wood_stud_wall:
-    def __init__(self,b_in=1.5,d_in=3.5,height_ft=10, spacing_in=12, grade="No.2", fb_psi=875, fv_psi= 150, fc_psi=1150, E_psi=1400000, Emin_psi=510000, fc_perp_pl_psi=565, moisture_percent = 19, temp = 90, incised = 0,  num_plates = 0, c_frt=[1,1,1,1,1,1]):
+    def __init__(self,b_in=1.5,d_in=3.5,height_ft=10, spacing_in=12, grade="No.2", fb_psi=875, fv_psi= 150, fc_psi=1150, E_psi=1400000, Emin_psi=510000, fc_perp_pl_psi=565, moisture_percent = 19, temp = 90, incised = 0,  num_plates = 0, c_frt=[1,1,1,1,1,1], compression_face=1):
         self.b_in = b_in
         self.d_in = d_in
         
@@ -29,6 +29,7 @@ class wood_stud_wall:
         self.E_psi = E_psi
         self.fc_perp_pl_psi = fc_perp_pl_psi
         self.c_frt = c_frt
+        self.compression_face = compression_face
         self.defl_180 = self.height_in/180.0
         self.defl_240 = self.height_in/240.0
         self.defl_360 = self.height_in/360.0
@@ -196,11 +197,6 @@ class wood_stud_wall:
                 self.ct_fc = 0.7
                 self.ct_fc_perp = 0.7
                 self.ct_fv = 0.7
-                
-        #Beam Stability Factor, CL
-        #NDS 2005 section 4.3.5
-        self.cl = 1.0 #Assumes stud walls are sheathed on the compression face
-        self.assumptions = self.assumptions + 'Beam Stability Factor_CL - Wall studs are continuously sheathed on the compression face\n'
         
         #Flat Use Factor, Cfu
         #NDS 2005 section 4.3.7
@@ -237,9 +233,27 @@ class wood_stud_wall:
         
         #Fv' = Fv * Cm * Ct * Ci - apply Cd in Fc and Fb functions
         self.fv_prime_psi = self.fv_psi * self.cm_fv * self.ct_fv * self.ci_fv* self.c_frt[1]
+        
         #Emin' = Emin * Cm * Ct * Ci * CT - NDS 2005 Table 4.3.1
         self.Emin_prime_psi = self.Emin_psi * self.cm_E * self.ct_E * self.ci_E * self.cT * self.c_frt[5]
         
+        #Beam Stability Factor, CL
+        #NDS 2005 section 4.3.5
+        if self.compression_face == 1.0:
+            self.cl = 1.0 #Assumes stud walls are sheathed on the compression face
+            self.assumptions = self.assumptions + 'Beam Stability Factor_CL - Wall studs are continuously sheathed on the compression face\n'
+        else:
+            if self.height_in/self.d_in < 7.0:
+                self.cl_le = 2.06 * self.height_in
+            elif self.height_in/self.d_in <= 14.3:
+                self.cl_le = (1.63 * self.height_in)+(3*self.d_in)
+            else:
+                self.cl_le = 1.84 * self.height_in   
+            
+            self.Rb_cl = (self.cl_le*self.d_in/self.b_in**2)**0.5
+            self.Fbe_cl = (1.20 * self.Emin_prime_psi)/self.Rb_cl**2
+            #see Fb' function for remainder of CL calculation as it depends on Cd
+            
         #E' = E * Cm * Ct * Ci - NDS 2005 Table 4.3.1
         self.E_prime_psi = self.E_psi * self.cm_E * self.ct_E * self.ci_E * self.c_frt[4]
         
@@ -296,7 +310,14 @@ class wood_stud_wall:
         #apply cd to Fv'
         self.fv_prime_psi_cd = self.fv_prime_psi * cd
         
-        self.fb_prime_psi = self.fb_psi * cd * self.cm_fb * self.ct_fb * self.cl * self.cf_fb * self.cfu * self.ci_fb * self.cr * self.c_frt[0]
+        if self.compression_face == 1.0:
+            self.fb_prime_psi = self.fb_psi * cd * self.cm_fb * self.ct_fb * self.cl * self.cf_fb * self.cfu * self.ci_fb * self.cr * self.c_frt[0]
+        else:
+            self.fb_star_psi = self.fb_psi * cd * self.cm_fb * self.ct_fb * self.cf_fb * self.cfu * self.ci_fb * self.cr * self.c_frt[0]
+            self.fbe_fbstar = self.Fbe_cl / self.fb_star_psi
+            #NDS equation 3.3-6
+            self.cl = ((1+self.fbe_fbstar)/1.9) - ((((1+self.fbe_fbstar)/1.9)**2) - (self.fbe_fbstar)/0.95)**0.5
+            self.fb_prime_psi = self.fb_psi * cd * self.cm_fb * self.ct_fb * self.cl * self.cf_fb * self.cfu * self.ci_fb * self.cr * self.c_frt[0]
         
         return self.fb_prime_psi
     
