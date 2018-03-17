@@ -38,14 +38,14 @@ class Master_window:
         self.base_frame.pack(side=tk.BOTTOM, padx= 1, pady= 1, fill=tk.X, expand=1)
         
         self.nb = ttk.Notebook(self.main_frame)
-        self.nb.pack(fill=tk.BOTH)
+        self.nb.pack(fill=tk.BOTH, expand=1)
         
         #Tab 1
         self.page1 = ttk.Frame(self.nb)
         self.nb.add(self.page1, text='Wall and Stud Information and Inputs - Find Axial Capacity Per Stud')
         
         self.pg1_frame = tk.Frame(self.page1, bd=2, relief='sunken', padx=1,pady=1)
-        self.pg1_frame.pack(fill=tk.BOTH, padx=5, pady=5)
+        self.pg1_frame.pack(fill=tk.BOTH,expand=1, padx=5, pady=5)
         
         #user input frame
         self.input_frame = tk.LabelFrame(self.pg1_frame, text="Inputs", bd=2, relief='sunken', padx=5, pady=5)
@@ -173,37 +173,37 @@ class Master_window:
         self.frt_fb_label = tk.Label(self.ref_stud_properties_frame,text = 'Cfrt,fb :')
         self.frt_fb_label.grid(row=2,column=4)
         self.frt_fb = tk.StringVar()
-        self.frt_fb.set(1.0)
+        self.frt_fb.set(0.88)
         self.frt_fb_entry = tk.Entry(self.ref_stud_properties_frame, textvariable=self.frt_fb, width=10)
         self.frt_fb_entry.grid(row=2,column=5)
         self.frt_fv_label = tk.Label(self.ref_stud_properties_frame,text = 'Cfrt,fv :')
         self.frt_fv_label.grid(row=3,column=4)
         self.frt_fv = tk.StringVar()
-        self.frt_fv.set(1.0)
+        self.frt_fv.set(0.93)
         self.frt_fv_entry = tk.Entry(self.ref_stud_properties_frame, textvariable=self.frt_fv, width=10)
         self.frt_fv_entry.grid(row=3,column=5)
         self.frt_fc_label = tk.Label(self.ref_stud_properties_frame,text = 'Cfrt,fc :')
         self.frt_fc_label.grid(row=4,column=4)
         self.frt_fc = tk.StringVar()
-        self.frt_fc.set(1.0)
+        self.frt_fc.set(0.94)
         self.frt_fc_entry = tk.Entry(self.ref_stud_properties_frame, textvariable=self.frt_fc, width=10)
         self.frt_fc_entry.grid(row=4,column=5)
         self.frt_fc_perp_label = tk.Label(self.ref_stud_properties_frame,text = 'Cfrt,fc_perp :')
         self.frt_fc_perp_label.grid(row=5,column=4)
         self.frt_fc_perp = tk.StringVar()
-        self.frt_fc_perp.set(1.0)
+        self.frt_fc_perp.set(0.95)
         self.frt_fc_perp_entry = tk.Entry(self.ref_stud_properties_frame, textvariable=self.frt_fc_perp, width=10)
         self.frt_fc_perp_entry.grid(row=5,column=5)
         self.frt_E_label = tk.Label(self.ref_stud_properties_frame,text = 'Cfrt,E :')
         self.frt_E_label.grid(row=6,column=4)
         self.frt_E = tk.StringVar()
-        self.frt_E.set(1.0)
+        self.frt_E.set(0.94)
         self.frt_E_entry = tk.Entry(self.ref_stud_properties_frame, textvariable=self.frt_E, width=10)
         self.frt_E_entry.grid(row=6,column=5)
         self.frt_Emin_label = tk.Label(self.ref_stud_properties_frame,text = 'Cfrt,Emin :')
         self.frt_Emin_label.grid(row=7,column=4)
         self.frt_Emin = tk.StringVar()
-        self.frt_Emin.set(1.0)
+        self.frt_Emin.set(0.94)
         self.frt_Emin_entry = tk.Entry(self.ref_stud_properties_frame, textvariable=self.frt_Emin, width=10)
         self.frt_Emin_entry.grid(row=7,column=5)         
         
@@ -331,7 +331,7 @@ class Master_window:
         self.nb.add(self.page2, text='P-Lateral Pressure Diagram', state = tk.DISABLED)
         
         self.pg2_frame = tk.Frame(self.page2, bd=2, relief='sunken', padx=1,pady=1)
-        self.pg2_frame.pack(fill=tk.BOTH, padx=5, pady=5)
+        self.pg2_frame.pack(fill=tk.BOTH,expand=1, padx=5, pady=5)
         
         self.chart_frame = tk.Frame(self.pg2_frame, padx=5, pady=5)
 
@@ -377,14 +377,14 @@ class Master_window:
         self.toolbar.update()
         self.canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
-        self.chart_frame.pack(side=tk.TOP, fill=tk.BOTH)
+        self.chart_frame.pack(side=tk.TOP,expand=1, fill=tk.BOTH)
         
         #Tab 3 -P vs M Curve
         self.page3 = ttk.Frame(self.nb)
         self.nb.add(self.page3, text='P-M Diagram', state = tk.DISABLED)
         
         self.pg3_frame = tk.Frame(self.page3, bd=2, relief='sunken', padx=1,pady=1)
-        self.pg3_frame.pack(fill=tk.BOTH, padx=5, pady=5)
+        self.pg3_frame.pack(fill=tk.BOTH,expand=1, padx=5, pady=5)
         
         self.chart_frameB = tk.Frame(self.pg3_frame, padx=5, pady=5)
 
@@ -431,14 +431,14 @@ class Master_window:
         self.toolbarB.update()
         self.canvasB._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
-        self.chart_frameB.pack(side=tk.TOP, fill=tk.BOTH)
+        self.chart_frameB.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
         
         #Tab 4 -P vs M Curve
         self.page4 = ttk.Frame(self.nb)
         self.nb.add(self.page4, text='P-M Diagram - Stud', state = tk.DISABLED)
         
         self.pg4_frame = tk.Frame(self.page4, bd=2, relief='sunken', padx=1,pady=1)
-        self.pg4_frame.pack(fill=tk.BOTH, padx=5, pady=5)
+        self.pg4_frame.pack(fill=tk.BOTH,expand=1, padx=5, pady=5)
         
         self.chart_frameD = tk.Frame(self.pg4_frame, padx=5, pady=5)
 
@@ -488,14 +488,14 @@ class Master_window:
         self.toolbarD.update()
         self.canvasD._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
-        self.chart_frameD.pack(side=tk.TOP, fill=tk.BOTH)
+        self.chart_frameD.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
         
         #Tab 5 - User Loads
         self.page5 = ttk.Frame(self.nb)
         self.nb.add(self.page5, text='User Loads', state = tk.DISABLED)
         
         self.pg5_frame = tk.Frame(self.page5, bd=2, relief='sunken', padx=1,pady=1)
-        self.pg5_frame.pack(fill=tk.BOTH, padx=5, pady=5)
+        self.pg5_frame.pack(fill=tk.BOTH,expand=1, padx=5, pady=5)
         
         #user Loads input frame
         self.user_ins_top_frame = tk.Frame(self.pg5_frame)
