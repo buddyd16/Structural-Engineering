@@ -8,7 +8,7 @@ from __future__ import division
 #import matplotlib.pyplot as plt
 
 class wood_stud_wall:
-    def __init__(self,b_in=1.5,d_in=3.5,height_ft=10, spacing_in=12, grade="No.2", fb_psi=875, fv_psi= 150, fc_psi=1150, E_psi=1400000, Emin_psi=510000, fc_perp_pl_psi=565, moisture_percent = 19, temp = 90, incised = 0,  num_plates = 0, c_frt=[1,1,1,1,1,1], compression_face=1):
+    def __init__(self,b_in=1.5,d_in=3.5,height_ft=10, spacing_in=12, grade="No.2", fb_psi=875, fv_psi= 150, fc_psi=1150, E_psi=1400000, Emin_psi=510000, fc_perp_pl_psi=565, moisture_percent = 19, temp = 90, incised = 0,  num_plates = 0, c_frt=[1,1,1,1,1,1], compression_face=1, blocking_ft=0):
         self.b_in = b_in
         self.d_in = d_in
         
@@ -30,6 +30,7 @@ class wood_stud_wall:
         self.fc_perp_pl_psi = fc_perp_pl_psi
         self.c_frt = c_frt
         self.compression_face = compression_face
+        self.blocking_in = 12*blocking_ft
         self.defl_180 = self.height_in/180.0
         self.defl_240 = self.height_in/240.0
         self.defl_360 = self.height_in/360.0
@@ -243,12 +244,17 @@ class wood_stud_wall:
             self.cl = 1.0 #Assumes stud walls are sheathed on the compression face
             self.assumptions = self.assumptions + 'Beam Stability Factor_CL - Wall studs are continuously sheathed on the compression face\n'
         else:
-            if self.height_in/self.d_in < 7.0:
-                self.cl_le = 2.06 * self.height_in
-            elif self.height_in/self.d_in <= 14.3:
-                self.cl_le = (1.63 * self.height_in)+(3*self.d_in)
+            if self.blocking_in == 0 or self.blocking_in > self.height_in:
+                self.lu_bending_in = self.height_in
             else:
-                self.cl_le = 1.84 * self.height_in   
+                self.lu_bending_in = self.blocking_in
+                
+            if self.height_in/self.d_in < 7.0:
+                self.cl_le = 2.06 * self.lu_bending_in
+            elif self.height_in/self.d_in <= 14.3:
+                self.cl_le = (1.63 * self.lu_bending_in)+(3*self.d_in)
+            else:
+                self.cl_le = 1.84 * self.lu_bending_in   
             
             self.Rb_cl = (self.cl_le*self.d_in/self.b_in**2)**0.5
             self.Fbe_cl = (1.20 * self.Emin_prime_psi)/self.Rb_cl**2
