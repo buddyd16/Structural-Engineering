@@ -62,12 +62,14 @@ def pl(p, a, l, x):
     if x <= a:
         v = rl
         m = rl * x
-        d = ((rl * x ** 3) / 6) + (c1 * x)
+        eis = ((rl * x ** 2)  / 2) + c1
+        eid = ((rl * x ** 3) / 6) + (c1 * x)
     else:
         v = -1 * rr
         m = (-1 * rr * x) + (rr * l)
-        d = ((-rr * x ** 3) / 6) + ((rr * l * x ** 2) / 2) + (c2 * x) + c4
-    return (rl, rr, v, m, d)
+        eis = ((-1.0 * rr * x ** 2)/2.0) + (rr * l * x) + c2
+        eid = ((-rr * x ** 3) / 6) + ((rr * l * x ** 2) / 2) + (c2 * x) + c4
+    return (rl, rr, v, m, eid)
 
 
 def udl(W, a, b, l, x):
@@ -86,16 +88,19 @@ def udl(W, a, b, l, x):
     if x <= a:
         v = rl
         m = (rl * x) + c1
-        d = ((rl * x ** 3) / 6) + ((c1 * x ** 2) / 2) + (c4 * x) + c7
+        eis = ((rl * x ** 2) / 2) + (c1 * x) + c4
+        eid = ((rl * x ** 3) / 6) + ((c1 * x ** 2) / 2) + (c4 * x) + c7
     elif x < c:
         v = rl - (W * (x - a))
         m = (rl * x) - ((W * x ** 2) / 2) + (W * a * x) + c2
-        d = ((rl * x ** 3) / 6) - ((W * x ** 4) / 24) + ((W * a * x ** 3) / 6) + ((c2 * x ** 2) / 2) + (c5 * x) + c8
+        eis = ((rl * x **2) / 2) - ((W * x ** 3) / 6) + ((W * a * x **2) / 2) + (c2 * x) + c5
+        eid = ((rl * x ** 3) / 6) - ((W * x ** 4) / 24) + ((W * a * x ** 3) / 6) + ((c2 * x ** 2) / 2) + (c5 * x) + c8
     else:
         v = -rr
         m = (-1 * rr * x) + c3
-        d = ((-1 * rr * x ** 3) / 6) + ((c3 * x ** 2) / 2) + (c6 * x) + c9
-    return (rl, rr, v, m, d)
+        eis = ((-1 * rr * x ** 2) / 2) + (c3 * x) + c6
+        eid = ((-1 * rr * x ** 3) / 6) + ((c3 * x ** 2) / 2) + (c6 * x) + c9
+    return (rl, rr, v, m, eid)
 
 
 def trapl(w1, w2, a, b, l, x):
@@ -120,16 +125,19 @@ def trapl(w1, w2, a, b, l, x):
     if x <= a:
         v = rl
         m = (rl * x) + c1
-        d = ((rl * x ** 3) / 6) + ((c1 * x ** 2) / 2) + (c4 * x) + c7
+        eis = ((rl * x ** 2) / 2) + (c1 * x) + c4
+        eid = ((rl * x ** 3) / 6) + ((c1 * x ** 2) / 2) + (c4 * x) + c7
     elif x < d:
         v = rl - ((x ** 2 * s) / 2) - (x * (w1 - (s * a))) - ((((s * a) - (2 * w1)) * a) / 2)
         m = (rl * x) - ((x ** 3 * s) / 6) - ((x ** 2 * (w1 - (s * a))) / 2) - ((((s * a) - (2 * w1)) * a * x) / 2) + c2
-        d = ((rl * x ** 3) / 6) - ((x ** 5 * s) / 120) - ((x ** 4 * (w1 - (s * a))) / 24) - ((((s * a) - (2 * w1)) * a * x ** 3) / 12) + ((c2 * x ** 2) / 2) + (c5 * x) + c8
+        eis = ((rl * x ** 2) / 2) - ((x ** 4 * s) / 24) - ((x ** 3 * (w1 - (s * a))) / 6) - ((((s * a) - (2 * w1)) * a * x ** 2) / 4) + (c2 * x) + c5
+        eid = ((rl * x ** 3) / 6) - ((x ** 5 * s) / 120) - ((x ** 4 * (w1 - (s * a))) / 24) - ((((s * a) - (2 * w1)) * a * x ** 3) / 12) + ((c2 * x ** 2) / 2) + (c5 * x) + c8
     else:
         v = -1 * rr
         m = (-1 * rr * x) + c3
-        d = ((-1 * rr * x ** 3) / 6) + ((c3 * x ** 2) / 2) + (c6 * x) + c9
-    return (rl, rr, v, m, d)
+        eis = ((-1 * rr * x ** 2) / 2) + (c3 * x) + c6
+        eid = ((-1 * rr * x ** 3) / 6) + ((c3 * x ** 2) / 2) + (c6 * x) + c9
+    return (rl, rr, v, m, eid)
 
 
 def cant_right_point(p, a, l, x):
@@ -2379,7 +2387,7 @@ class Main_window:
         beam_elasticmodulus=[float(x)*1000 for x in beam_elasticmodulus]
 
         E = beam_elasticmodulus[0]
-        iters = max(int(round(max(beam_spans)/1.00)),500)
+        iters = max(int(round(max(beam_spans)/1.0)),500)
         Main_window.stations = iters
         N = len(beam_spans)
         displace_loads = [0]*(N+1)
