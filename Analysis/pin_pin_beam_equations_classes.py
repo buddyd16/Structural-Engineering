@@ -148,19 +148,19 @@ class point_moment:
 
             return v
 
-    def m(self,x):
+    def mo(self,x):
         if self.a > self.l:
             return 'Error a > l'
         else:
             iters = len(x)            
-            m=zeros(iters)
+            mo=zeros(iters)
             
             for i in range(0,iters):
-                if x[i] <= self.a:
-                    m[i] = self.rl * x[i]
+                if x[i] < self.a:
+                    mo[i] = self.rl * x[i]
                 else:
-                    m[i] = (self.rl * x[i]) + self.m
-            return m
+                    mo[i] = (self.rl * x[i]) + self.m
+            return mo
     
     def eis(self,x):
         if self.a > self.l:
