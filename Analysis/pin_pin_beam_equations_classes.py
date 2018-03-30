@@ -1068,7 +1068,7 @@ class cant_right_udl:
             
             for i in range(0,iters):
                 if x[i] <= self.a:
-                    eid[i] = 0.5*self.rl*x[i]**2 + self.ml*x[i] + self.c1 * x[i] + self.c2
+                    eid[i] = (1.0/6.0)*self.rl*x[i]**2 + 0.5*self.ml*x[i]**2 + self.c1 * x[i] + self.c2
                 elif x[i] <= self.b:
                     eid[i] = (1.0/6.0)*self.rl*x[i]**3 + 0.5*self.ml*x[i]**2 - (1.0/24.0)*self.w1*(x[i]-self.a)**4 + self.c3*x[i] + self.c4
                 else:
