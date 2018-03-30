@@ -153,7 +153,7 @@ def cant_right_point(p, a, l, x):
 
 
 def cant_right_udl(w, a, b, l, x):
-    c = a+b
+    c = b-a
     w_tot = w*c
     rl = w_tot
     ml = -1*w_tot*(b-(c/2))

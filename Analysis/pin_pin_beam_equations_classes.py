@@ -150,18 +150,18 @@ class pl:
             return eid
 
 class point_moment:
-    def __init__(self, m, a, l):
-        self.m = m
+    def __init__(self, ma, a, l):
+        self.ma = ma
         self.a = a
         self.l = l
         
-        self.rr = m/l
+        self.rr = ma/l
         self.rl = -1.0*self.rr
         
-        self.c2 = (-1.0/l) * ((m*a**2) - (0.5*m*a**2) + (self.rl * (l**3/6.0)) + (0.5*m*l**2))
-        self.c1 = m*a + self.c2
+        self.c2 = (-1.0/l) * ((ma*a**2) - (0.5*ma*a**2) + (self.rl * (l**3/6.0)) + (0.5*ma*l**2))
+        self.c1 = ma*a + self.c2
         self.c3 = 0
-        self.c4 = ((-1.0*self.rl*l**3)/6.0) - (0.5*m*l**2) - (self.c2*l)
+        self.c4 = ((-1.0*self.rl*l**3)/6.0) - (0.5*ma*l**2) - (self.c2*l)
 
     def v(self,x):
         if self.a > self.l:
@@ -175,19 +175,19 @@ class point_moment:
 
             return v
 
-    def mo(self,x):
+    def m(self,x):
         if self.a > self.l:
             return 'Error a > l'
         else:
             iters = len(x)            
-            mo=zeros(iters)
+            m=zeros(iters)
             
             for i in range(0,iters):
                 if x[i] < self.a:
-                    mo[i] = self.rl * x[i]
+                    m[i] = self.rl * x[i]
                 else:
-                    mo[i] = (self.rl * x[i]) + self.m
-            return mo
+                    m[i] = (self.rl * x[i]) + self.ma
+            return m
     
     def eis(self,x):
         if self.a > self.l:
@@ -200,7 +200,7 @@ class point_moment:
                 if x[i] <= self.a:
                     eis[i] = (0.5*self.rl*x[i]**2) + self.c1
                 else:
-                    eis[i] = (0.5*self.rl*x[i]**2) + (self.m*x[i]) + self.c2
+                    eis[i] = (0.5*self.rl*x[i]**2) + (self.ma*x[i]) + self.c2
             return eis
             
     def eid(self,x):
@@ -214,7 +214,7 @@ class point_moment:
                 if x[i] <= self.a:
                     eid[i] = ((1/6.0)*self.rl*x[i]**3) + (self.c1*x[i]) + self.c3
                 else:
-                    eid[i] = (1/6.0)*self.rl*x[i]**3 + (0.5*self.m*x[i]**2) + (self.c2*x[i]) + self.c4
+                    eid[i] = (1/6.0)*self.rl*x[i]**3 + (0.5*self.ma*x[i]**2) + (self.c2*x[i]) + self.c4
             return eid
             
     def vx(self,x):
@@ -238,7 +238,7 @@ class point_moment:
             if x <= self.a:
                 m = self.rl * x
             else:
-                m = (self.rl * x) + self.m
+                m = (self.rl * x) + self.ma
             return m
     
     def eisx(self,x):
@@ -251,7 +251,7 @@ class point_moment:
             if x <= self.a:
                 eis = (0.5*self.rl*x**2) + self.c1
             else:
-                eis = (0.5*self.rl*x**2) + (self.m*x) + self.c2
+                eis = (0.5*self.rl*x**2) + (self.ma*x) + self.c2
             return eis
     
     def eidx(self,x):
@@ -264,7 +264,7 @@ class point_moment:
             if x <= self.a:
                 eid = ((1/6.0)*self.rl*x**3) + (self.c1*x) + self.c3
             else:
-                eid = (1/6.0)*self.rl*x**3 + (0.5*self.m*x**2) + (self.c2*x) + self.c4
+                eid = (1/6.0)*self.rl*x**3 + (0.5*self.ma*x**2) + (self.c2*x) + self.c4
             return eid
         
 #def udl( W, a, b, l, x):
@@ -799,11 +799,12 @@ class trap:
 #    return(rl,ml,v,m)
 
 class cant_right_point:
-    def __init__(self, p, a, l):
+    def __init__(self, p, a, l, lb):
         
         self.p = float(p)
         self.a = float(a)
         self.l = float(l)
+        self.lb = float(lb)
         self.b = self.l - self.a
         
         if self.a > self.l:
@@ -812,7 +813,14 @@ class cant_right_point:
             
         else:
             self.rl = self.p
-            self.ml = -1*self.p*self.a
+            self.ml = -1.0*self.p*self.a
+        
+        self.backspan = point_moment(-1.0*self.ml,self.lb,self.lb)
+        self.c1 = self.backspan.eisx(self.lb)
+        self.c2 = 0
+        self.c3 = 0.5*self.rl*self.a**2 + self.ml*self.a + self.c1
+        self.c4 = -1.0*self.c3*self.a + (1.0/6.0)*self.rl*self.a**3 + 0.5*self.ml*self.a**2 + self.c1*self.a + self.c2
+        
     
     def v(self,x):
         if self.a > self.l:
@@ -844,6 +852,36 @@ class cant_right_point:
                     m[i] = 0
         return m
 
+    def eis(self,x):
+        if self.a > self.l:
+            return 'Error a > l'
+            return 'Error a > l'
+        else:
+            iters = len(x)
+            eis=zeros(iters)
+            
+            for i in range(0,iters):
+                if x[i]<=self.a:
+                    eis[i] = 0.5*self.rl*x[i]**2 + self.ml*x[i] + self.c1
+                else:
+                    eis[i] = self.c3
+        return eis
+
+    def eid(self,x):
+        if self.a > self.l:
+            return 'Error a > l'
+            return 'Error a > l'
+        else:
+            iters = len(x)
+            eid=zeros(iters)
+            
+            for i in range(0,iters):
+                if x[i]<=self.a:
+                    eid[i] = (1.0/6.0)*self.rl*x[i]**3 + 0.5*self.ml*x[i]**2 + self.c1*x[i] + self.c2
+                else:
+                    eid[i] = self.c3*x[i] + self.c4
+        return eid
+
     def vx(self,x):
         if self.a > self.l:
             return 'Error a > l'
@@ -865,7 +903,28 @@ class cant_right_point:
             else:
                 m = 0
         return m
-               
+
+    def eisx(self,x):
+        if self.a > self.l:
+            return 'Error a > l'
+            return 'Error a > l'
+        else:
+            if x<=self.a:
+                eis = 0.5*self.rl*x**2 + self.ml*x + self.c1
+            else:
+                eis = self.c3
+        return eis
+
+    def eidx(self,x):
+        if self.a > self.l:
+            return 'Error a > l'
+            return 'Error a > l'
+        else:
+            if x<=self.a:
+                eid = (1.0/6.0)*self.rl*x**3 + 0.5*self.ml*x**2 + self.c1*x + self.c2
+            else:
+                eid = self.c3*x + self.c4
+        return eid              
 
 #def cant_right_udl(w,a,b,l,x):
 #    c = a+b
@@ -889,14 +948,15 @@ class cant_right_point:
 #    return(rl,ml,v,m)
 
 class cant_right_udl:
-    def __init__(self, w1, a, b, l):
+    def __init__(self, w1, a, b, l, lb):
         
         self.w1 = float(w1)
         self.a = float(a)
         self.l = float(l)
         self.b = float(b)
-        self.c = self.a+self.b
+        self.c = self.b - self.a
         self.w_tot = self.w1*self.c
+        self.lb = float(lb)
         
         if self.a > self.b:
             self.rl = 'Error a > b'
@@ -909,7 +969,17 @@ class cant_right_udl:
             self.ml = 'Error b > l'
         else:
             self.rl = self.w_tot
-            self.ml = -1*self.w_tot*(self.b-(self.c/2))
+            self.ml = -1.0*self.w_tot*(self.b-(self.c/2))
+        
+        self.backspan = point_moment(-1.0*self.ml,self.lb,self.lb)
+        self.c1 = self.backspan.eisx(self.lb)
+        self.c2 = 0
+        
+        self.c3 = self.c1
+        self.c4 = self.c1*self.a + self.c2 - self.c3*a
+               
+        self.c5 = 0.5*self.w_tot*self.b**2 + self.ml*self.b - (1.0/6.0)*self.w1*(self.b-self.a)**3 + self.c3
+        self.c6 = (1.0/6.0)*self.w_tot*self.b**3 + 0.5*self.ml*self.b**2 - (1.0/24.0)*self.w1*(self.b-self.a)**4 + self.c3*self.b + self.c4 - self.c5*self.b
             
     
     
@@ -929,9 +999,9 @@ class cant_right_udl:
             
             for i in range(0,iters):
                 if x[i] <= self.a:
-                    v[i] = self.w_tot
+                    v[i] = self.rl
                 elif x[i]<=self.b:
-                    v[i] = self.w_tot - self.w1*(x[i]-self.a)
+                    v[i] = self.rl - self.w1*(x[i]-self.a)
                 else:
                     v[i] = 0
             return v
@@ -959,6 +1029,51 @@ class cant_right_udl:
                     m[i] = 0
             return m
 
+    def eis(self,x):
+        if self.a > self.b:
+            return 'Error a > b'
+            return 'Error a > b'
+        elif self.a > self.l:
+            return 'Error a > l'
+            return 'Error a > l'
+        elif self.b > self.l:
+            return 'Error b > l'
+            return 'Error b > l'
+        else:
+            iters = len(x)
+            eis=zeros(iters)
+            
+            for i in range(0,iters):
+                if x[i] <= self.a:
+                    eis[i] = 0.5*self.rl*x[i]**2 + self.ml*x[i] + self.c1
+                elif x[i] <= self.b:
+                    eis[i] = 0.5*self.rl*x[i]**2 + self.ml*x[i] - ((1.0/6.0) * self.w1 * (x[i]-self.a)**3) + self.c3
+                else:
+                    eis[i] = self.c5
+            return eis
+
+    def eid(self,x):
+        if self.a > self.b:
+            return 'Error a > b'
+            return 'Error a > b'
+        elif self.a > self.l:
+            return 'Error a > l'
+            return 'Error a > l'
+        elif self.b > self.l:
+            return 'Error b > l'
+            return 'Error b > l'
+        else:
+            iters = len(x)
+            eid=zeros(iters)
+            
+            for i in range(0,iters):
+                if x[i] <= self.a:
+                    eid[i] = 0.5*self.rl*x[i]**2 + self.ml*x[i] + self.c1 * x[i] + self.c2
+                elif x[i] <= self.b:
+                    eid[i] = (1.0/6.0)*self.rl*x[i]**3 + 0.5*self.ml*x[i]**2 - (1.0/24.0)*self.w1*(x[i]-self.a)**4 + self.c3*x[i] + self.c4
+                else:
+                    eid[i] = self.c5*x[i] + self.c6
+            return eid
     
     def vx(self,x):
         x = float(x)
