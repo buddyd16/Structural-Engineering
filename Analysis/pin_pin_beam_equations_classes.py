@@ -68,20 +68,34 @@ class pl:
                 else:
                     m[i] = (-1 * self.rr * x[i]) + (self.rr * self.l)
             return m
-    
-    def d(self,x):
+
+    def eis(self,x):
         if self.a > self.l:
             return 'Error a > l'
         else:
             iters = len(x)            
-            d=zeros(iters)
+            eis=zeros(iters)
             
             for i in range(0,iters):
                 if x[i] <= self.a:
-                    d[i] = ((self.rl * x[i] ** 3) / 6) + (self.c1 * x[i])           
+                    eis[i] = ((self.rl * x[i] ** 2)  / 2) + self.c1       
                 else:
-                    d[i] = ((-1*self.rr * x[i] ** 3) / 6) + ((self.rr * self.l * x[i] ** 2) / 2) + (self.c2 * x[i]) + self.c4
-            return d
+                    eis[i] = ((-1.0 * self.rr * x[i] ** 2)/2.0) + (self.rr * self.l * x[i]) + self.c2
+            return eis
+    
+    def eid(self,x):
+        if self.a > self.l:
+            return 'Error a > l'
+        else:
+            iters = len(x)            
+            eid=zeros(iters)
+            
+            for i in range(0,iters):
+                if x[i] <= self.a:
+                    eid[i] = ((self.rl * x[i] ** 3) / 6) + (self.c1 * x[i])           
+                else:
+                    eid[i] = ((-1*self.rr * x[i] ** 3) / 6) + ((self.rr * self.l * x[i] ** 2) / 2) + (self.c2 * x[i]) + self.c4
+            return eid
     
     def vx(self,x):
         x = float(x)
@@ -108,8 +122,21 @@ class pl:
             else:
                 m = (-1 * self.rr * x) + (self.rr * self.l)
             return m
+
+    def eisx(self,x):
+        x = float(x)
+        if self.a > self.l:
+            return 'Error a > l'
+        elif x > self.l:
+            return 'Error x > l'
+        else:
+            if x <= self.a:
+                eisx = ((self.rl * x ** 2)  / 2) + self.c1       
+            else:
+                eisx = ((-1.0 * self.rr * x ** 2)/2.0) + (self.rr * self.l * x) + self.c2
+            return eisx
     
-    def dx(self,x):
+    def eidx(self,x):
         x = float(x)
         if self.a > self.l:
             return 'Error a > l'
@@ -117,10 +144,10 @@ class pl:
             return 'Error x > l'
         else:                        
             if x <= self.a:
-                d = ((self.rl * x ** 3) / 6) + (self.c1 * x)           
+                eid = ((self.rl * x ** 3) / 6) + (self.c1 * x)           
             else:
-                d = ((-1*self.rr * x ** 3) / 6) + ((self.rr * self.l * x ** 2) / 2) + (self.c2 * x) + self.c4
-            return d
+                eid = ((-1*self.rr * x ** 3) / 6) + ((self.rr * self.l * x ** 2) / 2) + (self.c2 * x) + self.c4
+            return eid
 
 class point_moment:
     def __init__(self, m, a, l):
@@ -176,19 +203,19 @@ class point_moment:
                     eis[i] = (0.5*self.rl*x[i]**2) + (self.m*x[i]) + self.c2
             return eis
             
-    def d(self,x):
+    def eid(self,x):
         if self.a > self.l:
             return 'Error a > l'
         else:
             iters = len(x)            
-            d=zeros(iters)
+            eid=zeros(iters)
             
             for i in range(0,iters):
                 if x[i] <= self.a:
-                    d[i] = ((1/6.0)*self.rl*x[i]**3) + (self.c1*x[i]) + self.c3
+                    eid[i] = ((1/6.0)*self.rl*x[i]**3) + (self.c1*x[i]) + self.c3
                 else:
-                    d[i] = (1/6.0)*self.rl*x[i]**3 + (0.5*self.m*x[i]**2) + (self.c2*x[i]) + self.c4
-            return d
+                    eid[i] = (1/6.0)*self.rl*x[i]**3 + (0.5*self.m*x[i]**2) + (self.c2*x[i]) + self.c4
+            return eid
             
     def vx(self,x):
         x = float(x)
@@ -227,7 +254,7 @@ class point_moment:
                 eis = (0.5*self.rl*x**2) + (self.m*x) + self.c2
             return eis
     
-    def dx(self,x):
+    def eidx(self,x):
         x = float(x)
         if self.a > self.l:
             return 'Error a > l'
@@ -235,10 +262,10 @@ class point_moment:
             return 'Error x > l'
         else:                        
             if x <= self.a:
-                d = ((1/6.0)*self.rl*x**3) + (self.c1*x) + self.c3
+                eid = ((1/6.0)*self.rl*x**3) + (self.c1*x) + self.c3
             else:
-                d = (1/6.0)*self.rl*x**3 + (0.5*self.m*x**2) + (self.c2*x) + self.c4
-            return d
+                eid = (1/6.0)*self.rl*x**3 + (0.5*self.m*x**2) + (self.c2*x) + self.c4
+            return eid
         
 #def udl( W, a, b, l, x):
 #    c = a + b
@@ -345,8 +372,8 @@ class udl:
                 else:
                     m[i] = (-1 * self.rr * x[i]) + self.c3
             return m
-    
-    def d(self,x):
+
+    def eis(self,x):
         if self.a > self.b:
             return 'Error a > b'
             return 'Error a > b'
@@ -358,16 +385,39 @@ class udl:
             return 'Error b > l'
         else:
             iters = len(x)            
-            d=zeros(iters)
+            eis=zeros(iters)
             
             for i in range(0,iters):
                 if x[i] <= self.a:
-                    d[i] = ((self.rl * x[i] ** 3) / 6) + ((self.c1 * x[i] ** 2) / 2) + (self.c4 * x[i]) + self.c7
-                elif x[i]<=self.b:
-                    d[i] = ((self.rl * x[i] ** 3) / 6) - ((self.w1 * x[i] ** 4) / 24) + ((self.w1 * self.a * x[i] ** 3) / 6) + ((self.c2 * x[i] ** 2) / 2) + (self.c5 * x[i]) + self.c8
+                    eis[i] = ((self.rl * x[i] ** 2) / 2.0) + (self.c1 * x[i]) + self.c4
+                elif x[i] <= self.b:
+                    eis[i] = ((self.rl * x[i] **2) / 2.0) - ((self.w1 * x[i] ** 3) / 6.0) + ((self.w1 * self.a * x[i] **2) / 2.0) + (self.c2 * x[i]) + self.c5
                 else:
-                    d[i] = ((-1 * self.rr * x[i] ** 3) / 6) + ((self.c3 * x[i] ** 2) / 2) + (self.c6 * x[i]) + self.c9
-            return d
+                    eis[i] = ((-1.0 * self.rr * x[i] ** 2) / 2.0) + (self.c3 * x[i]) + self.c6
+            return eis
+   
+    def eid(self,x):
+        if self.a > self.b:
+            return 'Error a > b'
+            return 'Error a > b'
+        elif self.a > self.l:
+            return 'Error a > l'
+            return 'Error a > l'
+        elif self.b > self.l:
+            return 'Error b > l'
+            return 'Error b > l'
+        else:
+            iters = len(x)            
+            eid=zeros(iters)
+            
+            for i in range(0,iters):
+                if x[i] <= self.a:
+                    eid[i] = ((self.rl * x[i] ** 3) / 6) + ((self.c1 * x[i] ** 2) / 2) + (self.c4 * x[i]) + self.c7
+                elif x[i]<=self.b:
+                    eid[i] = ((self.rl * x[i] ** 3) / 6) - ((self.w1 * x[i] ** 4) / 24) + ((self.w1 * self.a * x[i] ** 3) / 6) + ((self.c2 * x[i] ** 2) / 2) + (self.c5 * x[i]) + self.c8
+                else:
+                    eid[i] = ((-1 * self.rr * x[i] ** 3) / 6) + ((self.c3 * x[i] ** 2) / 2) + (self.c6 * x[i]) + self.c9
+            return eid
     
     def vx(self,x):
         x = float(x)
@@ -412,8 +462,30 @@ class udl:
             else:
                 m = (-1 * self.rr * x) + self.c3
         return m
+
+    def eisx(self,x):
+        x = float(x)
+        if self.a > self.b:
+            return 'Error a > b'
+            return 'Error a > b'
+        elif self.a > self.l:
+            return 'Error a > l'
+            return 'Error a > l'
+        elif self.b > self.l:
+            return 'Error b > l'
+            return 'Error b > l'
+        elif x > self.l:
+            return 'Error x > l'
+        else:
+            if x <= self.a:
+                eis = ((self.rl * x ** 2) / 2.0) + (self.c1 * x) + self.c4
+            elif x <= self.b:
+                eis = ((self.rl * x **2) / 2.0) - ((self.w1 * x ** 3) / 6.0) + ((self.w1 * self.a * x **2) / 2.0) + (self.c2 * x) + self.c5
+            else:
+                eis = ((-1.0 * self.rr * x ** 2) / 2.0) + (self.c3 * x) + self.c6
+        return eis
     
-    def dx(self,x):
+    def eidx(self,x):
         x = float(x)
         if self.a > self.b:
             return 'Error a > b'
@@ -428,12 +500,12 @@ class udl:
             return 'Error x > l'
         else:                       
             if x <= self.a:
-                d = ((self.rl * x ** 3) / 6) + ((self.c1 * x ** 2) / 2) + (self.c4 * x) + self.c7
+                eid = ((self.rl * x ** 3) / 6) + ((self.c1 * x ** 2) / 2) + (self.c4 * x) + self.c7
             elif x<=self.b:
-                d = ((self.rl * x ** 3) / 6) - ((self.w1 * x ** 4) / 24) + ((self.w1 * self.a * x ** 3) / 6) + ((self.c2 * x ** 2) / 2) + (self.c5 * x) + self.c8
+                eid = ((self.rl * x ** 3) / 6) - ((self.w1 * x ** 4) / 24) + ((self.w1 * self.a * x ** 3) / 6) + ((self.c2 * x ** 2) / 2) + (self.c5 * x) + self.c8
             else:
-                d = ((-1 * self.rr * x ** 3) / 6) + ((self.c3 * x ** 2) / 2) + (self.c6 * x) + self.c9
-        return d
+                eid = ((-1 * self.rr * x ** 3) / 6) + ((self.c3 * x ** 2) / 2) + (self.c6 * x) + self.c9
+        return eid
 
 #def trapl( w1, w2, a, b, l, x):
 #    d = a + b
