@@ -27,24 +27,43 @@ for i in range(1,501):
     xs[i] = xs[i-1] + step
     xsb[i] = xsb[i-1] + step_backspan
 
-cant_test = ppbeam.cant_right_udl(1,1,3,l,lb)
+cant_test = ppbeam.cant_right_point_moment(1,2.5,l,lb)
+test = ppbeam.udl(1,2,6,lb)
 
-c1 = cant_test.c1
-c3 = cant_test.c3
+c1 = cant_test.rl
+c3 = cant_test.ml
 
 shear = cant_test.v(xs)
-shearb = cant_test.backspan.v(xsb)
+shearb = cant_test.backspan.v(xsb) + test.v(xsb)
 
 moment = cant_test.m(xs)
-momentb = cant_test.backspan.m(xsb)
+momentb = cant_test.backspan.m(xsb) + test.m(xsb)
 
-slope = cant_test.eis(xs) / (E*I)
-slopeb = cant_test.backspan.eis(xsb) / (E*I)
+slope = (cant_test.eis(xs) + test.eisx(lb))/ (E*I)
+slopeb = (cant_test.backspan.eis(xsb) + test.eis(xsb)) / (E*I)
 
-delta = (cant_test.eid(xs)/(E*I))*12.0
-deltab = (cant_test.backspan.eid(xsb)/(E*I))*12.0
 
-fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2)
+delta = ((cant_test.eid(xs) + ppbeam.cant_right_nl(test.eisx(lb)).eid(xs))/(E*I))*12.0
+deltab = ((cant_test.backspan.eid(xsb)+test.eid(xsb))/(E*I))*12.0
+
+fig=plt.figure
+
+ax = plt.subplot2grid((3, 2), (0, 0), colspan=2)
+ax1 = plt.subplot2grid((3, 2), (1, 0))
+ax2 = plt.subplot2grid((3, 2), (1, 1))
+ax3 = plt.subplot2grid((3, 2), (2, 0))
+ax4 = plt.subplot2grid((3, 2), (2, 1))
+
+
+ax.plot(test.x_graph,test.y_graph)
+ax.plot(cant_test.x_graph+xsb[-1],cant_test.y_graph)
+ax.plot(xsb,[0]*len(xsb))
+ax.plot(xs+xsb[-1],[0]*len(xs))
+ax.minorticks_on()
+ax.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
+ax.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
+ax.set_ylabel('Load (kips or klf)')
+ax.set_xlabel('L (ft)')
 
 ax1.plot(xsb,shearb)
 ax1.plot(xs+xsb[-1],shear)
@@ -94,7 +113,6 @@ ax4.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
 ax4.set_ylabel('D (in)')
 ax4.set_xlabel('L (ft)')
 
-
-fig.tight_layout()
+plt.tight_layout()
 
 plt.show()
