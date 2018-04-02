@@ -153,25 +153,37 @@ class point_moment:
         self.c4 = ((-1.0*self.rl*l**3)/6.0) - (0.5*ma*l**2) - (self.c2*l)
         
         arrow_height = self.ma/6.0
-        r = self.ma
+        r = self.ma/2.0
         #30 degree arrow
         arrow_minus= (arrow_height*math.tan(math.radians(30)))
-        self.x_graph = [self.a,self.a,self.a]
-        self.y_graph = [-r,0,r]
-        x=0
-        y=0
-        for a in range(-90, 181):
-            x = self.a+(r*math.cos(math.radians(a)))
-            y = 0+(r*math.sin(math.radians(a)))       
+        
+        if self.ma <0:
+            self.x_graph = [self.a,self.a,self.a]
+            self.y_graph = [r,0,-r]
+            x=0
+            y=0
+            for a in range(-90, 181):
+                x = self.a+(r*math.cos(math.radians(a)))
+                y = 0+(r*math.sin(math.radians(a)))       
+                self.x_graph.append(x)
+                self.y_graph.append(y)
+            
+            self.x_graph.append(x-arrow_minus)
+            self.y_graph.append(y+arrow_height)
             self.x_graph.append(x)
             self.y_graph.append(y)
-        
-        self.x_graph.append(x-arrow_minus)
-        self.y_graph.append(y+arrow_height)
-        self.x_graph.append(x)
-        self.y_graph.append(y)
-        self.x_graph.append(x+arrow_minus)
-        self.y_graph.append(y+arrow_height)
+            self.x_graph.append(x+arrow_minus)
+            self.y_graph.append(y+arrow_height)
+        else:
+            self.x_graph = [self.a-r,self.a,self.a+r, self.a+r-arrow_minus,self.a+r,self.a+r+arrow_minus,self.a+r]
+            self.y_graph = [0,0,0,arrow_height,0,arrow_height,0]
+            x=0
+            y=0
+            for a in range(0,271):
+                x = self.a+(r*math.cos(math.radians(a)))
+                y = 0+(r*math.sin(math.radians(a)))       
+                self.x_graph.append(x)
+                self.y_graph.append(y)           
 
         
     def v(self,x):
@@ -963,25 +975,37 @@ class cant_right_point_moment:
         self.c4 = 0.5*self.ml*self.a**2 + self.c1 * self.a + self.c2 - self.c3 * self.a
         
         arrow_height = self.ma/6.0
-        r = self.ma
+        r = self.ma/2.0
         #30 degree arrow
         arrow_minus= (arrow_height*math.tan(math.radians(30)))
-        self.x_graph = [self.a,self.a,self.a]
-        self.y_graph = [-r,0,r]
-        x=0
-        y=0
-        for a in range(-90, 181):
-            x = self.a+(r*math.cos(math.radians(a)))
-            y = 0+(r*math.sin(math.radians(a)))       
+        
+        if self.ma <0:
+            self.x_graph = [self.a,self.a,self.a]
+            self.y_graph = [r,0,-r]
+            x=0
+            y=0
+            for a in range(-90, 181):
+                x = self.a+(r*math.cos(math.radians(a)))
+                y = 0+(r*math.sin(math.radians(a)))       
+                self.x_graph.append(x)
+                self.y_graph.append(y)
+            
+            self.x_graph.append(x-arrow_minus)
+            self.y_graph.append(y+arrow_height)
             self.x_graph.append(x)
             self.y_graph.append(y)
-        
-        self.x_graph.append(x-arrow_minus)
-        self.y_graph.append(y+arrow_height)
-        self.x_graph.append(x)
-        self.y_graph.append(y)
-        self.x_graph.append(x+arrow_minus)
-        self.y_graph.append(y+arrow_height)
+            self.x_graph.append(x+arrow_minus)
+            self.y_graph.append(y+arrow_height)
+        else:
+            self.x_graph = [self.a-r,self.a,self.a+r, self.a+r-arrow_minus,self.a+r,self.a+r+arrow_minus,self.a+r]
+            self.y_graph = [0,0,0,arrow_height,0,arrow_height,0]
+            x=0
+            y=0
+            for a in range(0,271):
+                x = self.a+(r*math.cos(math.radians(a)))
+                y = 0+(r*math.sin(math.radians(a)))       
+                self.x_graph.append(x)
+                self.y_graph.append(y) 
         
     def v(self,x):
         if self.a > self.l:
@@ -1550,8 +1574,63 @@ class cant_right_trap:
                 eid = self.c6*x + self.c7
         return eid
 
+class cant_left_nl:
+    def __init__(self, slope, l):
+        self.l = l
+        self.slope = slope
+        self.c1 = self.slope
+        self.c2 = -1.0*self.c1*self.l
+
+    def v(self,x):
+        iters = len(x)
+        v=zeros(iters)
+        
+        return v
+
+    def m(self,x):
+        iters = len(x)
+        m=zeros(iters)
+
+        return m
+    
+    def eis(self,x):
+        iters = len(x)
+        eis=zeros(iters)
+        for i in range(0,iters):
+            eis[i] = self.c1
+
+        return eis
+
+    def eid(self,x):
+        iters = len(x)
+        eid=zeros(iters)
+        for i in range(0,iters):
+            eid[i] = self.c1* x[i] + self.c2
+
+        return eid
+        
+    def vx(self,x):
+        v=0
+        
+        return v
+
+    def mx(self,x):
+        m=0
+
+        return m
+    
+    def eisx(self,x):
+        eis = self.c1
+
+        return eis
+
+    def eidx(self,x):
+        eid = self.c1 * x + self.c2
+
+        return eid
+
 class cant_left_point:
-    def __init__(self, p, a, l):
+    def __init__(self, p, a, l,lb):
         
         self.p = float(p)
         self.a = float(a)
@@ -1565,7 +1644,14 @@ class cant_left_point:
         else:
             self.rr = self.p
             self.mr = -1*self.p*(self.l-self.a)
-    
+        
+        self.backspan = point_moment(self.mr,0,lb)
+        
+        self.c3 = self.backspan.eisx(0) + (self.p * self.a * self. l)
+        self.c4 = (0.5*self.p * self.a * self.l**2) - (self.c3 *self.l)
+        self.c1 = (-1.0*self.p*self.a**2) + self.c3
+        self.c2 = (-0.5 * self.p * self.a**3) + (self.c3*self.a) + self.c4 - (self.c1*self.a)
+        
     def v(self,x):
         if self.a > self.l:
             return 'Error a > l'
@@ -1578,7 +1664,7 @@ class cant_left_point:
                 if x[i]<=self.a:
                     v[i] = 0
                 else:
-                    v[i] = -1*self.rr
+                    v[i] = -1*self.p
         return v
     
     def m(self,x):
@@ -1593,9 +1679,24 @@ class cant_left_point:
                 if x[i]<=self.a:
                     m[i] = 0
                 else:
-                    m[i] = -1*self.rr*(x[i]-self.a)
+                    m[i] = -1*self.p * (x[i] - self.a)
         return m
-
+        
+    def eis(self,x):
+        if self.a > self.l:
+            return 'Error a > l'
+            return 'Error a > l'
+        else:
+            iters = len(x)            
+            eis=zeros(iters)
+            
+            for i in range(0,iters):
+                if x[i]<=self.a:
+                    eis[i] = self.c1
+                else:
+                    eis[i] = -1*self.rr*(x[i]-self.a)
+        return eis
+        
     def vx(self,x):
         if self.a > self.l:
             return 'Error a > l'

@@ -8,8 +8,7 @@ from numpy import zeros
 import pin_pin_beam_equations_classes as ppbeam
 import matplotlib.pyplot as plt
 
-
-l = 5
+l =  5
 lb = 10
 
 E = 29000 * 144  #144 is conversion from ksi to ksf - 12^2
@@ -27,24 +26,24 @@ for i in range(1,501):
     xs[i] = xs[i-1] + step
     xsb[i] = xsb[i-1] + step_backspan
 
-cant_test = ppbeam.cant_right_point_moment(1,2.5,l,lb)
-test = ppbeam.udl(1,2,6,lb)
+cant_right_test = ppbeam.cant_right_trap(-0.5,-0.25,1,3,l,lb)
+test = ppbeam.trap(0.5,1,2,5,lb)
 
-c1 = cant_test.rl
-c3 = cant_test.ml
+c1 = cant_right_test.rl
+c3 = cant_right_test.ml
 
-shear = cant_test.v(xs)
-shearb = cant_test.backspan.v(xsb) + test.v(xsb)
+shear = cant_right_test.v(xs)
+shearb =cant_right_test.backspan.v(xsb) + test.v(xsb)
 
-moment = cant_test.m(xs)
-momentb = cant_test.backspan.m(xsb) + test.m(xsb)
+moment = cant_right_test.m(xs)
+momentb = cant_right_test.backspan.m(xsb) + test.m(xsb)
 
-slope = (cant_test.eis(xs) + test.eisx(lb))/ (E*I)
-slopeb = (cant_test.backspan.eis(xsb) + test.eis(xsb)) / (E*I)
+slope = (cant_right_test.eis(xs) + test.eisx(lb))/ (E*I)
+slopeb = (cant_right_test.backspan.eis(xsb) + test.eis(xsb)) / (E*I)
 
 
-delta = ((cant_test.eid(xs) + ppbeam.cant_right_nl(test.eisx(lb)).eid(xs))/(E*I))*12.0
-deltab = ((cant_test.backspan.eid(xsb)+test.eid(xsb))/(E*I))*12.0
+delta = ((cant_right_test.eid(xs) + ppbeam.cant_right_nl(test.eisx(lb)).eid(xs))/(E*I))*12.0
+deltab = ((cant_right_test.backspan.eid(xsb)+test.eid(xsb))/(E*I))*12.0
 
 fig=plt.figure
 
@@ -56,7 +55,7 @@ ax4 = plt.subplot2grid((3, 2), (2, 1))
 
 
 ax.plot(test.x_graph,test.y_graph)
-ax.plot(cant_test.x_graph+xsb[-1],cant_test.y_graph)
+ax.plot(cant_right_test.x_graph+xsb[-1],cant_right_test.y_graph)
 ax.plot(xsb,[0]*len(xsb))
 ax.plot(xs+xsb[-1],[0]*len(xs))
 ax.minorticks_on()
