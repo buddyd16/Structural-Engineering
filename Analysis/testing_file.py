@@ -46,9 +46,9 @@ for i in range(1,501):
     xsc[i] = xsc[i-1] + step_backspan
     xsr[i] = xsr[i-1] + step_right
 
-load_left = ppbeam.cant_left_udl(1,0,4,ll,lc)
-load_center = ppbeam.pl(5,5,lc)
-load_right = ppbeam.cant_right_point(2,2,lr,lc)
+load_left = ppbeam.cant_left_trap(1,0.5,1,4,ll,lc)
+load_center = ppbeam.pl(0,0,lc)
+load_right = ppbeam.cant_right_trap(-0.5,-1,1,4,lr,lc)
 
 reaction_left = load_center.rl + load_right.backspan.rl + load_left.rr + load_left.backspan.rl
 reaction_right = load_center.rr + load_right.backspan.rr + load_right.rl + load_left.backspan.rr

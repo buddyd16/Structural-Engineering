@@ -1785,14 +1785,14 @@ class cant_left_point_moment:
             
         else:
             self.rr = 0
-            self.mr = -1.0*self.ma
+            self.mr = self.ma
         
         self.backspan = point_moment(self.mr,0,lb)
         
-        self.c3 = self.backspan.eisx(0) + (self.ma*self.l)
-        self.c4 = (0.5*self.ma*self.l**2) - self.c3*self.l
-        self.c1 = (-1.0*self.ma*self.a) + self.c3
-        self.c2 = -0.5*self.ma*self.a**2 + self.c3*self.a + self.c4 - self.c1*self.a
+        self.c3 = self.backspan.eisx(0) - (self.ma*self.l)
+        self.c4 = (-0.5*self.ma*self.l**2) - self.c3*self.l
+        self.c1 = (1.0*self.ma*self.a) + self.c3
+        self.c2 = 0.5*self.ma*self.a**2 + self.c3*self.a + self.c4 - self.c1*self.a
         
         arrow_height = self.ma/6.0
         r = self.ma/2.0
@@ -1854,7 +1854,7 @@ class cant_left_point_moment:
                 if x[i]<=self.a:
                     m[i] = 0
                 else:
-                    m[i] = -1*self.ma
+                    m[i] = self.ma
         return m
         
     def eis(self,x):
@@ -1869,7 +1869,7 @@ class cant_left_point_moment:
                 if x[i]<=self.a:
                     eis[i] = self.c1
                 else:
-                    eis[i] = (-1.0 * self.ma * x[i]) + self.c3
+                    eis[i] = (self.ma * x[i]) + self.c3
         return eis
     
     def eid(self, x):
@@ -1884,7 +1884,7 @@ class cant_left_point_moment:
                 if x[i]<=self.a:
                     eid[i] = self.c1*x[i] + self.c2
                 else:
-                    eid[i] = (-0.5)*self.ma*x[i]**2 + self.c3*x[i] + self.c4
+                    eid[i] = (0.5)*self.ma*x[i]**2 + self.c3*x[i] + self.c4
         return eid
         
     def vx(self,x):
@@ -1906,7 +1906,7 @@ class cant_left_point_moment:
             if x<=self.a:
                 m = 0
             else:
-                m = -1*self.ma
+                m = self.ma
         return m
         
     def eisx(self,x):
@@ -1917,7 +1917,7 @@ class cant_left_point_moment:
             if x<=self.a:
                 eis = self.c1
             else:
-                eis = (-1.0 * self.ma * x) + self.c3
+                eis = (self.ma * x) + self.c3
         return eis
     
     def eidx(self, x):
@@ -1928,7 +1928,7 @@ class cant_left_point_moment:
             if x<=self.a:
                 eid = self.c1*x + self.c2
             else:
-                eid = (-0.5)*self.ma*x**2 + self.c3*x + self.c4
+                eid = (0.5)*self.ma*x**2 + self.c3*x + self.c4
         return eid
         
 class cant_left_udl:
@@ -2066,16 +2066,98 @@ class cant_left_udl:
                     eid[i] = ((-1.0/6.0) * self.w_tot * (x[i]-(self.a+(0.5*self.c)))**3) + self.c5*x[i] + self.c6
             return eid   
 
+    def vx(self,x):
+        if self.a > self.b:
+            return 'Error a > b'
+            return 'Error a > b'
+        elif self.a > self.l:
+            return 'Error a > l'
+            return 'Error a > l'
+        elif self.b > self.l:
+            return 'Error b > l'
+            return 'Error b > l'
+        else:
+            if x <= self.a:
+                v = 0
+            elif x<=self.b:
+                v = -1*self.w1*(x-self.a)
+            else:
+                v = -1*self.w_tot
+        return v
+    
+    def mx(self,x):
+        if self.a > self.b:
+            return 'Error a > b'
+            return 'Error a > b'
+        elif self.a > self.l:
+            return 'Error a > l'
+            return 'Error a > l'
+        elif self.b > self.l:
+            return 'Error b > l'
+            return 'Error b > l'
+        else:
+            if x <= self.a:
+                m = 0
+            elif x <= self.b:
+                m = -0.5*self.w1*(x-self.a)**2
+            else:
+                m = -1.0 * self.w_tot * (x-(self.a+(0.5*self.c)))
+        return m
+    
+    def eisx(self,x):
+        if self.a > self.b:
+            return 'Error a > b'
+            return 'Error a > b'
+        elif self.a > self.l:
+            return 'Error a > l'
+            return 'Error a > l'
+        elif self.b > self.l:
+            return 'Error b > l'
+            return 'Error b > l'
+        else:
+            if x <= self.a:
+                eis = self.c1
+            elif x <= self.b:
+                eis = (-1.0/6.0)*self.w1*(x-self.a)**3 + self.c3
+            else:
+                eis = (-0.5 * self.w_tot * (x-(self.a+(0.5*self.c)))**2) + self.c5
+        return eis
+
+    def eidx(self,x):
+        if self.a > self.b:
+            return 'Error a > b'
+            return 'Error a > b'
+        elif self.a > self.l:
+            return 'Error a > l'
+            return 'Error a > l'
+        elif self.b > self.l:
+            return 'Error b > l'
+            return 'Error b > l'
+        else:
+            if x <= self.a:
+                eid = self.c1*x+ self.c2
+            elif x <= self.b:
+                eid = (-1.0/24.0)*self.w1*(x-self.a)**4 + self.c3*x + self.c4
+            else:
+                eid = ((-1.0/6.0) * self.w_tot * (x-(self.a+(0.5*self.c)))**3) + self.c5*x + self.c6
+        return eid 
 
 class cant_left_trap:
-    def __init__(self, w1, w2, a, b, l):
+    def __init__(self, w1, w2, a, b, l, lb):
         
         self.w1 = float(w1)
         self.w2 = float(w2)
         self.a = float(a)
         self.l = float(l)
         self.b = float(b)
-        self.c = b-a        
+        self.lb = float(lb)
+        self.c = self.b-self.a
+        
+        self.w = 0.5*(self.w1+self.w2)*self.c
+        self.dl = self.a+(((self.w1+(2*self.w2))/(3*(self.w2+self.w1)))*self.c)
+        self.dr = self.l-self.dl
+        self.s = (self.w1-self.w2)/self.c
+        self.cc = (((self.w1+(2*self.w2))/(3*(self.w2+self.w1)))*self.c) + self.a
         
         if self.a > self.b:
             self.rr = 'Error a > b'
@@ -2090,13 +2172,30 @@ class cant_left_trap:
             self.rr = 'Error w1 and w2 change direction'
             self.mr = 'Error w1 and w2 change direction'        
         else:
-            self.w = 0.5*(self.w1+self.w2)*self.c
-            self.dl = self.a+(((self.w1+(2*self.w2))/(3*(self.w2+self.w1)))*self.c)
-            self.dr = self.l-self.dl
-            self.s = (self.w1-self.w2)/self.c
             self.rr = self.w
-            self.mr = -1*self.w*self.d    
-    
+            self.mr = -1*self.rr*(self.l-self.cc)
+            
+        self.backspan = point_moment(self.mr,0,lb)
+        
+        self.c6 = self.backspan.eisx(0) + (0.5*self.w*(self.l-self.cc)**2)
+        self.c7 = ((1.0/6.0)*self.w*(self.l-self.cc)**3) - (self.c6*self.l)
+        self.c3 = -1.0*((1.0/6.0)*self.a*((self.a**2 * self.s) - (3*self.a*((self.a*self.s) + self.w1)) + (3*self.a*((self.a*self.s) + (2*self.w1)))))
+        self.c4 = (-0.5*self.w*(self.b-self.cc)**2) + self.c6 - (self.c3*self.b) - ((1.0/24.0)*self.b**2 *((self.b**2 * self.s) - (4*self.b*((self.a*self.s) + self.w1)) + (6*self.a*((self.a*self.s) + (2*self.w1)))))
+        self.c5 = ((-1.0/6.0)*self.w*(self.b-self.cc)**3) + (self.c6*self.b)+self.c7-(0.5*self.c3*self.b**2)-(self.c4*self.b)-((1.0/120.0)*self.b**3 *((self.b**2 * self.s) - (5*self.b*((self.a*self.s) + self.w1)) + (10*self.a*((self.a*self.s) + (2*self.w1)))))
+        self.c1 = ((1.0/24.0)*self.a**2 *((self.a**2 * self.s) - (4*self.a*((self.a*self.s) + self.w1)) + (6*self.a*((self.a*self.s) + (2*self.w1))))) + (self.c3*self.a) + self.c4
+        self.c2 = ((1.0/120.0)*self.a**3 *((self.a**2 * self.s) - (5*self.a*((self.a*self.s) + self.w1)) + (10*self.a*((self.a*self.s) + (2*self.w1))))) + (0.5*self.c3*self.a**2) + (self.c4*self.a) + self.c5 - (self.c1*self.a)
+        
+        arrow_height = self.w1/6.0
+        arrow_height2 = self.w2/6.0
+        #30 degree arrow
+        arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(30)))
+        arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(30)))
+        arrow_plus_end= self.b+(arrow_height2*math.tan(math.radians(30)))
+        arrow_minus_end= self.b-(arrow_height2*math.tan(math.radians(30)))
+        
+        self.x_graph=[arrow_minus_start,self.a,arrow_plus_start,self.a,self.a,self.b,self.b,arrow_minus_end,self.b,arrow_plus_end]
+        self.y_graph=[arrow_height,0,arrow_height,0,self.w1,self.w2,0,arrow_height2,0,arrow_height2]
+
     def v(self,x):
         if self.a > self.b:
             return 'Error a > b'
@@ -2117,13 +2216,10 @@ class cant_left_trap:
             for i in range(0,iters):
                 if x[i] <= self.a:
                     v[i] = 0
-                elif x[i]<=self.b:
-                    cx = x[i]-self.a
-                    wx = self.w1-(self.s*cx)
-                    wwx = 0.5*(self.w1+wx)*cx                   
-                    v[i] = -1*wwx
+                elif x[i]<=self.b:                   
+                    v[i] = (-0.5*((2*self.w1)-(self.s*(x[i]-self.a))))*(x[i]-self.a)
                 else:
-                    v[i] = -1*self.w
+                    v[i] = -1*self.rr
         return v
     
     def m(self,x):
@@ -2146,19 +2242,13 @@ class cant_left_trap:
             for i in range(0,iters):
                 if x[i] <= self.a:
                     m[i] = 0
-                elif x[i] <= self.b:
-                    cx = x[i]-self.a
-                    wx = self.w1-(self.s*cx)
-                    dlx = self.a+(((self.w1+(2*wx))/(3*(wx+self.w1)))*cx)
-                    drx = x[i]-dlx
-                    wwx = 0.5*(self.w1+wx)*cx                    
-                    m[i] = -1*wwx*drx
+                elif x[i] <= self.b:                   
+                    m[i] = ((1.0/6.0)*x[i]*((x[i]**2 * self.s) - (3*x[i]*((self.a*self.s) + self.w1)) + (3*self.a*((self.a*self.s) + (2*self.w1))))) + self.c3
                 else:
-                    m[i] = -1*self.w*(x[i]-self.dl)
+                    m[i] = -1*self.w*(x[i]-self.cc)
         return m
-    
-    def vx(self,x):
-        x = float(x)
+        
+    def eis(self,x):
         if self.a > self.b:
             return 'Error a > b'
             return 'Error a > b'
@@ -2171,22 +2261,68 @@ class cant_left_trap:
         elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
             return 'Error w1 and w2 change direction'
             return 'Error w1 and w2 change direction'
-        elif x > self.l:
-            return 'Error x > l'
+        else:           
+            iters = len(x)            
+            eis=zeros(iters)
+            
+            for i in range(0,iters):
+                if x[i] <= self.a:
+                    eis[i] = self.c1
+                elif x[i] <= self.b:                   
+                    eis[i] = ((1.0/24.0)*x[i]**2 *((x[i]**2 * self.s) - (4*x[i]*((self.a*self.s) + self.w1)) + (6*self.a*((self.a*self.s) + (2*self.w1))))) + (self.c3 * x[i]) + self.c4
+                else:
+                    eis[i] = (-0.5*self.w*(x[i]-self.cc)**2) + self.c6
+        return eis   
+
+    def eid(self,x):
+        if self.a > self.b:
+            return 'Error a > b'
+            return 'Error a > b'
+        elif self.a > self.l:
+            return 'Error a > l'
+            return 'Error a > l'
+        elif self.b > self.l:
+            return 'Error b > l'
+            return 'Error b > l'
+        elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
+            return 'Error w1 and w2 change direction'
+            return 'Error w1 and w2 change direction'
+        else:           
+            iters = len(x)            
+            eid=zeros(iters)
+            
+            for i in range(0,iters):
+                if x[i] <= self.a:
+                    eid[i] = self.c1*x[i] + self.c2
+                elif x[i] <= self.b:                   
+                    eid[i] = ((1.0/120.0)*x[i]**3 *((x[i]**2 * self.s) - (5*x[i]*((self.a*self.s) + self.w1)) + (10*self.a*((self.a*self.s) + (2*self.w1))))) + (0.5*self.c3 * x[i]**2) + (self.c4*x[i]) + self.c5
+                else:
+                    eid[i] = ((-1.0/6.0)*self.w*(x[i]-self.cc)**3) + (self.c6*x[i]) + self.c7
+        return eid
+
+    def vx(self,x):
+        if self.a > self.b:
+            return 'Error a > b'
+            return 'Error a > b'
+        elif self.a > self.l:
+            return 'Error a > l'
+            return 'Error a > l'
+        elif self.b > self.l:
+            return 'Error b > l'
+            return 'Error b > l'
+        elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
+            return 'Error w1 and w2 change direction'
+            return 'Error w1 and w2 change direction'
         else:
             if x <= self.a:
                 v = 0
-            elif x<=self.b:
-                cx = x-self.a
-                wx = self.w1-(self.s*cx)
-                wwx = 0.5*(self.w1+wx)*cx                   
-                v = -1*wwx
+            elif x<=self.b:                   
+                v= (-0.5*((2*self.w1)-(self.s*(x-self.a))))*(x-self.a)
             else:
-                v = -1*self.w
+                v = -1*self.rr
         return v
     
     def mx(self,x):
-        x = float(x)
         if self.a > self.b:
             return 'Error a > b'
             return 'Error a > b'
@@ -2199,20 +2335,55 @@ class cant_left_trap:
         elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
             return 'Error w1 and w2 change direction'
             return 'Error w1 and w2 change direction'
-        elif x > self.l:
-            return 'Error x > l'
-        else:
+        else:           
             if x <= self.a:
                 m = 0
-            elif x <= self.b:
-                cx = x-self.a
-                wx = self.w1-(self.s*cx)
-                dlx = self.a+(((self.w1+(2*wx))/(3*(wx+self.w1)))*cx)
-                drx = x-dlx
-                wwx = 0.5*(self.w1+wx)*cx                    
-                m = -1*wwx*drx
+            elif x <= self.b:                   
+                m = ((1.0/6.0)*x*((x**2 * self.s) - (3*x*((self.a*self.s) + self.w1)) + (3*self.a*((self.a*self.s) + (2*self.w1))))) + self.c3
             else:
-                m = -1*self.w*(x-self.dl)
+                m = -1*self.w*(x-self.cc)
         return m
+        
+    def eisx(self,x):
+        if self.a > self.b:
+            return 'Error a > b'
+            return 'Error a > b'
+        elif self.a > self.l:
+            return 'Error a > l'
+            return 'Error a > l'
+        elif self.b > self.l:
+            return 'Error b > l'
+            return 'Error b > l'
+        elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
+            return 'Error w1 and w2 change direction'
+            return 'Error w1 and w2 change direction'
+        else:           
+            if x <= self.a:
+                eis = self.c1
+            elif x <= self.b:                   
+                eis = ((1.0/24.0)*x**2 *((x**2 * self.s) - (4*x*((self.a*self.s) + self.w1)) + (6*self.a*((self.a*self.s) + (2*self.w1))))) + (self.c3 * x) + self.c4
+            else:
+                eis = (-0.5*self.w*(x-self.cc)**2) + self.c6
+        return eis   
 
-    
+    def eidx(self,x):
+        if self.a > self.b:
+            return 'Error a > b'
+            return 'Error a > b'
+        elif self.a > self.l:
+            return 'Error a > l'
+            return 'Error a > l'
+        elif self.b > self.l:
+            return 'Error b > l'
+            return 'Error b > l'
+        elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
+            return 'Error w1 and w2 change direction'
+            return 'Error w1 and w2 change direction'
+        else:           
+            if x <= self.a:
+                eid = self.c1*x + self.c2
+            elif x <= self.b:                   
+                eid = ((1.0/120.0)*x**3 *((x**2 * self.s) - (5*x*((self.a*self.s) + self.w1)) + (10*self.a*((self.a*self.s) + (2*self.w1))))) + (0.5*self.c3 * x**2) + (self.c4*x) + self.c5
+            else:
+                eid = ((-1.0/6.0)*self.w*(x-self.cc)**3) + (self.c6*x) + self.c7
+        return eid
