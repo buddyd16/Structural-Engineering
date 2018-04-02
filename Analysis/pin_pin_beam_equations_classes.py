@@ -767,6 +767,9 @@ class trap:
 class cant_right_nl:
     def __init__(self, slope):
         self.slope = slope
+        
+        self.rl = 0
+        self.ml = 0
 
     def v(self,x):
         iters = len(x)
@@ -1580,6 +1583,9 @@ class cant_left_nl:
         self.slope = slope
         self.c1 = self.slope
         self.c2 = -1.0*self.c1*self.l
+        
+        self.rr = 0
+        self.mr = 0
 
     def v(self,x):
         iters = len(x)
@@ -1647,10 +1653,18 @@ class cant_left_point:
         
         self.backspan = point_moment(self.mr,0,lb)
         
-        self.c3 = self.backspan.eisx(0) + (self.p * self.a * self. l)
-        self.c4 = (0.5*self.p * self.a * self.l**2) - (self.c3 *self.l)
-        self.c1 = (-1.0*self.p*self.a**2) + self.c3
-        self.c2 = (-0.5 * self.p * self.a**3) + (self.c3*self.a) + self.c4 - (self.c1*self.a)
+        self.c3 = self.backspan.eisx(0) + (0.5*self.p * (self.l-self.a)**2)
+        self.c4 = ((1/6.0)*self.p*(self.l-self.a)**3) - (self.c3*self.l)
+        self.c1 = self.c3
+        self.c2 = (self.c3*self.a) + self.c4 - (self.c1*self.a)
+        
+        arrow_height = self.p/6.0
+        #30 degree arrow
+        arrow_plus= self.a+(arrow_height*math.tan(math.radians(30)))
+        arrow_minus= self.a-(arrow_height*math.tan(math.radians(30)))
+        
+        self.x_graph=[arrow_minus,self.a,arrow_plus,self.a,self.a]
+        self.y_graph=[arrow_height,0,arrow_height,0,self.p]
         
     def v(self,x):
         if self.a > self.l:
@@ -1694,39 +1708,238 @@ class cant_left_point:
                 if x[i]<=self.a:
                     eis[i] = self.c1
                 else:
-                    eis[i] = -1*self.rr*(x[i]-self.a)
+                    eis[i] = (-0.5*self.p * (x[i]-self.a)**2) + self.c3
         return eis
+    
+    def eid(self, x):
+        if self.a > self.l:
+            return 'Error a > l'
+            return 'Error a > l'
+        else:
+            iters = len(x)            
+            eid=zeros(iters)
+            
+            for i in range(0,iters):
+                if x[i]<=self.a:
+                    eid[i] = self.c1*x[i] + self.c2
+                else:
+                    eid[i] = (-1/6.0)*self.p*(x[i]-self.a)**3 + self.c3*x[i] + self.c4
+        return eid
         
     def vx(self,x):
         if self.a > self.l:
             return 'Error a > l'
-            return 'Error a > l'            
-        else:            
+            return 'Error a > l'
+        else:
             if x<=self.a:
                 v = 0
             else:
-                v = -1*self.rr
+                v = -1*self.p
         return v
     
     def mx(self,x):
         if self.a > self.l:
             return 'Error a > l'
-            return 'Error a > l'            
+            return 'Error a > l'
         else:
             if x<=self.a:
                 m = 0
             else:
-                m = -1*self.rr*(x-self.a)
-        return m  
+                m = -1*self.p * (x - self.a)
+        return m
+        
+    def eisx(self,x):
+        if self.a > self.l:
+            return 'Error a > l'
+            return 'Error a > l'
+        else:
+            if x<=self.a:
+                eis = self.c1
+            else:
+                eis  = (-0.5*self.p * (x-self.a)**2) + self.c3
+        return eis
+    
+    def eidx(self, x):
+        if self.a > self.l:
+            return 'Error a > l'
+            return 'Error a > l'
+        else:
+            if x<=self.a:
+                eid = self.c1*x + self.c2
+            else:
+                eid = (-1/6.0)*self.p*(x-self.a)**3 + self.c3*x + self.c4
+        
+        return eid
+
+class cant_left_point_moment:
+    def __init__(self, ma, a, l,lb):
+        
+        self.ma = float(ma)
+        self.a = float(a)
+        self.l = float(l)
+        
+        
+        if self.a > self.l:
+            self.rr = 'Error a > l'
+            self.mr = 'Error a > l'
+            
+        else:
+            self.rr = 0
+            self.mr = -1.0*self.ma
+        
+        self.backspan = point_moment(self.mr,0,lb)
+        
+        self.c3 = self.backspan.eisx(0) + (self.ma*self.l)
+        self.c4 = (0.5*self.ma*self.l**2) - self.c3*self.l
+        self.c1 = (-1.0*self.ma*self.a) + self.c3
+        self.c2 = -0.5*self.ma*self.a**2 + self.c3*self.a + self.c4 - self.c1*self.a
+        
+        arrow_height = self.ma/6.0
+        r = self.ma/2.0
+        #30 degree arrow
+        arrow_minus= (arrow_height*math.tan(math.radians(30)))
+        
+        if self.ma <0:
+            self.x_graph = [self.a,self.a,self.a]
+            self.y_graph = [r,0,-r]
+            x=0
+            y=0
+            for a in range(-90, 181):
+                x = self.a+(r*math.cos(math.radians(a)))
+                y = 0+(r*math.sin(math.radians(a)))       
+                self.x_graph.append(x)
+                self.y_graph.append(y)
+            
+            self.x_graph.append(x-arrow_minus)
+            self.y_graph.append(y+arrow_height)
+            self.x_graph.append(x)
+            self.y_graph.append(y)
+            self.x_graph.append(x+arrow_minus)
+            self.y_graph.append(y+arrow_height)
+        else:
+            self.x_graph = [self.a-r,self.a,self.a+r, self.a+r-arrow_minus,self.a+r,self.a+r+arrow_minus,self.a+r]
+            self.y_graph = [0,0,0,arrow_height,0,arrow_height,0]
+            x=0
+            y=0
+            for a in range(0,271):
+                x = self.a+(r*math.cos(math.radians(a)))
+                y = 0+(r*math.sin(math.radians(a)))       
+                self.x_graph.append(x)
+                self.y_graph.append(y) 
+        
+    def v(self,x):
+        if self.a > self.l:
+            return 'Error a > l'
+            return 'Error a > l'
+        else:
+            iters = len(x)
+            v=zeros(iters)
+            
+            for i in range(0,iters):
+                if x[i]<=self.a:
+                    v[i] = 0
+                else:
+                    v[i] = 0
+        return v
+    
+    def m(self,x):
+        if self.a > self.l:
+            return 'Error a > l'
+            return 'Error a > l'
+        else:
+            iters = len(x)            
+            m=zeros(iters)
+            
+            for i in range(0,iters):
+                if x[i]<=self.a:
+                    m[i] = 0
+                else:
+                    m[i] = -1*self.ma
+        return m
+        
+    def eis(self,x):
+        if self.a > self.l:
+            return 'Error a > l'
+            return 'Error a > l'
+        else:
+            iters = len(x)            
+            eis=zeros(iters)
+            
+            for i in range(0,iters):
+                if x[i]<=self.a:
+                    eis[i] = self.c1
+                else:
+                    eis[i] = (-1.0 * self.ma * x[i]) + self.c3
+        return eis
+    
+    def eid(self, x):
+        if self.a > self.l:
+            return 'Error a > l'
+            return 'Error a > l'
+        else:
+            iters = len(x)            
+            eid=zeros(iters)
+            
+            for i in range(0,iters):
+                if x[i]<=self.a:
+                    eid[i] = self.c1*x[i] + self.c2
+                else:
+                    eid[i] = (-0.5)*self.ma*x[i]**2 + self.c3*x[i] + self.c4
+        return eid
+        
+    def vx(self,x):
+        if self.a > self.l:
+            return 'Error a > l'
+            return 'Error a > l'
+        else:
+            if x<=self.a:
+                v = 0
+            else:
+                v = 0
+        return v
+    
+    def mx(self,x):
+        if self.a > self.l:
+            return 'Error a > l'
+            return 'Error a > l'
+        else:
+            if x<=self.a:
+                m = 0
+            else:
+                m = -1*self.ma
+        return m
+        
+    def eisx(self,x):
+        if self.a > self.l:
+            return 'Error a > l'
+            return 'Error a > l'
+        else:
+            if x<=self.a:
+                eis = self.c1
+            else:
+                eis = (-1.0 * self.ma * x) + self.c3
+        return eis
+    
+    def eidx(self, x):
+        if self.a > self.l:
+            return 'Error a > l'
+            return 'Error a > l'
+        else:
+            if x<=self.a:
+                eid = self.c1*x + self.c2
+            else:
+                eid = (-0.5)*self.ma*x**2 + self.c3*x + self.c4
+        return eid
         
 class cant_left_udl:
-    def __init__(self, w1, a, b, l):
+    def __init__(self, w1, a, b, l, lb):
         
         self.w1 = float(w1)
         self.a = float(a)
         self.l = float(l)
+        self.lb = float(lb)
         self.b = float(b)
-        self.c = self.a+self.b
+        self.c = self.b-self.a
         self.w_tot = self.w1*self.c
         
         if self.a > self.b:
@@ -1740,8 +1953,27 @@ class cant_left_udl:
             self.mr = 'Error b > l'
         else:
             self.rr = self.w_tot
-            self.mr = -1*self.w_tot*(self.l-self.b+(self.c/2))
-               
+            self.mr = -1.0*self.w_tot*(self.l-(a+(self.c/2.0)))
+        
+        self.backspan = point_moment(self.mr,0,lb)
+        
+        self.c5 = self.backspan.eisx(0) + (0.5 * self.w_tot * (self.l - (self.a + (0.5*self.c)))**2)
+        self.c6 = ((1.0/6.0)*self.w_tot * (self.l - (self.a + (0.5*self.c)))**3) - (self.c5*self.l)        
+        self.c3 =((-0.5)*self.w_tot * (self.b - (self.a + (0.5*self.c)))**2) + self.c5 + ((1.0/6.0)*self.w1*(b-a)**3)
+        self.c1 = self.c3
+        self.c4 = ((-1.0/6.0)*self.w_tot * (self.b - (self.a + (0.5*self.c)))**3) + (self.c5*self.b) + self.c6 + ((1.0/24.0)*self.w1*(self.b-self.a)**4) - (self.c3*self.b)
+        self.c2 = (self.c3*self.a) + self.c4 - (self.c1*self.a)
+        
+        arrow_height = self.w1/6.0
+        #30 degree arrow
+        arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(30)))
+        arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(30)))
+        arrow_plus_end= self.b+(arrow_height*math.tan(math.radians(30)))
+        arrow_minus_end= self.b-(arrow_height*math.tan(math.radians(30)))
+        
+        self.x_graph=[arrow_minus_start,self.a,arrow_plus_start,self.a,self.a,self.b,self.b,arrow_minus_end,self.b,arrow_plus_end]
+        self.y_graph=[arrow_height,0,arrow_height,0,self.w1,self.w1,0,arrow_height,0,arrow_height]
+                
     def v(self,x):
         if self.a > self.b:
             return 'Error a > b'
@@ -1762,7 +1994,7 @@ class cant_left_udl:
                 elif x[i]<=self.b:
                     v[i] = -1*self.w1*(x[i]-self.a)
                 else:
-                    v[i] = self.w_tot
+                    v[i] = -1*self.w_tot
             return v
     
     def m(self,x):
@@ -1783,14 +2015,35 @@ class cant_left_udl:
                 if x[i] <= self.a:
                     m[i] = 0
                 elif x[i] <= self.b:
-                    m[i] = -1*(self.w1*(x[i]-self.a)*((x[i]-self.a)/2))
+                    m[i] = -0.5*self.w1*(x[i]-self.a)**2
                 else:
-                    m[i] = -1*self.w_tot(x[i]-self.b+(self.c/2))
+                    m[i] = -1.0 * self.w_tot * (x[i]-(self.a+(0.5*self.c)))
             return m
+    
+    def eis(self,x):
+        if self.a > self.b:
+            return 'Error a > b'
+            return 'Error a > b'
+        elif self.a > self.l:
+            return 'Error a > l'
+            return 'Error a > l'
+        elif self.b > self.l:
+            return 'Error b > l'
+            return 'Error b > l'
+        else:
+            iters = len(x)            
+            eis=zeros(iters)
+            
+            for i in range(0,iters):
+                if x[i] <= self.a:
+                    eis[i] = self.c1
+                elif x[i] <= self.b:
+                    eis[i] = (-1.0/6.0)*self.w1*(x[i]-self.a)**3 + self.c3
+                else:
+                    eis[i] = (-0.5 * self.w_tot * (x[i]-(self.a+(0.5*self.c)))**2) + self.c5
+            return eis
 
-    
-    def vx(self,x):
-        x = float(x)
+    def eid(self,x):
         if self.a > self.b:
             return 'Error a > b'
             return 'Error a > b'
@@ -1800,38 +2053,19 @@ class cant_left_udl:
         elif self.b > self.l:
             return 'Error b > l'
             return 'Error b > l'
-        elif x > self.l:
-            return 'Error x > l'
         else:
-            if x <= self.a:
-                v = 0 
-            elif x<=self.b:
-                v =  -1*self.w1*(x-self.a)
-            else:
-                v = self.w_tot
-        return v
-    
-    def mx(self,x):
-        x = float(x)
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        elif x > self.l:
-            return 'Error x > l'
-        else:
-            if x <= self.a:
-                m = 0
-            elif x <= self.b:
-                m =  -1*(self.w1*(x-self.a)*((x-self.a)/2))
-            else:
-                m =  -1*self.w_tot(x-self.b+(self.c/2))
-        return m
+            iters = len(x)            
+            eid=zeros(iters)
+            
+            for i in range(0,iters):
+                if x[i] <= self.a:
+                    eid[i] = self.c1*x[i] + self.c2
+                elif x[i] <= self.b:
+                    eid[i] = (-1.0/24.0)*self.w1*(x[i]-self.a)**4 + self.c3*x[i] + self.c4
+                else:
+                    eid[i] = ((-1.0/6.0) * self.w_tot * (x[i]-(self.a+(0.5*self.c)))**3) + self.c5*x[i] + self.c6
+            return eid   
+
 
 class cant_left_trap:
     def __init__(self, w1, w2, a, b, l):
