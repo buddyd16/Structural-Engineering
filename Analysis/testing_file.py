@@ -23,7 +23,7 @@ def reaction_graph(r,x):
     
 ll = 5
 lc = 10
-lr =  5
+lr = 5
 
 
 E = 29000 * 144  #144 is conversion from ksi to ksf - 12^2
@@ -37,6 +37,25 @@ xsl = zeros(501)
 xsc = zeros(501)
 xsr = zeros(501)
 
+reaction_left = 0
+reaction_right = 0
+
+shearl = zeros(501)
+shearc = zeros(501)
+shearr = zeros(501)
+
+momentl = zeros(501)
+momentc = zeros(501)
+momentr = zeros(501)
+
+slopel = zeros(501)
+slopec = zeros(501)
+sloper = zeros(501)
+
+deltal = zeros(501)
+deltac = zeros(501)
+deltar = zeros(501)
+
 xsl[0]=0
 xsc[0]=0
 xsr[0]=0
@@ -46,31 +65,82 @@ for i in range(1,501):
     xsc[i] = xsc[i-1] + step_backspan
     xsr[i] = xsr[i-1] + step_right
 
-load_left = ppbeam.cant_left_trap(1,0.5,1,4,ll,lc)
-load_center = ppbeam.pl(0,0,lc)
-load_right = ppbeam.cant_right_trap(-0.5,-1,1,4,lr,lc)
+if ll == 0:
+    load_left = [ppbeam.cant_left_point(0,0,ll,lc)]
 
-reaction_left = load_center.rl + load_right.backspan.rl + load_left.rr + load_left.backspan.rl
-reaction_right = load_center.rr + load_right.backspan.rr + load_right.rl + load_left.backspan.rr
+else:
+    load_left = [ppbeam.cant_left_point(0,0,ll,lc), ppbeam.cant_left_trap(1,0.5,1,4,ll,lc), ppbeam.cant_left_point_moment(1,2,ll,lc), ppbeam.cant_left_point(0.75,3,ll,lc)]
 
+load_center = [ppbeam.pl(0,0,lc), ppbeam.trap(1,0.5,2,4,lc), ppbeam.trap(-0.5,-1,6,8,lc), ppbeam.point_moment(-1,5,lc), ppbeam.udl(0.375,0,lc,lc), ppbeam.pl(2,4.5,lc)]
+
+if lr == 0:
+    load_right = [ppbeam.cant_right_point(0,0,lr,lc)]
+else:
+    load_right = [ppbeam.cant_right_point(0,0,lr,lc), ppbeam.cant_right_trap(-0.5,-1,1,4,lr,lc), ppbeam.cant_right_point_moment(1,4,lr,lc), ppbeam.cant_right_udl(0.4,1,3.25,lr,lc)]    
+
+
+for load in load_left:
+    reaction_left = reaction_left + load.rr + load.backspan.rl
+    reaction_right = reaction_right + load.backspan.rr
+    
+    shearl = shearl + load.v(xsl)
+    shearc = shearc + load.backspan.v(xsc)
+    
+    momentl = momentl + load.m(xsl)
+    momentc = momentc + load.backspan.m(xsc)
+    
+    slopel = slopel + load.eis(xsl)
+    slopec = slopec + load.backspan.eis(xsc)
+    sloper = sloper + ppbeam.cant_right_nl(load.backspan.eisx(lc)).eis(xsr)
+    
+    deltal = deltal + load.eid(xsl)
+    deltac = deltac + load.backspan.eid(xsc)
+    deltar = deltar + ppbeam.cant_right_nl(load.backspan.eisx(lc)).eid(xsr)
+
+for load in load_center:
+    reaction_left = reaction_left + load.rl
+    reaction_right = reaction_right  + load.rr
+    
+    shearc = shearc + load.v(xsc)
+    
+    momentc = momentc + load.m(xsc)
+   
+    slopel = slopel + ppbeam.cant_left_nl(load.eisx(0),ll).eis(xsl)
+    slopec = slopec + load.eis(xsc)
+    sloper = sloper + ppbeam.cant_right_nl(load.eisx(lc)).eis(xsr)
+    
+    deltal = deltal + ppbeam.cant_left_nl(load.eisx(0),ll).eid(xsl)
+    deltac = deltac + load.eid(xsc)
+    deltar = deltar + ppbeam.cant_right_nl(load.eisx(lc)).eid(xsr)
+
+for load in load_right:
+    reaction_left = reaction_left + load.backspan.rl
+    reaction_right = reaction_right + load.backspan.rr + load.rl
+    
+    shearc = shearc + load.backspan.v(xsc)
+    shearr = shearr + load.v(xsr)
+    
+    momentc = momentc + load.backspan.m(xsc)
+    momentr = momentr + load.m(xsr)
+    
+    slopel = slopel + ppbeam.cant_left_nl(load.backspan.eisx(0),ll).eis(xsl)
+    slopec = slopec + load.backspan.eis(xsc)
+    sloper = sloper + load.eis(xsr)
+    
+    deltal = deltal + ppbeam.cant_left_nl(load.backspan.eisx(0),ll).eid(xsl)
+    deltac = deltac + load.backspan.eid(xsc)
+    deltar = deltar + load.eid(xsr)
+
+slopel = slopel / (E*I)
+slopec = slopec / (E*I)
+sloper = sloper / (E*I)
+
+deltal = (deltal / (E*I))*12.0
+deltac = (deltac / (E*I))*12.0
+deltar = (deltar / (E*I))*12.0
+  
 rlx, rly = reaction_graph(reaction_left,ll)
 rrx, rry = reaction_graph(reaction_right,ll+lc)
-
-shearl = load_left.v(xsl)
-shearc = load_left.backspan.v(xsc) + load_center.v(xsc) + load_right.backspan.v(xsc)
-shearr = load_right.v(xsr)
-
-momentl = load_left.m(xsl)
-momentc = load_left.backspan.m(xsc) + load_center.m(xsc) + load_right.backspan.m(xsc)
-momentr = load_right.m(xsr)
-
-slopel = (load_left.eis(xsl)+ ppbeam.cant_left_nl(load_center.eisx(0)+load_right.backspan.eisx(0),ll).eis(xsl))/ (E*I)
-slopec = (load_left.backspan.eis(xsc) + load_center.eis(xsc) + load_right.backspan.eis(xsc)) / (E*I)
-sloper = (load_right.eis(xsr) + ppbeam.cant_right_nl(load_center.eisx(lc)+load_left.backspan.eisx(lc)).eis(xsr))/ (E*I)
-
-deltal = ((load_left.eid(xsl) + ppbeam.cant_left_nl(load_center.eisx(0)+load_right.backspan.eisx(0),ll).eid(xsl))/(E*I))*12.0
-deltac = ((load_left.backspan.eid(xsc)+load_center.eid(xsc)+load_right.backspan.eid(xsc))/(E*I))*12.0
-deltar = ((load_right.eid(xsr) + ppbeam.cant_right_nl(load_center.eisx(lc)+load_left.backspan.eisx(lc)).eid(xsr))/(E*I))*12.0
 
 #convert x coordinates to global
 xsl = xsl
@@ -86,9 +156,12 @@ axm = plt.subplot2grid((4, 2), (2, 1))
 axs = plt.subplot2grid((4, 2), (3, 0))
 axd = plt.subplot2grid((4, 2), (3, 1))
 
-axb.plot(load_left.x_graph,load_left.y_graph)
-axb.plot(load_center.x_graph+xsl[-1],load_center.y_graph)
-axb.plot(load_right.x_graph+xsc[-1],load_right.y_graph)
+for load in load_left:
+    axb.plot(load.x_graph,load.y_graph)
+for load in load_center:
+    axb.plot(load.x_graph+xsl[-1],load.y_graph)
+for load in load_right:
+    axb.plot(load.x_graph+xsc[-1],load.y_graph)
 axb.plot([0,0,0],[0.5,0,-0.5], alpha=0)
 axb.plot(xsl,[0]*len(xsl))
 axb.plot(xsc,[0]*len(xsc))
