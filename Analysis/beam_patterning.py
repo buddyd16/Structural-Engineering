@@ -156,7 +156,7 @@ def cant_right_udl(w, a, b, l, x):
     c = b-a
     w_tot = w*c
     rl = w_tot
-    ml = -1*w_tot*(b-(c/2))
+    ml = -1*w_tot*(a + (c/2))
     if x <= a:
         v = w_tot
         m = rl*x + ml
@@ -199,16 +199,16 @@ def cant_left_udl(w, a, b, l, x):
 
 
 def cant_right_trap(w1, w2, a, b, l, x):
-    c = a+b
-    w = 0.5*(w1+w2)*b
-    d = a+(((w1+(2*w2))/(3*(w2+w1)))*b)
-    s = (w1-w2)/b
+    c = b-a
+    w = 0.5*(w1+w2)*c
+    d = a+(((w1+(2*w2))/(3*(w2+w1)))*c)
+    s = (w1-w2)/c
     rl = w
     ml = -1*w*d
     if x <= a:
         v = w
         m = (w*x)+ml
-    elif a < x < c:
+    elif a < x < b:
         cx = x-a
         wx = w1-(s*cx)
         dx = x - (a+(((w1+(2*wx))/(3*(wx+w1)))*cx))
