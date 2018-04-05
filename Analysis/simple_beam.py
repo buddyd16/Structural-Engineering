@@ -35,6 +35,8 @@ class Master_window:
         
         self.f_size = 8
         helv = tkFont.Font(family='Helvetica',size=self.f_size, weight='bold')
+        helv_res = tkFont.Font(family='Helvetica',size=self.f_size, weight='bold', underline = True)
+        
         self.menubar = tk.Menu(self.master)
         self.menu = tk.Menu(self.menubar, tearoff=0)
         self.menu_props = tk.Menu(self.menubar, tearoff=0)
@@ -67,9 +69,9 @@ class Master_window:
         
         self.pg1_frame = tk.Frame(self.page1, bd=2, relief='sunken', padx=1,pady=1, width=300, height=500)
         
-        tk.Label(self.pg1_frame, text="Left Cantilever (ft):").grid(row=1,column=1, sticky = tk.E)
-        tk.Label(self.pg1_frame, text="Center Span (ft):").grid(row=2,column=1, sticky = tk.E)
-        tk.Label(self.pg1_frame, text="Right Cantilever (ft):").grid(row=3,column=1, sticky = tk.E)
+        tk.Label(self.pg1_frame, text="Left Cantilever (ft):", font=helv).grid(row=1,column=1, sticky = tk.E)
+        tk.Label(self.pg1_frame, text="Center Span (ft):", font=helv).grid(row=2,column=1, sticky = tk.E)
+        tk.Label(self.pg1_frame, text="Right Cantilever (ft):", font=helv).grid(row=3,column=1, sticky = tk.E)
         
         self.left_cant_ft = tk.StringVar() 
         self.span_ft = tk.StringVar()
@@ -86,8 +88,8 @@ class Master_window:
         self.right_cant_entry = tk.Entry(self.pg1_frame, textvariable=self.right_cant_ft, width=10)
         self.right_cant_entry.grid(row=3,column=2, sticky = tk.W)
         
-        tk.Label(self.pg1_frame, text="E (ksi):").grid(row=4,column=1, sticky = tk.E)
-        tk.Label(self.pg1_frame, text="I (in^4):").grid(row=5,column=1, sticky = tk.E)
+        tk.Label(self.pg1_frame, text="E (ksi):", font=helv).grid(row=4,column=1, sticky = tk.E)
+        tk.Label(self.pg1_frame, text="I (in^4):", font=helv).grid(row=5,column=1, sticky = tk.E)
         
         self.E_ksi = tk.StringVar() 
         self.I_in4 = tk.StringVar()
@@ -100,13 +102,13 @@ class Master_window:
         self.I_entry = tk.Entry(self.pg1_frame, textvariable=self.I_in4, width=10)
         self.I_entry.grid(row=5,column=2, sticky = tk.W)
         
-        tk.Label(self.pg1_frame, text="Add Loads:").grid(row=6,column=1, sticky = tk.E)
-        tk.Label(self.pg1_frame, text="P,M,W1 (kips, ft-kips, klf):").grid(row=7,column=1, sticky = tk.E)
-        tk.Label(self.pg1_frame, text="W2 (kips, ft-kips, klf):").grid(row=8,column=1, sticky = tk.E)
-        tk.Label(self.pg1_frame, text="a (ft):").grid(row=9,column=1, sticky = tk.E)
-        tk.Label(self.pg1_frame, text="b (ft):").grid(row=10,column=1, sticky = tk.E)
-        tk.Label(self.pg1_frame, text="Load Type:").grid(row=11,column=1, sticky = tk.E)
-        tk.Label(self.pg1_frame, text="Load Location:").grid(row=12,column=1, sticky = tk.E)
+        tk.Label(self.pg1_frame, text="Add Loads:", font=helv).grid(row=6,column=1, sticky = tk.E)
+        tk.Label(self.pg1_frame, text="P,M,W1 (kips, ft-kips, klf):", font=helv).grid(row=7,column=1, sticky = tk.E)
+        tk.Label(self.pg1_frame, text="W2 (kips, ft-kips, klf):", font=helv).grid(row=8,column=1, sticky = tk.E)
+        tk.Label(self.pg1_frame, text="a (ft):", font=helv).grid(row=9,column=1, sticky = tk.E)
+        tk.Label(self.pg1_frame, text="b (ft):", font=helv).grid(row=10,column=1, sticky = tk.E)
+        tk.Label(self.pg1_frame, text="Load Type:", font=helv).grid(row=11,column=1, sticky = tk.E)
+        tk.Label(self.pg1_frame, text="Load Location:", font=helv).grid(row=12,column=1, sticky = tk.E)
         
         self.w1_gui = tk.StringVar() 
         self.w2_gui = tk.StringVar() 
@@ -127,7 +129,7 @@ class Master_window:
         self.b_gui_entry = tk.Entry(self.pg1_frame, textvariable=self.b_gui, width=10) 
         self.b_gui_entry.grid(row=10,column=2, sticky = tk.W)
         
-        self.b_run = tk.Button(self.pg1_frame,text = "Update", command = self.update)
+        self.b_run = tk.Button(self.pg1_frame,text = "Update", command = self.update, font=helv)
         self.b_run.grid(row=1,column=3, sticky = tk.W)        
         
         self.load_type = tk.StringVar()
@@ -142,27 +144,28 @@ class Master_window:
         self.load_loc_selection = tk.OptionMenu(self.pg1_frame, self.load_loc, *load_locals)
         self.load_loc_selection.grid(row=12,column=2, sticky = tk.W)
         
-        self.b_add_load = tk.Button(self.pg1_frame,text = "Add New Load", command = self.add_load)
+        self.b_add_load = tk.Button(self.pg1_frame,text = "Add New Load", command = self.add_load, font=helv)
         self.b_add_load.grid(row=7, column=3, sticky = tk.W)       
         
-        self.b_remove_load = tk.Button(self.pg1_frame,text = "Remove Last Load", command = self.remove_load)
+        self.b_remove_load = tk.Button(self.pg1_frame,text = "Remove Last Load", command = self.remove_load, font=helv)
         self.b_remove_load.grid(row=8, column=3, sticky = tk.W) 
         
         self.show_v = tk.IntVar()
-        tk.Checkbutton(self.pg1_frame, text=' : Show V', variable=self.show_v, command = self.bm_canvas_draw).grid(row=1, column=5, sticky = tk.W)
+        tk.Checkbutton(self.pg1_frame, text=' : Show V', variable=self.show_v, command = self.bm_canvas_draw, font=helv).grid(row=1, column=5, sticky = tk.W)
         self.show_m = tk.IntVar()
-        tk.Checkbutton(self.pg1_frame, text=' : Show M', variable=self.show_m, command = self.bm_canvas_draw).grid(row=2, column=5, sticky = tk.W)
+        tk.Checkbutton(self.pg1_frame, text=' : Show M', variable=self.show_m, command = self.bm_canvas_draw, font=helv).grid(row=2, column=5, sticky = tk.W)
         self.show_s = tk.IntVar()
-        tk.Checkbutton(self.pg1_frame, text=' : Show S', variable=self.show_s, command = self.bm_canvas_draw).grid(row=3, column=5, sticky = tk.W)
+        tk.Checkbutton(self.pg1_frame, text=' : Show S', variable=self.show_s, command = self.bm_canvas_draw, font=helv).grid(row=3, column=5, sticky = tk.W)
         self.show_d = tk.IntVar()
-        tk.Checkbutton(self.pg1_frame, text=' : Show D', variable=self.show_d, command = self.bm_canvas_draw).grid(row=4, column=5, sticky = tk.W)
+        tk.Checkbutton(self.pg1_frame, text=' : Show D', variable=self.show_d, command = self.bm_canvas_draw, font=helv).grid(row=4, column=5, sticky = tk.W)
         self.show_r = tk.IntVar()
-        tk.Checkbutton(self.pg1_frame, text=' : Show Reactions', variable=self.show_r, command = self.bm_canvas_draw ).grid(row=5, column=5, sticky = tk.W) 
+        tk.Checkbutton(self.pg1_frame, text=' : Show Reactions', variable=self.show_r, command = self.bm_canvas_draw, font=helv).grid(row=5, column=5, sticky = tk.W) 
         
         self.res_labels = []
         self.res_list = ['Results:','--','--','Cant. Left:','--','--','--','--','Center Span:','--','--','--','--','Cant. Right:','--','--','--','--']
+        label_fonts = [helv_res,helv,helv,helv_res,helv,helv,helv,helv,helv_res,helv,helv,helv,helv,helv_res,helv,helv,helv,helv]
         for i in range(0,18):
-            self.res_labels.append(tk.Label(self.pg1_frame, text= self.res_list[i]))
+            self.res_labels.append(tk.Label(self.pg1_frame, text= self.res_list[i], font=label_fonts[i]))
             self.res_labels[i].grid(row=i+1,column=6, sticky = tk.W)
         
         self.pg1_frame.pack(anchor='c', padx= 1, pady= 1, fill=tk.BOTH, expand=1)
