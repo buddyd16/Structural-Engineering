@@ -73,24 +73,24 @@ def pl(p, a, l, x):
 
 
 def udl(W, a, b, l, x):
-    c = a + b
-    rl = (W * b) - (((W * b) * (a + (b / 2))) / l)
-    rr = (((W * b) * (a + (b / 2))) / l)
+    c = b-a
+    rl = (W * c) - (((W * c) * (a + (c / 2))) / l)
+    rr = (((W * c) * (a + (c / 2))) / l)
     c1 = 0
     c2 = ((-1 * W * a ** 2) / 2)
     c3 = rr * l
     c7 = 0
     c8 = ((-1 * c1 * a ** 2) / 2) + ((c2 * a ** 2) / 2) + ((5 * W * a ** 4) / 24) + c7
-    c9 = ((-1 * rl * c ** 3) / 3) - ((rr * c ** 3) / 3) + ((W * c ** 4) / 8) - ((W * a * c ** 3) / 3) - ((c2 * c ** 2) / 2) + ((c3 * c ** 2) / 2) + c8
+    c9 = ((-1 * rl * b ** 3) / 3) - ((rr * b ** 3) / 3) + ((W * b ** 4) / 8) - ((W * a * b ** 3) / 3) - ((c2 * b ** 2) / 2) + ((c3 * b ** 2) / 2) + c8
     c6 = ((rr * l ** 2) / 6) - ((c3 * l) / 2) - (c9 / l)
-    c5 = ((-1 * rl * c ** 2) / 2) + ((W * c ** 3) / 6) - ((W * a * c ** 2) / 2) - ((rr * c ** 2) / 2) + (c3 * c) - (c2 * c) + c6
+    c5 = ((-1 * rl * b ** 2) / 2) + ((W * b ** 3) / 6) - ((W * a * b ** 2) / 2) - ((rr * b ** 2) / 2) + (c3 * b) - (c2 * b) + c6
     c4 = ((W * a ** 3) / 3) + (c2 * a) + c5 - (c1 * a)
     if x <= a:
         v = rl
         m = (rl * x) + c1
         eis = ((rl * x ** 2) / 2) + (c1 * x) + c4
         eid = ((rl * x ** 3) / 6) + ((c1 * x ** 2) / 2) + (c4 * x) + c7
-    elif x < c:
+    elif x < b:
         v = rl - (W * (x - a))
         m = (rl * x) - ((W * x ** 2) / 2) + (W * a * x) + c2
         eis = ((rl * x **2) / 2) - ((W * x ** 3) / 6) + ((W * a * x **2) / 2) + (c2 * x) + c5
@@ -104,13 +104,13 @@ def udl(W, a, b, l, x):
 
 
 def trapl(w1, w2, a, b, l, x):
-    d = a + b
-    s = (w2 - w1) / b
+    d = b-a
+    s = (w2 - w1) / d
     if w2 == -1*w1:
-        xbar = b/2
+        xbar = d/2
     else:
-        xbar = (b * ((2 * w2) + w1)) / (3 * (w2 + w1))
-    W = b * ((w1 + w2) / 2)
+        xbar = (d * ((2 * w2) + w1)) / (3 * (w2 + w1))
+    W = d * ((w1 + w2) / 2)
     rr = (W * (a + xbar)) / l
     rl = W - rr
     c1 = 0
@@ -118,16 +118,16 @@ def trapl(w1, w2, a, b, l, x):
     c3 = rr * l
     c7 = 0
     c8 = ((-1 * c1 * a ** 2) / 2) - ((a ** 5 * s) / 30) - ((a ** 4 * (w1 - (s * a))) / 8) - ((((s * a) - (2 * w1)) * a ** 4) / 6) + ((c2 * a ** 2) / 2) + c7
-    c9 = ((-1 * rl * d ** 3) / 3) + ((d ** 5 * s) / 30) + ((d ** 4 * (w1 - (s * a))) / 8) + ((((s * a) - (2 * w1)) * a * d ** 3) / 6) - ((c2 * d ** 2) / 2) + c8 - ((rr * d ** 3) / 3) + ((c3 * d ** 2) / 2)
+    c9 = ((-1 * rl * b ** 3) / 3) + ((b ** 5 * s) / 30) + ((b ** 4 * (w1 - (s * a))) / 8) + ((((s * a) - (2 * w1)) * a * b ** 3) / 6) - ((c2 * b ** 2) / 2) + c8 - ((rr * b ** 3) / 3) + ((c3 * b ** 2) / 2)
     c6 = (((rr * l ** 3) / 6) - ((c3 * l ** 2) / 2) - c9) / l
-    c5 = ((-1 * rr * d ** 2) / 2) + (c3 * d) + c6 - ((rl * d ** 2) / 2) + ((d ** 4 * s) / 24) + ((d ** 3 * (w1 - (s * a))) / 6) + ((((s * a) - (2 * w1)) * a * d ** 2) / 4) - (c2 * d)
+    c5 = ((-1 * rr * b ** 2) / 2) + (c3 * b) + c6 - ((rl * b ** 2) / 2) + ((b ** 4 * s) / 24) + ((b ** 3 * (w1 - (s * a))) / 6) + ((((s * a) - (2 * w1)) * a * b ** 2) / 4) - (c2 * b)
     c4 = ((-1 * a ** 4 * s) / 24) - ((a ** 3 * (w1 - (s * a))) / 6) - ((((s * a) - (2 * w1)) * a ** 3) / 4) + (c2 * a) + c5 - (c1 * a)
     if x <= a:
         v = rl
         m = (rl * x) + c1
         eis = ((rl * x ** 2) / 2) + (c1 * x) + c4
         eid = ((rl * x ** 3) / 6) + ((c1 * x ** 2) / 2) + (c4 * x) + c7
-    elif x < d:
+    elif x < b:
         v = rl - ((x ** 2 * s) / 2) - (x * (w1 - (s * a))) - ((((s * a) - (2 * w1)) * a) / 2)
         m = (rl * x) - ((x ** 3 * s) / 6) - ((x ** 2 * (w1 - (s * a))) / 2) - ((((s * a) - (2 * w1)) * a * x) / 2) + c2
         eis = ((rl * x ** 2) / 2) - ((x ** 4 * s) / 24) - ((x ** 3 * (w1 - (s * a))) / 6) - ((((s * a) - (2 * w1)) * a * x ** 2) / 4) + (c2 * x) + c5
@@ -160,7 +160,7 @@ def cant_right_udl(w, a, b, l, x):
     if x <= a:
         v = w_tot
         m = rl*x + ml
-    elif a < x <= b:
+    elif x <= b:
         v = w_tot - w*(x-a)
         m = rl*x + ml - (w*(x-a)*((x-a)/2))
     else:
@@ -182,7 +182,7 @@ def cant_left_point(p, a, l, x):
 
 
 def cant_left_udl(w, a, b, l, x):
-    c = a+b
+    c = b-a
     w_tot = w*c
     rr = w_tot
     mr = -1*w_tot*(l-b+(c/2))
@@ -190,11 +190,11 @@ def cant_left_udl(w, a, b, l, x):
         v = 0
         m = 0
     elif a < x <= b:
-        v = - w*(x-a)
+        v = -1*w*(x-a)
         m = -1*(w*(x-a)*((x-a)/2))
     else:
-        v = w_tot
-        m = -1*w_tot(x-b+(c/2))
+        v = -1*w_tot
+        m = -1*w_tot*(x-b+(c/2))
     return(rr, mr, v, m)
 
 
@@ -222,23 +222,23 @@ def cant_right_trap(w1, w2, a, b, l, x):
 
 
 def cant_left_trap(w1, w2, a, b, l, x):
-    c = a+b
-    w = 0.5*(w1+w2)*b
-    dl = a+(((w1+(2*w2))/(3*(w2+w1)))*b)
+    c = b-a
+    w = 0.5*(w1+w2)*c
+    dl = a+(((w1+(2*w2))/(3*(w2+w1)))*c)
     dr = l-dl
-    s = (w1-w2)/b
+    s = (w1-w2)/c
     rr = w
     mr = -1*w*dr
     if x <= a:
         v = 0
         m = 0
-    elif a < x < c:
+    elif a < x < b:
         cx = x-a
         wx = w1-(s*cx)
         dlx = a+(((w1+(2*wx))/(3*(wx+w1)))*cx)
         drx = x-dlx
         wwx = 0.5*(w1+wx)*cx
-        v = -1*wwx
+        v = (-0.5*((2*w1)-(s*(x-a))))*(x-a)
         m = -1*wwx*drx
     else:
         v = -1*w
@@ -2324,7 +2324,8 @@ class Main_window:
 
 
                 holder.append(float(p[2])*12)
-                holder.append((float(p[3])-float(p[2]))*12)
+                #holder.append((float(p[3])-float(p[2]))*12)
+                holder.append((float(p[3]))*12)
                 holder.append(p[4])
                 holder.append(int(p[5].replace('\n',''))-1)
                 holder.append(int(p[7].replace('\n','')))
