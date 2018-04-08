@@ -160,6 +160,7 @@ class Master_window:
         self.graph_b_frame = tk.Frame(self.pg1_frame, bd=2, relief='sunken', padx=4 ,pady=1)
         
         self.show_l = tk.IntVar()
+        self.show_l.set(1)
         tk.Checkbutton(self.graph_b_frame, text=' : Show Loads', variable=self.show_l, command = self.bm_canvas_draw, font=helv).grid(row=1, column=1, sticky = tk.W)        
         self.show_v = tk.IntVar()
         tk.Checkbutton(self.graph_b_frame, text=' : Show V', variable=self.show_v, command = self.bm_canvas_draw, font=helv).grid(row=2, column=1, sticky = tk.W)
@@ -182,6 +183,24 @@ class Master_window:
         for i in range(0,18):
             self.res_labels.append(tk.Label(self.res_frame, text= self.res_list[i], font=label_fonts[i]))
             self.res_labels[i].grid(row=i+1,column=1, sticky = tk.W)
+                    
+        self.resx_label = tk.Label(self.res_frame, text="x = ", font=helv)
+        self.resx_label.grid(row=1,column=2)
+        self.resx_var = tk.StringVar()
+        self.resx_var.set(1.0)
+        self.resx_entry = tk.Entry(self.res_frame, textvariable = self.resx_var, width=10)
+        self.resx_entry.grid(row=1, column=3)
+        tk.Label(self.res_frame, text = ' ft', font=helv).grid(row=1, column=4)
+        
+        self.b_runx = tk.Button(self.res_frame, text="Res. @ X", command = self.runx, font=helv)
+        self.b_runx.grid(row=1, column=4)
+        
+        self.resx_labels = []
+        self.resx_list = ['Results @ x :','Cant. Left:','--','--','--','--','Center Span:','--','--','--','--','Cant. Right:','--','--','--','--']
+        label_fontsx = [helv_res,helv_res,helv,helv,helv,helv,helv_res,helv,helv,helv,helv,helv_res,helv,helv,helv,helv]
+        for i in range(0,16):
+            self.resx_labels.append(tk.Label(self.res_frame, text= self.resx_list[i], font=label_fontsx[i]))
+            self.resx_labels[i].grid(row=i+2,column=3, sticky = tk.W)
             
         self.res_frame.pack(side=tk.LEFT, anchor='nw', padx=4 ,pady=1)
         
@@ -659,6 +678,148 @@ class Master_window:
             
             self.has_run = 1
             self.bm_canvas_draw()
+
+    def runx(self, *event):
+
+        if self.left_cant_ft.get() == '' or self.span_ft.get()== '' or self.right_cant_ft.get() == '':
+            pass
+        
+        else:
+            self.ll = float(self.left_cant_ft.get())
+            self.lc = float(self.span_ft.get())
+            self.lr = float(self.right_cant_ft.get())
+            
+            x = float(self.resx_var.get())
+
+    
+            E = float(self.E_ksi.get()) * 144        #144 is conversion from ksi to ksf - 12^2
+            I = float(self.I_in4.get()) / 12.0**4    #covert from in^4 to ft^4        
+            
+            if x > self.ll:
+                xsl = self.ll
+            else:
+                xsl = x
+            xsc = x
+            
+            if x > self.lr:
+                xsr = self.lr
+            else:
+                xsr = x
+            
+            shearlx = 0
+            shearcx = 0
+            shearrx = 0
+            
+            momentlx = 0
+            momentcx = 0
+            momentrx = 0
+            
+            slopelx = 0
+            slopecx = 0
+            sloperx = 0
+            
+            deltalx = 0
+            deltacx = 0
+            deltarx = 0
+            
+            if self.ll == 0:
+                load_left = [ppbeam.cant_left_point(0,0,self.ll,self.lc)]
+            
+            else:
+                load_left = self.loads_left
+            
+            if len(self.loads_center) == 0:
+                load_center = [ppbeam.pl(0,0,self.lc)]
+            else:
+                load_center = self.loads_center
+            
+            if self.lr == 0:
+                load_right = [ppbeam.cant_right_point(0,0,self.lr,self.lc)]
+            else:
+                load_right = self.loads_right
+            
+            
+            for load in load_left:
+                
+                shearlx = shearlx + load.vx(xsl)
+                shearcx = shearcx + load.backspan.vx(xsc)
+                
+                momentlx = momentlx + load.mx(xsl)
+                momentcx = momentcx + load.backspan.mx(xsc)
+                
+                slopelx = slopelx + load.eisx(xsl)
+                slopecx = slopecx + load.backspan.eisx(xsc)
+                sloperx = sloperx + ppbeam.cant_right_nl(load.backspan.eisx(self.lc)).eisx(xsr)
+                
+                deltalx = deltalx + load.eidx(xsl)
+                deltacx = deltacx + load.backspan.eidx(xsc)
+                deltarx = deltarx + ppbeam.cant_right_nl(load.backspan.eisx(self.lc)).eidx(xsr)
+            
+            for load in load_center:
+                
+                shearcx = shearcx + load.vx(xsc)
+                
+                momentcx = momentcx + load.mx(xsc)
+               
+                slopelx = slopelx + ppbeam.cant_left_nl(load.eisx(0),self.ll).eisx(xsl)
+                slopecx = slopecx + load.eisx(xsc)
+                sloperx = sloperx + ppbeam.cant_right_nl(load.eisx(self.lc)).eisx(xsr)
+                
+                deltalx = deltalx + ppbeam.cant_left_nl(load.eisx(0),self.ll).eidx(xsl)
+                deltacx = deltacx + load.eidx(xsc)
+                deltarx = deltarx + ppbeam.cant_right_nl(load.eisx(self.lc)).eidx(xsr)
+            
+            for load in load_right:
+                
+                shearcx = shearcx + load.backspan.vx(xsc)
+                shearrx = shearrx + load.vx(xsr)
+                
+                momentcx = momentcx + load.backspan.mx(xsc)
+                momentrx = momentrx + load.mx(xsr)
+                
+                slopelx = slopelx + ppbeam.cant_left_nl(load.backspan.eisx(0),self.ll).eisx(xsl)
+                slopecx = slopecx + load.backspan.eisx(xsc)
+                sloperx = sloperx + load.eisx(xsr)
+                
+                deltalx = deltalx + ppbeam.cant_left_nl(load.backspan.eisx(0),self.ll).eidx(xsl)
+                deltacx = deltacx + load.backspan.eidx(xsc)
+                deltarx = deltarx + load.eidx(xsr)
+            
+            slopelx = slopelx / (E*I)
+            slopecx = slopecx / (E*I)
+            sloperx = sloperx / (E*I)
+            
+            deltalx = (deltalx / (E*I))*12.0
+            deltacx = (deltacx / (E*I))*12.0
+            deltarx = (deltarx / (E*I))*12.0
+            
+            if self.ll == 0 or x > self.ll:
+            
+                self.resx_labels[2].configure(text = '--')
+                self.resx_labels[3].configure(text = '--')
+                self.resx_labels[4].configure(text = '--')
+                self.resx_labels[5].configure(text = '--')
+            else:
+                self.resx_labels[2].configure(text = 'V = {0:.3f} kips'.format(shearlx))
+                self.resx_labels[3].configure(text = 'M = {0:.3f} ft-kips'.format(momentlx))
+                self.resx_labels[4].configure(text = 'S = {0:.5f} rad'.format(slopelx))
+                self.resx_labels[5].configure(text = 'D = {0:.4f} in'.format(deltalx))
+                
+            self.resx_labels[7].configure(text = 'V = {0:.3f} kips'.format(shearcx))
+            self.resx_labels[8].configure(text = 'M = {0:.3f} ft-kips'.format(momentcx))
+            self.resx_labels[9].configure(text = 'S = {0:.5f} rad'.format(slopecx))
+            self.resx_labels[10].configure(text = 'D = {0:.4f} in'.format(deltacx))
+            
+            if self.lr == 0 or x > self.lr:
+                self.resx_labels[12].configure(text = '--')
+                self.resx_labels[13].configure(text = '--')
+                self.resx_labels[14].configure(text = '--')
+                self.resx_labels[15].configure(text = '--')               
+            else:
+                self.resx_labels[12].configure(text = 'V = {0:.3f} kips'.format(shearrx))
+                self.resx_labels[13].configure(text = 'M = {0:.3f} ft-kips'.format(momentrx))
+                self.resx_labels[14].configure(text = 'S = {0:.5f} rad'.format(sloperx))
+                self.resx_labels[15].configure(text = 'D = {0:.4f} in'.format(deltarx))
     
     def update(self, *event):
         
