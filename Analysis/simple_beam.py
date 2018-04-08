@@ -343,23 +343,98 @@ class Master_window:
                     self.bm_canvas.create_line((self.rlx[i-1] * sf) + initial, hg - (self.rly[i-1] * r_sf),(self.rlx[i] * sf) + initial,hg - (self.rly[i] * r_sf),fill="black", width=2)
                     self.bm_canvas.create_line((self.rrx[i-1] * sf) + initial, hg - (self.rry[i-1] * r_sf),(self.rrx[i] * sf) + initial,hg - (self.rry[i] * r_sf),fill="black", width=2)
 
-    def add_load(self, *event):
+    def build_loads(self, *event):
         
+        del self.loads_right[:]
+        del self.loads_left[:]
+        del self.loads_center[:]
+
         ll = float(self.left_cant_ft.get())
         lc = float(self.span_ft.get())
-        lr = float(self.right_cant_ft.get())
+        lr = float(self.right_cant_ft.get())        
         
-        load_location = self.load_loc.get()
+        for load in self.loads_gui_select_var:
+            
+            if load[0].get() == 0:
+                
+                pass
+            
+            else:
+                
+                w1 = float(load[1].get())
+                w2 = float(load[2].get())
+                a = float(load[3].get())
+                b = float(load[4].get())
+                load_location = load[5].get()
+                load_type = load[6].get()
+                
+                if load_type == 'Moment':
+                    self.loads_scale.append(w1/2.0)
+                    self.loads_scale.append(w2)        
+                else:
+                    self.loads_scale.append(w1)
+                    self.loads_scale.append(w2)
+                
+                #['Left','Center','Right']
+                if load_location == 'Left':
+                    #['Point','Moment','UDL','TRAP']
+                    if load_type == 'Point':
+                        self.loads_left.append(ppbeam.cant_left_point(w1,a,ll,lc))
+                    
+                    elif load_type == 'Moment':
+                        self.loads_left.append(ppbeam.cant_left_point_moment(w1,a,ll,lc))
+                        
+                    elif load_type == 'UDL':
+                        self.loads_left.append(ppbeam.cant_left_udl(w1,a,b,ll,lc))
+                    
+                    elif load_type == 'TRAP':
+                        self.loads_left.append(ppbeam.cant_left_trap(w1,w2,a,b,ll,lc))
+                    else:
+                        pass
+                
+                elif load_location == 'Center':
+                    #['Point','Moment','UDL','TRAP']
+                    if load_type == 'Point':
+                        self.loads_center.append(ppbeam.pl(w1,a,lc))
+                    
+                    elif load_type == 'Moment':
+                        self.loads_center.append(ppbeam.point_moment(w1,a,lc))
+                        
+                    elif load_type == 'UDL':
+                        self.loads_center.append(ppbeam.udl(w1,a,b,lc))
+                    
+                    elif load_type == 'TRAP':
+                        self.loads_center.append(ppbeam.trap(w1,w2,a,b,lc))
+                    else:
+                        pass
+                    
+                elif load_location == 'Right':
+                    #['Point','Moment','UDL','TRAP']
+                    if load_type == 'Point':
+                        self.loads_right.append(ppbeam.cant_right_point(w1,a,lr,lc))
+                    
+                    elif load_type == 'Moment':
+                        self.loads_right.append(ppbeam.cant_right_point_moment(w1,a,lr,lc))
+                        
+                    elif load_type == 'UDL':
+                        self.loads_right.append(ppbeam.cant_right_udl(w1,a,b,lr,lc))
+                    
+                    elif load_type == 'TRAP':
+                        self.loads_right.append(ppbeam.cant_right_trap(w1,w2,a,b,lr,lc))
+                    else:
+                        pass
+                    
+                else:
+                    pass
+                
+        self.run()
+        self.bm_canvas_draw()
         
-        load_type = self.load_type.get()
+    def add_load(self, *event):
         
-        w1 = float(self.w1_gui.get())
-        w2 = float(self.w2_gui.get())
-        a = float(self.a_gui.get())
-        b = float(self.b_gui.get())
-        
-        n = len(self.loads_gui)
         self.loads_gui_select_var.append([tk.IntVar(), tk.StringVar(), tk.StringVar(), tk.StringVar(), tk.StringVar(), tk.StringVar(), tk.StringVar()])
+        
+        n = len(self.loads_gui_select_var)
         self.loads_gui_select_var[n-1][0].set(1)
         self.loads_gui_select_var[n-1][1].set(self.w1_gui.get())
         self.loads_gui_select_var[n-1][2].set(self.w2_gui.get())
@@ -372,101 +447,38 @@ class Master_window:
         load_locals = ['Left','Center','Right']
         
         self.loads_gui.append([
-            tk.Checkbutton(self.loads_frame, variable=self.loads_gui_select_var[n-1][0]).grid(row=n+1, column=1),
-            tk.Entry(self.loads_frame, textvariable=self.loads_gui_select_var[n-1][1], width=15).grid(row=n+1, column=2, padx=2),
-            tk.Entry(self.loads_frame, textvariable=self.loads_gui_select_var[n-1][2], width=15).grid(row=n+1, column=3, padx=2),
-            tk.Entry(self.loads_frame, textvariable=self.loads_gui_select_var[n-1][3], width=15).grid(row=n+1, column=4, padx=2),
-            tk.Entry(self.loads_frame, textvariable=self.loads_gui_select_var[n-1][4], width=15).grid(row=n+1, column=5, padx=2),
-            tk.OptionMenu(self.loads_frame, self.loads_gui_select_var[n-1][5], *load_locals).grid(row=n+1, column=6),
-            tk.OptionMenu(self.loads_frame, self.loads_gui_select_var[n-1][6], *load_types).grid(row=n+1, column=7)])       
+            tk.Checkbutton(self.loads_frame, variable=self.loads_gui_select_var[n-1][0], command = self.build_loads),
+            tk.Entry(self.loads_frame, textvariable=self.loads_gui_select_var[n-1][1], width=15),
+            tk.Entry(self.loads_frame, textvariable=self.loads_gui_select_var[n-1][2], width=15),
+            tk.Entry(self.loads_frame, textvariable=self.loads_gui_select_var[n-1][3], width=15),
+            tk.Entry(self.loads_frame, textvariable=self.loads_gui_select_var[n-1][4], width=15),
+            tk.OptionMenu(self.loads_frame, self.loads_gui_select_var[n-1][5], *load_locals),
+            tk.OptionMenu(self.loads_frame, self.loads_gui_select_var[n-1][6], *load_types)])       
+
+        self.loads_gui[n-1][0].grid(row=n+1, column=1)
+        self.loads_gui[n-1][1].grid(row=n+1, column=2, padx = 4)
+        self.loads_gui[n-1][2].grid(row=n+1, column=3, padx = 4)
+        self.loads_gui[n-1][3].grid(row=n+1, column=4, padx = 4)
+        self.loads_gui[n-1][4].grid(row=n+1, column=5, padx = 4)
+        self.loads_gui[n-1][5].grid(row=n+1, column=6)
+        self.loads_gui[n-1][6].grid(row=n+1, column=7)
         
-        if load_type == 'Moment':
-            self.loads_scale.append(w1/2.0)
-            self.loads_scale.append(w2)        
-        else:
-            self.loads_scale.append(w1)
-            self.loads_scale.append(w2)
-        
-        #['Left','Center','Right']
-        if load_location == 'Left':
-            self.load_last_add.append('L')
-            #['Point','Moment','UDL','TRAP']
-            if load_type == 'Point':
-                self.loads_left.append(ppbeam.cant_left_point(w1,a,ll,lc))
-            
-            elif load_type == 'Moment':
-                self.loads_left.append(ppbeam.cant_left_point_moment(w1,a,ll,lc))
-                
-            elif load_type == 'UDL':
-                self.loads_left.append(ppbeam.cant_left_udl(w1,a,b,ll,lc))
-            
-            elif load_type == 'TRAP':
-                self.loads_left.append(ppbeam.cant_left_trap(w1,w2,a,b,ll,lc))
-            else:
-                pass
-        
-        elif load_location == 'Center':
-            self.load_last_add.append('C')
-            #['Point','Moment','UDL','TRAP']
-            if load_type == 'Point':
-                self.loads_center.append(ppbeam.pl(w1,a,lc))
-            
-            elif load_type == 'Moment':
-                self.loads_center.append(ppbeam.point_moment(w1,a,lc))
-                
-            elif load_type == 'UDL':
-                self.loads_center.append(ppbeam.udl(w1,a,b,lc))
-            
-            elif load_type == 'TRAP':
-                self.loads_center.append(ppbeam.trap(w1,w2,a,b,lc))
-            else:
-                pass
-            
-        elif load_location == 'Right':
-            self.load_last_add.append('R')
-            #['Point','Moment','UDL','TRAP']
-            if load_type == 'Point':
-                self.loads_right.append(ppbeam.cant_right_point(w1,a,lr,lc))
-            
-            elif load_type == 'Moment':
-                self.loads_right.append(ppbeam.cant_right_point_moment(w1,a,lr,lc))
-                
-            elif load_type == 'UDL':
-                self.loads_right.append(ppbeam.cant_right_udl(w1,a,b,lr,lc))
-            
-            elif load_type == 'TRAP':
-                self.loads_right.append(ppbeam.cant_right_trap(w1,w2,a,b,lr,lc))
-            else:
-                pass
-            
-        else:
-            pass
-        
-        self.run()
-        self.bm_canvas_draw()
+        self.build_loads()        
+
 
     def remove_load(self, *event):
         
-        if len(self.load_last_add) == 0:
-            pass
-        else:
-            span = self.load_last_add[-1]
+        for load in self.loads_gui[-1]:
+            load.destroy()
             
-            if span == 'L':
-                del self.loads_left[-1]
+        del self.loads_gui[-1]
             
-            elif span == 'C':
-                del self.loads_center[-1]
-                
-            else:
-                del self.loads_right[-1]
-        
-        del self.load_last_add[-1]        
+        del self.loads_gui_select_var[-1]
+               
         del self.loads_scale[-1]
         del self.loads_scale[-1]
         
-        self.run()
-        self.bm_canvas_draw()
+        self.build_loads()
         
 
     def reaction_graph(self,r,x):
@@ -650,12 +662,81 @@ class Master_window:
     
     def update(self, *event):
         
-        del self.loads_right[:]
-        del self.loads_left[:]
-        del self.loads_center[:]
-        del self.load_last_add[:]
+        ll = float(self.left_cant_ft.get())
+        lc = float(self.span_ft.get())
+        lr = float(self.right_cant_ft.get())
         
-        self.run()
+        n=0
+        
+        for load in self.loads_gui_select_var:
+            
+            a = float(load[3].get())
+            b = float(load[4].get())
+            load_location = load[5].get()
+            
+            if ll == 0 and load_location == 'Left':
+                del self.loads_gui_select_var[n]
+                
+                for widgets in self.loads_gui[n]:
+                    widgets.destroy()
+                
+                del self.loads_gui[n]
+            
+            elif lr == 0 and load_location == 'Right':
+                del self.loads_gui_select_var[n]
+                
+                for widgets in self.loads_gui[n]:
+                    widgets.destroy()
+                
+                del self.loads_gui[n]
+            
+            elif load_location == 'Left' and a > ll:
+                load[3].set(0)
+                
+            elif load_location == 'Right' and a > lr:
+                load[3].set(0)
+            
+            elif load_location == 'Left' and b > ll:
+                load[4].set(ll)
+                
+                if load[3].get() == load[4].get():
+                    del self.loads_gui_select_var[n]
+                    
+                    for widgets in self.loads_gui[n]:
+                        widgets.destroy()
+                        
+                    del self.loads_gui[n]
+                
+            elif load_location == 'Right' and b > lr:
+                load[4].set(lr)
+                
+                if load[3].get() == load[4].get():
+                    del self.loads_gui_select_var[n]
+                    
+                    for widgets in self.loads_gui[n]:
+                        widgets.destroy()
+                    
+                    del self.loads_gui[n]
+                        
+            elif load_location == 'Center' and a > lc:
+                load[3].set(0)
+                
+            elif load_location == 'Center' and b > lc:
+                load[4].set(lc)
+                
+                if load[3].get() == load[4].get():
+                    del self.loads_gui_select_var[n]
+                    
+                    for widgets in self.loads_gui[n]:
+                        widgets.destroy()
+                        
+                    del self.loads_gui[n]
+            else:
+                pass
+            
+            n = n+1
+            
+        self.build_loads()
         
     def export_pdf(self, *event):
         fig = plt.figure(figsize=(17,11),dpi=600)
