@@ -152,8 +152,8 @@ class point_moment:
         self.c3 = 0
         self.c4 = ((-1.0*self.rl*l**3)/6.0) - (0.5*ma*l**2) - (self.c2*l)
         
-        arrow_height = self.ma/6.0
-        r = self.ma/2.0
+        r = (self.ma/2.0)
+        arrow_height = r/6.0
         #30 degree arrow
         arrow_minus= (arrow_height*math.tan(math.radians(30)))
         
@@ -977,8 +977,8 @@ class cant_right_point_moment:
         self.c3 = self.ml*self.a + self.c1
         self.c4 = 0.5*self.ml*self.a**2 + self.c1 * self.a + self.c2 - self.c3 * self.a
         
-        arrow_height = self.ma/6.0
-        r = self.ma/2.0
+        r = (self.ma/2.0)
+        arrow_height = r/6.0
         #30 degree arrow
         arrow_minus= (arrow_height*math.tan(math.radians(30)))
         
@@ -1777,6 +1777,7 @@ class cant_left_point_moment:
         self.ma = float(ma)
         self.a = float(a)
         self.l = float(l)
+        self.lb = float(lb)
         
         
         if self.a > self.l:
@@ -1794,8 +1795,8 @@ class cant_left_point_moment:
         self.c1 = (1.0*self.ma*self.a) + self.c3
         self.c2 = 0.5*self.ma*self.a**2 + self.c3*self.a + self.c4 - self.c1*self.a
         
-        arrow_height = self.ma/6.0
-        r = self.ma/2.0
+        r = (self.ma/2.0)
+        arrow_height = r/6.0
         #30 degree arrow
         arrow_minus= (arrow_height*math.tan(math.radians(30)))
         
