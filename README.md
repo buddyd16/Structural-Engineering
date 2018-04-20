@@ -19,14 +19,15 @@ can solve for shear, moment, slope, and deflection of a simply supported beam wi
 Can be used to verify frame or fixed beam FEM results by applying point end moments returned by your 3rd party software, works on basis of superposition.
 
 ## Three Moment Method
+# Reworking to use the pin-pin class file and directly compute slope and deflection rather than rely on approx. integration. Also adding in point moments as a load type.
 Contains a class for the Three Moment Method for continuous beam analysis. Refer to the comments in the py file for additional information.
 
-**finding some of my edits to the pin pin and simple beam file might create issues in the patterning file, end user should be mindful of this and so some quick sanity checks on the results, cantilevers should be per the aisc manual and interior spans should be loading + end moment superposition. UDL and TRAP loads should trigger a manual verification, will be corrected in future versions.**
+**finding some of my edits to the pin pin and simple beam file might create issues in the three moment method file, end user should be mindful of this and so some quick sanity checks on the results, cantilevers should be per the aisc manual and interior spans should be loading + end moment superposition. UDL and TRAP loads should trigger a manual verification, will be corrected in future versions.**
 
 ## Beam Patterning - depends on having the point and udl GIF files in same directory as the py file
+# Reworking to use the external three momenth method python file rather than the duplicate local function.
 A Tkinter GUI based Python program implimenting IBC 2012 load combinations and load patterning. Analysis is done using the Three moment method. Results are displayed on screen and CSV and DXF files are created and placed in RESULTS folder on the users desktop. NOTE: When using the prescribed support displacement option the beam slope diagram and values are incorrect. Deflection values have been corrected using small angle approximations. The effect of the support displacement can be toggled on and off in the results window for shear, moment, slope and deflection charts. Limit to 8 spans or less, based on testing will run into a memory limit at 9 spans with patterning considered this is due to exponetial increase in number of patterns to solve and the results arrays generated.
 
-**finding some of my edits to the pin pin and simple beam file might create issues in the patterning file, end user should be mindful of this and so some quick sanity checks on the results, cantilevers should be per the aisc manual and interior spans should be loading + end moment superposition. UDL and TRAP loads should trigger a manual verification, will be corrected in future versions.**
 
 ## 14th Edition AISC Shapes Database - depends on having the excel file in the same directory as the py file
 **This is in no way affiliated or endorsed in whole or in part by AISC this is a personal project being provided for anyone's general use at no cost.
