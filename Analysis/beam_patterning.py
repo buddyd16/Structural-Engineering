@@ -17,6 +17,7 @@ import scipy.integrate
 import matplotlib.pyplot as plt
 import os
 import itertools
+import math
 
 def load_pattern(num_spans):
     test = []
@@ -541,18 +542,27 @@ def three_moment_method(beam_spans, beam_momentofinertia, cant, beam_loads_raw, 
             m_diag[x,j] = m_diag[x,j]-(((M[j]-M[j+1])/beam_spans[j])*xs[x,j])+M[j]
         s_diag[:,j] = (sci.integrate.cumtrapz(m_diag[:,j],xs[:,j], initial = 0)/(E*beam_momentofinertia[j]))+slope[j,0]
         d_diag[:,j] = sci.integrate.cumtrapz(s_diag[:,j],xs[:,j], initial = 0)
+        
+        
     #correct d for support displacement
     for j in range(0,N):
         span = beam_spans[j]
+        
+        #test slope correction
+        slope_i = math.atan(-1.0*(displace[j]-displace[j+1])/span)
+        #slope_i = 0
+        
         for i in range(0,len(xs[:,j])):
+           
             delt_i = displace[j] + (((displace[j+1]-displace[j])/span)*xs[i,j])
             d_diag[i,j] = d_diag[i,j] + delt_i
+            s_diag[i,j] = s_diag[i,j] + slope_i
+            
     #Cantilever Diagram Corrections
-
     if cant[0]=='L' or cant[0] =='B':
         v_diag[:,0] = -1*v_diag_cantL[:,0]
         m_diag[:,0] = m_diag_cantL[:,0]
-        s_diag[:,0] = (sci.integrate.cumtrapz(m_diag[::-1,0],xs[:,0], initial = 0)/(E*beam_momentofinertia[0]))-slope[1,0]
+        s_diag[:,0] = (sci.integrate.cumtrapz(m_diag[::-1,0],xs[:,0], initial = 0)/(E*beam_momentofinertia[0]))-s_diag[0,1]
         d_diag[:,0] = sci.integrate.cumtrapz(s_diag[:,0],xs[:,0], initial = 0)
         s_diag[:,0] = -1*s_diag[::-1,0]
         d_diag[:,0] = d_diag[::-1,0]
@@ -563,12 +573,14 @@ def three_moment_method(beam_spans, beam_momentofinertia, cant, beam_loads_raw, 
     if cant[0]=='R' or cant[0] =='B':
         v_diag[:,N-1] = -1*v_diag_cantR[:,N-1]
         m_diag[:,N-1] = m_diag_cantR[:,N-1]
-        s_diag[:,N-1] = (sci.integrate.cumtrapz(m_diag[:,N-1],xs[:,N-1], initial = 0)/(E*beam_momentofinertia[N-1]))+slope[N-1,0]
+        s_diag[:,N-1] = (sci.integrate.cumtrapz(m_diag[:,N-1],xs[:,N-1], initial = 0)/(E*beam_momentofinertia[N-1]))+s_diag[-1,N-2]
         d_diag[:,N-1] = sci.integrate.cumtrapz(s_diag[:,N-1],xs[:,N-1], initial = 0)
 
     else:
         pass
-
+    
+    #Below not needed with slope correction above for support displacement
+    ''''
     #correct cantilever d for support displacement
     if cant[0]=='L' or cant[0] =='B':
         if displace[2] == 0 and displace[1] == 0:
@@ -610,7 +622,8 @@ def three_moment_method(beam_spans, beam_momentofinertia, cant, beam_loads_raw, 
                     xr= span_int - xl
                     delt_i= -1*(xs[i,N-1] + xr)* (displace[N-2]/xl)
                     d_diag[i,N-1]= d_diag[i,N-1] + delt_i
-
+    '''
+    
     j=0
     for j in range(1,N):
         xs[:,j] = xs[:,j] + sumL[j-1]
