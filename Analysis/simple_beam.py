@@ -195,6 +195,12 @@ class Master_window:
         self.b_runx = tk.Button(self.res_frame, text="Res. @ X", command = self.runx, font=helv)
         self.b_runx.grid(row=1, column=4)
         
+        self.b_solveredundant = tk.Button(self.res_frame, text="Solve for Internal Reaction @ X", command = self.redundantx, font=helv)
+        self.b_solveredundant.grid(row=1, column=5)
+        
+        self.redundant_reaction_label = tk.Label(self.res_frame, text= '-- kips', font=helv_res)
+        self.redundant_reaction_label.grid(row=2, column=5)
+        
         self.resx_labels = []
         self.resx_list = ['Results @ x :','Cant. Left:','--','--','--','--','Center Span:','--','--','--','--','Cant. Right:','--','--','--','--']
         label_fontsx = [helv_res,helv_res,helv,helv,helv,helv,helv_res,helv,helv,helv,helv,helv_res,helv,helv,helv,helv]
@@ -261,7 +267,7 @@ class Master_window:
             lc = float(self.span_ft.get())
             lr = float(self.right_cant_ft.get())
             
-            initial = 30
+            initial = 75
             
             sf = (w-(2*initial)) / (ll+lc+lr)
             
@@ -347,9 +353,9 @@ class Master_window:
                     d_sf = (hg - 10) / max(max(max(self.deltac),max(self.deltal),max(self.deltar)), abs(min(min(self.deltac),min(self.deltal),min(self.deltar))))
                 
                 for i in range(1,len(self.deltac)):
-                    self.bm_canvas.create_line((xl[i-1] * sf) + initial, hg - (self.deltal[i-1] * d_sf),(xl[i] * sf) + initial,hg - (self.deltal[i] * d_sf),fill="blue", width=2)
-                    self.bm_canvas.create_line((xc[i-1] * sf) + initial, hg - (self.deltac[i-1] * d_sf),(xc[i] * sf) + initial,hg - (self.deltac[i] * d_sf),fill="blue", width=2)
-                    self.bm_canvas.create_line((xr[i-1] * sf) + initial, hg - (self.deltar[i-1] * d_sf),(xr[i] * sf) + initial,hg - (self.deltar[i] * d_sf),fill="blue", width=2)
+                    self.bm_canvas.create_line((xl[i-1] * sf) + initial, hg - (self.deltal[i-1] * d_sf),(xl[i] * sf) + initial,hg - (self.deltal[i] * d_sf),fill="grey", width=2)
+                    self.bm_canvas.create_line((xc[i-1] * sf) + initial, hg - (self.deltac[i-1] * d_sf),(xc[i] * sf) + initial,hg - (self.deltac[i] * d_sf),fill="grey", width=2)
+                    self.bm_canvas.create_line((xr[i-1] * sf) + initial, hg - (self.deltar[i-1] * d_sf),(xr[i] * sf) + initial,hg - (self.deltar[i] * d_sf),fill="grey", width=2)
 
             if self.show_r.get() == 1:
                 
@@ -793,6 +799,8 @@ class Master_window:
             deltacx = (deltacx / (E*I))*12.0
             deltarx = (deltarx / (E*I))*12.0
             
+            self.deltacx = deltacx
+            
             if self.ll == 0 or x > self.ll:
             
                 self.resx_labels[2].configure(text = '--')
@@ -820,6 +828,18 @@ class Master_window:
                 self.resx_labels[13].configure(text = 'M = {0:.3f} ft-kips'.format(momentrx))
                 self.resx_labels[14].configure(text = 'S = {0:.5f} rad'.format(sloperx))
                 self.resx_labels[15].configure(text = 'D = {0:.4f} in'.format(deltarx))
+                
+    def redundantx(self, *event):
+        self.runx()
+        E = float(self.E_ksi.get()) * 144        #144 is conversion from ksi to ksf - 12^2
+        I = float(self.I_in4.get()) / 12.0**4    #covert from in^4 to ft^4
+        a = float(self.resx_var.get())
+        b = self.lc - a
+        
+        p = ((self.deltacx/12.0) * 3.0 * E * I * self.lc) / (a**2 * b**2)
+        
+        self.redundant_reaction_label.configure(text='R,int = {0:.3f} kips'.format(p))
+        
     
     def update(self, *event):
         
