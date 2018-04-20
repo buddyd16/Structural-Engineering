@@ -12,6 +12,12 @@ Tkinter GUI based Python program
 Provides various code defined capacities based on strain compatibility. Allows for user assigned elevations of steel reinforcement
 layers. Does not check or provide for min spacing of tension layer bars nor maximum amount of bars that fit in a layer.
 
+## Simple Beam
+Tkinter GUI based python program
+can solve for shear, moment, slope, and deflection of a simply supported beam with cantilevers at either end. Can apply any combination of point, point moment, uniform line, or trapezoidal loadings. Will automatically generate results curves and has the ability to find values at a specific location. Recently added the ability to solve for redundant interior reactions, simply add the result as a point load to verify deflection returns to 0 at the designated location. Can export an 11x17 pdf plot showing applied loads, reactions, shear, moment, slope, and deflection.
+
+Can be used to verify frame or fixed beam FEM results by applying point end moments returned by your 3rd party software, works on basis of superposition.
+
 ## Three Moment Method
 Contains a class for the Three Moment Method for continuous beam analysis. Refer to the comments in the py file for additional information.
 
