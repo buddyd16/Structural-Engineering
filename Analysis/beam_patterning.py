@@ -637,7 +637,7 @@ def three_moment_method(beam_spans, beam_momentofinertia, cant, beam_loads_raw, 
         if displace[N-2] == 0 and displace[N-1] == 0:
             pass
         else: 
-           d_diag[:,-1] = d_diag[:,0]+displace[-2] 	 
+           d_diag[:,-1] = d_diag[:,-1]+displace[-2] 	 
  
     j=0
     for j in range(1,N):
