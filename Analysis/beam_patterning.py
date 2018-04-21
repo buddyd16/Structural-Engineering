@@ -623,7 +623,22 @@ def three_moment_method(beam_spans, beam_momentofinertia, cant, beam_loads_raw, 
                     delt_i= -1*(xs[i,N-1] + xr)* (displace[N-2]/xl)
                     d_diag[i,N-1]= d_diag[i,N-1] + delt_i
     '''
-    
+
+    #correct cantilever d for support displacement
+
+    if cant[0]=='L' or cant[0] =='B':
+        if displace[2] == 0 and displace[1] == 0:
+            pass
+        else:        
+            d_diag[:,0] = d_diag[:,0]+displace[1]
+
+
+    if cant[0]=='R' or cant[0] =='B':
+        if displace[N-2] == 0 and displace[N-1] == 0:
+            pass
+        else: 
+           d_diag[:,-1] = d_diag[:,0]+displace[-2] 	 
+ 
     j=0
     for j in range(1,N):
         xs[:,j] = xs[:,j] + sumL[j-1]
