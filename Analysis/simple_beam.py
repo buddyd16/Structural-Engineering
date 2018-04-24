@@ -60,8 +60,26 @@ class Master_window:
         self.beam_canvas_frame = tk.Frame(self.main_frame, bd=2, relief='sunken', padx=1,pady=1)
         self.bm_canvas = tk.Canvas(self.beam_canvas_frame, width=750, height=150, bd=2, relief='sunken')
         self.bm_canvas.bind("<Configure>", self.bm_canvas_draw)
-        self.bm_canvas.pack(anchor='c', padx= 1, pady= 1, fill=tk.BOTH, expand=1)
-        self.beam_canvas_frame.pack(anchor='c', padx= 1, pady= 1, fill=tk.BOTH, expand=1)
+        self.bm_canvas.pack(side = tk.LEFT, anchor='c', padx= 1, pady= 1, fill=tk.BOTH, expand=1)
+        self.beam_canvas_frame.pack(side=tk.TOP, anchor='c', padx= 1, pady= 1, fill=tk.BOTH, expand=1)
+        
+        self.graph_b_frame = tk.Frame(self.beam_canvas_frame, bd=2, relief='sunken', padx=4 ,pady=1)
+        
+        self.show_l = tk.IntVar()
+        self.show_l.set(1)
+        tk.Checkbutton(self.graph_b_frame, text=' : Show Loads', variable=self.show_l, command = self.bm_canvas_draw, font=helv).grid(row=1, column=1, sticky = tk.W)        
+        self.show_v = tk.IntVar()
+        tk.Checkbutton(self.graph_b_frame, text=' : Show V', variable=self.show_v, command = self.bm_canvas_draw, font=helv).grid(row=2, column=1, sticky = tk.W)
+        self.show_m = tk.IntVar()
+        tk.Checkbutton(self.graph_b_frame, text=' : Show M', variable=self.show_m, command = self.bm_canvas_draw, font=helv).grid(row=3, column=1, sticky = tk.W)
+        self.show_s = tk.IntVar()
+        tk.Checkbutton(self.graph_b_frame, text=' : Show S', variable=self.show_s, command = self.bm_canvas_draw, font=helv).grid(row=4, column=1, sticky = tk.W)
+        self.show_d = tk.IntVar()
+        tk.Checkbutton(self.graph_b_frame, text=' : Show D', variable=self.show_d, command = self.bm_canvas_draw, font=helv).grid(row=5, column=1, sticky = tk.W)
+        self.show_r = tk.IntVar()
+        tk.Checkbutton(self.graph_b_frame, text=' : Show Reactions', variable=self.show_r, command = self.bm_canvas_draw, font=helv).grid(row=6, column=1, sticky = tk.W) 
+        
+        self.graph_b_frame.pack(side=tk.RIGHT, anchor='e')
         
         self.nb = ttk.Notebook(self.main_frame)
         self.nb.pack(anchor='c', padx= 1, pady= 1, fill=tk.BOTH, expand=1)
@@ -107,73 +125,10 @@ class Master_window:
         self.I_entry = tk.Entry(self.bm_info_frame, textvariable=self.I_in4, width=10)
         self.I_entry.grid(row=5,column=2, sticky = tk.W)
         
-        tk.Label(self.bm_info_frame, text="Add Loads:", font=helv).grid(row=6,column=1, sticky = tk.E)
-        tk.Label(self.bm_info_frame, text="P,M,W1 (kips, ft-kips, klf):", font=helv).grid(row=7,column=1, sticky = tk.E)
-        tk.Label(self.bm_info_frame, text="W2 (kips, ft-kips, klf):", font=helv).grid(row=8,column=1, sticky = tk.E)
-        tk.Label(self.bm_info_frame, text="a (ft):", font=helv).grid(row=9,column=1, sticky = tk.E)
-        tk.Label(self.bm_info_frame, text="b (ft):", font=helv).grid(row=10,column=1, sticky = tk.E)
-        tk.Label(self.bm_info_frame, text="Load Type:", font=helv).grid(row=11,column=1, sticky = tk.E)
-        tk.Label(self.bm_info_frame, text="Load Location:", font=helv).grid(row=12,column=1, sticky = tk.E)
-        
-        self.w1_gui = tk.StringVar() 
-        self.w2_gui = tk.StringVar() 
-        self.a_gui = tk.StringVar() 
-        self.b_gui = tk.StringVar()
-        
-        self.w1_gui.set(0)
-        self.w2_gui.set(0)
-        self.a_gui.set(0) 
-        self.b_gui.set(0)
-        
-        self.w1_gui_entry = tk.Entry(self.bm_info_frame, textvariable=self.w1_gui, width=10)
-        self.w1_gui_entry.grid(row=7,column=2, sticky = tk.W)
-        self.w2_gui_entry = tk.Entry(self.bm_info_frame, textvariable=self.w2_gui, width=10)
-        self.w2_gui_entry.grid(row=8,column=2, sticky = tk.W)
-        self.a_gui_entry = tk.Entry(self.bm_info_frame, textvariable=self.a_gui, width=10)
-        self.a_gui_entry.grid(row=9,column=2, sticky = tk.W)
-        self.b_gui_entry = tk.Entry(self.bm_info_frame, textvariable=self.b_gui, width=10) 
-        self.b_gui_entry.grid(row=10,column=2, sticky = tk.W)
-        
         self.b_run = tk.Button(self.bm_info_frame,text = "Update", command = self.update, font=helv)
         self.b_run.grid(row=1,column=3, sticky = tk.W)        
         
-        self.load_type = tk.StringVar()
-        self.load_type.set('Point')
-        load_types = ['Point','Moment','UDL','TRAP']
-        self.load_type_selection = tk.OptionMenu(self.bm_info_frame, self.load_type, *load_types)
-        self.load_type_selection.grid(row=11,column=2, sticky = tk.W)
-        
-        self.load_loc = tk.StringVar()
-        self.load_loc.set('Center')
-        load_locals = ['Left','Center','Right']
-        self.load_loc_selection = tk.OptionMenu(self.bm_info_frame, self.load_loc, *load_locals)
-        self.load_loc_selection.grid(row=12,column=2, sticky = tk.W)
-        
-        self.b_add_load = tk.Button(self.bm_info_frame,text = "Add New Load", command = self.add_load, font=helv)
-        self.b_add_load.grid(row=7, column=3, sticky = tk.W)       
-        
-        self.b_remove_load = tk.Button(self.bm_info_frame,text = "Remove Last Load", command = self.remove_load, font=helv)
-        self.b_remove_load.grid(row=8, column=3, sticky = tk.W) 
-        
         self.bm_info_frame.pack(side=tk.LEFT, anchor='nw', padx=4 ,pady=1)        
-        
-        self.graph_b_frame = tk.Frame(self.pg1_frame, bd=2, relief='sunken', padx=4 ,pady=1)
-        
-        self.show_l = tk.IntVar()
-        self.show_l.set(1)
-        tk.Checkbutton(self.graph_b_frame, text=' : Show Loads', variable=self.show_l, command = self.bm_canvas_draw, font=helv).grid(row=1, column=1, sticky = tk.W)        
-        self.show_v = tk.IntVar()
-        tk.Checkbutton(self.graph_b_frame, text=' : Show V', variable=self.show_v, command = self.bm_canvas_draw, font=helv).grid(row=2, column=1, sticky = tk.W)
-        self.show_m = tk.IntVar()
-        tk.Checkbutton(self.graph_b_frame, text=' : Show M', variable=self.show_m, command = self.bm_canvas_draw, font=helv).grid(row=3, column=1, sticky = tk.W)
-        self.show_s = tk.IntVar()
-        tk.Checkbutton(self.graph_b_frame, text=' : Show S', variable=self.show_s, command = self.bm_canvas_draw, font=helv).grid(row=4, column=1, sticky = tk.W)
-        self.show_d = tk.IntVar()
-        tk.Checkbutton(self.graph_b_frame, text=' : Show D', variable=self.show_d, command = self.bm_canvas_draw, font=helv).grid(row=5, column=1, sticky = tk.W)
-        self.show_r = tk.IntVar()
-        tk.Checkbutton(self.graph_b_frame, text=' : Show Reactions', variable=self.show_r, command = self.bm_canvas_draw, font=helv).grid(row=6, column=1, sticky = tk.W) 
-        
-        self.graph_b_frame.pack(side=tk.LEFT, anchor='nw')
         
         self.res_frame = tk.Frame(self.pg1_frame, bd=2, relief='sunken', padx=4 ,pady=1)
         
@@ -218,7 +173,59 @@ class Master_window:
 
         self.pg2_frame = tk.Frame(self.page2, bd=2, relief='sunken', padx=1,pady=1)
         
-        self.loads_frame = tk.Frame(self.pg2_frame, bd=2, relief='sunken', padx=4,pady=4)
+        self.add_loads_frame = tk.Frame(self.pg2_frame, bd=2, relief='sunken', padx=4,pady=4)
+        
+        tk.Label(self.add_loads_frame, text="Add Loads:", font=helv).grid(row=1,column=1, sticky = tk.W)
+        tk.Label(self.add_loads_frame, text="P,M,W1\n(kips, ft-kips, klf):", font=helv).grid(row=2,column=1, sticky = tk.W)
+        tk.Label(self.add_loads_frame, text="W2\n(kips, ft-kips, klf):", font=helv).grid(row=2,column=2, sticky = tk.W)
+        tk.Label(self.add_loads_frame, text="a (ft):", font=helv).grid(row=2,column=3, sticky = tk.W)
+        tk.Label(self.add_loads_frame, text="b (ft):", font=helv).grid(row=2,column=4, sticky = tk.W)
+        tk.Label(self.add_loads_frame, text="Load Type:", font=helv).grid(row=2,column=5, sticky = tk.W)
+        tk.Label(self.add_loads_frame, text="Load Location:", font=helv).grid(row=2,column=6, sticky = tk.W)
+        
+        self.w1_gui = tk.StringVar() 
+        self.w2_gui = tk.StringVar() 
+        self.a_gui = tk.StringVar() 
+        self.b_gui = tk.StringVar()
+        
+        self.w1_gui.set(0)
+        self.w2_gui.set(0)
+        self.a_gui.set(0) 
+        self.b_gui.set(0)
+        
+        self.w1_gui_entry = tk.Entry(self.add_loads_frame, textvariable=self.w1_gui, width=10)
+        self.w1_gui_entry.grid(row=3,column=1, sticky = tk.W)
+        self.w2_gui_entry = tk.Entry(self.add_loads_frame, textvariable=self.w2_gui, width=10)
+        self.w2_gui_entry.grid(row=3,column=2, sticky = tk.W)
+        self.a_gui_entry = tk.Entry(self.add_loads_frame, textvariable=self.a_gui, width=10)
+        self.a_gui_entry.grid(row=3,column=3, sticky = tk.W)
+        self.b_gui_entry = tk.Entry(self.add_loads_frame, textvariable=self.b_gui, width=10) 
+        self.b_gui_entry.grid(row=3,column=4, sticky = tk.W)
+        self.load_type = tk.StringVar()
+        self.load_type.set('Point')
+        load_types = ['Point','Moment','UDL','TRAP']
+        self.load_type_selection = tk.OptionMenu(self.add_loads_frame, self.load_type, *load_types)
+        self.load_type_selection.grid(row=3,column=5, sticky = tk.W)
+        
+        self.load_loc = tk.StringVar()
+        self.load_loc.set('Center')
+        load_locals = ['Left','Center','Right']
+        self.load_loc_selection = tk.OptionMenu(self.add_loads_frame, self.load_loc, *load_locals)
+        self.load_loc_selection.grid(row=3,column=6, sticky = tk.W)
+        
+        self.b_add_load = tk.Button(self.add_loads_frame,text = "Add New Load", command = self.add_load, font=helv)
+        self.b_add_load.grid(row=3, column=7, sticky = tk.W)       
+        
+        self.b_remove_load = tk.Button(self.add_loads_frame,text = "Remove Loads", command = self.remove_load, font=helv)
+        self.b_remove_load.grid(row=3, column=8, sticky = tk.W)
+        
+        self.add_loads_frame.pack(anchor="nw", padx= 4, pady= 4)
+        
+        self.loads_scroll_frame = tk.Frame(self.pg2_frame, bd=2, relief='sunken', padx=4,pady=4)
+        self.loads_scrollbar = tk.Scrollbar(self.loads_scroll_frame, orient="vertical")
+        self.loads_canvas = tk.Canvas(self.loads_scroll_frame, bd=1, scrollregion=(0,0,200,200))
+        
+        self.loads_frame = tk.Frame(self.loads_canvas, bd=2, relief='sunken', padx=4,pady=4)
         
         self.loads_gui_select_var = []
         self.loads_gui = []
@@ -231,9 +238,20 @@ class Master_window:
         tk.Label(self.loads_frame, text="Span", font=helv_res).grid(row=0, column=6) 
         tk.Label(self.loads_frame, text="Type", font=helv_res).grid(row=0, column=7)         
         
-        self.loads_frame.pack(anchor="nw", padx= 4, pady= 4, fill=tk.BOTH, expand=1)
+        self.loads_frame.pack(anchor="nw", fill=tk.BOTH, expand=1)
         
-        self.pg2_frame.pack(anchor='c', padx= 1, pady= 1, fill=tk.BOTH, expand=1)   
+        self.loads_canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
+        self.loads_scrollbar.pack(side=tk.LEFT, fill=tk.Y, expand=tk.FALSE)
+        self.loads_scroll_frame.pack(anchor="nw", padx= 4, pady= 4, fill=tk.BOTH, expand=1)
+        
+        self.loads_canvas.configure(yscrollcommand=self.loads_scrollbar.set)
+        self.loads_scrollbar.configure(command=self.loads_canvas.yview)
+        self.loads_canvas.create_window(0,0,window=self.loads_frame, anchor=tk.NW)
+        self.loads_canvas.configure(scrollregion=(0,0,1000,1000))
+        
+        self.loads_frame.bind("<Configure>", self.ScrollFrameConfig)
+        
+        self.pg2_frame.pack(anchor='c', padx= 1, pady= 1, fill=tk.BOTH, expand=1)
         
         self.b_export_pdf = tk.Button(self.base_frame,text="Export PDF", command=self.export_pdf, font=helv)
         self.b_export_pdf.pack(side=tk.RIGHT)
@@ -248,7 +266,10 @@ class Master_window:
               
         self.run()
 
-            
+
+    def ScrollFrameConfig(self, *event):
+        self.loads_canvas.configure(scrollregion=self.loads_canvas.bbox("all"))
+        
     def quit_app(self):
         self.master.destroy()
         self.master.quit()
@@ -492,7 +513,7 @@ class Master_window:
 
 
     def remove_load(self, *event):
-        
+            
         for load in self.loads_gui[-1]:
             load.destroy()
             

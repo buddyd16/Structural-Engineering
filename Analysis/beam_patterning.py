@@ -550,14 +550,13 @@ def three_moment_method(beam_spans, beam_momentofinertia, cant, beam_loads_raw, 
         
         #test slope correction
         slope_i = math.atan(-1.0*(displace[j]-displace[j+1])/span)
+        s_diag[:,j] = s_diag[:,j] + slope_i
         #slope_i = 0
         
         for i in range(0,len(xs[:,j])):
-           
             delt_i = displace[j] + (((displace[j+1]-displace[j])/span)*xs[i,j])
             d_diag[i,j] = d_diag[i,j] + delt_i
-            s_diag[i,j] = s_diag[i,j] + slope_i
-            
+
     #Cantilever Diagram Corrections
     if cant[0]=='L' or cant[0] =='B':
         v_diag[:,0] = -1*v_diag_cantL[:,0]
