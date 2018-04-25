@@ -1,6 +1,6 @@
 # Structural-Engineering
 Structural Engineering Modules (Python 2.7 primarily)
-Everything was developed using a standard install of the 2.7.10 version of Pyhton XY which can be downloaded from here: https://python-xy.github.io/downloads.html
+Everything was developed using a standard install of the 2.7.10 version of Python XY which can be downloaded from here: https://python-xy.github.io/downloads.html
 
 ## Concrete T beam - depends on concrete_beam_classes in the same directory
 Tkinter GUI based Python program.
