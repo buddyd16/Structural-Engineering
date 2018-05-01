@@ -19,6 +19,7 @@ import ttk
 import tkFont
 import pin_pin_beam_equations_classes as ppbeam
 from numpy import zeros
+import numpy as np
 import math
 import matplotlib.pyplot as plt
 
@@ -165,11 +166,17 @@ class Master_window:
         self.b_runx = tk.Button(self.res_frame, text="Res. @ X", command = self.runx, font=helv)
         self.b_runx.grid(row=1, column=4)
         
-        self.b_solveredundant = tk.Button(self.res_frame, text="Solve for Internal Reaction @ X", command = self.redundantx, font=helv)
-        self.b_solveredundant.grid(row=1, column=5)
+        self.b_solveredundant = tk.Button(self.res_frame, text="Solve for \nInternal Reaction @ X", command = self.redundantx, font=helv)
+        self.b_solveredundant.grid(row=1, column=5, padx=4)
         
         self.redundant_reaction_label = tk.Label(self.res_frame, text= '-- kips', font=helv_res)
         self.redundant_reaction_label.grid(row=2, column=5)
+        
+        self.b_solvefixedend = tk.Button(self.res_frame, text="Solve and Apply\n Fixed End Reactions", command = self.fixed_end_moments, font=helv)
+        self.b_solvefixedend.grid(row=1, column=6, padx=4)
+        
+        self.fixedendmoment_label = tk.Label(self.res_frame, text= '-- ft-kips\n-- ft-kips', font=helv_res)
+        self.fixedendmoment_label.grid(row=2, column=6)
         
         self.resx_labels = []
         self.resx_list = ['Results @ x :','Cant. Left:','--','--','--','--','Center Span:','--','--','--','--','Cant. Right:','--','--','--','--']
@@ -954,6 +961,98 @@ class Master_window:
             n = n+1
             
         self.build_loads()
+
+    def fixed_end_moments(self, *event):
+        if self.has_run == 1:
+            pass
+        else:
+            self.run()
+        
+        E = float(self.E_ksi.get()) #ksi
+        I = float(self.I_in4.get()) #in4
+        L_ft = float(self.span_ft.get())
+        L_in = 12.0 * L_ft
+        
+        eis0 = self.slopec[0] * E * I
+        eisL = self.slopec[-1] * E * I
+
+        ll = float(self.left_cant_ft.get())
+        lr = float(self.right_cant_ft.get())
+        
+        if ll == 0 and lr == 0:
+            end = [1,1]
+        
+        elif ll == 0:
+            end = [1,0]
+        
+        elif lr == 0:
+            end = [0,1]
+        
+        else:
+            end = [0,0]
+        
+        
+        if end[0] == 1 and end[1] == 1:
+            s = np.array([[eis0],[eisL]])
+            
+            ems = np.array([[-1.0*L_in/3.0 , L_in/6.0],[L_in/6.0 , -1.0*L_in/3.0]])
+            
+            fem = np.linalg.solve(ems,s)
+            
+            fem_kft = fem / (-1.0 * 12.0)
+            
+        elif end[0] == 1 and end[1] == 0:
+            fel_kft = ((eis0 * -3.0) / L_in)/ ( -1.0*12.0)
+            fem_kft = np.array([[fel_kft],[0]])
+        
+        elif end[0] == 0 and end[1] == 1:
+            fer_kft = ((eisL * -3.0) / L_in)/(-1.0*12.0)
+            fem_kft = np.array([[0],[fer_kft]])
+        
+        else:
+            fem_kft = np.array([[0],[0]])
+        
+        self.fixedendmoment_label.configure(text='M0 = {0:.4f} ft-kips\nML = {1:.4f} ft-kips'.format(fem_kft[0][0],fem_kft[1][0]))
+        
+        #Apply Fixed End Moments
+        i=0
+        for fem in fem_kft:
+            if fem == 0:
+                pass
+            else:
+                self.loads_gui_select_var.append([tk.IntVar(), tk.StringVar(), tk.StringVar(), tk.StringVar(), tk.StringVar(), tk.StringVar(), tk.StringVar()])
+                
+                n = len(self.loads_gui_select_var)
+                self.loads_gui_select_var[n-1][0].set(1)
+                self.loads_gui_select_var[n-1][1].set(fem[0])
+                self.loads_gui_select_var[n-1][2].set(0)
+                self.loads_gui_select_var[n-1][3].set(i*L_ft)
+                self.loads_gui_select_var[n-1][4].set(0)
+                self.loads_gui_select_var[n-1][5].set('Center')
+                self.loads_gui_select_var[n-1][6].set('Moment')
+                
+                load_types = ['Point','Moment','UDL','TRAP']
+                load_locals = ['Left','Center','Right']
+                
+                self.loads_gui.append([
+                    tk.Checkbutton(self.loads_frame, variable=self.loads_gui_select_var[n-1][0], command = self.build_loads),
+                    tk.Entry(self.loads_frame, textvariable=self.loads_gui_select_var[n-1][1], width=15),
+                    tk.Entry(self.loads_frame, textvariable=self.loads_gui_select_var[n-1][2], width=15),
+                    tk.Entry(self.loads_frame, textvariable=self.loads_gui_select_var[n-1][3], width=15),
+                    tk.Entry(self.loads_frame, textvariable=self.loads_gui_select_var[n-1][4], width=15),
+                    tk.OptionMenu(self.loads_frame, self.loads_gui_select_var[n-1][5], *load_locals),
+                    tk.OptionMenu(self.loads_frame, self.loads_gui_select_var[n-1][6], *load_types)])       
+        
+                self.loads_gui[n-1][0].grid(row=n+1, column=1)
+                self.loads_gui[n-1][1].grid(row=n+1, column=2, padx = 4)
+                self.loads_gui[n-1][2].grid(row=n+1, column=3, padx = 4)
+                self.loads_gui[n-1][3].grid(row=n+1, column=4, padx = 4)
+                self.loads_gui[n-1][4].grid(row=n+1, column=5, padx = 4)
+                self.loads_gui[n-1][5].grid(row=n+1, column=6)
+                self.loads_gui[n-1][6].grid(row=n+1, column=7)
+            i+=1
+        
+        self.build_loads() 
         
     def export_pdf(self, *event):
         fig = plt.figure(figsize=(17,11),dpi=600)
