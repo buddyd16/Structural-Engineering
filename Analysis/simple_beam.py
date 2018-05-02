@@ -166,7 +166,7 @@ class Master_window:
         self.b_runx = tk.Button(self.res_frame, text="Res. @ X", command = self.runx, font=helv)
         self.b_runx.grid(row=1, column=4)
         
-        self.b_solveredundant = tk.Button(self.res_frame, text="Solve for \nInternal Reaction @ X", command = self.redundantx, font=helv)
+        self.b_solveredundant = tk.Button(self.res_frame, text="Solve and Apply \nInternal Reaction @ X", command = self.redundantx, font=helv)
         self.b_solveredundant.grid(row=1, column=5, padx=4)
         
         self.redundant_reaction_label = tk.Label(self.res_frame, text= '-- kips', font=helv_res)
@@ -883,6 +883,40 @@ class Master_window:
         
         self.redundant_reaction_label.configure(text='R,int = {0:.3f} kips'.format(p))
         
+        #Add Redundant Interior Reaction as Point Load on Center Span
+        self.loads_gui_select_var.append([tk.IntVar(), tk.StringVar(), tk.StringVar(), tk.StringVar(), tk.StringVar(), tk.StringVar(), tk.StringVar()])
+        
+        n = len(self.loads_gui_select_var)
+        self.loads_gui_select_var[n-1][0].set(1)
+        self.loads_gui_select_var[n-1][1].set(p)
+        self.loads_gui_select_var[n-1][2].set(0)
+        self.loads_gui_select_var[n-1][3].set(a)
+        self.loads_gui_select_var[n-1][4].set(0)
+        self.loads_gui_select_var[n-1][5].set('Center')
+        self.loads_gui_select_var[n-1][6].set('Point')
+        
+        load_types = ['Point','Moment','UDL','TRAP']
+        load_locals = ['Left','Center','Right']
+        
+        self.loads_gui.append([
+            tk.Checkbutton(self.loads_frame, variable=self.loads_gui_select_var[n-1][0], command = self.build_loads),
+            tk.Entry(self.loads_frame, textvariable=self.loads_gui_select_var[n-1][1], width=15),
+            tk.Entry(self.loads_frame, textvariable=self.loads_gui_select_var[n-1][2], width=15),
+            tk.Entry(self.loads_frame, textvariable=self.loads_gui_select_var[n-1][3], width=15),
+            tk.Entry(self.loads_frame, textvariable=self.loads_gui_select_var[n-1][4], width=15),
+            tk.OptionMenu(self.loads_frame, self.loads_gui_select_var[n-1][5], *load_locals),
+            tk.OptionMenu(self.loads_frame, self.loads_gui_select_var[n-1][6], *load_types)])       
+
+        self.loads_gui[n-1][0].grid(row=n+1, column=1)
+        self.loads_gui[n-1][1].grid(row=n+1, column=2, padx = 4)
+        self.loads_gui[n-1][2].grid(row=n+1, column=3, padx = 4)
+        self.loads_gui[n-1][3].grid(row=n+1, column=4, padx = 4)
+        self.loads_gui[n-1][4].grid(row=n+1, column=5, padx = 4)
+        self.loads_gui[n-1][5].grid(row=n+1, column=6)
+
+        self.loads_gui[n-1][6].grid(row=n+1, column=7)
+
+        self.build_loads()       
     
     def update(self, *event):
         
@@ -1180,7 +1214,7 @@ def main():
     root = tk.Tk()
     root.title("Simple Beam")
     Master_window(root)
-    root.minsize(800,650)
+    root.minsize(1024,768)
     root.mainloop()
 
 if __name__ == '__main__':
