@@ -849,9 +849,15 @@ class cant_right_point:
         else:
             self.rl = self.p
             self.ml = -1.0*self.p*self.a
-        
-        self.backspan = point_moment(-1.0*self.ml,self.lb,self.lb)
-        self.c1 = self.backspan.eisx(self.lb)
+            
+        # 0 length backspan indicates fixed-free beam initialize slope to 0
+        if lb == 0:
+            self.backspan = 0
+            self.c1 = 0
+        else:
+            self.backspan = point_moment(-1.0*self.ml,self.lb,self.lb)
+            self.c1 = self.backspan.eisx(self.lb)
+            
         self.c2 = 0
         self.c3 = 0.5*self.rl*self.a**2 + self.ml*self.a + self.c1
         self.c4 = -1.0*self.c3*self.a + (1.0/6.0)*self.rl*self.a**3 + 0.5*self.ml*self.a**2 + self.c1*self.a + self.c2
@@ -984,9 +990,15 @@ class cant_right_point_moment:
         else:
             self.rl = 0
             self.ml = -1.0*self.ma
-        
-        self.backspan = point_moment(-1.0*self.ml,self.lb,self.lb)
-        self.c1 = self.backspan.eisx(self.lb)
+            
+        # 0 length backspan indicates fixed-free beam initialize slope to 0
+        if lb == 0:
+            self.backspan = 0
+            self.c1 = 0
+        else:
+            self.backspan = point_moment(-1.0*self.ml,self.lb,self.lb)
+            self.c1 = self.backspan.eisx(self.lb)
+            
         self.c2 = 0
         self.c3 = self.ml*self.a + self.c1
         self.c4 = 0.5*self.ml*self.a**2 + self.c1 * self.a + self.c2 - self.c3 * self.a
@@ -1152,8 +1164,14 @@ class cant_right_udl:
             self.rl = self.w_tot
             self.ml = -1.0*self.w_tot*(self.b-(self.c/2))
         
-        self.backspan = point_moment(-1.0*self.ml,self.lb,self.lb)
-        self.c1 = self.backspan.eisx(self.lb)
+        # 0 length backspan indicates fixed-free beam initialize slope to 0
+        if lb == 0:
+            self.backspan = 0
+            self.c1 = 0
+        else:
+            self.backspan = point_moment(-1.0*self.ml,self.lb,self.lb)
+            self.c1 = self.backspan.eisx(self.lb)
+            
         self.c2 = 0
         
         self.c3 = self.c1
@@ -1376,8 +1394,14 @@ class cant_right_trap:
             self.rl = self.w
             self.ml = -1*self.w*self.d
 
-        self.backspan = point_moment(-1.0*self.ml,self.lb,self.lb)
-        self.c1 = self.backspan.eisx(self.lb)
+        # 0 length backspan indicates fixed-free beam initialize slope to 0
+        if lb == 0:
+            self.backspan = 0
+            self.c1 = 0
+        else:
+            self.backspan = point_moment(-1.0*self.ml,self.lb,self.lb)
+            self.c1 = self.backspan.eisx(self.lb)
+            
         self.c2 = 0
 
         self.c3 = self.ml - (1.0/6.0)*self.s*self.a**3 + 0.5*(self.s*self.a + self.w1)*self.a**2 - 0.5*(self.s*self.a + 2*self.w1)*self.a**2      
@@ -1665,9 +1689,14 @@ class cant_left_point:
             self.rr = self.p
             self.mr = -1*self.p*(self.l-self.a)
         
-        self.backspan = point_moment(self.mr,0,lb)
+        # 0 length backspan indicates fixed-free beam initialize slope to 0
+        if lb == 0:
+            self.backspan = 0
+            self.c3 = 0 + (0.5*self.p * (self.l-self.a)**2)
+        else:
+            self.backspan = point_moment(self.mr,0,lb)
+            self.c3 = self.backspan.eisx(0) + (0.5*self.p * (self.l-self.a)**2)
         
-        self.c3 = self.backspan.eisx(0) + (0.5*self.p * (self.l-self.a)**2)
         self.c4 = ((1/6.0)*self.p*(self.l-self.a)**3) - (self.c3*self.l)
         self.c1 = self.c3
         self.c2 = (self.c3*self.a) + self.c4 - (self.c1*self.a)
@@ -1802,9 +1831,14 @@ class cant_left_point_moment:
             self.rr = 0
             self.mr = self.ma
         
-        self.backspan = point_moment(self.mr,0,lb)
+        # 0 length backspan indicates fixed-free beam initialize slope to 0
+        if lb == 0:
+            self.backspan = 0
+            self.c3 = 0 - (self.ma*self.l)
+        else:
+            self.backspan = point_moment(self.mr,0,lb)
+            self.c3 = self.backspan.eisx(0) - (self.ma*self.l)
         
-        self.c3 = self.backspan.eisx(0) - (self.ma*self.l)
         self.c4 = (-0.5*self.ma*self.l**2) - self.c3*self.l
         self.c1 = (1.0*self.ma*self.a) + self.c3
         self.c2 = 0.5*self.ma*self.a**2 + self.c3*self.a + self.c4 - self.c1*self.a
@@ -1970,9 +2004,14 @@ class cant_left_udl:
             self.rr = self.w_tot
             self.mr = -1.0*self.w_tot*(self.l-(a+(self.c/2.0)))
         
-        self.backspan = point_moment(self.mr,0,lb)
+        # 0 length backspan indicates fixed-free beam initialize slope to 0
+        if lb == 0:
+            self.backspan = 0
+            self.c5 = 0 + (0.5 * self.w_tot * (self.l - (self.a + (0.5*self.c)))**2)
+        else:
+            self.backspan = point_moment(self.mr,0,lb)
+            self.c5 = self.backspan.eisx(0) + (0.5 * self.w_tot * (self.l - (self.a + (0.5*self.c)))**2)
         
-        self.c5 = self.backspan.eisx(0) + (0.5 * self.w_tot * (self.l - (self.a + (0.5*self.c)))**2)
         self.c6 = ((1.0/6.0)*self.w_tot * (self.l - (self.a + (0.5*self.c)))**3) - (self.c5*self.l)        
         self.c3 =((-0.5)*self.w_tot * (self.b - (self.a + (0.5*self.c)))**2) + self.c5 + ((1.0/6.0)*self.w1*(b-a)**3)
         self.c1 = self.c3
@@ -2190,9 +2229,14 @@ class cant_left_trap:
             self.rr = self.w
             self.mr = -1*self.rr*(self.l-self.cc)
             
-        self.backspan = point_moment(self.mr,0,lb)
+        # 0 length backspan indicates fixed-free beam initialize slope to 0
+        if lb == 0:
+            self.backspan = 0
+            self.c6 = 0 + (0.5*self.w*(self.l-self.cc)**2)
+        else:
+            self.backspan = point_moment(self.mr,0,lb)
+            self.c6 = self.backspan.eisx(0) + (0.5*self.w*(self.l-self.cc)**2)
         
-        self.c6 = self.backspan.eisx(0) + (0.5*self.w*(self.l-self.cc)**2)
         self.c7 = ((1.0/6.0)*self.w*(self.l-self.cc)**3) - (self.c6*self.l)
         self.c3 = -1.0*((1.0/6.0)*self.a*((self.a**2 * self.s) - (3*self.a*((self.a*self.s) + self.w1)) + (3*self.a*((self.a*self.s) + (2*self.w1)))))
         self.c4 = (-0.5*self.w*(self.b-self.cc)**2) + self.c6 - (self.c3*self.b) - ((1.0/24.0)*self.b**2 *((self.b**2 * self.s) - (4*self.b*((self.a*self.s) + self.w1)) + (6*self.a*((self.a*self.s) + (2*self.w1)))))
