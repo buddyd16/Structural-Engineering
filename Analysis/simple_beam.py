@@ -14,6 +14,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from __future__ import division
 import Tkinter as tk
 import ttk
 import tkFont
@@ -140,6 +141,11 @@ class Master_window:
         self.E_entry.grid(row=4,column=2, sticky = tk.W)
         self.I_entry = tk.Entry(self.bm_info_frame, textvariable=self.I_in4, width=10)
         self.I_entry.grid(row=5,column=2, sticky = tk.W)
+        
+        tk.Label(self.bm_info_frame, text="Stations:", font=helv).grid(row=6,column=1, sticky = tk.E)
+        self.stations = tk.Spinbox(self.bm_info_frame, values=(4, 10, 20, 25, 50, 100, 200, 500, 1000), command=self.run)
+        self.stations.grid(row=6, column=2)
+
         
         self.b_run = tk.Button(self.bm_info_frame,text = "Update", command = self.update, font=helv)
         self.b_run.grid(row=1,column=3, sticky = tk.W)        
@@ -551,7 +557,11 @@ class Master_window:
 
     def reaction_graph(self,r,x):
         r = -1.0 * r
-        arrow_height = r/6.0
+        #arrow_height = r/6.0
+        if r < 0.0:
+            arrow_height = -0.5
+        else:
+            arrow_height = 0.5
         #30 degree arrow
         arrow_plus= x+(arrow_height*math.tan(math.radians(30)))
         arrow_minus= x-(arrow_height*math.tan(math.radians(30)))
@@ -575,38 +585,40 @@ class Master_window:
             E = float(self.E_ksi.get()) * 144        #144 is conversion from ksi to ksf - 12^2
             I = float(self.I_in4.get()) / 12.0**4    #covert from in^4 to ft^4        
             
-            step_left = self.ll/500.0
-            step_backspan = self.lc/500.0
-            step_right = self.lr/500.0
+            iters = int(self.stations.get())
             
-            xsl = zeros(501)
-            xsc = zeros(501)
-            xsr = zeros(501)
+            step_left = self.ll/(iters+0.00)
+            step_backspan = self.lc/(iters+0.00)
+            step_right = self.lr/(iters+0.00)
+            
+            xsl = zeros(iters+1)
+            xsc = zeros(iters+1)
+            xsr = zeros(iters+1)
             
             reaction_left = 0
             reaction_right = 0
             
-            shearl = zeros(501)
-            shearc = zeros(501)
-            shearr = zeros(501)
+            shearl = zeros(iters+1)
+            shearc = zeros(iters+1)
+            shearr = zeros(iters+1)
             
-            momentl = zeros(501)
-            momentc = zeros(501)
-            momentr = zeros(501)
+            momentl = zeros(iters+1)
+            momentc = zeros(iters+1)
+            momentr = zeros(iters+1)
             
-            slopel = zeros(501)
-            slopec = zeros(501)
-            sloper = zeros(501)
+            slopel = zeros(iters+1)
+            slopec = zeros(iters+1)
+            sloper = zeros(iters+1)
             
-            deltal = zeros(501)
-            deltac = zeros(501)
-            deltar = zeros(501)
+            deltal = zeros(iters+1)
+            deltac = zeros(iters+1)
+            deltar = zeros(iters+1)
             
             xsl[0]=0
             xsc[0]=0
             xsr[0]=0
             
-            for i in range(1,501):
+            for i in range(1,(iters+1)):
                 xsl[i] = xsl[i-1] + step_left
                 xsc[i] = xsc[i-1] + step_backspan
                 xsr[i] = xsr[i-1] + step_right
@@ -1208,7 +1220,7 @@ class Master_window:
         plt.subplots_adjust(left=0.125, bottom=0.1, right=0.9, top=0.9, wspace=0.2, hspace=0.4)
 
         fig.savefig('simple_beam.pdf', dpi=600)
-        plt.close()    
+        plt.close('all')    
        
 def main():
     root = tk.Tk()
