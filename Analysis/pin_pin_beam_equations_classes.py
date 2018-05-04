@@ -53,7 +53,10 @@ class pl:
             
             for i in range(0,iters):
                 if x[i] <= self.a:
-                    v[i] = self.rl           
+                    if x[i] == 0 and self.a == 0:
+                        v[i] = 0
+                    else:
+                        v[i] = self.rl
                 else:
                     v[i] = -1 * self.rr
             return v
@@ -108,7 +111,10 @@ class pl:
             return 'Error x > l'
         else:
             if x <= self.a:
-                v = self.rl           
+                if x==0 and self.a==0:
+                    v = 0
+                else:
+                    v = self.rl           
             else:
                 v = -1 * self.rr
             return v
@@ -220,8 +226,13 @@ class point_moment:
             m=zeros(iters)
             
             for i in range(0,iters):
-                if x[i] < self.a:
-                    m[i] = self.rl * x[i]
+                if x[i] <= self.a:
+                    if x[i] == 0 and self.a == 0:
+                        m[i] = self.ma
+                    elif x[i] == self.l and self.a == self.l:
+                        m[i] = -1.0*self.ma
+                    else:
+                        m[i] = self.rl * x[i]
                 else:
                     m[i] = (self.rl * x[i]) + self.ma
             return m
@@ -272,8 +283,13 @@ class point_moment:
         elif x > self.l:
             return 'Error x > l'
         else:
-            if x < self.a:
-                m = self.rl * x
+            if x <= self.a:
+                if x == 0 and self.a == 0:
+                    m = self.ma
+                elif x == self.l and self.a == self.l:
+                    m = -1.0*self.ma
+                else:
+                    m = self.rl * x
             else:
                 m = (self.rl * x) + self.ma
             return m
@@ -880,7 +896,10 @@ class cant_right_point:
             
             for i in range(0,iters):
                 if x[i]<=self.a:
-                    v[i] = self.p
+                    if x[i] == 0 and self.a == 0:
+                        v[i] == 0
+                    else:
+                        v[i] = self.p
                 else:
                     v[i] = 0
         return v
@@ -936,7 +955,10 @@ class cant_right_point:
             return 'Error a > l'
         else:            
             if x<=self.a:
-                v = self.p
+                if x == 0 and self.a ==0:
+                    v = 0
+                else:
+                    v = self.p
             else:
                 v = 0
         return v

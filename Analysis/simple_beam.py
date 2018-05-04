@@ -571,14 +571,14 @@ class Master_window:
                     
                     if load_type == 'Point':
                         self.loads_left.append(ppbeam.cant_left_point(w1,a,ll,lc))
-                        b = a + 0.0001
-                        c = a - 0.0001
+                        b = min(ll,a + 0.0001)
+                        c = max(0,a - 0.0001)
                         self.extra_l_station = np.append(self.extra_l_station, [c,a,b])
 
                     elif load_type == 'Moment':
                         self.loads_left.append(ppbeam.cant_left_point_moment(w1,a,ll,lc))
-                        b = a + 0.0001
-                        c = a - 0.0001
+                        b = min(ll,a + 0.0001)
+                        c = max(0,a - 0.0001)
                         self.extra_l_station = np.append(self.extra_l_station, [c,a,b])
 
                     elif load_type == 'UDL':
@@ -595,14 +595,14 @@ class Master_window:
                     #['Point','Moment','UDL','TRAP']
                     if load_type == 'Point':
                         self.loads_center.append(ppbeam.pl(w1,a,lc))
-                        b = a + 0.0001
-                        c = a - 0.0001
+                        b = min(lc,a + 0.0001)
+                        c = max(0,a - 0.0001)
                         self.extra_c_station = np.append(self.extra_c_station, [c,a,b])
 
                     elif load_type == 'Moment':
                         self.loads_center.append(ppbeam.point_moment(w1,a,lc))
-                        b = a + 0.0001
-                        c = a - 0.0001
+                        b = min(lc,a + 0.0001)
+                        c = max(0,a - 0.0001)
                         self.extra_c_station = np.append(self.extra_c_station, [c,a,b])
 
                     elif load_type == 'UDL':
@@ -620,14 +620,14 @@ class Master_window:
                     #['Point','Moment','UDL','TRAP']
                     if load_type == 'Point':
                         self.loads_right.append(ppbeam.cant_right_point(w1,a,lr,lc))
-                        b = a + 0.0001
-                        c = a - 0.0001
+                        b = min(lr,a + 0.0001)
+                        c = max(0,a - 0.0001)
                         self.extra_r_station = np.append(self.extra_r_station, [c,a,b])
 
                     elif load_type == 'Moment':
                         self.loads_right.append(ppbeam.cant_right_point_moment(w1,a,lr,lc))
-                        b = a + 0.0001
-                        c = a - 0.0001
+                        b = min(lr,a + 0.0001)
+                        c = max(0,a - 0.0001)
                         self.extra_r_station = np.append(self.extra_r_station, [c,a,b])
                        
                     elif load_type == 'UDL':
