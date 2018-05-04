@@ -1495,46 +1495,84 @@ class Master_window:
         self.build_loads() 
         
     def export_pdf(self, *event):
-        fig = plt.figure(figsize=(17,11),dpi=600)
+        fig = plt.figure(figsize=(11,17),dpi=600)
+        
+        axb_l = plt.subplot2grid((8, 1), (0, 0))
+        axb_p = plt.subplot2grid((8, 1), (1, 0))
+        axb_m = plt.subplot2grid((8, 1), (2, 0))
 
-        axb = plt.subplot2grid((4, 2), (0, 0), colspan=2)
-        axbm = axb.twinx()
-        axr = plt.subplot2grid((4, 2), (1, 0), colspan=2)
-        axv = plt.subplot2grid((4, 2), (2, 0))
-        axm = plt.subplot2grid((4, 2), (2, 1))
-        axs = plt.subplot2grid((4, 2), (3, 0))
-        axd = plt.subplot2grid((4, 2), (3, 1))
+        axr = plt.subplot2grid((8, 1), (3, 0))
+        axv = plt.subplot2grid((8, 1), (4, 0))
+        axm = plt.subplot2grid((8, 1), (5, 0))
+        axs = plt.subplot2grid((8, 1), (6, 0))
+        axd = plt.subplot2grid((8, 1), (7, 0))
 
         for load in self.loads_left:
             if len(load.x_graph) > 11:
-                axbm.plot(load.x_graph,load.y_graph)
+                axb_m.plot(load.x_graph,load.y_graph)
+            elif len(load.x_graph) > 6:
+                axb_l.plot(load.x_graph,load.y_graph)
             else:
-                axb.plot(load.x_graph,load.y_graph)
+                axb_p.plot(load.x_graph,load.y_graph)
+                
         for load in self.loads_center:
             if len(load.x_graph) > 11:
-                axbm.plot(load.x_graph+self.xsl[-1],load.y_graph)
+                axb_m.plot(load.x_graph+self.xsl[-1],load.y_graph)
+            elif len(load.x_graph) > 6:
+                axb_l.plot(load.x_graph+self.xsl[-1],load.y_graph)
             else:
-                axb.plot(load.x_graph+self.xsl[-1],load.y_graph)
+                axb_p.plot(load.x_graph+self.xsl[-1],load.y_graph)
+                
         for load in self.loads_right:
             if len(load.x_graph) > 11:
-                axbm.plot(load.x_graph+self.xsc[-1],load.y_graph)
+                axb_m.plot(load.x_graph+self.xsc[-1],load.y_graph)
+            elif len(load.x_graph) > 6:
+                axb_l.plot(load.x_graph+self.xsc[-1],load.y_graph)
             else:
-                axb.plot(load.x_graph+self.xsc[-1],load.y_graph)
-        axb.plot([0,0,0],[0.5,0,-0.5], alpha=0)
-        axb.plot(self.xsl,[0]*len(self.xsl))
-        axb.plot(self.xsc,[0]*len(self.xsc))
-        axb.plot(self.xsr,[0]*len(self.xsr))
+                axb_p.plot(load.x_graph+self.xsc[-1],load.y_graph)
+                
+        axb_l.plot([0,0,0],[0.5,0,-0.5], alpha=0)
+        axb_l.plot(self.xsl,[0]*len(self.xsl))
+        axb_l.plot(self.xsc,[0]*len(self.xsc))
+        axb_l.plot(self.xsr,[0]*len(self.xsr))
+        
+        axb_m.plot([0,0,0],[0.5,0,-0.5], alpha=0)
+        axb_m.plot(self.xsl,[0]*len(self.xsl))
+        axb_m.plot(self.xsc,[0]*len(self.xsc))
+        axb_m.plot(self.xsr,[0]*len(self.xsr))
+        
+        axb_p.plot([0,0,0],[0.5,0,-0.5], alpha=0)
+        axb_p.plot(self.xsl,[0]*len(self.xsl))
+        axb_p.plot(self.xsc,[0]*len(self.xsc))
+        axb_p.plot(self.xsr,[0]*len(self.xsr))
+        
         #support symbols
         x0 = self.ll
         x2 = self.ll+self.lc
-        axb.plot([x0,x0-0.25,x0+0.25,x0],[0,-0.25,-0.25,0], color='k')
-        axb.plot([x2,x2-0.25,x2+0.25,x2],[0,-0.25,-0.25,0], color='k')
-        axb.minorticks_on()
-        axb.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
-        axb.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
-        axb.set_ylabel('Load\n(kips or klf)')
-        axbm.set_ylabel('Load\n(ft-kips)')
-        axb.set_xlabel('L (ft)')
+        axb_l.plot([x0,x0-0.25,x0+0.25,x0],[0,-0.25,-0.25,0], color='k')
+        axb_l.plot([x2,x2-0.25,x2+0.25,x2],[0,-0.25,-0.25,0], color='k')
+        axb_l.minorticks_on()
+        axb_l.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
+        axb_l.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
+        
+        axb_m.plot([x0,x0-0.25,x0+0.25,x0],[0,-0.25,-0.25,0], color='k')
+        axb_m.plot([x2,x2-0.25,x2+0.25,x2],[0,-0.25,-0.25,0], color='k')
+        axb_m.minorticks_on()
+        axb_m.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
+        axb_m.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
+        
+        axb_p.plot([x0,x0-0.25,x0+0.25,x0],[0,-0.25,-0.25,0], color='k')
+        axb_p.plot([x2,x2-0.25,x2+0.25,x2],[0,-0.25,-0.25,0], color='k')
+        axb_p.minorticks_on()
+        axb_p.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
+        axb_p.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
+        
+        axb_l.set_ylabel('Applied Loads\n(klf)')
+        axb_m.set_ylabel('Applied Moments\n(ft-kips)')
+        axb_p.set_ylabel('Applied Point Loads\n(kips)')
+        axb_l.set_xlabel('L (ft)')
+        axb_m.set_xlabel('L (ft)')
+        axb_p.set_xlabel('L (ft)')
 
         axr.plot(self.rlx,self.rly)
         axr.annotate('RL = {0:.3f} kips'.format(self.reaction_left), xy=(self.ll,min(self.rly)))
@@ -1610,8 +1648,8 @@ class Master_window:
         axd.set_ylabel('D (in)')
         axd.set_xlabel('L (ft)')
 
-        #plt.tight_layout()
-        plt.subplots_adjust(left=0.125, bottom=0.1, right=0.9, top=0.9, wspace=0.2, hspace=0.4)
+        plt.tight_layout()
+        #plt.subplots_adjust(left=0.125, bottom=0.1, right=0.9, top=0.9, wspace=0.2, hspace=0.4)
 
         fig.savefig('simple_beam.pdf', dpi=600)
         plt.close('all')    
