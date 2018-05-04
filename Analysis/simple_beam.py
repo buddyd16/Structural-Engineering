@@ -41,7 +41,7 @@ class Master_window:
         self.shearr = zeros(501)
         
         self.momentl = zeros(501)
-        self. momentc = zeros(501)
+        self.momentc = zeros(501)
         self.momentr = zeros(501)
         
         self.slopel = zeros(501)
@@ -75,7 +75,7 @@ class Master_window:
         
         #Beam Canvas
         self.beam_canvas_frame = tk.Frame(self.main_frame, bd=2, relief='sunken', padx=1,pady=1)
-        self.bm_canvas = tk.Canvas(self.beam_canvas_frame, width=750, height=150, bd=2, relief='sunken')
+        self.bm_canvas = tk.Canvas(self.beam_canvas_frame, width=750, height=150, bd=2, relief='sunken', background="gray30")
         self.bm_canvas.bind("<Configure>", self.bm_canvas_draw)
         self.bm_canvas.pack(side = tk.LEFT, anchor='c', padx= 1, pady= 1, fill=tk.BOTH, expand=1)
         self.beam_canvas_frame.pack(side=tk.TOP, anchor='c', padx= 1, pady= 1, fill=tk.BOTH, expand=1)
@@ -195,9 +195,9 @@ class Master_window:
         
         self.pg1_frame.pack(anchor='c', padx= 1, pady= 1, fill=tk.BOTH, expand=1)
 
-        #Tab 2 - Loads - Future Use
+        #Tab 2 - Loads
         self.page2 = ttk.Frame(self.nb)
-        self.nb.add(self.page2, text='Loads - Work in Progress')
+        self.nb.add(self.page2, text='Loads')
 
         self.pg2_frame = tk.Frame(self.page2, bd=2, relief='sunken', padx=1,pady=1)
         
@@ -244,7 +244,7 @@ class Master_window:
         self.b_add_load = tk.Button(self.add_loads_frame,text = "Add New Load", command = self.add_load, font=helv)
         self.b_add_load.grid(row=3, column=7, sticky = tk.W)       
         
-        self.b_remove_load = tk.Button(self.add_loads_frame,text = "Remove Loads", command = self.remove_load, font=helv)
+        self.b_remove_load = tk.Button(self.add_loads_frame,text = "Remove Unchecked Loads", command = self.remove_load, font=helv)
         self.b_remove_load.grid(row=3, column=8, sticky = tk.W)
         
         self.add_loads_frame.pack(anchor="nw", padx= 4, pady= 4)
@@ -280,7 +280,97 @@ class Master_window:
         self.loads_frame.bind("<Configure>", self.ScrollFrameConfig)
         
         self.pg2_frame.pack(anchor='c', padx= 1, pady= 1, fill=tk.BOTH, expand=1)
+
+        #Tab 3 - Detailed Results
+        self.page3 = ttk.Frame(self.nb)
+        self.nb.add(self.page3, text='Detailed Results')
+
+        self.pg3_frame = tk.Frame(self.page3, bd=2, relief='sunken', padx=1,pady=1)
+
+        self.nb_res = ttk.Notebook(self.pg3_frame)
+
+        self.nb_res.pack(anchor='c', padx= 1, pady= 1, fill=tk.BOTH, expand=1)
         
+        self.l_res_tab = ttk.Frame(self.nb_res)
+        self.nb_res.add(self.l_res_tab, text='Left Results')        
+
+        self.res_l_frame = tk.Frame(self.l_res_tab, bd=2, relief='sunken', padx=1,pady=1)       
+        tk.Label(self.res_l_frame, text="X (ft)", font=helv_res).grid(row=0, column=1)
+        tk.Label(self.res_l_frame, text="V (Kips)", font=helv_res).grid(row=0, column=2)
+        tk.Label(self.res_l_frame, text="M (ft-Kips)", font=helv_res).grid(row=0, column=3)
+        tk.Label(self.res_l_frame, text="S (Rad)", font=helv_res).grid(row=0, column=4)
+        tk.Label(self.res_l_frame, text="D (in)", font=helv_res).grid(row=0, column=5)
+
+        self.results_scrollbar_l = tk.Scrollbar(self.res_l_frame, orient="vertical", command=self.det_res_scroll_l)
+        self.results_scrollbar_l.grid(row=1, column=6, sticky=tk.NS)
+
+        self.xl_listbox = tk.Listbox(self.res_l_frame, height = 30, width = 16, font=helv, yscrollcommand=self.results_scrollbar_l.set)
+        self.xl_listbox.grid(row=1, column=1)
+        self.lv_listbox = tk.Listbox(self.res_l_frame, height = 30, width = 16, font=helv, yscrollcommand=self.results_scrollbar_l.set)
+        self.lv_listbox.grid(row=1, column=2)
+        self.lm_listbox = tk.Listbox(self.res_l_frame, height = 30, width = 16, font=helv, yscrollcommand=self.results_scrollbar_l.set)
+        self.lm_listbox.grid(row=1, column=3)
+        self.ls_listbox = tk.Listbox(self.res_l_frame, height = 30, width = 16, font=helv, yscrollcommand=self.results_scrollbar_l.set)
+        self.ls_listbox.grid(row=1, column=4)
+        self.ld_listbox = tk.Listbox(self.res_l_frame, height = 30, width = 16, font=helv, yscrollcommand=self.results_scrollbar_l.set)
+        self.ld_listbox.grid(row=1, column=5)
+        
+        self.res_l_frame.pack(anchor='c', padx= 1, pady= 1, fill=tk.BOTH, expand=1)
+
+        self.c_res_tab = ttk.Frame(self.nb_res)
+        self.nb_res.add(self.c_res_tab, text='Center Results')
+
+        self.res_c_frame = tk.Frame(self.c_res_tab, bd=2, relief='sunken', padx=1,pady=1)       
+        tk.Label(self.res_c_frame, text="X (ft)", font=helv_res).grid(row=0, column=1)
+        tk.Label(self.res_c_frame, text="V (Kips)", font=helv_res).grid(row=0, column=2)
+        tk.Label(self.res_c_frame, text="M (ft-Kips)", font=helv_res).grid(row=0, column=3)
+        tk.Label(self.res_c_frame, text="S (Rad)", font=helv_res).grid(row=0, column=4)
+        tk.Label(self.res_c_frame, text="D (in)", font=helv_res).grid(row=0, column=5)
+
+        self.results_scrollbar = tk.Scrollbar(self.res_c_frame, orient="vertical", command=self.det_res_scroll)
+        self.results_scrollbar.grid(row=1, column=6, sticky=tk.NS)
+
+        self.xc_listbox = tk.Listbox(self.res_c_frame, height = 30, width = 16, font=helv, yscrollcommand=self.results_scrollbar.set)
+        self.xc_listbox.grid(row=1, column=1)
+        self.cv_listbox = tk.Listbox(self.res_c_frame, height = 30, width = 16, font=helv, yscrollcommand=self.results_scrollbar.set)
+        self.cv_listbox.grid(row=1, column=2)
+        self.cm_listbox = tk.Listbox(self.res_c_frame, height = 30, width = 16, font=helv, yscrollcommand=self.results_scrollbar.set)
+        self.cm_listbox.grid(row=1, column=3)
+        self.cs_listbox = tk.Listbox(self.res_c_frame, height = 30, width = 16, font=helv, yscrollcommand=self.results_scrollbar.set)
+        self.cs_listbox.grid(row=1, column=4)
+        self.cd_listbox = tk.Listbox(self.res_c_frame, height = 30, width = 16, font=helv, yscrollcommand=self.results_scrollbar.set)
+        self.cd_listbox.grid(row=1, column=5)
+        
+        self.res_c_frame.pack(anchor='c', padx= 1, pady= 1, fill=tk.BOTH, expand=1)
+
+        self.r_res_tab = ttk.Frame(self.nb_res)
+        self.nb_res.add(self.r_res_tab, text='Right Results')    
+        
+        self.res_r_frame = tk.Frame(self.r_res_tab, bd=2, relief='sunken', padx=1,pady=1)       
+        tk.Label(self.res_r_frame, text="X (ft)", font=helv_res).grid(row=0, column=1)
+        tk.Label(self.res_r_frame, text="V (Kips)", font=helv_res).grid(row=0, column=2)
+        tk.Label(self.res_r_frame, text="M (ft-Kips)", font=helv_res).grid(row=0, column=3)
+        tk.Label(self.res_r_frame, text="S (Rad)", font=helv_res).grid(row=0, column=4)
+        tk.Label(self.res_r_frame, text="D (in)", font=helv_res).grid(row=0, column=5)
+
+        self.results_scrollbar_r = tk.Scrollbar(self.res_r_frame, orient="vertical", command=self.det_res_scroll_r)
+        self.results_scrollbar_r.grid(row=1, column=6, sticky=tk.NS)
+
+        self.xr_listbox = tk.Listbox(self.res_r_frame, height = 30, width = 16, font=helv, yscrollcommand=self.results_scrollbar_r.set)
+        self.xr_listbox.grid(row=1, column=1)
+        self.rv_listbox = tk.Listbox(self.res_r_frame, height = 30, width = 16, font=helv, yscrollcommand=self.results_scrollbar_r.set)
+        self.rv_listbox.grid(row=1, column=2)
+        self.rm_listbox = tk.Listbox(self.res_r_frame, height = 30, width = 16, font=helv, yscrollcommand=self.results_scrollbar_r.set)
+        self.rm_listbox.grid(row=1, column=3)
+        self.rs_listbox = tk.Listbox(self.res_r_frame, height = 30, width = 16, font=helv, yscrollcommand=self.results_scrollbar_r.set)
+        self.rs_listbox.grid(row=1, column=4)
+        self.rd_listbox = tk.Listbox(self.res_r_frame, height = 30, width = 16, font=helv, yscrollcommand=self.results_scrollbar_r.set)
+        self.rd_listbox.grid(row=1, column=5)
+        
+        self.res_r_frame.pack(anchor='c', padx= 1, pady= 1, fill=tk.BOTH, expand=1)
+
+        self.pg3_frame.pack(anchor='c', padx= 1, pady= 1, fill=tk.BOTH, expand=1)
+      
         self.b_export_pdf = tk.Button(self.base_frame,text="Export PDF", command=self.export_pdf, font=helv)
         self.b_export_pdf.pack(side=tk.RIGHT)
         self.b_quit = tk.Button(self.base_frame,text="Quit", command=self.quit_app, font=helv)
@@ -291,7 +381,8 @@ class Master_window:
         self.loads_right = []
         
         self.has_run = 0
-              
+        
+        self.build_loads()
         self.run()
 
 
@@ -364,7 +455,6 @@ class Master_window:
                 else:
                     v_sf = (hg - 10) / max(max(max(self.shearc), max(self.shearl), max(self.shearr)), abs(min(min(self.shearc), min(self.shearl), min(self.shearr))))
                 
-                
                 for i in range(1,len(self.shearc)):
                     self.bm_canvas.create_line((xl[i-1] * sf) + initial, hg - (self.shearl[i-1] * v_sf),(xl[i] * sf) + initial,hg - (self.shearl[i] * v_sf),fill="red", width=2)
                     self.bm_canvas.create_line((xc[i-1] * sf) + initial, hg - (self.shearc[i-1] * v_sf),(xc[i] * sf) + initial,hg - (self.shearc[i] * v_sf),fill="red", width=2)
@@ -417,6 +507,27 @@ class Master_window:
                     self.bm_canvas.create_line((self.rlx[i-1] * sf) + initial, hg - (self.rly[i-1] * r_sf),(self.rlx[i] * sf) + initial,hg - (self.rly[i] * r_sf),fill="black", width=2)
                     self.bm_canvas.create_line((self.rrx[i-1] * sf) + initial, hg - (self.rry[i-1] * r_sf),(self.rrx[i] * sf) + initial,hg - (self.rry[i] * r_sf),fill="black", width=2)
 
+    def det_res_scroll(self, *args):
+        self.xc_listbox.yview(*args)
+        self.cv_listbox.yview(*args)
+        self.cm_listbox.yview(*args)
+        self.cs_listbox.yview(*args)
+        self.cd_listbox.yview(*args)
+
+    def det_res_scroll_l(self, *args):
+        self.xl_listbox.yview(*args)
+        self.lv_listbox.yview(*args)
+        self.lm_listbox.yview(*args)
+        self.ls_listbox.yview(*args)
+        self.ld_listbox.yview(*args)
+
+    def det_res_scroll_r(self, *args):
+        self.xr_listbox.yview(*args)
+        self.rv_listbox.yview(*args)
+        self.rm_listbox.yview(*args)
+        self.rs_listbox.yview(*args)
+        self.rd_listbox.yview(*args)
+
     def build_loads(self, *event):
         
         del self.loads_right[:]
@@ -425,7 +536,12 @@ class Master_window:
 
         ll = float(self.left_cant_ft.get())
         lc = float(self.span_ft.get())
-        lr = float(self.right_cant_ft.get())        
+        lr = float(self.right_cant_ft.get())
+
+        self.extra_l_station = np.array([0])
+        self.extra_c_station = np.array([0])
+        self.extra_r_station = np.array([0])
+        
         
         for load in self.loads_gui_select_var:
             
@@ -452,17 +568,26 @@ class Master_window:
                 #['Left','Center','Right']
                 if load_location == 'Left':
                     #['Point','Moment','UDL','TRAP']
+                    
                     if load_type == 'Point':
                         self.loads_left.append(ppbeam.cant_left_point(w1,a,ll,lc))
-                    
+                        b = a + 0.0001
+                        c = a - 0.0001
+                        self.extra_l_station = np.append(self.extra_l_station, [c,a,b])
+
                     elif load_type == 'Moment':
                         self.loads_left.append(ppbeam.cant_left_point_moment(w1,a,ll,lc))
-                        
+                        b = a + 0.0001
+                        c = a - 0.0001
+                        self.extra_l_station = np.append(self.extra_l_station, [c,a,b])
+
                     elif load_type == 'UDL':
                         self.loads_left.append(ppbeam.cant_left_udl(w1,a,b,ll,lc))
+                        self.extra_l_station = np.append(self.extra_l_station, [a,b])
                     
                     elif load_type == 'TRAP':
                         self.loads_left.append(ppbeam.cant_left_trap(w1,w2,a,b,ll,lc))
+                        self.extra_l_station = np.append(self.extra_l_station, [a,b])
                     else:
                         pass
                 
@@ -470,15 +595,24 @@ class Master_window:
                     #['Point','Moment','UDL','TRAP']
                     if load_type == 'Point':
                         self.loads_center.append(ppbeam.pl(w1,a,lc))
-                    
+                        b = a + 0.0001
+                        c = a - 0.0001
+                        self.extra_c_station = np.append(self.extra_c_station, [c,a,b])
+
                     elif load_type == 'Moment':
                         self.loads_center.append(ppbeam.point_moment(w1,a,lc))
-                        
+                        b = a + 0.0001
+                        c = a - 0.0001
+                        self.extra_c_station = np.append(self.extra_c_station, [c,a,b])
+
                     elif load_type == 'UDL':
                         self.loads_center.append(ppbeam.udl(w1,a,b,lc))
-                    
+                        self.extra_c_station = np.append(self.extra_c_station, [a,b])
+                        
                     elif load_type == 'TRAP':
                         self.loads_center.append(ppbeam.trap(w1,w2,a,b,lc))
+                        self.extra_c_station = np.append(self.extra_c_station, [a,b])
+                        
                     else:
                         pass
                     
@@ -486,24 +620,76 @@ class Master_window:
                     #['Point','Moment','UDL','TRAP']
                     if load_type == 'Point':
                         self.loads_right.append(ppbeam.cant_right_point(w1,a,lr,lc))
-                    
+                        b = a + 0.0001
+                        c = a - 0.0001
+                        self.extra_r_station = np.append(self.extra_r_station, [c,a,b])
+
                     elif load_type == 'Moment':
                         self.loads_right.append(ppbeam.cant_right_point_moment(w1,a,lr,lc))
-                        
+                        b = a + 0.0001
+                        c = a - 0.0001
+                        self.extra_r_station = np.append(self.extra_r_station, [c,a,b])
+                       
                     elif load_type == 'UDL':
                         self.loads_right.append(ppbeam.cant_right_udl(w1,a,b,lr,lc))
-                    
+                        self.extra_r_station = np.append(self.extra_r_station, [a,b])
+                        
                     elif load_type == 'TRAP':
                         self.loads_right.append(ppbeam.cant_right_trap(w1,w2,a,b,lr,lc))
+                        self.extra_r_station = np.append(self.extra_r_station, [a,b])
+                        
                     else:
                         pass
                     
                 else:
                     pass
-                
+              
+        self.extra_l_station = np.unique(self.extra_l_station)
+        self.extra_c_station = np.unique(self.extra_c_station)
+        self.extra_r_station = np.unique(self.extra_r_station)
+
         self.run()
         self.bm_canvas_draw()
+    
+    def build_loads_gui(self, *event):
+        #Destroy all the individual tkinter gui elements for the current applied loads
+        for load_gui in self.loads_gui:
+            for gui_element in load_gui:
+                gui_element.destroy()
+
+        #Delete all the elements in the List containing the gui elements
+        del self.loads_gui[:]
+        del self.loads_scale[:]
         
+        n = 0
+        for loads in self.loads_gui_select_var:
+            load_types = ['Point','Moment','UDL','TRAP']
+            load_locals = ['Left','Center','Right']
+            
+            if loads[6].get() == 'Moment':
+                self.loads_scale.append(float(loads[1].get())/2.0)           
+            else:
+                self.loads_scale.append(float(loads[1].get()))
+            self.loads_scale.append(float(loads[2].get()))
+
+            self.loads_gui.append([
+                tk.Checkbutton(self.loads_frame, variable=loads[0], command = self.build_loads),
+                tk.Entry(self.loads_frame, textvariable=loads[1], width=15),
+                tk.Entry(self.loads_frame, textvariable=loads[2], width=15),
+                tk.Entry(self.loads_frame, textvariable=loads[3], width=15),
+                tk.Entry(self.loads_frame, textvariable=loads[4], width=15),
+                tk.OptionMenu(self.loads_frame, loads[5], *load_locals),
+                tk.OptionMenu(self.loads_frame, loads[6], *load_types)])
+
+            self.loads_gui[n][0].grid(row=n+1, column=1)
+            self.loads_gui[n][1].grid(row=n+1, column=2, padx = 4)
+            self.loads_gui[n][2].grid(row=n+1, column=3, padx = 4)
+            self.loads_gui[n][3].grid(row=n+1, column=4, padx = 4)
+            self.loads_gui[n][4].grid(row=n+1, column=5, padx = 4)
+            self.loads_gui[n][5].grid(row=n+1, column=6)
+            self.loads_gui[n][6].grid(row=n+1, column=7)
+            n+=1
+                   
     def add_load(self, *event):
         
         self.loads_gui_select_var.append([tk.IntVar(), tk.StringVar(), tk.StringVar(), tk.StringVar(), tk.StringVar(), tk.StringVar(), tk.StringVar()])
@@ -520,7 +706,7 @@ class Master_window:
         load_types = ['Point','Moment','UDL','TRAP']
         load_locals = ['Left','Center','Right']
         
-        self.loads_gui.append([
+        '''self.loads_gui.append([
             tk.Checkbutton(self.loads_frame, variable=self.loads_gui_select_var[n-1][0], command = self.build_loads),
             tk.Entry(self.loads_frame, textvariable=self.loads_gui_select_var[n-1][1], width=15),
             tk.Entry(self.loads_frame, textvariable=self.loads_gui_select_var[n-1][2], width=15),
@@ -536,22 +722,24 @@ class Master_window:
         self.loads_gui[n-1][4].grid(row=n+1, column=5, padx = 4)
         self.loads_gui[n-1][5].grid(row=n+1, column=6)
         self.loads_gui[n-1][6].grid(row=n+1, column=7)
-        
+        '''
+        self.build_loads_gui()
         self.build_loads()        
 
 
     def remove_load(self, *event):
-            
+        '''  
         for load in self.loads_gui[-1]:
             load.destroy()
             
         del self.loads_gui[-1]
             
         del self.loads_gui_select_var[-1]
-               
-        del self.loads_scale[-1]
-        del self.loads_scale[-1]
+        '''
         
+        self.loads_gui_select_var = [i for i in self.loads_gui_select_var if i[0].get() == 1]
+        self.build_loads_gui()
+
         self.build_loads()
         
 
@@ -572,6 +760,23 @@ class Master_window:
         return x_graph, y_graph
         
     def run(self, *event):
+        self.xl_listbox.delete(0,tk.END)
+        self.lv_listbox.delete(0,tk.END)
+        self.lm_listbox.delete(0,tk.END)
+        self.ls_listbox.delete(0,tk.END)
+        self.ld_listbox.delete(0,tk.END)
+
+        self.xc_listbox.delete(0,tk.END)
+        self.cv_listbox.delete(0,tk.END)
+        self.cm_listbox.delete(0,tk.END)
+        self.cs_listbox.delete(0,tk.END)
+        self.cd_listbox.delete(0,tk.END)
+
+        self.xr_listbox.delete(0,tk.END)
+        self.rv_listbox.delete(0,tk.END)
+        self.rm_listbox.delete(0,tk.END)
+        self.rs_listbox.delete(0,tk.END)
+        self.rd_listbox.delete(0,tk.END)
 
         if self.left_cant_ft.get() == '' or self.span_ft.get()== '' or self.right_cant_ft.get() == '':
             pass
@@ -598,22 +803,6 @@ class Master_window:
             reaction_left = 0
             reaction_right = 0
             
-            shearl = zeros(iters+1)
-            shearc = zeros(iters+1)
-            shearr = zeros(iters+1)
-            
-            momentl = zeros(iters+1)
-            momentc = zeros(iters+1)
-            momentr = zeros(iters+1)
-            
-            slopel = zeros(iters+1)
-            slopec = zeros(iters+1)
-            sloper = zeros(iters+1)
-            
-            deltal = zeros(iters+1)
-            deltac = zeros(iters+1)
-            deltar = zeros(iters+1)
-            
             xsl[0]=0
             xsc[0]=0
             xsr[0]=0
@@ -622,6 +811,57 @@ class Master_window:
                 xsl[i] = xsl[i-1] + step_left
                 xsc[i] = xsc[i-1] + step_backspan
                 xsr[i] = xsr[i-1] + step_right
+            
+            xsl = np.append(xsl, self.extra_l_station)
+            xsc = np.append(xsc, self.extra_c_station)  
+            xsr = np.append(xsr, self.extra_r_station)
+
+            xsl = np.sort(xsl)
+            xsc = np.sort(xsc)  
+            xsr = np.sort(xsr)
+
+            xsl = np.unique(xsl)
+            xsc = np.unique(xsc)  
+            xsr = np.unique(xsr)
+           
+
+            i = max(xsl.shape[0], xsc.shape[0], xsr.shape[0])
+
+            if xsl.shape[0] < i :
+                a = i - xsl.shape[0]
+                for x in range(0,a):
+                    xsl = np.append(xsl, self.ll)
+            else:
+                pass
+            if xsc.shape[0] < i :
+                a = i - xsc.shape[0]
+                for x in range(0,a):
+                    xsc = np.append(xsc, self.lc)
+            else:
+                pass
+            if xsr.shape[0] < i :
+                a = i - xsr.shape[0]
+                for x in range(0,a):
+                    xsr = np.append(xsr, self.lr)
+            else:
+                pass
+
+            shearl = zeros(i)
+            shearc = zeros(i)
+            shearr = zeros(i)
+            
+            momentl = zeros(i)
+            momentc = zeros(i)
+
+            momentr = zeros(i)
+            
+            slopel = zeros(i)
+            slopec = zeros(i)
+            sloper = zeros(i)
+            
+            deltal = zeros(i)
+            deltac = zeros(i)
+            deltar = zeros(i)         
             
             if self.ll == 0:
                 load_left = [ppbeam.cant_left_point(0,0,self.ll,self.lc)]
@@ -732,6 +972,160 @@ class Master_window:
             self.res_labels[16].configure(text = 'Smax = {0:.5f} rad - Smin = {1:.5f} rad'.format(max(self.sloper), min(self.sloper)))
             self.res_labels[17].configure(text = 'Dmax = {0:.4f} in - Dmin = {1:.4f} in'.format(max(self.deltar), min(self.deltar)))
             
+            #Left detailed results to GUI
+            color = "pale green"
+            i=0
+            for x in xsl:
+                self.xl_listbox.insert(tk.END,'{0:.4f}'.format(x))
+                
+                if i % 2 == 0:
+                    self.xl_listbox.itemconfigure(i, background=color)
+                else:
+                    pass
+                i+=1
+            
+            i=0
+            for v in self.shearl:
+                self.lv_listbox.insert(tk.END,'{0:.4f}'.format(v))
+                
+                if i % 2 == 0:
+                    self.lv_listbox.itemconfigure(i, background=color)
+                else:
+                    pass
+                i+=1
+            
+            i=0
+            for m in self.momentl:
+                self.lm_listbox.insert(tk.END,'{0:.4f}'.format(m))
+                
+                if i % 2 == 0:
+                    self.lm_listbox.itemconfigure(i, background=color)
+                else:
+                    pass
+                i+=1
+            
+            i=0
+            for s in self.slopel:
+                self.ls_listbox.insert(tk.END,'{0:.8f}'.format(s))
+                
+                if i % 2 == 0:
+                    self.ls_listbox.itemconfigure(i, background=color)
+                else:
+                    pass
+                i+=1
+            
+            i=0
+            for d in self.deltal:
+                self.ld_listbox.insert(tk.END,'{0:.6f}'.format(d))
+                
+                if i % 2 == 0:
+                    self.ld_listbox.itemconfigure(i, background=color)
+                else:
+                    pass
+                i+=1            
+           
+            #Center/Main detailed results to GUI
+            i=0
+            for x in xsc:
+                self.xc_listbox.insert(tk.END,'{0:.4f}'.format(x))
+                
+                if i % 2 == 0:
+                    self.xc_listbox.itemconfigure(i, background=color)
+                else:
+                    pass
+                i+=1
+
+            i=0            
+            for v in self.shearc:
+                self.cv_listbox.insert(tk.END,'{0:.4f}'.format(v))
+                
+                if i % 2 == 0:
+                    self.cv_listbox.itemconfigure(i, background=color)
+                else:
+                    pass
+                i+=1
+
+            i=0
+            for m in self.momentc:
+                self.cm_listbox.insert(tk.END,'{0:.4f}'.format(m))
+                
+                if i % 2 == 0:
+                    self.cm_listbox.itemconfigure(i, background=color)
+                else:
+                    pass
+                i+=1
+
+            i=0
+            for s in self.slopec:
+                self.cs_listbox.insert(tk.END,'{0:.8f}'.format(s))
+                
+                if i % 2 == 0:
+                    self.cs_listbox.itemconfigure(i, background=color)
+                else:
+                    pass
+                i+=1
+
+            i=0
+            for d in self.deltac:
+                self.cd_listbox.insert(tk.END,'{0:.6f}'.format(d))
+                
+                if i % 2 == 0:
+                    self.cd_listbox.itemconfigure(i, background=color)
+                else:
+                    pass
+                i+=1
+
+            #Right detailed results to GUI
+            i=0
+            for x in xsr:
+                self.xr_listbox.insert(tk.END,'{0:.4f}'.format(x))
+                
+                if i % 2 == 0:
+                    self.xr_listbox.itemconfigure(i, background=color)
+                else:
+                    pass
+                i+=1
+
+            i=0            
+            for v in self.shearr:
+                self.rv_listbox.insert(tk.END,'{0:.4f}'.format(v))
+                
+                if i % 2 == 0:
+                    self.rv_listbox.itemconfigure(i, background=color)
+                else:
+                    pass
+                i+=1
+
+            i=0
+            for m in self.momentr:
+                self.rm_listbox.insert(tk.END,'{0:.4f}'.format(m))
+                
+                if i % 2 == 0:
+                    self.rm_listbox.itemconfigure(i, background=color)
+                else:
+                    pass
+                i+=1
+
+            i=0
+            for s in self.sloper:
+                self.rs_listbox.insert(tk.END,'{0:.8f}'.format(s))
+                
+                if i % 2 == 0:
+                    self.rs_listbox.itemconfigure(i, background=color)
+                else:
+                    pass
+                i+=1
+
+            i=0
+            for d in self.deltar:
+                self.rd_listbox.insert(tk.END,'{0:.6f}'.format(d))
+                
+                if i % 2 == 0:
+                    self.rd_listbox.itemconfigure(i, background=color)
+                else:
+                    pass
+                i+=1
+
             #convert x coordinates to global
             self.xsl = xsl
             self.xsc = xsc + xsl[-1]

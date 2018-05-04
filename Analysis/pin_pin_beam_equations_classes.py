@@ -272,7 +272,7 @@ class point_moment:
         elif x > self.l:
             return 'Error x > l'
         else:
-            if x <= self.a:
+            if x < self.a:
                 m = self.rl * x
             else:
                 m = (self.rl * x) + self.ma
