@@ -50,6 +50,7 @@ class Line:
             self.drift_lu = []
             self.drift_hd = []
             self.drift_pd = []
+            self.drift_w = []
             self.drift_plot_labels = []
             
             
@@ -165,7 +166,7 @@ def line_line_intersection_points(a0x,a0y,a1x,a1y,b0x,b0y,b1x,b1y):
 
          
 ##testing area
-logging = 1
+logging = 0
 tolerance = 0.0001
 pg_psf = 25
 snow_density_pcf = min((0.13*pg_psf) + 14, 30)
@@ -222,15 +223,19 @@ points_x = []
 points_y = []
 
 dist = 1000
-int_points = 5
-
-if logging == 1:
-    calc_log = calc_log + 'Number of Interior Points: {0}:\n'.format(int_points)
-else:
-    pass
+#int_points = 5
+#
+#if logging == 1:
+#    calc_log = calc_log + 'Number of Interior Points: {0}:\n'.format(int_points)
+#else:
+#    pass
 
 for line in lines:
-
+    int_points = (int(line.length/5.0))+1
+    if logging == 1:
+        calc_log = calc_log + 'Number of Interior Points: {0}:\n'.format(int_points)
+    else:
+        pass
     line.interior_points_calc(int_points)
     line.reset_drift_lines()
     
@@ -382,19 +387,37 @@ for line in lines:
         line.drift_lu.append(lu)
         line.drift_hd.append(hd_ft)
         line.drift_pd.append(pd_psf)
+        line.drift_w.append(w_ft)
         drift_string = 'lu = {0:.2f} ft, hd = {1:.2f} ft, w = {2:.2f} ft\npd = {3:.2f} psf'.format(lu,hd_ft,w_ft,pd_psf)
         line.drift_plot_labels.append(drift_string)
 
         count+=1
         
 colors = ['r','b','g','c','m','y','k','r','b','g','c','m','y','k','r','b','g','c','m','y','k']
-i=0                 
+i=0
+              
 for line in lines:
     plt.plot([line.startx,line.endx], [line.starty,line.endy], color=colors[i])
-    plt.plot(line.drift_line_x, line.drift_line_y, color=colors[i], marker = 'o')
-    plt.plot(line.internal_points_x, line.internal_points_y, color=colors[i], marker = 'x')
+    plt.plot(line.drift_line_x, line.drift_line_y, color=colors[i], marker = '+')
+    plt.plot(line.internal_points_x, line.internal_points_y, color=colors[i], marker = '+')
     #plt.plot(line.drift_line_x, line.drift_line_y, color=colors[i])
     #plt.plot(line.internal_points_x, line.internal_points_y, color=colors[i])
+    k=0
+    prev_label = ''
+    for point in line.internal_points_x:
+        label = '{0:.2f} psf\nw = {1:.2f} ft'.format(line.drift_pd[k], line.drift_w[k])
+        if k+1 > len(line.drift_w)-1:
+            next_label = ''
+        else:
+            next_label = '{0:.2f} psf\nw = {1:.2f} ft'.format(line.drift_pd[k+1], line.drift_w[k+1])
+        if label != prev_label or label != next_label:
+            angle = 45
+            plt.annotate(label,xy=(line.internal_points_x[k], line.internal_points_y[k]), xycoords='data', rotation=angle, horizontalalignment='left', verticalalignment='bottom' )
+            plt.plot([line.internal_points_x[k],line.drift_line_x[k]], [line.internal_points_y[k],line.drift_line_y[k]], color='k')
+        else:
+            pass
+        k+=1
+        prev_label = label
     i+=1
 
 plt.ylim(ymax=max(y)+5, ymin=min(y)-5)
