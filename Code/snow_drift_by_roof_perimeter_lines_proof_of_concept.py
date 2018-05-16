@@ -26,7 +26,7 @@ import matplotlib.pyplot as plt
 class Line:
     def __init__(self, start=[0,0], end=[1,1], hc_ft = 1.0, label='1', location='e'):
         self.error_string = ''
-        self.location = location
+        
         
         if start == end:
             self.error_string = 'Not Valid - Start Point = End Point'
@@ -39,6 +39,7 @@ class Line:
             self.endx = end[0]
             self.endy = end[1]
             
+            self.location = location
             self.length_calc()
             self.angle_degrees_calc()
             self.hc_ft = hc_ft
@@ -164,7 +165,7 @@ def line_line_intersection_points(a0x,a0y,a1x,a1y,b0x,b0y,b1x,b1y):
 
          
 ##testing area
-logging = 0
+logging = 1
 tolerance = 0.0001
 pg_psf = 25
 snow_density_pcf = min((0.13*pg_psf) + 14, 30)
@@ -221,7 +222,7 @@ points_x = []
 points_y = []
 
 dist = 1000
-int_points = 500
+int_points = 5
 
 if logging == 1:
     calc_log = calc_log + 'Number of Interior Points: {0}:\n'.format(int_points)
@@ -324,7 +325,6 @@ for line in lines:
                         
                         if logging == 1:
                             calc_log = calc_log + 3*indent + 'Valid Intersection\n'
-                            calc_log = calc_log + 4*indent + '**Drift Calculation**\n'.format(lu)
                             calc_log = calc_log + 4*indent + 'Lu = {0:.3f}\n'.format(lu)
                             calc_log = calc_log + 4*indent + 'Lu = {0:.3f} - min lu of 25\n'.format(lu)
                         else:
@@ -339,13 +339,13 @@ for line in lines:
         hd_ft = 0.75 * hd_ft
             
         if logging == 1:
-            calc_log = calc_log + 3*indent + 'Valid Intersection\n'
-            calc_log = calc_log + 4*indent + '**Drift Calculation**\n'.format(lu)
-            calc_log = calc_log + 4*indent + 'Lu = {0:.3f}\n'.format(lu)
-            calc_log = calc_log + 4*indent + 'Lu = {0:.3f} - min lu of 25\n'.format(lu)
-            calc_log = calc_log + 4*indent + 'hd = {0:.3f}\n'.format(hd_ft)
-            calc_log = calc_log + 4*indent + '0.75*hd = {0:.3f}\n'.format(hd_ft)
-            calc_log = calc_log + 4*indent + 'Edge Height = {0:.3f}\n'.format(line.hc_ft)
+            calc_log = calc_log + '\n' + 2*indent + 'Valid Intersections:{0}\n\n'.format(valid_point)
+            calc_log = calc_log + 2*indent + '**Drift Calculation**\n'.format(lu)
+            calc_log = calc_log + 2*indent + 'Lu = {0:.3f}\n'.format(lu)
+            calc_log = calc_log + 2*indent + 'Lu = {0:.3f} - min lu of 25\n'.format(lu)
+            calc_log = calc_log + 2*indent + 'hd = {0:.3f}\n'.format(hd_ft)
+            calc_log = calc_log + 2*indent + '0.75*hd = {0:.3f}\n'.format(hd_ft)
+            calc_log = calc_log + 2*indent + 'Edge Height = {0:.3f}\n'.format(line.hc_ft)
         else:
             pass
         
@@ -353,16 +353,16 @@ for line in lines:
             w_ft = 4*hd_ft
             hd_ft = hd_ft
             if logging == 1:
-                calc_log = calc_log + 4*indent + 'w = 4*hd = {0:.3f}\n'.format(w_ft)
-                calc_log = calc_log + 4*indent + 'hd = hd = {0:.3f}\n'.format(hd_ft)
+                calc_log = calc_log + 2*indent + 'w = 4*hd = {0:.3f}\n'.format(w_ft)
+                calc_log = calc_log + 2*indent + 'hd = hd = {0:.3f}\n'.format(hd_ft)
             else:
                 pass
         else:
             w_ft = min((4*hd_ft**2)/line.hc_ft, 8*line.hc_ft)
             hd_ft = line.hc_ft
             if logging == 1:
-                calc_log = calc_log + 4*indent + 'w = min of 4*hd^2 / hc and 8*hc  = {0:.3f}\n'.format(w_ft)
-                calc_log = calc_log + 4*indent + 'hd = hc = {0:.3f}\n'.format(line.hc_ft)
+                calc_log = calc_log + 2*indent + 'w = min of 4*hd^2 / hc and 8*hc  = {0:.3f}\n'.format(w_ft)
+                calc_log = calc_log + 2*indent + 'hd = hc = {0:.3f}\n'.format(line.hc_ft)
             else:
                 pass
         
@@ -371,9 +371,9 @@ for line in lines:
         pd_psf = snow_density_pcf*hd_ft
         
         if logging == 1:
-            calc_log = calc_log + 4*indent + 'Angle to Intersection: {0:.3f}\n'.format(angle)
-            calc_log = calc_log + 4*indent + 'pd = {0:.3f}\n'.format(pd_psf)
-            calc_log = calc_log + 4*indent + 'Interior Drift Coord = ({0:.3f},{1:.3f})\n'.format(drift_point[0],drift_point[1])
+            calc_log = calc_log + 2*indent + 'Angle to Intersection: {0:.3f}\n'.format(angle)
+            calc_log = calc_log + 2*indent + 'pd = {0:.3f}\n'.format(pd_psf)
+            calc_log = calc_log + 2*indent + 'Interior Drift Coord = ({0:.3f},{1:.3f})\n\n'.format(drift_point[0],drift_point[1])
         else:
             pass
         
@@ -384,20 +384,17 @@ for line in lines:
         line.drift_pd.append(pd_psf)
         drift_string = 'lu = {0:.2f} ft, hd = {1:.2f} ft, w = {2:.2f} ft\npd = {3:.2f} psf'.format(lu,hd_ft,w_ft,pd_psf)
         line.drift_plot_labels.append(drift_string)
-        if logging == 1:
-            calc_log = calc_log + '\n' + 2*indent + 'Valid Intersections:{0}\n\n'.format(valid_point)
-        else:
-            pass
+
         count+=1
         
 colors = ['r','b','g','c','m','y','k','r','b','g','c','m','y','k','r','b','g','c','m','y','k']
 i=0                 
 for line in lines:
     plt.plot([line.startx,line.endx], [line.starty,line.endy], color=colors[i])
-    #plt.plot(line.drift_line_x, line.drift_line_y, color=colors[i], marker = 'o')
-    #plt.plot(line.internal_points_x, line.internal_points_y, color=colors[i], marker = 'x')
-    plt.plot(line.drift_line_x, line.drift_line_y, color=colors[i])
-    plt.plot(line.internal_points_x, line.internal_points_y, color=colors[i])
+    plt.plot(line.drift_line_x, line.drift_line_y, color=colors[i], marker = 'o')
+    plt.plot(line.internal_points_x, line.internal_points_y, color=colors[i], marker = 'x')
+    #plt.plot(line.drift_line_x, line.drift_line_y, color=colors[i])
+    #plt.plot(line.internal_points_x, line.internal_points_y, color=colors[i])
     i+=1
 
 plt.ylim(ymax=max(y)+5, ymin=min(y)-5)
