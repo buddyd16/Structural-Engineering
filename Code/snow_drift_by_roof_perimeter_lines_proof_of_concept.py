@@ -442,7 +442,7 @@ else:
     pass
 
 #DXF file
-    if write_dxf == 1:
+if write_dxf == 1:
     file = open('Drift_by_lines.dxf','w')
     file.write('  0\nSECTION\n  2\nENTITIES\n')
 
@@ -487,14 +487,17 @@ else:
                 file.write('  0\nVERTEX\n  8\nDrift-Label\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n'.format(x3,y3))
                 file.write('  0\nSEQEND\n')
 
+                real_label = 'pd = {0:.2f} psf'.format(line.drift_pd[k])
                 angle = angle_by_two_points(x2,y2,x3,y3)
+                length = length_by_two_points(x2,y2,x3,y3) / 2.0
+                anno_pt = point_at_angle_distance([x2,y2],angle,length)
 
                 if 179.99 < angle < 359.99:
                     angle = angle + 180
                 else:
                     pass
 
-                file.write('  0\nTEXT\n 62\n3\n  8\nDrift-Label\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n 40\n0.5\n  1\n{2} in\n 50\n{3:.4f}\n'.format(x2,y2,label,angle))
+                file.write('  0\nTEXT\n 62\n3\n  8\nDrift-Label\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n 40\n0.5\n  1\n{2}\n 50\n{3:.4f}\n'.format(anno_pt[0],anno_pt[1],real_label,angle))
 
             else:
                 pass
