@@ -257,7 +257,7 @@ class Main_window:
             for line in coords_raw:            
                 coords = line.split(',')
                 x.append(float(coords[0]))
-                y.append(float(coords[1])++float(self.shift_y_entry.get()))
+                y.append(float(coords[1])+float(self.shift_y_entry.get()))
                 for i in range(len(x)):
                     new_coords = '{0:.3f},{1:.3f}'.format(x[i],y[i])
                     self.lb_coords.delete(i)

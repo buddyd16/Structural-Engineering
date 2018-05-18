@@ -86,118 +86,86 @@ class pl:
         self.y_graph=[arrow_height,0,arrow_height,0,self.p]
 
     def v(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-        else:
-            iters = len(x)
-            v=zeros(iters)
+        iters = len(x)
+        v=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i] <= self.a:
-                    if x[i] == 0 and self.a == 0:
-                        v[i] = 0
-                    else:
-                        v[i] = self.rl
+        for i in range(0,iters):
+            if x[i] <= self.a:
+                if x[i] == 0 and self.a == 0:
+                    v[i] = 0
                 else:
-                    v[i] = -1 * self.rr
-            return v
+                    v[i] = self.rl
+            else:
+                v[i] = -1 * self.rr
+        return v
 
     def m(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-        else:
-            iters = len(x)
-            m=zeros(iters)
+        iters = len(x)
+        m=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i] <= self.a:
-                    m[i] = self.rl * x[i]
-                else:
-                    m[i] = (-1 * self.rr * x[i]) + (self.rr * self.l)
-            return m
+        for i in range(0,iters):
+            if x[i] <= self.a:
+                m[i] = self.rl * x[i]
+            else:
+                m[i] = (-1 * self.rr * x[i]) + (self.rr * self.l)
+        return m
 
     def eis(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-        else:
-            iters = len(x)
-            eis=zeros(iters)
+        iters = len(x)
+        eis=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i] <= self.a:
-                    eis[i] = ((self.rl * x[i] ** 2)  / 2) + self.c1
-                else:
-                    eis[i] = ((-1.0 * self.rr * x[i] ** 2)/2.0) + (self.rr * self.l * x[i]) + self.c2
-            return eis
+        for i in range(0,iters):
+            if x[i] <= self.a:
+                eis[i] = ((self.rl * x[i] ** 2)  / 2) + self.c1
+            else:
+                eis[i] = ((-1.0 * self.rr * x[i] ** 2)/2.0) + (self.rr * self.l * x[i]) + self.c2
+        return eis
 
     def eid(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-        else:
-            iters = len(x)
-            eid=zeros(iters)
+        iters = len(x)
+        eid=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i] <= self.a:
-                    eid[i] = ((self.rl * x[i] ** 3) / 6) + (self.c1 * x[i])
-                else:
-                    eid[i] = ((-1*self.rr * x[i] ** 3) / 6) + ((self.rr * self.l * x[i] ** 2) / 2) + (self.c2 * x[i]) + self.c4
-            return eid
+        for i in range(0,iters):
+            if x[i] <= self.a:
+                eid[i] = ((self.rl * x[i] ** 3) / 6) + (self.c1 * x[i])
+            else:
+                eid[i] = ((-1*self.rr * x[i] ** 3) / 6) + ((self.rr * self.l * x[i] ** 2) / 2) + (self.c2 * x[i]) + self.c4
+        return eid
 
     def vx(self,x):
         x = float(x)
-        if self.a > self.l:
-            return 'Error a > l'
-        elif x > self.l:
-            return 'Error x > l'
-        else:
-            if x <= self.a:
-                if x==0 and self.a==0:
-                    v = 0
-                else:
-                    v = self.rl
+        if x <= self.a:
+            if x==0 and self.a==0:
+                v = 0
             else:
-                v = -1 * self.rr
-            return v
+                v = self.rl
+        else:
+            v = -1 * self.rr
+        return v
 
     def mx(self,x):
         x = float(x)
-        if self.a > self.l:
-            return 'Error a > l'
-        elif x > self.l:
-            return 'Error x > l'
+        if x <= self.a:
+            m = self.rl * x
         else:
-            if x <= self.a:
-                m = self.rl * x
-            else:
-                m = (-1 * self.rr * x) + (self.rr * self.l)
-            return m
+            m = (-1 * self.rr * x) + (self.rr * self.l)
+        return m
 
     def eisx(self,x):
         x = float(x)
-        if self.a > self.l:
-            return 'Error a > l'
-        elif x > self.l:
-            return 'Error x > l'
+        if x <= self.a:
+            eisx = ((self.rl * x ** 2)  / 2) + self.c1
         else:
-            if x <= self.a:
-                eisx = ((self.rl * x ** 2)  / 2) + self.c1
-            else:
-                eisx = ((-1.0 * self.rr * x ** 2)/2.0) + (self.rr * self.l * x) + self.c2
-            return eisx
+            eisx = ((-1.0 * self.rr * x ** 2)/2.0) + (self.rr * self.l * x) + self.c2
+        return eisx
 
     def eidx(self,x):
         x = float(x)
-        if self.a > self.l:
-            return 'Error a > l'
-        elif x > self.l:
-            return 'Error x > l'
+        if x <= self.a:
+            eid = ((self.rl * x ** 3) / 6) + (self.c1 * x)
         else:
-            if x <= self.a:
-                eid = ((self.rl * x ** 3) / 6) + (self.c1 * x)
-            else:
-                eid = ((-1*self.rr * x ** 3) / 6) + ((self.rr * self.l * x ** 2) / 2) + (self.c2 * x) + self.c4
-            return eid
+            eid = ((-1*self.rr * x ** 3) / 6) + ((self.rr * self.l * x ** 2) / 2) + (self.c2 * x) + self.c4
+        return eid
 
 class point_moment:
     def __init__(self, ma, a, l):
@@ -248,118 +216,86 @@ class point_moment:
 
 
     def v(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-        else:
-            iters = len(x)
-            v=zeros(iters)
+        iters = len(x)
+        v=zeros(iters)
 
-            for i in range(0,iters):
-                v[i] = self.rl
+        for i in range(0,iters):
+            v[i] = self.rl
 
-            return v
+        return v
 
     def m(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-        else:
-            iters = len(x)
-            m=zeros(iters)
+        iters = len(x)
+        m=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i] <= self.a:
-                    if x[i] == 0 and self.a == 0:
-                        m[i] = self.ma
-                    elif x[i] == self.l and self.a == self.l:
-                        m[i] = -1.0*self.ma
-                    else:
-                        m[i] = self.rl * x[i]
+        for i in range(0,iters):
+            if x[i] <= self.a:
+                if x[i] == 0 and self.a == 0:
+                    m[i] = self.ma
+                elif x[i] == self.l and self.a == self.l:
+                    m[i] = -1.0*self.ma
                 else:
-                    m[i] = (self.rl * x[i]) + self.ma
-            return m
+                    m[i] = self.rl * x[i]
+            else:
+                m[i] = (self.rl * x[i]) + self.ma
+        return m
 
     def eis(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-        else:
-            iters = len(x)
-            eis=zeros(iters)
+        iters = len(x)
+        eis=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i] <= self.a:
-                    eis[i] = (0.5*self.rl*x[i]**2) + self.c1
-                else:
-                    eis[i] = (0.5*self.rl*x[i]**2) + (self.ma*x[i]) + self.c2
-            return eis
+        for i in range(0,iters):
+            if x[i] <= self.a:
+                eis[i] = (0.5*self.rl*x[i]**2) + self.c1
+            else:
+                eis[i] = (0.5*self.rl*x[i]**2) + (self.ma*x[i]) + self.c2
+        return eis
 
     def eid(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-        else:
-            iters = len(x)
-            eid=zeros(iters)
+        iters = len(x)
+        eid=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i] <= self.a:
-                    eid[i] = ((1/6.0)*self.rl*x[i]**3) + (self.c1*x[i]) + self.c3
-                else:
-                    eid[i] = (1/6.0)*self.rl*x[i]**3 + (0.5*self.ma*x[i]**2) + (self.c2*x[i]) + self.c4
-            return eid
+        for i in range(0,iters):
+            if x[i] <= self.a:
+                eid[i] = ((1/6.0)*self.rl*x[i]**3) + (self.c1*x[i]) + self.c3
+            else:
+                eid[i] = (1/6.0)*self.rl*x[i]**3 + (0.5*self.ma*x[i]**2) + (self.c2*x[i]) + self.c4
+        return eid
 
     def vx(self,x):
         x = float(x)
-        if self.a > self.l:
-            return 'Error a > l'
-        elif x > self.l:
-            return 'Error x > l'
-        else:
-            v = self.rl
+        v = self.rl
 
         return v
 
     def mx(self,x):
         x = float(x)
-        if self.a > self.l:
-            return 'Error a > l'
-        elif x > self.l:
-            return 'Error x > l'
-        else:
-            if x <= self.a:
-                if x == 0 and self.a == 0:
-                    m = self.ma
-                elif x == self.l and self.a == self.l:
-                    m = -1.0*self.ma
-                else:
-                    m = self.rl * x
+        if x <= self.a:
+            if x == 0 and self.a == 0:
+                m = self.ma
+            elif x == self.l and self.a == self.l:
+                m = -1.0*self.ma
             else:
-                m = (self.rl * x) + self.ma
-            return m
+                m = self.rl * x
+        else:
+            m = (self.rl * x) + self.ma
+        return m
 
     def eisx(self,x):
         x = float(x)
-        if self.a > self.l:
-            return 'Error a > l'
-        elif x > self.l:
-            return 'Error x > l'
+        if x <= self.a:
+            eis = (0.5*self.rl*x**2) + self.c1
         else:
-            if x <= self.a:
-                eis = (0.5*self.rl*x**2) + self.c1
-            else:
-                eis = (0.5*self.rl*x**2) + (self.ma*x) + self.c2
-            return eis
+            eis = (0.5*self.rl*x**2) + (self.ma*x) + self.c2
+        return eis
 
     def eidx(self,x):
         x = float(x)
-        if self.a > self.l:
-            return 'Error a > l'
-        elif x > self.l:
-            return 'Error x > l'
+        if x <= self.a:
+            eid = ((1/6.0)*self.rl*x**3) + (self.c1*x) + self.c3
         else:
-            if x <= self.a:
-                eid = ((1/6.0)*self.rl*x**3) + (self.c1*x) + self.c3
-            else:
-                eid = (1/6.0)*self.rl*x**3 + (0.5*self.ma*x**2) + (self.c2*x) + self.c4
-            return eid
+            eid = (1/6.0)*self.rl*x**3 + (0.5*self.ma*x**2) + (self.c2*x) + self.c4
+        return eid
 
 class udl:
     def __init__(self, w1, a, b, l):
@@ -403,183 +339,95 @@ class udl:
         self.y_graph=[arrow_height,0,arrow_height,0,self.w1,self.w1,0,arrow_height,0,arrow_height]
 
     def v(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        else:
-            iters = len(x)
-            v=zeros(iters)
+        iters = len(x)
+        v=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i] <= self.a:
-                    v[i] = self.rl
-                elif x[i]<=self.b:
-                    v[i] = self.rl - (self.w1 * (x[i] - self.a))
-                else:
-                    v[i] = -1 * self.rr
-            return v
+        for i in range(0,iters):
+            if x[i] <= self.a:
+                v[i] = self.rl
+            elif x[i]<=self.b:
+                v[i] = self.rl - (self.w1 * (x[i] - self.a))
+            else:
+                v[i] = -1 * self.rr
+        return v
 
     def m(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        else:
-            iters = len(x)
-            m=zeros(iters)
+        iters = len(x)
+        m=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i] <= self.a:
-                    m[i] = (self.rl * x[i]) + self.c1
-                elif x[i] <= self.b:
-                    m[i] = (self.rl * x[i]) - ((self.w1 * x[i] ** 2) / 2) + (self.w1 * self.a * x[i]) + self.c2
-                else:
-                    m[i] = (-1 * self.rr * x[i]) + self.c3
-            return m
+        for i in range(0,iters):
+            if x[i] <= self.a:
+                m[i] = (self.rl * x[i]) + self.c1
+            elif x[i] <= self.b:
+                m[i] = (self.rl * x[i]) - ((self.w1 * x[i] ** 2) / 2) + (self.w1 * self.a * x[i]) + self.c2
+            else:
+                m[i] = (-1 * self.rr * x[i]) + self.c3
+        return m
 
     def eis(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        else:
-            iters = len(x)
-            eis=zeros(iters)
+        iters = len(x)
+        eis=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i] <= self.a:
-                    eis[i] = ((self.rl * x[i] ** 2) / 2.0) + (self.c1 * x[i]) + self.c4
-                elif x[i] <= self.b:
-                    eis[i] = ((self.rl * x[i] **2) / 2.0) - ((self.w1 * x[i] ** 3) / 6.0) + ((self.w1 * self.a * x[i] **2) / 2.0) + (self.c2 * x[i]) + self.c5
-                else:
-                    eis[i] = ((-1.0 * self.rr * x[i] ** 2) / 2.0) + (self.c3 * x[i]) + self.c6
-            return eis
+        for i in range(0,iters):
+            if x[i] <= self.a:
+                eis[i] = ((self.rl * x[i] ** 2) / 2.0) + (self.c1 * x[i]) + self.c4
+            elif x[i] <= self.b:
+                eis[i] = ((self.rl * x[i] **2) / 2.0) - ((self.w1 * x[i] ** 3) / 6.0) + ((self.w1 * self.a * x[i] **2) / 2.0) + (self.c2 * x[i]) + self.c5
+            else:
+                eis[i] = ((-1.0 * self.rr * x[i] ** 2) / 2.0) + (self.c3 * x[i]) + self.c6
+        return eis
 
     def eid(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        else:
-            iters = len(x)
-            eid=zeros(iters)
+        iters = len(x)
+        eid=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i] <= self.a:
-                    eid[i] = ((self.rl * x[i] ** 3) / 6) + ((self.c1 * x[i] ** 2) / 2) + (self.c4 * x[i]) + self.c7
-                elif x[i]<=self.b:
-                    eid[i] = ((self.rl * x[i] ** 3) / 6) - ((self.w1 * x[i] ** 4) / 24) + ((self.w1 * self.a * x[i] ** 3) / 6) + ((self.c2 * x[i] ** 2) / 2) + (self.c5 * x[i]) + self.c8
-                else:
-                    eid[i] = ((-1 * self.rr * x[i] ** 3) / 6) + ((self.c3 * x[i] ** 2) / 2) + (self.c6 * x[i]) + self.c9
-            return eid
+        for i in range(0,iters):
+            if x[i] <= self.a:
+                eid[i] = ((self.rl * x[i] ** 3) / 6) + ((self.c1 * x[i] ** 2) / 2) + (self.c4 * x[i]) + self.c7
+            elif x[i]<=self.b:
+                eid[i] = ((self.rl * x[i] ** 3) / 6) - ((self.w1 * x[i] ** 4) / 24) + ((self.w1 * self.a * x[i] ** 3) / 6) + ((self.c2 * x[i] ** 2) / 2) + (self.c5 * x[i]) + self.c8
+            else:
+                eid[i] = ((-1 * self.rr * x[i] ** 3) / 6) + ((self.c3 * x[i] ** 2) / 2) + (self.c6 * x[i]) + self.c9
+        return eid
 
     def vx(self,x):
         x = float(x)
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        elif x > self.l:
-            return 'Error x > l'
+        if x <= self.a:
+            v = self.rl
+        elif x<=self.b:
+            v = self.rl - (self.w1 * (x - self.a))
         else:
-            if x <= self.a:
-                v = self.rl
-            elif x<=self.b:
-                v = self.rl - (self.w1 * (x - self.a))
-            else:
-                v = -1 * self.rr
+            v = -1 * self.rr
         return v
 
     def mx(self,x):
         x = float(x)
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        elif x > self.l:
-            return 'Error x > l'
+        if x <= self.a:
+            m = (self.rl * x) + self.c1
+        elif x <= self.b:
+            m = (self.rl * x) - ((self.w1 * x ** 2) / 2) + (self.w1 * self.a * x) + self.c2
         else:
-            if x <= self.a:
-                m = (self.rl * x) + self.c1
-            elif x <= self.b:
-                m = (self.rl * x) - ((self.w1 * x ** 2) / 2) + (self.w1 * self.a * x) + self.c2
-            else:
-                m = (-1 * self.rr * x) + self.c3
+            m = (-1 * self.rr * x) + self.c3
         return m
 
     def eisx(self,x):
         x = float(x)
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        elif x > self.l:
-            return 'Error x > l'
+        if x <= self.a:
+            eis = ((self.rl * x ** 2) / 2.0) + (self.c1 * x) + self.c4
+        elif x <= self.b:
+            eis = ((self.rl * x **2) / 2.0) - ((self.w1 * x ** 3) / 6.0) + ((self.w1 * self.a * x **2) / 2.0) + (self.c2 * x) + self.c5
         else:
-            if x <= self.a:
-                eis = ((self.rl * x ** 2) / 2.0) + (self.c1 * x) + self.c4
-            elif x <= self.b:
-                eis = ((self.rl * x **2) / 2.0) - ((self.w1 * x ** 3) / 6.0) + ((self.w1 * self.a * x **2) / 2.0) + (self.c2 * x) + self.c5
-            else:
-                eis = ((-1.0 * self.rr * x ** 2) / 2.0) + (self.c3 * x) + self.c6
+            eis = ((-1.0 * self.rr * x ** 2) / 2.0) + (self.c3 * x) + self.c6
         return eis
 
     def eidx(self,x):
         x = float(x)
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        elif x > self.l:
-            return 'Error x > l'
+        if x <= self.a:
+            eid = ((self.rl * x ** 3) / 6) + ((self.c1 * x ** 2) / 2) + (self.c4 * x) + self.c7
+        elif x<=self.b:
+            eid = ((self.rl * x ** 3) / 6) - ((self.w1 * x ** 4) / 24) + ((self.w1 * self.a * x ** 3) / 6) + ((self.c2 * x ** 2) / 2) + (self.c5 * x) + self.c8
         else:
-            if x <= self.a:
-                eid = ((self.rl * x ** 3) / 6) + ((self.c1 * x ** 2) / 2) + (self.c4 * x) + self.c7
-            elif x<=self.b:
-                eid = ((self.rl * x ** 3) / 6) - ((self.w1 * x ** 4) / 24) + ((self.w1 * self.a * x ** 3) / 6) + ((self.c2 * x ** 2) / 2) + (self.c5 * x) + self.c8
-            else:
-                eid = ((-1 * self.rr * x ** 3) / 6) + ((self.c3 * x ** 2) / 2) + (self.c6 * x) + self.c9
+            eid = ((-1 * self.rr * x ** 3) / 6) + ((self.c3 * x ** 2) / 2) + (self.c6 * x) + self.c9
         return eid
 
 class trap:
@@ -632,207 +480,95 @@ class trap:
         self.y_graph=[arrow_height,0,arrow_height,0,self.w1,self.w2,0,arrow_height2,0,arrow_height2]
 
     def v(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
-            return 'Error w1 and w2 change direction'
-            return 'Error w1 and w2 change direction'
-        else:
-            iters = len(x)
-            v=zeros(iters)
+        iters = len(x)
+        v=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i] <= self.a:
-                    v[i] = self.rl
-                elif x[i]<=self.b:
-                    v[i] = self.rl - ((x[i] ** 2 * self.s) / 2) - (x[i] * (self.w1 - (self.s * self.a))) - ((((self.s * self.a) - (2 * self.w1)) * self.a) / 2)
-                else:
-                    v[i] = -1 * self.rr
+        for i in range(0,iters):
+            if x[i] <= self.a:
+                v[i] = self.rl
+            elif x[i]<=self.b:
+                v[i] = self.rl - ((x[i] ** 2 * self.s) / 2) - (x[i] * (self.w1 - (self.s * self.a))) - ((((self.s * self.a) - (2 * self.w1)) * self.a) / 2)
+            else:
+                v[i] = -1 * self.rr
         return v
 
     def m(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
-            return 'Error w1 and w2 change direction'
-            return 'Error w1 and w2 change direction'
-        else:
-            iters = len(x)
-            m=zeros(iters)
+        iters = len(x)
+        m=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i] <= self.a:
-                    m[i] = (self.rl * x[i]) + self.c1
-                elif x[i] <= self.b:
-                    m[i] = (self.rl * x[i]) - ((x[i] ** 3 * self.s) / 6) - ((x[i] ** 2 * (self.w1 - (self.s * self.a))) / 2) - ((((self.s * self.a) - (2 * self.w1)) * self.a * x[i]) / 2) + self.c2
-                else:
-                    m[i] = (-1 * self.rr * x[i]) + self.c3
+        for i in range(0,iters):
+            if x[i] <= self.a:
+                m[i] = (self.rl * x[i]) + self.c1
+            elif x[i] <= self.b:
+                m[i] = (self.rl * x[i]) - ((x[i] ** 3 * self.s) / 6) - ((x[i] ** 2 * (self.w1 - (self.s * self.a))) / 2) - ((((self.s * self.a) - (2 * self.w1)) * self.a * x[i]) / 2) + self.c2
+            else:
+                m[i] = (-1 * self.rr * x[i]) + self.c3
         return m
 
     def eis(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
-            return 'Error w1 and w2 change direction'
-            return 'Error w1 and w2 change direction'
-        else:
-            iters = len(x)
-            eis=zeros(iters)
+        iters = len(x)
+        eis=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i] <= self.a:
-                    eis[i] = ((self.rl * x[i] ** 2) / 2) + (self.c1 * x[i]) + self.c4
-                elif x[i] <= self.b:
-                    eis[i] = ((self.rl * x[i] ** 2) / 2) - ((x[i] ** 4 * self.s) / 24) - ((x[i] ** 3 * (self.w1 - (self.s * self.a))) / 6) - ((((self.s * self.a) - (2 * self.w1)) * self.a * x[i] ** 2) / 4) + (self.c2 * x[i]) + self.c5
-                else:
-                    eis[i] = ((-1 * self.rr * x[i] ** 2) / 2) + (self.c3 * x[i]) + self.c6
+        for i in range(0,iters):
+            if x[i] <= self.a:
+                eis[i] = ((self.rl * x[i] ** 2) / 2) + (self.c1 * x[i]) + self.c4
+            elif x[i] <= self.b:
+                eis[i] = ((self.rl * x[i] ** 2) / 2) - ((x[i] ** 4 * self.s) / 24) - ((x[i] ** 3 * (self.w1 - (self.s * self.a))) / 6) - ((((self.s * self.a) - (2 * self.w1)) * self.a * x[i] ** 2) / 4) + (self.c2 * x[i]) + self.c5
+            else:
+                eis[i] = ((-1 * self.rr * x[i] ** 2) / 2) + (self.c3 * x[i]) + self.c6
         return eis
 
     def eid(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
-            return 'Error w1 and w2 change direction'
-            return 'Error w1 and w2 change direction'
-        else:
-            iters = len(x)
-            eid=zeros(iters)
+        iters = len(x)
+        eid=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i] <= self.a:
-                    eid[i] = ((self.rl * x[i] ** 3) / 6) + ((self.c1 * x[i] ** 2) / 2) + (self.c4 * x[i]) + self.c7
-                elif x[i]<=self.b:
-                    eid[i] = ((self.rl * x[i] ** 3) / 6) - ((x[i] ** 5 * self.s) / 120) - ((x[i] ** 4 * (self.w1 - (self.s * self.a))) / 24) - ((((self.s * self.a) - (2 * self.w1)) * self.a * x[i] ** 3) / 12) + ((self.c2 * x[i] ** 2) / 2) + (self.c5 * x[i]) + self.c8
-                else:
-                    eid[i] = ((-1 * self.rr * x[i] ** 3) / 6) + ((self.c3 * x[i] ** 2) / 2) + (self.c6 * x[i]) + self.c9
+        for i in range(0,iters):
+            if x[i] <= self.a:
+                eid[i] = ((self.rl * x[i] ** 3) / 6) + ((self.c1 * x[i] ** 2) / 2) + (self.c4 * x[i]) + self.c7
+            elif x[i]<=self.b:
+                eid[i] = ((self.rl * x[i] ** 3) / 6) - ((x[i] ** 5 * self.s) / 120) - ((x[i] ** 4 * (self.w1 - (self.s * self.a))) / 24) - ((((self.s * self.a) - (2 * self.w1)) * self.a * x[i] ** 3) / 12) + ((self.c2 * x[i] ** 2) / 2) + (self.c5 * x[i]) + self.c8
+            else:
+                eid[i] = ((-1 * self.rr * x[i] ** 3) / 6) + ((self.c3 * x[i] ** 2) / 2) + (self.c6 * x[i]) + self.c9
         return eid
 
     def vx(self,x):
         x = float(x)
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
-            return 'Error w1 and w2 change direction'
-            return 'Error w1 and w2 change direction'
-        elif x > self.l:
-            return 'Error x > l'
+        if x <= self.a:
+            v = self.rl
+        elif x<=self.b:
+            v = self.rl - ((x ** 2 * self.s) / 2) - (x * (self.w1 - (self.s * self.a))) - ((((self.s * self.a) - (2 * self.w1)) * self.a) / 2)
         else:
-            if x <= self.a:
-                v = self.rl
-            elif x<=self.b:
-                v = self.rl - ((x ** 2 * self.s) / 2) - (x * (self.w1 - (self.s * self.a))) - ((((self.s * self.a) - (2 * self.w1)) * self.a) / 2)
-            else:
-                v = -1 * self.rr
+            v = -1 * self.rr
         return v
 
     def mx(self,x):
         x = float(x)
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
-            return 'Error w1 and w2 change direction'
-            return 'Error w1 and w2 change direction'
-        elif x > self.l:
-            return 'Error x > l'
+        if x <= self.a:
+            m = (self.rl * x) + self.c1
+        elif x <= self.b:
+            m = (self.rl * x) - ((x ** 3 * self.s) / 6) - ((x ** 2 * (self.w1 - (self.s * self.a))) / 2) - ((((self.s * self.a) - (2 * self.w1)) * self.a * x) / 2) + self.c2
         else:
-            if x <= self.a:
-                m = (self.rl * x) + self.c1
-            elif x <= self.b:
-                m = (self.rl * x) - ((x ** 3 * self.s) / 6) - ((x ** 2 * (self.w1 - (self.s * self.a))) / 2) - ((((self.s * self.a) - (2 * self.w1)) * self.a * x) / 2) + self.c2
-            else:
-                m = (-1 * self.rr * x) + self.c3
+            m = (-1 * self.rr * x) + self.c3
         return m
 
     def eisx(self,x):
         x = float(x)
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
-            return 'Error w1 and w2 change direction'
-            return 'Error w1 and w2 change direction'
-        elif x > self.l:
-            return 'Error x > l'
+        if x <= self.a:
+            eis = ((self.rl * x ** 2) / 2) + (self.c1 * x) + self.c4
+        elif x <= self.b:
+            eis = ((self.rl * x ** 2) / 2) - ((x ** 4 * self.s) / 24) - ((x ** 3 * (self.w1 - (self.s * self.a))) / 6) - ((((self.s * self.a) - (2 * self.w1)) * self.a * x ** 2) / 4) + (self.c2 * x) + self.c5
         else:
-            if x <= self.a:
-                eis = ((self.rl * x ** 2) / 2) + (self.c1 * x) + self.c4
-            elif x <= self.b:
-                eis = ((self.rl * x ** 2) / 2) - ((x ** 4 * self.s) / 24) - ((x ** 3 * (self.w1 - (self.s * self.a))) / 6) - ((((self.s * self.a) - (2 * self.w1)) * self.a * x ** 2) / 4) + (self.c2 * x) + self.c5
-            else:
-                eis = ((-1 * self.rr * x ** 2) / 2) + (self.c3 * x) + self.c6
+            eis = ((-1 * self.rr * x ** 2) / 2) + (self.c3 * x) + self.c6
         return eis
 
     def eidx(self,x):
         x = float(x)
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
-            return 'Error w1 and w2 change direction'
-            return 'Error w1 and w2 change direction'
-        elif x > self.l:
-            return 'Error x > l'
+        if x <= self.a:
+            eid = ((self.rl * x ** 3) / 6) + ((self.c1 * x ** 2) / 2) + (self.c4 * x) + self.c7
+        elif x<=self.b:
+            eid = ((self.rl * x ** 3) / 6) - ((x ** 5 * self.s) / 120) - ((x ** 4 * (self.w1 - (self.s * self.a))) / 24) - ((((self.s * self.a) - (2 * self.w1)) * self.a * x ** 3) / 12) + ((self.c2 * x ** 2) / 2) + (self.c5 * x) + self.c8
         else:
-            if x <= self.a:
-                eid = ((self.rl * x ** 3) / 6) + ((self.c1 * x ** 2) / 2) + (self.c4 * x) + self.c7
-            elif x<=self.b:
-                eid = ((self.rl * x ** 3) / 6) - ((x ** 5 * self.s) / 120) - ((x ** 4 * (self.w1 - (self.s * self.a))) / 24) - ((((self.s * self.a) - (2 * self.w1)) * self.a * x ** 3) / 12) + ((self.c2 * x ** 2) / 2) + (self.c5 * x) + self.c8
-            else:
-                eid = ((-1 * self.rr * x ** 3) / 6) + ((self.c3 * x ** 2) / 2) + (self.c6 * x) + self.c9
+            eid = ((-1 * self.rr * x ** 3) / 6) + ((self.c3 * x ** 2) / 2) + (self.c6 * x) + self.c9
         return eid
 
 class cant_right_nl:
@@ -928,113 +664,81 @@ class cant_right_point:
         self.y_graph=[arrow_height,0,arrow_height,0,self.p]
 
     def v(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        else:
-            iters = len(x)
-            v=zeros(iters)
+        iters = len(x)
+        v=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i]<=self.a:
-                    if x[i] == 0 and self.a == 0:
-                        v[i] == 0
-                    else:
-                        v[i] = self.p
+        for i in range(0,iters):
+            if x[i]<=self.a:
+                if x[i] == 0 and self.a == 0:
+                    v[i] == 0
                 else:
-                    v[i] = 0
+                    v[i] = self.p
+            else:
+                v[i] = 0
         return v
 
     def m(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        else:
-            iters = len(x)
-            m=zeros(iters)
+        iters = len(x)
+        m=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i]<=self.a:
-                    m[i] = self.rl*x[i] + self.ml
-                else:
-                    m[i] = 0
+        for i in range(0,iters):
+            if x[i]<=self.a:
+                m[i] = self.rl*x[i] + self.ml
+            else:
+                m[i] = 0
         return m
 
     def eis(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        else:
-            iters = len(x)
-            eis=zeros(iters)
+        iters = len(x)
+        eis=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i]<=self.a:
-                    eis[i] = 0.5*self.rl*x[i]**2 + self.ml*x[i] + self.c1
-                else:
-                    eis[i] = self.c3
+        for i in range(0,iters):
+            if x[i]<=self.a:
+                eis[i] = 0.5*self.rl*x[i]**2 + self.ml*x[i] + self.c1
+            else:
+                eis[i] = self.c3
         return eis
 
     def eid(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        else:
-            iters = len(x)
-            eid=zeros(iters)
+        iters = len(x)
+        eid=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i]<=self.a:
-                    eid[i] = (1.0/6.0)*self.rl*x[i]**3 + 0.5*self.ml*x[i]**2 + self.c1*x[i] + self.c2
-                else:
-                    eid[i] = self.c3*x[i] + self.c4
+        for i in range(0,iters):
+            if x[i]<=self.a:
+                eid[i] = (1.0/6.0)*self.rl*x[i]**3 + 0.5*self.ml*x[i]**2 + self.c1*x[i] + self.c2
+            else:
+                eid[i] = self.c3*x[i] + self.c4
         return eid
 
     def vx(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        else:
-            if x<=self.a:
-                if x == 0 and self.a ==0:
-                    v = 0
-                else:
-                    v = self.p
-            else:
+        if x<=self.a:
+            if x == 0 and self.a ==0:
                 v = 0
+            else:
+                v = self.p
+        else:
+            v = 0
         return v
 
     def mx(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
+        if x<=self.a:
+            m = self.rl*x + self.ml
         else:
-            if x<=self.a:
-                m = self.rl*x + self.ml
-            else:
-                m = 0
+            m = 0
         return m
 
     def eisx(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
+        if x<=self.a:
+            eis = 0.5*self.rl*x**2 + self.ml*x + self.c1
         else:
-            if x<=self.a:
-                eis = 0.5*self.rl*x**2 + self.ml*x + self.c1
-            else:
-                eis = self.c3
+            eis = self.c3
         return eis
 
     def eidx(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
+        if x<=self.a:
+            eid = (1.0/6.0)*self.rl*x**3 + 0.5*self.ml*x**2 + self.c1*x + self.c2
         else:
-            if x<=self.a:
-                eid = (1.0/6.0)*self.rl*x**3 + 0.5*self.ml*x**2 + self.c1*x + self.c2
-            else:
-                eid = self.c3*x + self.c4
+            eid = self.c3*x + self.c4
         return eid
 
 class cant_right_point_moment:
@@ -1100,107 +804,75 @@ class cant_right_point_moment:
                 self.y_graph.append(y)
 
     def v(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        else:
-            iters = len(x)
-            v=zeros(iters)
+        iters = len(x)
+        v=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i]<=self.a:
-                    v[i] = 0
-                else:
-                    v[i] = 0
+        for i in range(0,iters):
+            if x[i]<=self.a:
+                v[i] = 0
+            else:
+                v[i] = 0
         return v
 
     def m(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        else:
-            iters = len(x)
-            m=zeros(iters)
+        iters = len(x)
+        m=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i]<=self.a:
-                    m[i] = self.ml
-                else:
-                    m[i] = 0
+        for i in range(0,iters):
+            if x[i]<=self.a:
+                m[i] = self.ml
+            else:
+                m[i] = 0
         return m
 
     def eis(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        else:
-            iters = len(x)
-            eis=zeros(iters)
+        iters = len(x)
+        eis=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i]<=self.a:
-                    eis[i] = self.ml*x[i] + self.c1
-                else:
-                    eis[i] = self.c3
+        for i in range(0,iters):
+            if x[i]<=self.a:
+                eis[i] = self.ml*x[i] + self.c1
+            else:
+                eis[i] = self.c3
         return eis
 
     def eid(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        else:
-            iters = len(x)
-            eid=zeros(iters)
+        iters = len(x)
+        eid=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i]<=self.a:
-                    eid[i] = 0.5*self.ml*x[i]**2 + self.c1*x[i] + self.c2
-                else:
-                    eid[i] = self.c3*x[i] + self.c4
+        for i in range(0,iters):
+            if x[i]<=self.a:
+                eid[i] = 0.5*self.ml*x[i]**2 + self.c1*x[i] + self.c2
+            else:
+                eid[i] = self.c3*x[i] + self.c4
         return eid
 
     def vx(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
+        if x<=self.a:
+            v = 0
         else:
-            if x<=self.a:
-                v = 0
-            else:
-                v = 0
+            v = 0
         return v
 
     def mx(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
+        if x<=self.a:
+            m = self.ml
         else:
-            if x<=self.a:
-                m = self.ml
-            else:
-                m = 0
+            m = 0
         return m
 
     def eisx(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
+        if x<=self.a:
+            eis = self.ml*x + self.c1
         else:
-            if x<=self.a:
-                eis = self.ml*x + self.c1
-            else:
-                eis = self.c3
+            eis = self.c3
         return eis
 
     def eidx(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
+        if x<=self.a:
+            eid = 0.5*self.ml*x**2 + self.c1*x + self.c2
         else:
-            if x<=self.a:
-                eid = 0.5*self.ml*x**2 + self.c1*x + self.c2
-            else:
-                eid = self.c3*x + self.c4
+            eid = self.c3*x + self.c4
         return eid
 
 class cant_right_udl:
@@ -1254,178 +926,94 @@ class cant_right_udl:
         self.y_graph=[arrow_height,0,arrow_height,0,self.w1,self.w1,0,arrow_height,0,arrow_height]
 
     def v(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        else:
-            iters = len(x)
-            v=zeros(iters)
+        iters = len(x)
+        v=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i] <= self.a:
-                    v[i] = self.rl
-                elif x[i]<=self.b:
-                    v[i] = self.rl - self.w1*(x[i]-self.a)
-                else:
-                    v[i] = 0
-            return v
+        for i in range(0,iters):
+            if x[i] <= self.a:
+                v[i] = self.rl
+            elif x[i]<=self.b:
+                v[i] = self.rl - self.w1*(x[i]-self.a)
+            else:
+                v[i] = 0
+        return v
 
     def m(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        else:
-            iters = len(x)
-            m=zeros(iters)
+        iters = len(x)
+        m=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i] <= self.a:
-                    m[i] = self.rl*x[i] + self.ml
-                elif x[i] <= self.b:
-                    m[i] = self.rl*x[i] + self.ml - (self.w1*(x[i]-self.a)*((x[i]-self.a)/2))
-                else:
-                    m[i] = 0
-            return m
+        for i in range(0,iters):
+            if x[i] <= self.a:
+                m[i] = self.rl*x[i] + self.ml
+            elif x[i] <= self.b:
+                m[i] = self.rl*x[i] + self.ml - (self.w1*(x[i]-self.a)*((x[i]-self.a)/2))
+            else:
+                m[i] = 0
+        return m
 
     def eis(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        else:
-            iters = len(x)
-            eis=zeros(iters)
+        iters = len(x)
+        eis=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i] <= self.a:
-                    eis[i] = 0.5*self.rl*x[i]**2 + self.ml*x[i] + self.c1
-                elif x[i] <= self.b:
-                    eis[i] = 0.5*self.rl*x[i]**2 + self.ml*x[i] - ((1.0/6.0) * self.w1 * (x[i]-self.a)**3) + self.c3
-                else:
-                    eis[i] = self.c5
-            return eis
+        for i in range(0,iters):
+            if x[i] <= self.a:
+                eis[i] = 0.5*self.rl*x[i]**2 + self.ml*x[i] + self.c1
+            elif x[i] <= self.b:
+                eis[i] = 0.5*self.rl*x[i]**2 + self.ml*x[i] - ((1.0/6.0) * self.w1 * (x[i]-self.a)**3) + self.c3
+            else:
+                eis[i] = self.c5
+        return eis
 
     def eid(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        else:
-            iters = len(x)
-            eid=zeros(iters)
+        iters = len(x)
+        eid=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i] <= self.a:
-                    eid[i] = (1.0/6.0)*self.rl*x[i]**2 + 0.5*self.ml*x[i]**2 + self.c1 * x[i] + self.c2
-                elif x[i] <= self.b:
-                    eid[i] = (1.0/6.0)*self.rl*x[i]**3 + 0.5*self.ml*x[i]**2 - (1.0/24.0)*self.w1*(x[i]-self.a)**4 + self.c3*x[i] + self.c4
-                else:
-                    eid[i] = self.c5*x[i] + self.c6
-            return eid
+        for i in range(0,iters):
+            if x[i] <= self.a:
+                eid[i] = (1.0/6.0)*self.rl*x[i]**2 + 0.5*self.ml*x[i]**2 + self.c1 * x[i] + self.c2
+            elif x[i] <= self.b:
+                eid[i] = (1.0/6.0)*self.rl*x[i]**3 + 0.5*self.ml*x[i]**2 - (1.0/24.0)*self.w1*(x[i]-self.a)**4 + self.c3*x[i] + self.c4
+            else:
+                eid[i] = self.c5*x[i] + self.c6
+        return eid
 
     def vx(self,x):
         x = float(x)
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        elif x > self.l:
-            return 'Error x > l'
+        if x <= self.a:
+            v = self.w_tot
+        elif x<=self.b:
+            v = self.w_tot - self.w1*(x-self.a)
         else:
-            if x <= self.a:
-                v = self.w_tot
-            elif x<=self.b:
-                v = self.w_tot - self.w1*(x-self.a)
-            else:
-                v = 0
+            v = 0
         return v
 
     def mx(self,x):
         x = float(x)
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        elif x > self.l:
-            return 'Error x > l'
+        if x <= self.a:
+            m = self.rl*x + self.ml
+        elif x <= self.b:
+            m = self.rl*x + self.ml - (self.w1*(x-self.a)*((x-self.a)/2))
         else:
-            if x <= self.a:
-                m = self.rl*x + self.ml
-            elif x <= self.b:
-                m = self.rl*x + self.ml - (self.w1*(x-self.a)*((x-self.a)/2))
-            else:
-                m = 0
+            m = 0
         return m
 
     def eisx(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
+        if x <= self.a:
+            eis = 0.5*self.rl*x**2 + self.ml*x + self.c1
+        elif x <= self.b:
+            eis = 0.5*self.rl*x**2 + self.ml*x - ((1.0/6.0) * self.w1 * (x-self.a)**3) + self.c3
         else:
-            if x <= self.a:
-                eis = 0.5*self.rl*x**2 + self.ml*x + self.c1
-            elif x <= self.b:
-                eis = 0.5*self.rl*x**2 + self.ml*x - ((1.0/6.0) * self.w1 * (x-self.a)**3) + self.c3
-            else:
-                eis = self.c5
-            return eis
+            eis = self.c5
+        return eis
 
     def eidx(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
+        if x <= self.a:
+            eid = (1.0/6.0)*self.rl*x**2 + 0.5*self.ml*x**2 + self.c1 * x + self.c2
+        elif x <= self.b:
+            eid = (1.0/6.0)*self.rl*x**3 + 0.5*self.ml*x**2 - (1.0/24.0)*self.w1*(x-self.a)**4 + self.c3*x + self.c4
         else:
-            if x <= self.a:
-                eid = (1.0/6.0)*self.rl*x**2 + 0.5*self.ml*x**2 + self.c1 * x + self.c2
-            elif x <= self.b:
-                eid = (1.0/6.0)*self.rl*x**3 + 0.5*self.ml*x**2 - (1.0/24.0)*self.w1*(x-self.a)**4 + self.c3*x + self.c4
-            else:
-                eid = self.c5*x + self.c6
-            return eid
+            eid = self.c5*x + self.c6
+        return eid
 
 class cant_right_trap:
     def __init__(self, w1, w2, a, b, l, lb):
@@ -1487,195 +1075,91 @@ class cant_right_trap:
         self.y_graph=[arrow_height,0,arrow_height,0,self.w1,self.w2,0,arrow_height2,0,arrow_height2]
 
     def v(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
-            return 'Error w1 and w2 change direction'
-            return 'Error w1 and w2 change direction'
-        else:
-            iters = len(x)
-            v=zeros(iters)
+        iters = len(x)
+        v=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i] <= self.a:
-                    v[i] = self.rl
-                elif x[i]<=self.b:
-                    v[i] = self.rl + 0.5*self.s*x[i]**2 - x[i]*((self.s*self.a)+self.w1) + 0.5*self.a*((self.s*self.a)+(2*self.w1))
-                else:
-                    v[i] =0
+        for i in range(0,iters):
+            if x[i] <= self.a:
+                v[i] = self.rl
+            elif x[i]<=self.b:
+                v[i] = self.rl + 0.5*self.s*x[i]**2 - x[i]*((self.s*self.a)+self.w1) + 0.5*self.a*((self.s*self.a)+(2*self.w1))
+            else:
+                v[i] =0
         return v
 
     def m(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
-            return 'Error w1 and w2 change direction'
-            return 'Error w1 and w2 change direction'
-        else:
-            iters = len(x)
-            m=zeros(iters)
+        iters = len(x)
+        m=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i] <= self.a:
-                    m[i] = self.rl*x[i] + self.ml
-                elif x[i] <= self.b:
-                    m[i] = self.rl*x[i] + self.c3 + (1.0/6.0)*self.s*x[i]**3 - 0.5*((self.s*self.a)+self.w1)*x[i]**2 + 0.5*((self.s*self.a)+(2*self.w1))*self.a*x[i]
-                else:
-                    m[i] = 0
+        for i in range(0,iters):
+            if x[i] <= self.a:
+                m[i] = self.rl*x[i] + self.ml
+            elif x[i] <= self.b:
+                m[i] = self.rl*x[i] + self.c3 + (1.0/6.0)*self.s*x[i]**3 - 0.5*((self.s*self.a)+self.w1)*x[i]**2 + 0.5*((self.s*self.a)+(2*self.w1))*self.a*x[i]
+            else:
+                m[i] = 0
         return m
 
     def eis(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
-            return 'Error w1 and w2 change direction'
-            return 'Error w1 and w2 change direction'
-        else:
-            iters = len(x)
-            eis=zeros(iters)
+        iters = len(x)
+        eis=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i] <= self.a:
-                    eis[i] = (0.5*self.rl*x[i]**2)+self.ml*x[i]+self.c1
-                elif x[i] <= self.b:
-                    eis[i] = (0.5*self.rl*x[i]**2)+self.c3*x[i] + (1.0/24.0)*self.s*x[i]**4 - (1.0/6.0)*((self.s*self.a)+self.w1)*x[i]**3 + 0.25*((self.s*self.a)+(2*self.w1))*self.a*x[i]**2 + self.c4
-                else:
-                    eis[i] = self.c6
+        for i in range(0,iters):
+            if x[i] <= self.a:
+                eis[i] = (0.5*self.rl*x[i]**2)+self.ml*x[i]+self.c1
+            elif x[i] <= self.b:
+                eis[i] = (0.5*self.rl*x[i]**2)+self.c3*x[i] + (1.0/24.0)*self.s*x[i]**4 - (1.0/6.0)*((self.s*self.a)+self.w1)*x[i]**3 + 0.25*((self.s*self.a)+(2*self.w1))*self.a*x[i]**2 + self.c4
+            else:
+                eis[i] = self.c6
         return eis
 
     def eid(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
-            return 'Error w1 and w2 change direction'
-            return 'Error w1 and w2 change direction'
-        else:
-            iters = len(x)
-            eid=zeros(iters)
+        iters = len(x)
+        eid=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i] <= self.a:
-                    eid[i] = ((1.0/6.0)*self.rl*x[i]**3)+ 0.5*self.ml*x[i]**2 + self.c1*x[i] + self.c2
-                elif x[i] <= self.b:
-                    eid[i] = ((1.0/6.0)*self.rl*x[i]**3) + 0.5*self.c3*x[i]**2 + (1.0/120.0)*self.s*x[i]**5 - (1.0/24.0)*((self.s*self.a)+self.w1)*x[i]**4 + (1.0/12.0)*((self.s*self.a)+(2*self.w1))*self.a*x[i]**3 + self.c4*x[i] + self.c5
-                else:
-                    eid[i] = self.c6*x[i] + self.c7
+        for i in range(0,iters):
+            if x[i] <= self.a:
+                eid[i] = ((1.0/6.0)*self.rl*x[i]**3)+ 0.5*self.ml*x[i]**2 + self.c1*x[i] + self.c2
+            elif x[i] <= self.b:
+                eid[i] = ((1.0/6.0)*self.rl*x[i]**3) + 0.5*self.c3*x[i]**2 + (1.0/120.0)*self.s*x[i]**5 - (1.0/24.0)*((self.s*self.a)+self.w1)*x[i]**4 + (1.0/12.0)*((self.s*self.a)+(2*self.w1))*self.a*x[i]**3 + self.c4*x[i] + self.c5
+            else:
+                eid[i] = self.c6*x[i] + self.c7
         return eid
 
     def vx(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
-            return 'Error w1 and w2 change direction'
-            return 'Error w1 and w2 change direction'
+        if x <= self.a:
+            v= self.rl
+        elif x<=self.b:
+            v= self.rl + 0.5*self.s*x**2 - x*((self.s*self.a)+self.w1) + 0.5*self.a*((self.s*self.a)+(2*self.w1))
         else:
-            if x <= self.a:
-                v= self.rl
-            elif x<=self.b:
-                v= self.rl + 0.5*self.s*x**2 - x*((self.s*self.a)+self.w1) + 0.5*self.a*((self.s*self.a)+(2*self.w1))
-            else:
-                v =0
+            v =0
         return v
 
     def mx(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
-            return 'Error w1 and w2 change direction'
-            return 'Error w1 and w2 change direction'
+        if x <= self.a:
+            m = self.rl*x + self.ml
+        elif x <= self.b:
+            m = self.rl*x + self.c3 + (1.0/6.0)*self.s*x**3 - 0.5*((self.s*self.a)+self.w1)*x**2 + 0.5*((self.s*self.a)+(2*self.w1))*self.a*x
         else:
-            if x <= self.a:
-                m = self.rl*x + self.ml
-            elif x <= self.b:
-                m = self.rl*x + self.c3 + (1.0/6.0)*self.s*x**3 - 0.5*((self.s*self.a)+self.w1)*x**2 + 0.5*((self.s*self.a)+(2*self.w1))*self.a*x
-            else:
-                m = 0
+            m = 0
         return m
 
     def eisx(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
-            return 'Error w1 and w2 change direction'
-            return 'Error w1 and w2 change direction'
+        if x <= self.a:
+            eis = (0.5*self.rl*x**2)+self.ml*x+self.c1
+        elif x <= self.b:
+            eis = (0.5*self.rl*x**2)+self.c3*x + (1.0/24.0)*self.s*x**4 - (1.0/6.0)*((self.s*self.a)+self.w1)*x**3 + 0.25*((self.s*self.a)+(2*self.w1))*self.a*x**2 + self.c4
         else:
-            if x <= self.a:
-                eis = (0.5*self.rl*x**2)+self.ml*x+self.c1
-            elif x <= self.b:
-                eis = (0.5*self.rl*x**2)+self.c3*x + (1.0/24.0)*self.s*x**4 - (1.0/6.0)*((self.s*self.a)+self.w1)*x**3 + 0.25*((self.s*self.a)+(2*self.w1))*self.a*x**2 + self.c4
-            else:
-                eis = self.c6
+            eis = self.c6
         return eis
 
     def eidx(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
-            return 'Error w1 and w2 change direction'
-            return 'Error w1 and w2 change direction'
+        if x <= self.a:
+            eid = ((1.0/6.0)*self.rl*x**3)+ 0.5*self.ml*x**2 + self.c1*x + self.c2
+        elif x <= self.b:
+            eid = ((1.0/6.0)*self.rl*x**3) + 0.5*self.c3*x**2 + (1.0/120.0)*self.s*x**5 - (1.0/24.0)*((self.s*self.a)+self.w1)*x**4 + (1.0/12.0)*((self.s*self.a)+(2*self.w1))*self.a*x**3 + self.c4*x + self.c5
         else:
-            if x <= self.a:
-                eid = ((1.0/6.0)*self.rl*x**3)+ 0.5*self.ml*x**2 + self.c1*x + self.c2
-            elif x <= self.b:
-                eid = ((1.0/6.0)*self.rl*x**3) + 0.5*self.c3*x**2 + (1.0/120.0)*self.s*x**5 - (1.0/24.0)*((self.s*self.a)+self.w1)*x**4 + (1.0/12.0)*((self.s*self.a)+(2*self.w1))*self.a*x**3 + self.c4*x + self.c5
-            else:
-                eid = self.c6*x + self.c7
+            eid = self.c6*x + self.c7
         return eid
 
 class cant_left_nl:
@@ -1773,107 +1257,75 @@ class cant_left_point:
         self.y_graph=[arrow_height,0,arrow_height,0,self.p]
 
     def v(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        else:
-            iters = len(x)
-            v=zeros(iters)
+        iters = len(x)
+        v=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i]<=self.a:
-                    v[i] = 0
-                else:
-                    v[i] = -1*self.p
+        for i in range(0,iters):
+            if x[i]<=self.a:
+                v[i] = 0
+            else:
+                v[i] = -1*self.p
         return v
 
     def m(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        else:
-            iters = len(x)
-            m=zeros(iters)
+        iters = len(x)
+        m=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i]<=self.a:
-                    m[i] = 0
-                else:
-                    m[i] = -1*self.p * (x[i] - self.a)
+        for i in range(0,iters):
+            if x[i]<=self.a:
+                m[i] = 0
+            else:
+                m[i] = -1*self.p * (x[i] - self.a)
         return m
 
     def eis(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        else:
-            iters = len(x)
-            eis=zeros(iters)
+        iters = len(x)
+        eis=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i]<=self.a:
-                    eis[i] = self.c1
-                else:
-                    eis[i] = (-0.5*self.p * (x[i]-self.a)**2) + self.c3
+        for i in range(0,iters):
+            if x[i]<=self.a:
+                eis[i] = self.c1
+            else:
+                eis[i] = (-0.5*self.p * (x[i]-self.a)**2) + self.c3
         return eis
 
     def eid(self, x):
-        if self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        else:
-            iters = len(x)
-            eid=zeros(iters)
+        iters = len(x)
+        eid=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i]<=self.a:
-                    eid[i] = self.c1*x[i] + self.c2
-                else:
-                    eid[i] = (-1/6.0)*self.p*(x[i]-self.a)**3 + self.c3*x[i] + self.c4
+        for i in range(0,iters):
+            if x[i]<=self.a:
+                eid[i] = self.c1*x[i] + self.c2
+            else:
+                eid[i] = (-1/6.0)*self.p*(x[i]-self.a)**3 + self.c3*x[i] + self.c4
         return eid
 
     def vx(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
+        if x<=self.a:
+            v = 0
         else:
-            if x<=self.a:
-                v = 0
-            else:
-                v = -1*self.p
+            v = -1*self.p
         return v
 
     def mx(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
+        if x<=self.a:
+            m = 0
         else:
-            if x<=self.a:
-                m = 0
-            else:
-                m = -1*self.p * (x - self.a)
+            m = -1*self.p * (x - self.a)
         return m
 
     def eisx(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
+        if x<=self.a:
+            eis = self.c1
         else:
-            if x<=self.a:
-                eis = self.c1
-            else:
-                eis  = (-0.5*self.p * (x-self.a)**2) + self.c3
+            eis  = (-0.5*self.p * (x-self.a)**2) + self.c3
         return eis
 
     def eidx(self, x):
-        if self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
+        if x<=self.a:
+            eid = self.c1*x + self.c2
         else:
-            if x<=self.a:
-                eid = self.c1*x + self.c2
-            else:
-                eid = (-1/6.0)*self.p*(x-self.a)**3 + self.c3*x + self.c4
+            eid = (-1/6.0)*self.p*(x-self.a)**3 + self.c3*x + self.c4
 
         return eid
 
@@ -1940,107 +1392,75 @@ class cant_left_point_moment:
                 self.y_graph.append(y)
 
     def v(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        else:
-            iters = len(x)
-            v=zeros(iters)
+        iters = len(x)
+        v=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i]<=self.a:
-                    v[i] = 0
-                else:
-                    v[i] = 0
+        for i in range(0,iters):
+            if x[i]<=self.a:
+                v[i] = 0
+            else:
+                v[i] = 0
         return v
 
     def m(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        else:
-            iters = len(x)
-            m=zeros(iters)
+        iters = len(x)
+        m=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i]<=self.a:
-                    m[i] = 0
-                else:
-                    m[i] = self.ma
+        for i in range(0,iters):
+            if x[i]<=self.a:
+                m[i] = 0
+            else:
+                m[i] = self.ma
         return m
 
     def eis(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        else:
-            iters = len(x)
-            eis=zeros(iters)
+        iters = len(x)
+        eis=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i]<=self.a:
-                    eis[i] = self.c1
-                else:
-                    eis[i] = (self.ma * x[i]) + self.c3
+        for i in range(0,iters):
+            if x[i]<=self.a:
+                eis[i] = self.c1
+            else:
+                eis[i] = (self.ma * x[i]) + self.c3
         return eis
 
     def eid(self, x):
-        if self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        else:
-            iters = len(x)
-            eid=zeros(iters)
+        iters = len(x)
+        eid=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i]<=self.a:
-                    eid[i] = self.c1*x[i] + self.c2
-                else:
-                    eid[i] = (0.5)*self.ma*x[i]**2 + self.c3*x[i] + self.c4
+        for i in range(0,iters):
+            if x[i]<=self.a:
+                eid[i] = self.c1*x[i] + self.c2
+            else:
+                eid[i] = (0.5)*self.ma*x[i]**2 + self.c3*x[i] + self.c4
         return eid
 
     def vx(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
+        if x<=self.a:
+            v = 0
         else:
-            if x<=self.a:
-                v = 0
-            else:
-                v = 0
+            v = 0
         return v
 
     def mx(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
+        if x<=self.a:
+            m = 0
         else:
-            if x<=self.a:
-                m = 0
-            else:
-                m = self.ma
+            m = self.ma
         return m
 
     def eisx(self,x):
-        if self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
+        if x<=self.a:
+            eis = self.c1
         else:
-            if x<=self.a:
-                eis = self.c1
-            else:
-                eis = (self.ma * x) + self.c3
+            eis = (self.ma * x) + self.c3
         return eis
 
     def eidx(self, x):
-        if self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
+        if x<=self.a:
+            eid = self.c1*x + self.c2
         else:
-            if x<=self.a:
-                eid = self.c1*x + self.c2
-            else:
-                eid = (0.5)*self.ma*x**2 + self.c3*x + self.c4
+            eid = (0.5)*self.ma*x**2 + self.c3*x + self.c4
         return eid
 
 class cant_left_udl:
@@ -2092,171 +1512,91 @@ class cant_left_udl:
         self.y_graph=[arrow_height,0,arrow_height,0,self.w1,self.w1,0,arrow_height,0,arrow_height]
 
     def v(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        else:
-            iters = len(x)
-            v=zeros(iters)
+        iters = len(x)
+        v=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i] <= self.a:
-                    v[i] = 0
-                elif x[i]<=self.b:
-                    v[i] = -1*self.w1*(x[i]-self.a)
-                else:
-                    v[i] = -1*self.w_tot
-            return v
+        for i in range(0,iters):
+            if x[i] <= self.a:
+                v[i] = 0
+            elif x[i]<=self.b:
+                v[i] = -1*self.w1*(x[i]-self.a)
+            else:
+                v[i] = -1*self.w_tot
+        return v
 
     def m(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        else:
-            iters = len(x)
-            m=zeros(iters)
+        iters = len(x)
+        m=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i] <= self.a:
-                    m[i] = 0
-                elif x[i] <= self.b:
-                    m[i] = -0.5*self.w1*(x[i]-self.a)**2
-                else:
-                    m[i] = -1.0 * self.w_tot * (x[i]-(self.a+(0.5*self.c)))
-            return m
+        for i in range(0,iters):
+            if x[i] <= self.a:
+                m[i] = 0
+            elif x[i] <= self.b:
+                m[i] = -0.5*self.w1*(x[i]-self.a)**2
+            else:
+                m[i] = -1.0 * self.w_tot * (x[i]-(self.a+(0.5*self.c)))
+        return m
 
     def eis(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        else:
-            iters = len(x)
-            eis=zeros(iters)
+        iters = len(x)
+        eis=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i] <= self.a:
-                    eis[i] = self.c1
-                elif x[i] <= self.b:
-                    eis[i] = (-1.0/6.0)*self.w1*(x[i]-self.a)**3 + self.c3
-                else:
-                    eis[i] = (-0.5 * self.w_tot * (x[i]-(self.a+(0.5*self.c)))**2) + self.c5
-            return eis
+        for i in range(0,iters):
+            if x[i] <= self.a:
+                eis[i] = self.c1
+            elif x[i] <= self.b:
+                eis[i] = (-1.0/6.0)*self.w1*(x[i]-self.a)**3 + self.c3
+            else:
+                eis[i] = (-0.5 * self.w_tot * (x[i]-(self.a+(0.5*self.c)))**2) + self.c5
+        return eis
 
     def eid(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        else:
-            iters = len(x)
-            eid=zeros(iters)
+        iters = len(x)
+        eid=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i] <= self.a:
-                    eid[i] = self.c1*x[i] + self.c2
-                elif x[i] <= self.b:
-                    eid[i] = (-1.0/24.0)*self.w1*(x[i]-self.a)**4 + self.c3*x[i] + self.c4
-                else:
-                    eid[i] = ((-1.0/6.0) * self.w_tot * (x[i]-(self.a+(0.5*self.c)))**3) + self.c5*x[i] + self.c6
-            return eid
+        for i in range(0,iters):
+            if x[i] <= self.a:
+                eid[i] = self.c1*x[i] + self.c2
+            elif x[i] <= self.b:
+                eid[i] = (-1.0/24.0)*self.w1*(x[i]-self.a)**4 + self.c3*x[i] + self.c4
+            else:
+                eid[i] = ((-1.0/6.0) * self.w_tot * (x[i]-(self.a+(0.5*self.c)))**3) + self.c5*x[i] + self.c6
+        return eid
 
     def vx(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
+        if x <= self.a:
+            v = 0
+        elif x<=self.b:
+            v = -1*self.w1*(x-self.a)
         else:
-            if x <= self.a:
-                v = 0
-            elif x<=self.b:
-                v = -1*self.w1*(x-self.a)
-            else:
-                v = -1*self.w_tot
+            v = -1*self.w_tot
         return v
 
     def mx(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
+        if x <= self.a:
+            m = 0
+        elif x <= self.b:
+            m = -0.5*self.w1*(x-self.a)**2
         else:
-            if x <= self.a:
-                m = 0
-            elif x <= self.b:
-                m = -0.5*self.w1*(x-self.a)**2
-            else:
-                m = -1.0 * self.w_tot * (x-(self.a+(0.5*self.c)))
+            m = -1.0 * self.w_tot * (x-(self.a+(0.5*self.c)))
         return m
 
     def eisx(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
+        if x <= self.a:
+            eis = self.c1
+        elif x <= self.b:
+            eis = (-1.0/6.0)*self.w1*(x-self.a)**3 + self.c3
         else:
-            if x <= self.a:
-                eis = self.c1
-            elif x <= self.b:
-                eis = (-1.0/6.0)*self.w1*(x-self.a)**3 + self.c3
-            else:
-                eis = (-0.5 * self.w_tot * (x-(self.a+(0.5*self.c)))**2) + self.c5
+            eis = (-0.5 * self.w_tot * (x-(self.a+(0.5*self.c)))**2) + self.c5
         return eis
 
     def eidx(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
+        if x <= self.a:
+            eid = self.c1*x+ self.c2
+        elif x <= self.b:
+            eid = (-1.0/24.0)*self.w1*(x-self.a)**4 + self.c3*x + self.c4
         else:
-            if x <= self.a:
-                eid = self.c1*x+ self.c2
-            elif x <= self.b:
-                eid = (-1.0/24.0)*self.w1*(x-self.a)**4 + self.c3*x + self.c4
-            else:
-                eid = ((-1.0/6.0) * self.w_tot * (x-(self.a+(0.5*self.c)))**3) + self.c5*x + self.c6
+            eid = ((-1.0/6.0) * self.w_tot * (x-(self.a+(0.5*self.c)))**3) + self.c5*x + self.c6
         return eid
 
 class cant_left_trap:
@@ -2319,193 +1659,89 @@ class cant_left_trap:
         self.y_graph=[arrow_height,0,arrow_height,0,self.w1,self.w2,0,arrow_height2,0,arrow_height2]
 
     def v(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
-            return 'Error w1 and w2 change direction'
-            return 'Error w1 and w2 change direction'
-        else:
-            iters = len(x)
-            v=zeros(iters)
+        iters = len(x)
+        v=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i] <= self.a:
-                    v[i] = 0
-                elif x[i]<=self.b:
-                    v[i] = (-0.5*((2*self.w1)-(self.s*(x[i]-self.a))))*(x[i]-self.a)
-                else:
-                    v[i] = -1*self.rr
+        for i in range(0,iters):
+            if x[i] <= self.a:
+                v[i] = 0
+            elif x[i]<=self.b:
+                v[i] = (-0.5*((2*self.w1)-(self.s*(x[i]-self.a))))*(x[i]-self.a)
+            else:
+                v[i] = -1*self.rr
         return v
 
     def m(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
-            return 'Error w1 and w2 change direction'
-            return 'Error w1 and w2 change direction'
-        else:
-            iters = len(x)
-            m=zeros(iters)
+        iters = len(x)
+        m=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i] <= self.a:
-                    m[i] = 0
-                elif x[i] <= self.b:
-                    m[i] = ((1.0/6.0)*x[i]*((x[i]**2 * self.s) - (3*x[i]*((self.a*self.s) + self.w1)) + (3*self.a*((self.a*self.s) + (2*self.w1))))) + self.c3
-                else:
-                    m[i] = -1*self.w*(x[i]-self.cc)
+        for i in range(0,iters):
+            if x[i] <= self.a:
+                m[i] = 0
+            elif x[i] <= self.b:
+                m[i] = ((1.0/6.0)*x[i]*((x[i]**2 * self.s) - (3*x[i]*((self.a*self.s) + self.w1)) + (3*self.a*((self.a*self.s) + (2*self.w1))))) + self.c3
+            else:
+                m[i] = -1*self.w*(x[i]-self.cc)
         return m
 
     def eis(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
-            return 'Error w1 and w2 change direction'
-            return 'Error w1 and w2 change direction'
-        else:
-            iters = len(x)
-            eis=zeros(iters)
+        iters = len(x)
+        eis=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i] <= self.a:
-                    eis[i] = self.c1
-                elif x[i] <= self.b:
-                    eis[i] = ((1.0/24.0)*x[i]**2 *((x[i]**2 * self.s) - (4*x[i]*((self.a*self.s) + self.w1)) + (6*self.a*((self.a*self.s) + (2*self.w1))))) + (self.c3 * x[i]) + self.c4
-                else:
-                    eis[i] = (-0.5*self.w*(x[i]-self.cc)**2) + self.c6
+        for i in range(0,iters):
+            if x[i] <= self.a:
+                eis[i] = self.c1
+            elif x[i] <= self.b:
+                eis[i] = ((1.0/24.0)*x[i]**2 *((x[i]**2 * self.s) - (4*x[i]*((self.a*self.s) + self.w1)) + (6*self.a*((self.a*self.s) + (2*self.w1))))) + (self.c3 * x[i]) + self.c4
+            else:
+                eis[i] = (-0.5*self.w*(x[i]-self.cc)**2) + self.c6
         return eis
 
     def eid(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
-            return 'Error w1 and w2 change direction'
-            return 'Error w1 and w2 change direction'
-        else:
-            iters = len(x)
-            eid=zeros(iters)
+        iters = len(x)
+        eid=zeros(iters)
 
-            for i in range(0,iters):
-                if x[i] <= self.a:
-                    eid[i] = self.c1*x[i] + self.c2
-                elif x[i] <= self.b:
-                    eid[i] = ((1.0/120.0)*x[i]**3 *((x[i]**2 * self.s) - (5*x[i]*((self.a*self.s) + self.w1)) + (10*self.a*((self.a*self.s) + (2*self.w1))))) + (0.5*self.c3 * x[i]**2) + (self.c4*x[i]) + self.c5
-                else:
-                    eid[i] = ((-1.0/6.0)*self.w*(x[i]-self.cc)**3) + (self.c6*x[i]) + self.c7
+        for i in range(0,iters):
+            if x[i] <= self.a:
+                eid[i] = self.c1*x[i] + self.c2
+            elif x[i] <= self.b:
+                eid[i] = ((1.0/120.0)*x[i]**3 *((x[i]**2 * self.s) - (5*x[i]*((self.a*self.s) + self.w1)) + (10*self.a*((self.a*self.s) + (2*self.w1))))) + (0.5*self.c3 * x[i]**2) + (self.c4*x[i]) + self.c5
+            else:
+                eid[i] = ((-1.0/6.0)*self.w*(x[i]-self.cc)**3) + (self.c6*x[i]) + self.c7
         return eid
 
     def vx(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
-            return 'Error w1 and w2 change direction'
-            return 'Error w1 and w2 change direction'
+        if x <= self.a:
+            v = 0
+        elif x<=self.b:
+            v= (-0.5*((2*self.w1)-(self.s*(x-self.a))))*(x-self.a)
         else:
-            if x <= self.a:
-                v = 0
-            elif x<=self.b:
-                v= (-0.5*((2*self.w1)-(self.s*(x-self.a))))*(x-self.a)
-            else:
-                v = -1*self.rr
+            v = -1*self.rr
         return v
 
     def mx(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
-            return 'Error w1 and w2 change direction'
-            return 'Error w1 and w2 change direction'
+        if x <= self.a:
+            m = 0
+        elif x <= self.b:
+            m = ((1.0/6.0)*x*((x**2 * self.s) - (3*x*((self.a*self.s) + self.w1)) + (3*self.a*((self.a*self.s) + (2*self.w1))))) + self.c3
         else:
-            if x <= self.a:
-                m = 0
-            elif x <= self.b:
-                m = ((1.0/6.0)*x*((x**2 * self.s) - (3*x*((self.a*self.s) + self.w1)) + (3*self.a*((self.a*self.s) + (2*self.w1))))) + self.c3
-            else:
-                m = -1*self.w*(x-self.cc)
+            m = -1*self.w*(x-self.cc)
         return m
 
     def eisx(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
-            return 'Error w1 and w2 change direction'
-            return 'Error w1 and w2 change direction'
+        if x <= self.a:
+            eis = self.c1
+        elif x <= self.b:
+            eis = ((1.0/24.0)*x**2 *((x**2 * self.s) - (4*x*((self.a*self.s) + self.w1)) + (6*self.a*((self.a*self.s) + (2*self.w1))))) + (self.c3 * x) + self.c4
         else:
-            if x <= self.a:
-                eis = self.c1
-            elif x <= self.b:
-                eis = ((1.0/24.0)*x**2 *((x**2 * self.s) - (4*x*((self.a*self.s) + self.w1)) + (6*self.a*((self.a*self.s) + (2*self.w1))))) + (self.c3 * x) + self.c4
-            else:
-                eis = (-0.5*self.w*(x-self.cc)**2) + self.c6
+            eis = (-0.5*self.w*(x-self.cc)**2) + self.c6
         return eis
 
     def eidx(self,x):
-        if self.a > self.b:
-            return 'Error a > b'
-            return 'Error a > b'
-        elif self.a > self.l:
-            return 'Error a > l'
-            return 'Error a > l'
-        elif self.b > self.l:
-            return 'Error b > l'
-            return 'Error b > l'
-        elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
-            return 'Error w1 and w2 change direction'
-            return 'Error w1 and w2 change direction'
+        if x <= self.a:
+            eid = self.c1*x + self.c2
+        elif x <= self.b:
+            eid = ((1.0/120.0)*x**3 *((x**2 * self.s) - (5*x*((self.a*self.s) + self.w1)) + (10*self.a*((self.a*self.s) + (2*self.w1))))) + (0.5*self.c3 * x**2) + (self.c4*x) + self.c5
         else:
-            if x <= self.a:
-                eid = self.c1*x + self.c2
-            elif x <= self.b:
-                eid = ((1.0/120.0)*x**3 *((x**2 * self.s) - (5*x*((self.a*self.s) + self.w1)) + (10*self.a*((self.a*self.s) + (2*self.w1))))) + (0.5*self.c3 * x**2) + (self.c4*x) + self.c5
-            else:
-                eid = ((-1.0/6.0)*self.w*(x-self.cc)**3) + (self.c6*x) + self.c7
+            eid = ((-1.0/6.0)*self.w*(x-self.cc)**3) + (self.c6*x) + self.c7
         return eid
