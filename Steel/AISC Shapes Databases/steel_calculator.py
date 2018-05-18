@@ -60,26 +60,41 @@ class Master_window:
         self.b_quit = tk.Button(self.base_frame,text="Quit", command=self.quit_app, font=self.helv)
         self.b_quit.pack(side=tk.RIGHT)
         
+        self.left_frame = tk.Frame(self.main_frame, padx=1, pady=1)
+        self.left_frame.grid(row=1, column=1)
+         
+        self.picker_frame = tk.Frame(self.left_frame, padx=1, pady=1)
+        self.picker_frame.grid(row=1, column=1)
+        self.defs_frame = tk.Frame(self.left_frame, padx=1, pady=1)
+        self.defs_frame.grid(row=2, column=1)
+        
+        self.def_title = tk.Label(self.defs_frame, text='-- ', font=self.helv)
+        self.def_title.grid(row=1, column=1, padx=4)
+        
+        self.def_text = tk.Text(self.defs_frame, height = 10, width = 60, bg= "grey90", font=self.helv, wrap=tk.WORD)
+        self.def_text.grid(row=1, column=2, padx=4, pady=10)   
+        
         self.shape_picked = tk.StringVar()
         self.shape_picked.set('W')
         shape_types = self.aisc_db.shape_types
         shape_types.sort()
-        self.shape_type_picker = tk.OptionMenu(self.main_frame, self.shape_picked, *shape_types, command=self.shape_change)
+        self.shape_type_picker = tk.OptionMenu(self.picker_frame, self.shape_picked, *shape_types, command=self.shape_change)
         self.shape_type_picker.configure(width=20)
         self.shape_type_picker.grid(row=0, column=1)
         
-        self.shape_scrollbar_r = tk.Scrollbar(self.main_frame, orient="vertical", command=self.shapes_scroll)
+        self.shape_scrollbar_r = tk.Scrollbar(self.picker_frame, orient="vertical", command=self.shapes_scroll)
         self.shape_scrollbar_r.grid(row=1, column=2, sticky=tk.NS)
         
-        self.shape_listbox = tk.Listbox(self.main_frame, height = 40, width = 35, font=self.helv, yscrollcommand=self.shape_scrollbar_r.set)
+        self.shape_listbox = tk.Listbox(self.picker_frame, height = 40, width = 35, font=self.helv, yscrollcommand=self.shape_scrollbar_r.set)
         self.shape_listbox.grid(row=1, column=1)
         self.shape_listbox.bind("<<ListboxSelect>>", self.shape_click)
 
-        self.shape_data_scrollbar_r = tk.Scrollbar(self.main_frame, orient="vertical", command=self.shapes_data_scroll)
+        self.shape_data_scrollbar_r = tk.Scrollbar(self.picker_frame, orient="vertical", command=self.shapes_data_scroll)
         self.shape_data_scrollbar_r.grid(row=1, column=4, sticky=tk.NS)
         
-        self.shape_data_listbox = tk.Listbox(self.main_frame, height = 40, width = 50, font=self.helv, yscrollcommand=self.shape_data_scrollbar_r.set)
+        self.shape_data_listbox = tk.Listbox(self.picker_frame, height = 40, width = 50, font=self.helv, yscrollcommand=self.shape_data_scrollbar_r.set)
         self.shape_data_listbox.grid(row=1, column=3)
+        self.shape_data_listbox.bind("<<ListboxSelect>>", self.property_click)
         
         self.shape_selection_list = []
         self.shape_props_list = []
@@ -87,7 +102,7 @@ class Master_window:
         
         #Calc Input Data Frame
         self.calc_frame = tk.Frame(self.main_frame, padx=1, pady=1)
-        self.calc_frame.grid(row=1, column=5)
+        self.calc_frame.grid(row=1, column=2)
         
         self.cb_gui = tk.StringVar()
         self.cb_gui.set('1.0')
@@ -124,7 +139,7 @@ class Master_window:
         
         #Calc Results Frame
         self.calc_res_frame = tk.LabelFrame(self.main_frame, text='Shape:', bd=1, relief='sunken', padx=2, pady=2, font=self.helv)
-        self.calc_res_frame.grid(row=1, column=6)
+        self.calc_res_frame.grid(row=1, column=3)
         
         self.flexure_label = tk.Label(self.calc_res_frame, text='--', justify=tk.LEFT, font=self.helv)
         self.flexure_label.grid(row=1, column=1, rowspan=6, sticky = tk.NW)
@@ -137,6 +152,8 @@ class Master_window:
         
         self.shear_weak_label = tk.Label(self.calc_res_frame, text='--', justify=tk.LEFT, font=self.helv)
         self.shear_weak_label.grid(row=1, column=4, rowspan=6, sticky = tk.NW)
+        
+        self.definitions = self.aisc_db.definitions
                 
 
     def quit_app(self):
@@ -204,6 +221,7 @@ class Master_window:
     def shape_click(self, *args):
                 
         selection = self.shape_listbox.curselection()
+        self.shape_defs = []
         
         if selection == ():
             pass
@@ -216,7 +234,7 @@ class Master_window:
                 if prop == '0.0000':
                     pass
                 else:
-                    prop_string = '{0} = {1}'.format(self.shape_prop_labels[i],prop)
+                    prop_string = '{0} = {1} {2}'.format(self.shape_prop_labels[i],prop, self.aisc_db.units[i])
                     self.shape_data_listbox.insert(tk.END, prop_string)
                     
                     if count % 2 == 0:
@@ -225,12 +243,24 @@ class Master_window:
                         pass
                     count+=1
                     
-                i+=1
-            
+                    if 0 < i <84:
+                        self.shape_defs.append(self.definitions[i-1])
+                    else:
+                        self.shape_defs.append(self.definitions[i-83])
+                i+=1           
 
             self.W = self.shape_props_list[selection[0]]
             
             self.shape_calcs()
+    
+    def property_click(self, *args):
+        
+        selection = self.shape_data_listbox.curselection()
+        index = selection[0]
+        
+        self.def_title.configure(text=self.shape_defs[index][0])
+        self.def_text.delete(1.0,tk.END)
+        self.def_text.insert(tk.END,self.shape_defs[index][1])
             
     def shape_calcs(self, *args):
             

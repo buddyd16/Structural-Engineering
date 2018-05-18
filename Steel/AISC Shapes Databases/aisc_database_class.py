@@ -33,6 +33,23 @@ class aisc_15th_database:
         
         file.close()
         
+        file = open('aisc_v15_units.csv','r')
+        units_raw = file.readlines()
+        file.close()
+        
+        file = open('aisc_v15_defs.csv','r')
+        defs_raw = file.readlines()
+        file.close()
+        
+        self.units = units_raw[0].split(',')
+        self.units[-1] = self.units[-1].rstrip('\n')
+        
+        self.definitions = []
+        for prop_def in defs_raw:
+            prop_def = prop_def.split(',')
+            prop_def[-1] = prop_def[-1].rstrip('\n')
+            self.definitions.append(prop_def)
+        
         self.labels = data_raw[0].split(',')
         self.labels[-1] = self.labels[-1].rstrip('\n')
         
@@ -251,3 +268,9 @@ class aisc_15th_database:
                 pass
         
         return shape_selection_list,filtered_shape_list
+        
+db = aisc_15th_database()
+
+defs = db.definitions
+
+sections = db.shapes
