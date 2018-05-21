@@ -568,6 +568,7 @@ class Master_window:
                 flexure_weak_string = flexure_weak_string + 'Iy = {0}\n'.format(W[42])
                 B = float(W[13])
                 H = float(W[8])
+                A = float(W[5])
                 
                 #Slenderness
                 
@@ -614,9 +615,21 @@ class Master_window:
                     if be < b:
                          flexure_string = flexure_string + '\nbeff = {0:.3f} in [F7-4]\n'.format(be)
                          br = b - be
-                         Ieff_x = Ix - (2 * (((br*t*t*t)/12.0) + (br*t*((H-t)/2)**2)))
-                         flexure_string = flexure_string + 'Ieff,x = {0:.3f} in\n(Conservatively removes\n inefective compression\n flange from tension side also)\n'.format(Ieff_x)
-                         Seff_x = Ieff_x / (H/2)
+                         flexure_string = flexure_string +'b- = (b-beff) = {0:.3f} in\n'.format(br)
+                         A_neg = br*t
+                         flexure_string = flexure_string +'A- = b- * t = {0:.3f} in2\n'.format(A_neg)
+                         I_neg = (br*t*t*t) / 12.0
+                         flexure_string = flexure_string +'I- = b- * t^3 /12 = {0:.3f} in4\n'.format(I_neg)
+                         y_neg = H-(t/2.0)
+                         flexure_string = flexure_string +'y- = H - t/2 = {0:.3f} in\n'.format(y_neg)
+                         y = H/2.0
+                         flexure_string = flexure_string +'y,bar = H/2 = {0:.3f} in\n'.format(y)
+                         y_bar_eff = ((A*(y)) - (A_neg*(y_neg)))/(A-A_neg)
+                         flexure_string = flexure_string +'y,bar effective = {0:.3f} in\n'.format(y_bar_eff)
+                         
+                         Ieff_x = (Ix + (A*(y - y_bar_eff)**2)) - (I_neg + (A_neg*(y_neg-y_bar_eff)**2))
+                         flexure_string = flexure_string + 'Ieff,x = {0:.3f} in\n'.format(Ieff_x)
+                         Seff_x = Ieff_x / (H-y_bar_eff)
                          flexure_string = flexure_string + 'Seff,x = {0:.3f} in\n'.format(Seff_x)
                     else:
                          flexure_string = flexure_string + '\nbeff = {0:.3f} in\n'.format(b)
@@ -631,11 +644,23 @@ class Master_window:
                     be = (1.92 * t * (E/fy)**0.5) * (1 - ((0.38/h_t)*(E/fy)**0.5))
                     
                     if be < h:
-                         flexure_weak_string = flexure_weak_string + '\nbeff = {0:.3f} in [F7-4]\n'.format(be)
+                         flexure_weak_string = flexure_weak_string + '\nheff = {0:.3f} in [F7-4]\n'.format(be)
                          br = h - be
-                         Ieff_y = Iy - (2 * (((br*t*t*t)/12.0) + (br*t*((B-t)/2)**2)))
-                         flexure_weak_string = flexure_weak_string + 'Ieff,y = {0:.3f} in\n(Conservatively removes\n inefective compression\n flange from tension side also)\n'.format(Ieff_y)
-                         Seff_y = Ieff_y / (B/2)
+                         flexure_weak_string = flexure_weak_string +'h- = (h-heff) = {0:.3f} in\n'.format(br)
+                         A_neg = br*t
+                         flexure_weak_string = flexure_weak_string +'A- = h- * t = {0:.3f} in2\n'.format(A_neg)
+                         I_neg = (br*t*t*t) / 12.0
+                         flexure_weak_string = flexure_weak_string +'I- = h- * t^3 /12 = {0:.3f} in4\n'.format(I_neg)
+                         y_neg = B-(t/2.0)
+                         flexure_weak_string = flexure_weak_string +'x- = B - t/2 = {0:.3f} in\n'.format(y_neg)
+                         y = B/2.0
+                         flexure_weak_string = flexure_weak_string +'x,bar = B/2 = {0:.3f} in\n'.format(y)
+                         y_bar_eff = ((A*(y)) - (A_neg*(y_neg)))/(A-A_neg)
+                         flexure_weak_string = flexure_weak_string +'x,bar effective = {0:.3f} in\n'.format(y_bar_eff)
+                         
+                         Ieff_y = (Iy + (A*(y - y_bar_eff)**2)) - (I_neg + (A_neg*(y_neg-y_bar_eff)**2))
+                         flexure_weak_string = flexure_weak_string + 'Ieff,y = {0:.3f} in\n'.format(Ieff_y)
+                         Seff_y = Ieff_y / (B - y_bar_eff)
                          flexure_weak_string = flexure_weak_string + 'Seff,y = {0:.3f} in\n'.format(Seff_y)
                     else:
                          flexure_weak_string = flexure_weak_string + '\nbeff = {0:.3f} in\n'.format(h)
