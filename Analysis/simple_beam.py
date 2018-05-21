@@ -808,9 +808,21 @@ class Master_window:
             xsr[0]=0
             
             for i in range(1,(iters+1)):
-                xsl[i] = xsl[i-1] + step_left
-                xsc[i] = xsc[i-1] + step_backspan
-                xsr[i] = xsr[i-1] + step_right
+                if xsl[i-1] + step_left > self.ll:
+                    xsl[i] = self.ll
+                else:
+                    xsl[i] = xsl[i-1] + step_left
+                    
+                if xsc[i-1] + step_backspan > self.lc:
+                    xsc[i] = self.lc
+                else:
+                    xsc[i] = xsc[i-1] + step_backspan
+                
+                if xsr[i-1] + step_right > self.lr:
+                    xsr[i] = self.lr
+                else:
+                    xsr[i] = xsr[i-1] + step_right
+                
             
             xsl = np.append(xsl, self.extra_l_station)
             xsc = np.append(xsc, self.extra_c_station)  
