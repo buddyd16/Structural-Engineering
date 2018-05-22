@@ -128,30 +128,60 @@ class Master_window:
         self.E_gui_entry = tk.Entry(self.calc_frame, textvariable=self.E_gui, width=10)
         self.E_gui_entry.grid(row=4,column=2, sticky = tk.W)
         
+        self.G_gui = tk.StringVar()
+        self.G_gui.set('11200.0')
+        tk.Label(self.calc_frame, text='G (ksi) = ', font=self.helv).grid(row=5, column=1, padx=4)
+        self.G_gui_entry = tk.Entry(self.calc_frame, textvariable=self.G_gui, width=10)
+        self.G_gui_entry.grid(row=5,column=2, sticky = tk.W)
+        
         self.fy_gui = tk.StringVar()
         self.fy_gui.set('50.0')
-        tk.Label(self.calc_frame, text='Fy (ksi) = ', font=self.helv).grid(row=5, column=1, padx=4)
+        tk.Label(self.calc_frame, text='Fy (ksi) = ', font=self.helv).grid(row=6, column=1, padx=4)
         self.fy_gui_entry = tk.Entry(self.calc_frame, textvariable=self.fy_gui, width=10)
-        self.fy_gui_entry.grid(row=5,column=2, sticky = tk.W)
+        self.fy_gui_entry.grid(row=6,column=2, sticky = tk.W)
         
         self.b_refresh = tk.Button(self.calc_frame,text="Refresh\nCalcs", command=self.shape_calcs, font=self.helv)
-        self.b_refresh.grid(row=6, column=2)
+        self.b_refresh.grid(row=7, column=2)
         
         #Calc Results Frame
         self.calc_res_frame = tk.LabelFrame(self.main_frame, text='Shape:', bd=1, relief='sunken', padx=2, pady=2, font=self.helv)
         self.calc_res_frame.grid(row=1, column=3)
         
-        self.flexure_label = tk.Label(self.calc_res_frame, text='--', justify=tk.LEFT, font=self.helv)
-        self.flexure_label.grid(row=1, column=1, rowspan=6, sticky = tk.NW)
+        self.nb = ttk.Notebook(self.calc_res_frame)
+        self.nb.pack(fill=tk.BOTH, expand=1)
         
-        self.flexure_weak_label = tk.Label(self.calc_res_frame, text='--', justify=tk.LEFT, font=self.helv)
-        self.flexure_weak_label.grid(row=1, column=2, rowspan=6, sticky = tk.NW)
+        self.page1 = ttk.Frame(self.nb)
+        self.nb.add(self.page1, text='Flexure - Strong')
+        self.page2 = ttk.Frame(self.nb)
+        self.nb.add(self.page2, text='Flexure - Weak')
+        self.page3 = ttk.Frame(self.nb)
+        self.nb.add(self.page3, text='Shear - Strong')
+        self.page4 = ttk.Frame(self.nb)
+        self.nb.add(self.page4, text='Shear - Weak')
         
-        self.shear_label = tk.Label(self.calc_res_frame, text='--', justify=tk.LEFT, font=self.helv)
-        self.shear_label.grid(row=1, column=3, rowspan=6, sticky = tk.NW)
+        self.pg1_frame = tk.Frame(self.page1, bd=2, relief='sunken', padx=1,pady=1)
+        self.pg1_frame.pack(fill=tk.BOTH,expand=1, padx=5, pady=5)
         
-        self.shear_weak_label = tk.Label(self.calc_res_frame, text='--', justify=tk.LEFT, font=self.helv)
-        self.shear_weak_label.grid(row=1, column=4, rowspan=6, sticky = tk.NW)
+        self.pg2_frame = tk.Frame(self.page2, bd=2, relief='sunken', padx=1,pady=1)
+        self.pg2_frame.pack(fill=tk.BOTH,expand=1, padx=5, pady=5)
+        
+        self.pg3_frame = tk.Frame(self.page3, bd=2, relief='sunken', padx=1,pady=1)
+        self.pg3_frame.pack(fill=tk.BOTH,expand=1, padx=5, pady=5)
+        
+        self.pg4_frame = tk.Frame(self.page4, bd=2, relief='sunken', padx=1,pady=1)
+        self.pg4_frame.pack(fill=tk.BOTH,expand=1, padx=5, pady=5)
+        
+        self.flexure_label = tk.Label(self.pg1_frame, text='--', justify=tk.LEFT, font=self.helv)
+        self.flexure_label.pack()
+        
+        self.flexure_weak_label = tk.Label(self.pg2_frame, text='--', justify=tk.LEFT, font=self.helv)
+        self.flexure_weak_label.pack()
+        
+        self.shear_label = tk.Label(self.pg3_frame, text='--', justify=tk.LEFT, font=self.helv)
+        self.shear_label.pack()
+        
+        self.shear_weak_label = tk.Label(self.pg4_frame, text='--', justify=tk.LEFT, font=self.helv)
+        self.shear_weak_label.pack()
         
         self.definitions = self.aisc_db.definitions
                 
@@ -274,6 +304,7 @@ class Master_window:
             cb = float(self.cb_gui.get())
             Lb = float(self.lb_gui.get())*12.0
             E = float(self.E_gui.get())
+            G = float(self.G_gui.get())
             fy = float(self.fy_gui.get())
             Lv = float(self.lv_gui.get())*12.0
             
@@ -517,7 +548,11 @@ class Master_window:
                 shear_weak_string = shear_weak_string + '\nG7 - Weak Axis Shear in Singly\nand Doubly Symmetric Shapes\n'
                 kv_weak = 1.2
                 shear_weak_string = shear_weak_string + 'kv = 1.2 [G7]\n'
-                bf_tf = bf/tf
+                if W[0] == 'C' or W[0] == 'MC':
+                    bf_tf = bf/ tf
+                else:
+                    bf_tf = bf/ (2*tf)
+                    
                 if bf_tf <= 1.10 * ((kv_weak*E)/fy)**0.5:
                     Cv_weak = 1.0
                     shear_weak_string = shear_weak_string + 'Cv = {0:.2f} [G2-1b (i)][G2-3]\n'.format(Cv_weak)
@@ -628,13 +663,13 @@ class Master_window:
                          flexure_string = flexure_string +'y,bar effective = {0:.3f} in\n'.format(y_bar_eff)
                          
                          Ieff_x = (Ix + (A*(y - y_bar_eff)**2)) - (I_neg + (A_neg*(y_neg-y_bar_eff)**2))
-                         flexure_string = flexure_string + 'Ieff,x = {0:.3f} in\n'.format(Ieff_x)
+                         flexure_string = flexure_string + 'Ieff,x = {0:.3f} in4\n'.format(Ieff_x)
                          Seff_x = Ieff_x / (H-y_bar_eff)
-                         flexure_string = flexure_string + 'Seff,x = {0:.3f} in\n'.format(Seff_x)
+                         flexure_string = flexure_string + 'Seff,x = {0:.3f} in3\n'.format(Seff_x)
                     else:
                          flexure_string = flexure_string + '\nbeff = {0:.3f} in\n'.format(b)
-                         flexure_string = flexure_string + 'Ieff,x = {0:.3f} in\n'.format(Ix)
-                         flexure_string = flexure_string + 'Seff,x = {0:.3f} in\n'.format(sx)
+                         flexure_string = flexure_string + 'Ieff,x = {0:.3f} in4\n'.format(Ix)
+                         flexure_string = flexure_string + 'Seff,x = {0:.3f} in3\n'.format(sx)
                          Seff_x = sx
                 else:
                     pass
@@ -659,13 +694,13 @@ class Master_window:
                          flexure_weak_string = flexure_weak_string +'x,bar effective = {0:.3f} in\n'.format(y_bar_eff)
                          
                          Ieff_y = (Iy + (A*(y - y_bar_eff)**2)) - (I_neg + (A_neg*(y_neg-y_bar_eff)**2))
-                         flexure_weak_string = flexure_weak_string + 'Ieff,y = {0:.3f} in\n'.format(Ieff_y)
+                         flexure_weak_string = flexure_weak_string + 'Ieff,y = {0:.3f} in4\n'.format(Ieff_y)
                          Seff_y = Ieff_y / (B - y_bar_eff)
-                         flexure_weak_string = flexure_weak_string + 'Seff,y = {0:.3f} in\n'.format(Seff_y)
+                         flexure_weak_string = flexure_weak_string + 'Seff,y = {0:.3f} in3\n'.format(Seff_y)
                     else:
                          flexure_weak_string = flexure_weak_string + '\nbeff = {0:.3f} in\n'.format(h)
-                         flexure_weak_string = flexure_weak_string + 'Ieff,y = {0:.3f} in\n'.format(Iy)
-                         flexure_weak_string = flexure_weak_string + 'Seff,y = {0:.3f} in\n'.format(sy)
+                         flexure_weak_string = flexure_weak_string + 'Ieff,y = {0:.3f} in4\n'.format(Iy)
+                         flexure_weak_string = flexure_weak_string + 'Seff,y = {0:.3f} in3\n'.format(sy)
                          Seff_y = sy
                 else:
                     pass
@@ -872,9 +907,161 @@ class Master_window:
                 shear_string = shear_string + 'Phi = {0:.2f}\n'.format(phi_v)
                 shear_string = shear_string + 'Phi*Vn = {0:.2f} kips\n'.format(phi_v*vn)                
             
-            elif W[0] == '2L' or W[0] == 'MT' or W[0] == 'ST' or W[0] == 'WT':
-                pass
+            elif W[0] == 'MT' or W[0] == 'ST' or W[0] == 'WT':
+                zx = float(W[39])
+                flexure_string = flexure_string + '{1}\nZx = {0}\n'.format(W[39], shape)
+                sx = float(W[40])
+                flexure_string = flexure_string + 'Sx = {0}\n'.format(W[40])
+                y = float(W[28])
+                flexure_string = flexure_string + 'y = {0}\n'.format(W[28])
+                Ix = float(W[38])
+                flexure_string = flexure_string + 'Ix = {0}\n'.format(W[38])
+                sxc = Ix / y
+                flexure_string = flexure_string + 'Sxc = Ix / y = {0:.3f}\n'.format(sxc)
+                d = float(W[6])
+                flexure_string = flexure_string + 'd = {0}\n'.format(W[6])
+                Iy = float(W[42])
+                flexure_string = flexure_string + 'Iy = {0}\n'.format(W[42])
+                J = float(W[49])
+                flexure_string = flexure_string + 'J = {0}\n'.format(W[49])
+                bf_2tf = float(W[32])
+                flexure_string = flexure_string + 'bf/2tf = {0}\n'.format(W[32])
+                d_t = float(W[37])
+                flexure_string = flexure_string + 'D/t = {0}\n'.format(W[37])
+                bf = float(W[11])
+                tf = float(W[19])
+                tw = float(W[16])
                 
+                #F9.1 - Yielding                
+                my = fy*sx
+                flexure_string = flexure_string + '\nF9.1 - Yielding\n\nMy = Fy*Sx = {0:.3f} ft-kip\n'.format(my/12.0)
+                mp = fy*zx
+                flexure_string = flexure_string + 'Mp = Fy*Zx = {0:.3f} ft-kip\n'.format(mp/12.0)
+                
+                mn_y_tension = min(1.6*my,mp)
+                flexure_string = flexure_string + '\nMn = Mp < 1.6My = {0:.3f} ft-kip (Stem in Tension) [F9-2]\n'.format(mn_y_tension/12.0)
+                mn_y_compression = min(my,mp)
+                flexure_string = flexure_string + 'Mn = Mp < My = {0:.3f} ft-kip (Stem in Compression) [F9-3]\n'.format(mn_y_compression/12.0)
+                
+                #F9.2 - Lateral-Torsional Buckling
+                B_tension = 2.3*(d/Lb)*(Iy/J)**0.5
+                flexure_string = flexure_string + '\nF9.2 - Lateral-Torsional Buckling\n\nB+ = {0:.3f} (Stem in Tension)\n'.format(B_tension)
+                B_compression =-1.0*2.3*(d/Lb)*(Iy/J)**0.5
+                flexure_string = flexure_string + 'B- = {0:.3f} (Stem in Compression)\n'.format(B_compression)
+                flexure_string = flexure_string + 'B = +/-2.3(d/Lb)*(Iy/J)^1/2 [F9-5]\n'
+                
+                if Lb <= 0:
+                     flexure_string = flexure_string + 'Lb = 0 so N/A\n'
+                     mn_ltb_c = 2*mp
+                     mn_ltb_t = 2*mp
+                else:
+                    mcr_t = ((math.pi*((E*Iy*G*J)**0.5))/Lb) * (B_tension + (1+B_tension**2)**0.5)
+                    flexure_string = flexure_string + '\nMn,ltb = Mcr = {0:.3f} ft-kips (Stem in Tension) [F9-4]\n'.format(mcr_t/12.0)
+                    mcr_c = ((math.pi*((E*Iy*G*J)**0.5))/Lb) * (B_compression + (1+B_compression**2)**0.5)
+                    flexure_string = flexure_string + 'Mn,ltb = Mcr = {0:.3f} ft-kips (Stem in Compression) [F9-4]\n'.format(mcr_c/12.0)
+                    
+                    mn_ltb_t = mcr_t
+                    mn_ltb_c = mcr_c
+                
+                #F9.3 - Flange Local Buckling (Stem in Tension)
+                
+                lambda_p = 0.38*(E/fy)**0.5
+                lambda_r = (E/fy)**0.5
+                flexure_string = flexure_string + '\nF9.3 - Flange Local Buckling (Stem in Tension)\n\nLam,p = {0:.3f}\nLam,r = {1:.3f}\n'.format(lambda_p, lambda_r)
+                if bf_2tf <= lambda_p:
+                    flexure_string = flexure_string + 'Flange is: Compact\nN/A\n'
+                    mn_flb_t = 2*mp
+                
+                elif lambda_p < bf_2tf <= lambda_r:
+                    mn_flb_t = mp - ((mp - (0.7*fy*sxc))*((bf_2tf-lambda_p)/(lambda_r-lambda_p)))
+                    flexure_string = flexure_string + 'Flange is: Non-Compact\nMn,ltb = {0:.3f} ft-kips (Stem in Tension) [F9-6]\n'.format(mn_flb_t/12.0)
+                else:
+                    mn_flb_t = (0.7*E*sxc) / bf_2tf**2
+                    flexure_string = flexure_string + 'Flange is: Slender\nMn,ltb = {0:.3f} ft-kips (Stem in Tension) [F9-6]\n'.format(mn_flb_t/12.0)
+                
+                #F9.4 - Local Buckling of Tee Stems in Flexural Compression (Stem in Compression)
+                
+                flexure_string = flexure_string + '\nF9.4 - Local Buckling of Tee Stems in Flexural Compression (Stem in Compression)\n'
+                if d_t <= 0.84*(E/fy)**0.5:
+                    fcr = fy
+                    flexure_string = flexure_string + '\nWeb is: Compact\nFcr = Fy = {0:.3f} ksi [F9-9]'.format(fcr)
+                elif  0.84*(E/fy)**0.5 < d_t <= 1.03*(E/fy)**0.5:
+                    fcr = (2.55 - (1.84*d_t*((fy/E)**0.5)))*fy
+                    flexure_string = flexure_string + '\nWeb is: Non-Compact\nFcr = [2.55 - 1.84*D/t*(Fy/E)^1/2]*Fy = {0:.3f} ksi [F9-10]'.format(fcr)
+                else:
+                    fcr = 0.69*E / d_t**2
+                    flexure_string = flexure_string + '\nWeb is: Slender\nFcr = 0.69 E / (d/t)^2 = {0:.3f} ksi [F9-11]'.format(fcr)
+                
+                mn_lbts_c = fcr*sx
+                flexure_string = flexure_string + '\n\nMn,lbts = Fcr*Sx = {0:.3f} ft-kips [F9-8]'.format(mn_lbts_c/12.0)
+                
+                mn_c = min( mn_lbts_c,mn_ltb_c,mn_y_compression)
+                mn_t = min(mn_flb_t, mn_ltb_t, mn_y_tension)
+                flexure_string = flexure_string + '\n\nMn,t = {0:.3f} ft-kips (Stem in Tension)'.format(mn_t/12.0)
+                flexure_string = flexure_string + '\nMn,c = {0:.3f} ft-kips (Stem in Compression)'.format(mn_c/12.0)
+                phi = 0.9
+                flexure_string = flexure_string + '\nPhi = 0.9\n'
+                flexure_string = flexure_string + 'Phi*Mn,t = {0:.3f} ft-kips (Stem in Tension)\n'.format(phi*mn_t/12.0)
+                flexure_string = flexure_string + 'Phi*Mn,c = {0:.3f} ft-kips (Stem in Compression)'.format(phi*mn_c/12.0)
+
+
+                #Shear
+                h_tw = d_t
+                #G2.1 - Nominal Shear Strength
+                shear_string = shear_string + '\nG2.1 - Nominal Shear Strength\n'
+                
+                #G2.1b
+                kv = 1.2
+                shear_string = shear_string + 'kv = 1.2 [G2-1 (i)]\n'
+                if h_tw <= 1.10 * ((kv*E)/fy)**0.5:
+                    Cv = 1.0
+                    shear_string = shear_string + 'Cv = {0:.2f} [G2-1b (i)][G2-3]\n'.format(Cv)
+                elif h_tw <= 1.37 * ((kv*E)/fy)**0.5:
+                    Cv = (1.10 * ((kv*E)/fy)**0.5)/h_tw
+                    shear_string = shear_string + 'Cv = {0:.2f} [G2-1b (ii)][G2-4]\n'.format(Cv)
+                else:
+                    Cv = (1.51*E*kv)/(h_tw*h_tw*fy)
+                    shear_string = shear_string + 'Cv = {0:.2f} [G2-1b (iii)][G2-5]\n'.format(Cv)
+                phi_v = 0.90
+            
+                Aw = d*tw
+                shear_string = shear_string + 'Aw = {0:.2f} in2\n'.format(Aw)
+                
+                vn = 0.6*fy*Aw*Cv
+                shear_string = shear_string + '\nVn = {0:.2f} kips [G2-1]\n'.format(vn)
+                shear_string = shear_string + 'Phi = {0:.2f}\n'.format(phi_v)
+                shear_string = shear_string + 'Phi*Vn = {0:.2f} kips\n'.format(phi_v*vn)
+                
+                #G7 - Weak Axis Shear
+                shear_weak_string = shear_weak_string + '\nG7 - Weak Axis Shear in Singly\nand Doubly Symmetric Shapes\n'
+                kv_weak = 1.2
+                shear_weak_string = shear_weak_string + 'kv = 1.2 [G7]\n'
+                bf_tf = bf_2tf
+                if bf_tf <= 1.10 * ((kv_weak*E)/fy)**0.5:
+                    Cv_weak = 1.0
+                    shear_weak_string = shear_weak_string + 'Cv = {0:.2f} [G2-1b (i)][G2-3]\n'.format(Cv_weak)
+                elif bf_tf <= 1.37 * ((kv_weak*E)/fy)**0.5:
+                    Cv_weak = (1.10 * ((kv_weak*E)/fy)**0.5)/bf_tf
+                    shear_weak_string = shear_weak_string + 'Cv = {0:.2f} [G2-1b (ii)][G2-4]\n'.format(Cv_weak)
+                else:
+                    Cv_weak = (1.51*E*kv_weak)/(bf_tf*bf_tf*fy)
+                    shear_weak_string = shear_weak_string + 'Cv = {0:.2f} [G2-1b (iii)][G2-5]\n'.format(Cv_weak)
+                phi_v_weak = 0.90
+                
+                Aw_weak = bf*tf
+                shear_weak_string = shear_weak_string + 'Aw = bf*tf= {0:.2f} in2 [G7]\n'.format(Aw_weak)
+                
+                vn_weak = 0.6*fy*Aw_weak*Cv_weak
+                shear_weak_string = shear_weak_string + '\nVn = {0:.2f} kips [G2-1]\n'.format(vn_weak)
+                shear_weak_string = shear_weak_string + 'Phi = {0:.2f}\n'.format(phi_v_weak)
+                shear_weak_string = shear_weak_string + 'Phi*Vn = {0:.2f} kips\n'.format(phi_v_weak*vn_weak)               
+                    
+            elif W[0] == '2L':     
+                pass
+            
+            elif W[0] == 'L':
+                pass
+            
             else:
                 pass
             
