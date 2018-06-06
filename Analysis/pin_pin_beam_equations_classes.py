@@ -328,7 +328,7 @@ class udl:
             self.c5 = ((-1 * self.rl * self.b ** 2) / 2) + ((self.w1 * self.b ** 3) / 6) - ((self.w1 * self.a * self.b ** 2) / 2) - ((self.rr * self.b ** 2) / 2) + (self.c3 * self.b) - (self.c2 * self.b) + self.c6
             self.c4 = ((self.w1 * self.a ** 3) / 3) + (self.c2 * self.a) + self.c5 - (self.c1 * self.a)
 
-        arrow_height = self.w1/6.0
+        arrow_height = self.w1/12.0
         #30 degree arrow
         arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(30)))
         arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(30)))
@@ -915,7 +915,7 @@ class cant_right_udl:
         self.c5 = 0.5*self.w_tot*self.b**2 + self.ml*self.b - (1.0/6.0)*self.w1*(self.b-self.a)**3 + self.c3
         self.c6 = (1.0/6.0)*self.w_tot*self.b**3 + 0.5*self.ml*self.b**2 - (1.0/24.0)*self.w1*(self.b-self.a)**4 + self.c3*self.b + self.c4 - self.c5*self.b
 
-        arrow_height = self.w1/6.0
+        arrow_height = self.w1/12.0
         #30 degree arrow
         arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(30)))
         arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(30)))
@@ -1501,7 +1501,7 @@ class cant_left_udl:
         self.c4 = ((-1.0/6.0)*self.w_tot * (self.b - (self.a + (0.5*self.c)))**3) + (self.c5*self.b) + self.c6 + ((1.0/24.0)*self.w1*(self.b-self.a)**4) - (self.c3*self.b)
         self.c2 = (self.c3*self.a) + self.c4 - (self.c1*self.a)
 
-        arrow_height = self.w1/6.0
+        arrow_height = self.w1/12.0
         #30 degree arrow
         arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(30)))
         arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(30)))
