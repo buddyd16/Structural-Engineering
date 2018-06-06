@@ -4,8 +4,9 @@ Everything was developed using a standard install of the 2.7.10 version of Pytho
 
 ## Strap Beam - strap_beam_gui.py
 Tkinter GUI based Python Program
-requires the analysis folder and contained py files and the concrete folder and contained python files
-Currently an alpa level program there are several validation checks not being performed such as numebr of bars required in the strap actually fitting in the strap, etc.
+requires the analysis folder and contained py files and the concrete folder and contained python files.
+
+Currently an alpha level program there are several validation checks not being performed such as number of bars required in the strap actually fitting in the strap, etc.  No handling of foundation uplift base assumption of the program is positive bearing.
 
 ## Concrete T beam - depends on concrete_beam_classes in the same directory
 Tkinter GUI based Python program.
