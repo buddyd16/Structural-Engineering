@@ -2339,7 +2339,7 @@ class main_window:
         else:
             psi_s = 1.0
         
-        ld = ((3.0/40.0)*1*(fy_psi/fpc_psi**0.5)*((psi_t*psi_e*psi_s)/(min(cb_l/bar_left[0],2.5))))*bar_left[1]
+        ld = ((3.0/40.0)*1*(fy_psi/fpc_psi**0.5)*((psi_t*psi_e*psi_s)/(min(cb_l/bar_left[0],2.5))))*bar_left[0]
         as_reduction = as1_req / (max(bars_max,bars1)*bar_left[1])
         ld_min = 12
         ld_reduced = ld*as_reduction
@@ -2452,10 +2452,49 @@ class main_window:
         spacing2 = (b2_in - 6.0) / (bars2-1)
         max_spacing2 = min(3*h2_in,18)
         bars_max2 = m.ceil((b2_in - 6.0) / max_spacing2) + 1
+        bars_max2 = m.ceil((b1_in - 6.0) / max_spacing2) + 1
+        spacing_act2 = (b1_in - 6.0) / (max(bars2,bars_max2)-1)
+        
+        #development - ACI 318-08 12.2.3
+        cb_l2 = min(3+(bar_right[0]/2), 0.5*spacing_act2)
+        psi_t2 = 1.0
+        psi_e2 = 1.0
+        if bar_right_size < 7:
+            psi_s2 = 0.8
+        else:
+            psi_s2 = 1.0
+        
+        ld2 = ((3.0/40.0)*1*(fy_psi/fpc_psi**0.5)*((psi_t2*psi_e2*psi_s2)/(min(cb_l2/bar_right[0],2.5))))*bar_right[0]
+        as_reduction2 = as2_req / (max(bars_max2,bars2)*bar_right[1])
+        ld_min = 12
+        ld_reduced2 = ld2*as_reduction2
+        ld_use2 = max(ld_min,ld_reduced2)
+        ld_avail2 = (d2ftg_in/2.0) - 3.0 - (bs_in/2.0)
+        ld_test2 = ld_avail2 >= ld_use2
         
         if rho2 > rho_max:
             right_m_status[0] = 0
             self.ftg2_text = self.ftg2_text + '\nrho,req = {0:.4f} > rho,t = {1:.4f} -- **NG**\n'.format(rho2, rho_max)
+            
+        elif ld_test2 == False:
+            right_m_status[0] = 0
+            self.ftg2_text = self.ftg2_text + '\nrho,req = {0:.4f} < rho,t = {1:.4f} -- OK\n'.format(rho2, rho_max)
+            self.ftg2_text = self.ftg2_text + 'As = rho*B*d = {0:.2f} in^2\n'.format(as2_calc)
+            self.ftg2_text = self.ftg2_text + 'As,min = 0.0018*B*h = {0:.2f} in^2\n'.format(as2_min)
+            self.ftg2_text = self.ftg2_text + 'As,req = max[As,As,min] = {0:.2f} in^2 -- ({1})#{2} Bars\n'.format(as2_req, bars2, bar_right_size)
+            self.ftg2_text = self.ftg2_text + '\nBar Spacing = B - 6 in / (#bars - 1) = {0:.2f} in\n'.format(spacing2)
+            self.ftg2_text = self.ftg2_text + 'Max. Spacing = min of 3*H or 18 in = {0:.2f} in\n'.format(max_spacing2)
+            self.ftg2_text = self.ftg2_text + 'Bars for Max. Spacing = ({0})#{1} --- Use ({2})#{1} Bars\n'.format(bars_max2,bar_right_size, max(bars_max2, bars2))
+            self.ftg2_text = self.ftg2_text + '\nDevelopment Length of bars:\n'
+            self.ftg2_text = self.ftg2_text + 'cb = min of cover+0.5db and 0.5*bar Spacing = {0:.3f}\n'.format(cb_l2)
+            self.ftg2_text = self.ftg2_text + 'lambda = 1.0\npsi,t = 1.0\npsi,e = 1.0\npsi,s = {0}\n'.format(psi_s2)
+            self.ftg2_text = self.ftg2_text + "ld = [(3/40)*(Fy/ lambda * sqrt(F'c))*(psi,t psi,e psi,s/(cb/db))]*db [ACI 318-08 eq 12-2]\nwhere cb/db <= 2.5 -- cb/db= {1:.3f}\nld = {0:.3f} in\n".format(ld2, cb_l2/bar_right[0])
+            self.ftg2_text = self.ftg2_text + 'Reduction of As,req/As = {0:.3f}\n'.format(as_reduction2)
+            self.ftg2_text = self.ftg2_text + 'ld,reduced = {0:.3f} in\n'.format(ld_reduced2)
+            self.ftg2_text = self.ftg2_text + 'ld,min = 12.0 in\n'
+            self.ftg2_text = self.ftg2_text + 'Use max of ld, reduced amd ld,min = {0:.3f} in\n'.format(ld_use2)
+            self.ftg2_text = self.ftg2_text + 'ld,available = D - 3 - Bs/2 = {0:.3f} in\n'.format(ld_avail2)
+            self.ftg2_text = self.ftg2_text + 'ld > ld,available -- **NG**\n'
         else:
             right_m_status[0] = 1
             self.ftg2_text = self.ftg2_text + '\nrho,req = {0:.4f} < rho,t = {1:.4f} -- OK\n'.format(rho2, rho_max)
@@ -2465,6 +2504,17 @@ class main_window:
             self.ftg2_text = self.ftg2_text + '\nBar Spacing = B - 6 in / (#bars - 1) = {0:.2f} in\n'.format(spacing2)
             self.ftg2_text = self.ftg2_text + 'Max. Spacing = min of 3*H or 18 in = {0:.2f} in\n'.format(max_spacing2)
             self.ftg2_text = self.ftg2_text + 'Bars for Max. Spacing = ({0})#{1} --- Use ({2})#{1} Bars\n'.format(bars_max2,bar_right_size, max(bars_max2, bars2))
+            self.ftg2_text = self.ftg2_text + '\nDevelopment Length of bars:\n'
+            self.ftg2_text = self.ftg2_text + 'cb = min of cover+0.5db and 0.5*bar Spacing = {0:.3f}\n'.format(cb_l2)
+            self.ftg2_text = self.ftg2_text + 'lambda = 1.0\npsi,t = 1.0\npsi,e = 1.0\npsi,s = {0}\n'.format(psi_s2)
+            self.ftg2_text = self.ftg2_text + "ld = [(3/40)*(Fy/ lambda * sqrt(F'c))*(psi,t psi,e psi,s/(cb/db))]*db [ACI 318-08 eq 12-2]\nwhere cb/db <= 2.5 -- cb/db= {1:.3f}\nld = {0:.3f} in\n".format(ld2, cb_l2/bar_right[0])
+            self.ftg2_text = self.ftg2_text + 'Reduction of As,req/As = {0:.3f}\n'.format(as_reduction2)
+            self.ftg2_text = self.ftg2_text + 'ld,reduced = {0:.3f} in\n'.format(ld_reduced2)
+            self.ftg2_text = self.ftg2_text + 'ld,min = 12.0 in\n'
+            self.ftg2_text = self.ftg2_text + 'Use max of ld, reduced amd ld,min = {0:.3f} in\n'.format(ld_use2)
+            self.ftg2_text = self.ftg2_text + 'ld,available = D - 3 - Bs/2 = {0:.3f} in\n'.format(ld_avail2)
+            self.ftg2_text = self.ftg2_text + 'ld < ld,available -- OK\n'
+            
             
         #right - Shear - N/S
         self.ftg2_text = self.ftg2_text + '\nFlexural Shear - N/S:\n'
