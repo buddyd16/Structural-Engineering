@@ -62,9 +62,9 @@ class main_window:
         self.static_run = 0
         
         self.f_size = 8
-        self.helv = tkFont.Font(family='Helvetica',size=self.f_size, weight='bold')
-        self.helv_norm = tkFont.Font(family='Helvetica',size=self.f_size)
-        self.helv_res = tkFont.Font(family='Helvetica',size=self.f_size, weight='bold', underline = True)
+        self.helv = tkFont.Font(family=' Courier New',size=self.f_size, weight='bold')
+        self.helv_norm = tkFont.Font(family=' Courier New',size=self.f_size)
+        self.helv_res = tkFont.Font(family=' Courier New',size=self.f_size, weight='bold', underline = True)
         
         self.menubar = tk.Menu(self.master)
         self.menu = tk.Menu(self.menubar, tearoff=0)
@@ -802,6 +802,10 @@ class main_window:
     def run_calcs(self):
         self.basic_calcs()
         
+        #Refresh figures at the same time as running the calcs
+        #So user doesn't have to push both buttons
+        self.refresh_figs()
+        
         self.b_calc.configure(text="Calc/ReCalc")
         
     def quit_app(self):
@@ -993,15 +997,29 @@ class main_window:
         #Caclulate Self Weights and quick check on footing dimensions assuming a concentric load
         
         #Common data items
-        sw_pcf = float(self.density_pcf.get())
+        
         qa_ksf = float(self.Qa_ksf.get())
         fpc_ksi = float(self.Fpc_ksi.get())
+        sw_pcf = float(self.density_pcf.get())
         fpc_psi = fpc_ksi * 1000.0
         dl_factor = float(self.dl_factor.get())
         fy_ksi = float(self.Fy_ksi.get())
         
         self.rebar = concbeam.reinforcement(fy_ksi)
         
+        lcc_ft = float(self.lcc.get())
+        
+        #Common data items - Formatted output text
+        self.commons_out_text = '{:*^85}\n'.format('  Strap Beam - Analysis and Design - v. alpha  ')
+        self.commons_out_text = self.commons_out_text + 'For best formatting of this file use a monospace font type such as: Courier New\n'
+        self.commons_out_text = self.commons_out_text + 'and a Font Size of : 8\n'
+        self.commons_out_text = self.commons_out_text + '\n-- {0:-<82}\n'.format('Common Inputs ')
+        self.commons_out_text = self.commons_out_text + '{0:<22} {1:<12.3f}ksf  (Allowable Soil Bearing)\n'.format('Q,allow :', qa_ksf)
+        self.commons_out_text = self.commons_out_text + "{0:<22} {1:<12.3f}ksi  (Used for both Foundations and Strap Beam)\n".format("F'c :",fpc_ksi)
+        self.commons_out_text = self.commons_out_text + '{0:<22} {1:<12.3f}pcf  (Used for self weights)\n'.format('Concrete Density :',sw_pcf)
+        self.commons_out_text = self.commons_out_text + '{0:<22} {1:<12.3f}(Used to factor self weight for Ultimate values)\n'.format('Dead Load Factor :', dl_factor)
+        self.commons_out_text = self.commons_out_text + '{0:<22} {1:<12.3f}ksi  (Reinforcing Steel Yield Strength)\n'.format('Fy :',fy_ksi)
+        self.commons_out_text = self.commons_out_text + '\n{0:<22} {1:<12.3f}ft  (Center to Center distance between columns)\n'.format('L,cc :',lcc_ft)
         #Strap
         bs_in = float(self.bs.get())
         bs_ft = bs_in/12.0
@@ -1014,6 +1032,7 @@ class main_window:
         self.s_sw_klf.set('{0:.3f}'.format(self.strap_sw_klf))
         
         #Left Foundation
+
         b1_ft = float(self.b1.get())
         d1_ft = float(self.d1.get())
         h1_ft = float(self.h1.get())/12.0
@@ -1029,6 +1048,20 @@ class main_window:
         self.ftg1_sw_kips = (b1_ft*d1_ft*h1_ft*sw_pcf) / 1000.0
         
         self.left_sw_kips.set('{0:.3f}'.format(self.ftg1_sw_kips))
+        
+        self.left_fnd_out_text = '\n-- {0:-<82}\n'.format('Left Foundation ')
+        self.left_fnd_out_text = self.left_fnd_out_text + '{0:<10} {1:<7.3f} ft\n'.format('B =',b1_ft)
+        self.left_fnd_out_text = self.left_fnd_out_text + '{0:<10} {1:<7.3f} ft\n'.format('D =',d1_ft)
+        self.left_fnd_out_text = self.left_fnd_out_text + '{0:<10} {1:<7.3f} ft\n'.format('H =',h1_ft)
+        self.left_fnd_out_text = self.left_fnd_out_text + '\n{0:<10} B x D = {1:<7.3f} ft^2\n'.format('A =',self.ftg1_A_sqft)
+        self.left_fnd_out_text = self.left_fnd_out_text + '{0:<10} B x D x H x Concrete Density = {1:<7.3f} kips\n'.format('Self Wt =',self.ftg1_sw_kips)
+        
+        self.left_col_out_text = '\n-- {0:-<82}\n'.format('Left Column ')
+        self.left_col_out_text = self.left_col_out_text + '{0:<14} {1:<7.3f} ft\n'.format('B =',cb1_ft)
+        self.left_col_out_text = self.left_col_out_text + '{0:<14} {1:<7.3f} ft\n'.format('D =',cd1_ft)
+        self.left_col_out_text = self.left_col_out_text + '{0:<14} {1:<7.3f} ft (left edge of footing to center of column - parallel to B)\n'.format('e =',e1_ft)
+        self.left_col_out_text = self.left_col_out_text + '- Loads -\n{0:<14} {1:<7.3f} kips\n'.format('P,service =',p1s_kips)
+        self.left_col_out_text = self.left_col_out_text + '{0:<14} {1:<7.3f} kips\n'.format('P,ultimate =',p1u_kips)
         
         #Right Foundation
         b2_ft = float(self.b2.get())
@@ -1046,8 +1079,20 @@ class main_window:
         self.ftg2_sw_kips = (b2_ft*d2_ft*h2_ft*sw_pcf) / 1000.0
 
         self.right_sw_kips.set('{0:.3f}'.format(self.ftg2_sw_kips))
-
-        lcc_ft = float(self.lcc.get())
+        
+        self.right_fnd_out_text = '\n-- {0:-<82}\n'.format('Right Foundation ')
+        self.right_fnd_out_text = self.right_fnd_out_text + '{0:<10} {1:<7.3f} ft\n'.format('B =',b2_ft)
+        self.right_fnd_out_text = self.right_fnd_out_text + '{0:<10} {1:<7.3f} ft\n'.format('D =',d2_ft)
+        self.right_fnd_out_text = self.right_fnd_out_text + '{0:<10} {1:<7.3f} ft\n'.format('H =',h2_ft)
+        self.right_fnd_out_text = self.right_fnd_out_text + '\n{0:<10} B x D = {1:<7.3f} ft^2\n'.format('A =',self.ftg2_A_sqft)
+        self.right_fnd_out_text = self.right_fnd_out_text + '{0:<10} B x D x H x Concrete Density = {1:<7.3f} kips\n'.format('Self Wt =',self.ftg2_sw_kips)
+        
+        self.right_col_out_text = '\n-- {0:-<82}\n'.format('Right Column ')
+        self.right_col_out_text = self.right_col_out_text + '{0:<14} {1:<7.3f} ft\n'.format('B =',cb2_ft)
+        self.right_col_out_text = self.right_col_out_text + '{0:<14} {1:<7.3f} ft\n'.format('D =',cd2_ft)
+        self.right_col_out_text = self.right_col_out_text + '{0:<14} {1:<7.3f} ft (center of footing to center of column - parallel to B)\n'.format('e =',e2_ft)
+        self.right_col_out_text = self.right_col_out_text + '- Loads -\n{0:<14} {1:<7.3f} kips\n'.format('P,service =',p2s_kips)
+        self.right_col_out_text = self.right_col_out_text + '{0:<14} {1:<7.3f} kips\n'.format('P,ultimate =',p2u_kips)
         
         ls_ft = lcc_ft - (b1_ft/2.0) - ((b1_ft/2.0)-e1_ft) - (b2_ft/2.0) - e2_ft
         
@@ -1063,9 +1108,31 @@ class main_window:
         strap_l_over_ftg2 = ((b2_ft/2.0) + e2_ft + (cb2_ft/2.0) + (s_ext_ft))
         self.s_swr_kips.set('{0:.3f}'.format(strap_l_over_ftg2*s_sw_over_ftg2))
         
+        self.strap_out_text = '\n-- {0:-<82}\n'.format('Strap Beam ')
+        self.strap_out_text = self.strap_out_text + '{0:<14} {1:<7.3f} ft\n'.format('Bs =',bs_ft)
+        self.strap_out_text = self.strap_out_text + '{0:<14} {1:<7.3f} ft\n'.format('Hs =',hs_ft)
+        self.strap_out_text = self.strap_out_text + 'Ls = Lcc - B,l/2 - (B,l/2 - e,l) - B,r/2 - e,r = {0:<7.3f} ft\n'.format(ls_ft)
+        self.strap_out_text = self.strap_out_text + '\n{0:<20} {1:<7.3f} ft\n'.format('Ext. Beyond Column:',s_ext_ft)
+        self.strap_out_text = self.strap_out_text + '{0:<20} {1:<7.3f} in\n(Delta in elevation from bottom of strap to bottom of footing)\n'.format('Strap Elevation:',s_elev)
+        self.strap_out_text = self.strap_out_text + '\n{0:<12} {2:<43} {1:<7.3f} klf\n'.format('Self Wt. =',self.strap_sw_klf,'Bs x Hs x Concrete Density =')
+        self.strap_out_text = self.strap_out_text + '\n{0:<12} {2:<43} {1:<7.3f} ft\n(Depth of Strap above left footing)\n'.format('Hs,l =',strap_h_over_ftg1, '(Hs - H,l) + (Strap Elevation/12.0) =')
+        self.strap_out_text = self.strap_out_text + '\n{0:<12} {2:<43} {1:<7.3f} klf\n'.format('Self Wt.,l =',s_sw_over_ftg1, 'Bs x Hs,l x Concrete Density =')
+        self.strap_out_text = self.strap_out_text + '\n{0:<12} {2:<43} {1:<7.3f} ft\n(Depth of Strap above right footing)\n'.format('Hs,r =',strap_h_over_ftg2, '(Hs - H,r) + (Strap Elevation/12.0) =')
+        self.strap_out_text = self.strap_out_text + '\n{0:<12} {2:<43} {1:<7.3f} klf\n'.format('Self Wt.,r =',s_sw_over_ftg2, 'Bs x Hs,r x Concrete Density =')
+        self.strap_out_text = self.strap_out_text + '\n{0:<12} {2:<43} {1:<7.3f} ft\n(length of strap over right footing)\n'.format('Ls,r =',strap_l_over_ftg2,'B,r/2 + e,r + Bcol,r/2 + Strap Extension =')
+        
+        #Waterfall to the statics calculation function
         self.statics_calcs()
         
     def statics_calcs(self):
+        self.statics_out_text = '\n\n\n\n\n\n\n\n\n\n\n\n{0:-^85}\n{1:-^85}\n{2:-^85}\n'.format('-',' Statics for Soil Reactions - Service and Ultimate ','-')
+        self.service_out_text = '\n{0:-^85}\n'.format('  SERVICE  ')
+        self.service_out_text = self.service_out_text + '{0:^17}{1:^17}{2:^17}{3:^17}{4:^17}\n'.format('Source','Load (kips)', 'Location (ft)', 'Moment Arm (ft)','Moment (ft-kips)')
+        self.service_out_text = self.service_out_text + '{0:_^85}\n'.format('_')
+        self.ultimate_out_text = '\n\n{0:-^85}\n'.format('  ULTIMATE  ')
+        self.ultimate_out_text = self.ultimate_out_text + '{0:^17}{1:^17}{2:^17}{3:^17}{4:^17}\n'.format('Source','Load (kips)', 'Location (ft)', 'Moment Arm (ft)','Moment (ft-kips)')
+        self.ultimate_out_text = self.ultimate_out_text + '{0:_^85}\n'.format('_')
+        
         #Solve for service and ultimate soil reactions by taking moments about left reaction and sum of vertical forces
         service = []
         ultimate = []
@@ -1185,6 +1252,9 @@ class main_window:
             self.service_statics[4].insert(tk.END, '{0:.3f}'.format(item[4]))
             ms = ms + item[4]
             ps = ps + item[1]
+            
+            self.service_out_text = self.service_out_text + '{0:>17}{1:^17.3f}{2:^17.3f}{3:^17.3f}{4:^17.3f}\n'.format(item[0], item[1], item[2], item[3], item[4])
+            
             if i % 2 == 0:
                 self.service_statics[0].itemconfigure(i, background="pale green")
                 self.service_statics[1].itemconfigure(i, background="pale green")
@@ -1206,6 +1276,9 @@ class main_window:
             self.ultimate_statics[4].insert(tk.END, '{0:.3f}'.format(item[4]))
             mu = mu + item[4]
             pu = pu + item[1]
+            
+            self.ultimate_out_text = self.ultimate_out_text + '{0:>17}{1:^17.3f}{2:^17.3f}{3:^17.3f}{4:^17.3f}\n'.format(item[0], item[1], item[2], item[3], item[4])
+            
             if i % 2 == 0:
                 self.ultimate_statics[0].itemconfigure(i, background="pale green")
                 self.ultimate_statics[1].itemconfigure(i, background="pale green")
@@ -1230,12 +1303,12 @@ class main_window:
         service.append(['R2',R2s,R2_loc,R2_moment_arm,R2s*R2_moment_arm])
         ultimate.append(['R2',R2u,R2_loc,R2_moment_arm,R2u*R2_moment_arm])
         
-        if (R2s*R2_moment_arm) == ms and (R2u*R2_moment_arm) == mu:
+        if 0.999999<((R2s*R2_moment_arm) / ms) <1.000001 and 0.999999<((R2u*R2_moment_arm) / mu)<1.000001:
             self.status_summ.set(1)
         else:
             self.status_summ.set(0)
             
-        if (R2s + R1s) == ps and (R2u + R1u) == pu:
+        if 0.999999 < ((R2s + R1s) / ps) < 1.000001  and 0.999999 < ((R2u + R1u) / pu) < 1.000001:
             self.status_sumv.set(1)
         else:
             self.status_sumv.set(0)
@@ -1250,6 +1323,19 @@ class main_window:
         self.ultimate_statics[2].insert(tk.END, '--')
         self.ultimate_statics[3].insert(tk.END, '--')
         self.ultimate_statics[4].insert(tk.END, '{0:.3f}'.format(mu))
+        
+        self.service_out_text = self.service_out_text + '{0:_^85}\n'.format('_')
+        self.service_out_text = self.service_out_text + '{0:>17}{1:^17.3f}{2:^17}{3:^17}{4:^17.3f}\n'.format('Totals:', ps, '--', '--', ms)
+        self.service_out_text = self.service_out_text + '{0:_^85}\n'.format('_')
+        self.service_out_text = self.service_out_text + '{0:>17}{1:^17.3f}{2:^17.3f}{3:^17.3f}{4:^17.3f}\n'.format('R1',R1s,b1_ft/2.0,0,0)
+        self.service_out_text = self.service_out_text + '{0:>17}{1:^17.3f}{2:^17.3f}{3:^17.3f}{4:^17.3f}\n'.format('R2',R2s,R2_loc,R2_moment_arm,R2s*R2_moment_arm)
+
+        
+        self.ultimate_out_text = self.ultimate_out_text + '{0:_^85}\n'.format('_')
+        self.ultimate_out_text = self.ultimate_out_text + '{0:>17}{1:^17.3f}{2:^17}{3:^17}{4:^17.3f}\n'.format('Totals:', pu, '--', '--', mu)
+        self.ultimate_out_text = self.ultimate_out_text + '{0:_^85}\n'.format('_')
+        self.ultimate_out_text = self.ultimate_out_text + '{0:>17}{1:^17.3f}{2:^17.3f}{3:^17.3f}{4:^17.3f}\n'.format('R1',R1u,b1_ft/2.0,0,0)
+        self.ultimate_out_text = self.ultimate_out_text + '{0:>17}{1:^17.3f}{2:^17.3f}{3:^17.3f}{4:^17.3f}\n\n\n'.format('R2',R2u,R2_loc,R2_moment_arm,R2u*R2_moment_arm)
         
         self.ultimate_statics[0].insert(tk.END, ultimate[-1][0])
         self.ultimate_statics[1].insert(tk.END, '{0:.3f}'.format(ultimate[-1][1]))
@@ -1838,6 +1924,28 @@ class main_window:
                 pass
             i+=1
         
+        self.ult_results_out_text = '\n\n{0:-^85}\n{1:-^85}\n{2:-^85}\n'.format('-',' Ultimate Results at Select Stations ','-')
+        self.ult_results_out_text = self.ult_results_out_text+'\n\n{0:-^85}\n'.format('  Left Edge of Left Footing to Center of left Column  ')
+        self.ult_results_out_text = self.ult_results_out_text+'{0:^14}{1:^14}{2:^14}\n'.format('X (ft)','Vu (kips)','Mu (ft-kips)')
+        self.ult_results_out_text = self.ult_results_out_text+'{0:_^42}\n'.format('_')
+        i=0
+        for i in range(0, len(xsl)):
+            self.ult_results_out_text = self.ult_results_out_text+'{0:^14.3f}{1:^14.3f}{2:^14.3f}\n'.format(xsl[i],shearl[i],momentl[i])
+        self.ult_results_out_text = self.ult_results_out_text+'\n\n{0:-^85}\n'.format('  Center of left Column to Center of Right Column ')
+        self.ult_results_out_text = self.ult_results_out_text+'{0:^14}{1:^14}{2:^14}\n'.format('X (ft)','Vu (kips)','Mu (ft-kips)')
+        self.ult_results_out_text = self.ult_results_out_text+'{0:_^42}\n'.format('_')
+        i=0
+        for i in range(0, len(xsc)):
+            self.ult_results_out_text = self.ult_results_out_text+'{0:^14.3f}{1:^14.3f}{2:^14.3f}\n'.format(xsc[i],shearc[i],momentc[i])
+        
+        self.ult_results_out_text = self.ult_results_out_text+'\n\n{0:-^85}\n'.format('  Center of Right Column to Right Edge of Right Footing')
+        self.ult_results_out_text = self.ult_results_out_text+'{0:^14}{1:^14}{2:^14}\n'.format('X (ft)','Vu (kips)','Mu (ft-kips)')
+        self.ult_results_out_text = self.ult_results_out_text+'{0:_^42}\n'.format('_')
+        i=0
+        for i in range(0, len(xsr)):
+            self.ult_results_out_text = self.ult_results_out_text+'{0:^14.3f}{1:^14.3f}{2:^14.3f}\n'.format(xsr[i],shearr[i],momentr[i])
+            
+            
         self.xsl = xsl
         self.xsc = xsc + xsl[-1]
         self.xsr = xsr + self.xsc[-1]
@@ -2233,8 +2341,8 @@ class main_window:
         self.left_ftg_calc_txtbox.delete(1.0,tk.END)
         self.right_ftg_calc_txtbox.delete(1.0,tk.END)
         
-        self.ftg1_text = 'Left Foundation Calculations:\n'
-        self.ftg2_text = 'Right Foundation Calculations:\n'
+        self.ftg1_text = '\n{1:-^85}\n-- {0:-<82}\n{2:-^85}\n'.format('Left Foundation Calculations: ','-','-')
+        self.ftg2_text = '\n{1:-^85}\n-- {0:-<82}\n{2:-^85}\n'.format('Right Foundation Calculations: ','-','-')
         
         #Common data items
         sw_pcf = float(self.density_pcf.get())
@@ -2294,13 +2402,14 @@ class main_window:
         #Left Foundation Calculations
         a1 = self.ftg1_A_sqft
         sw1 = self.ftg1_sw_kips
-        self.ftg1_text = self.ftg1_text + 'A = B * D = {0:.2f} ft^2 - Self Wt = A * H/12 * Density = {1:.2f} kips\n'.format(a1,sw1)
+        self.ftg1_text = self.ftg1_text + 'A = B * D = {0:.2f} ft^2\nSelf Wt = A * H/12 * Density = {1:.2f} kips\n'.format(a1,sw1)
         
         r1s = self.service[-2][1]
         r1u = self.ultimate[-2][1]
         qa1 = r1s / a1
         qu1 = r1u / a1
         
+        self.ftg1_text = self.ftg1_text + '\n-- {0:-<82}\n'.format('Bearing: ')
         if qa1 <= qa_ksf:
             self.ftg1_text = self.ftg1_text + 'Qa = R1,service / A = {0:.2f} kips / A = {1:.2f} ksf < Q,allow = {2:.2f} ksf -- OK\nQu = R1,ultimate / A = {3:.2f} kips / A = {4:.2f} ksf\n'.format(r1s,qa1,qa_ksf,r1u,qu1)
             self.status_ftg1_q.set(1)
@@ -2309,9 +2418,9 @@ class main_window:
             self.status_ftg1_q.set(0)
         
         #Left - Flexure
-        self.ftg1_text = self.ftg1_text + '\nFlexure:\n'
+        self.ftg1_text = self.ftg1_text + '\n-- {0:-<82}\n'.format('Flexure: ')
         d1_in = h1_in - 3 - (bar_left[0]/2.0)
-        self.ftg1_text = self.ftg1_text + 'd = H - 3" - Øbar/2 = {0:.2f} - 3 - {1:.2f}/2 = {2:.2f} in\n'.format(h1_in,bar_left[0], d1_in)
+        self.ftg1_text = self.ftg1_text + 'd = H - 3" - Dia. bar/2 = {0:.2f} - 3 - {1:.2f}/2 = {2:.2f} in\n'.format(h1_in,bar_left[0], d1_in)
         lb1 = (d1_ft/2.0) - (bs_ft/2.0)
         Mu1 = ((qu1 * b1_ft)*lb1) * (lb1/2.0)
         Mu1_inlbs = Mu1 * 12.0 * 1000.0
@@ -2393,7 +2502,7 @@ class main_window:
             self.ftg1_text = self.ftg1_text + 'ld < ld,available -- OK\n'
             
         #Left - Shear
-        self.ftg1_text = self.ftg1_text + '\nFlexural Shear:\n'
+        self.ftg1_text = self.ftg1_text + '\n-- {0:-<82}\n'.format('Flexural Shear: ')
         #ACI 318-08 equation 11-3
         aci_11_31 = 2.0*1.0*b1_in*d1_in*(fpc_psi**0.5)*(1/1000.0)
         
@@ -2416,12 +2525,13 @@ class main_window:
         
         a2 = self.ftg2_A_sqft
         sw2 = self.ftg2_sw_kips
-        self.ftg2_text = self.ftg2_text + 'A = B * D = {0:.2f} ft^2 - Self Wt = A * H/12 * Density = {1:.2f} kips\n'.format(a2,sw2)
+        self.ftg2_text = self.ftg2_text + 'A = B * D = {0:.2f} ft^2\nSelf Wt = A * H/12 * Density = {1:.2f} kips\n'.format(a2,sw2)
         r2s = self.service[-1][1]
         r2u = self.ultimate[-1][1]
         qa2 = r2s / a2
         qu2 = r2u / a2
         
+        self.ftg2_text = self.ftg2_text + '\n-- {0:-<82}\n'.format('Bearing: ')
         if qa2 <= qa_ksf:
             self.ftg2_text = self.ftg2_text + 'Qa = R2,service / A = {0:.2f} kips / A = {1:.2f} ksf < Q,allow = {2:.2f} ksf -- OK\nQu = R2,ultimate / A = {3:.2f} kips / A = {4:.2f} ksf\n'.format(r2s,qa2,qa_ksf,r2u,qu2)
             self.status_ftg2_q.set(1)
@@ -2433,9 +2543,9 @@ class main_window:
         right_v_status = [0,0]
         
         #Right - Flexure - N/S
-        self.ftg2_text = self.ftg2_text + '\nFlexure - N/S:\n'
+        self.ftg2_text = self.ftg2_text + '\n-- {0:-<82}\n'.format('Flexure - N/S : ')
         d2_in = h2_in - 3 - (bar_right[0]/2.0)
-        self.ftg2_text = self.ftg2_text + 'd = H - 3" - Øbar/2 = {0:.2f} - 3 - {1:.2f}/2 = {2:.2f} in\n'.format(h2_in,bar_right[0], d2_in)
+        self.ftg2_text = self.ftg2_text + 'd = H - 3" - Dia. bar/2 = {0:.2f} - 3 - {1:.2f}/2 = {2:.2f} in\n'.format(h2_in,bar_right[0], d2_in)
         lb2 = (d2_ft/2.0) - (bs_ft/2.0)
         Mu2 = ((qu2 * b2_ft)*lb2) * (lb2/2.0)
         Mu2_inlbs = Mu2 * 12.0 * 1000.0
@@ -2452,7 +2562,6 @@ class main_window:
         spacing2 = (b2_in - 6.0) / (bars2-1)
         max_spacing2 = min(3*h2_in,18)
         bars_max2 = m.ceil((b2_in - 6.0) / max_spacing2) + 1
-        bars_max2 = m.ceil((b1_in - 6.0) / max_spacing2) + 1
         spacing_act2 = (b1_in - 6.0) / (max(bars2,bars_max2)-1)
         
         #development - ACI 318-08 12.2.3
@@ -2517,7 +2626,7 @@ class main_window:
             
             
         #right - Shear - N/S
-        self.ftg2_text = self.ftg2_text + '\nFlexural Shear - N/S:\n'
+        self.ftg2_text = self.ftg2_text + '\n-- {0:-<82}\n'.format('Flexural Shear - N/S : ')
         #ACI 318-08 equation 11-3
         aci_11_32 = 2.0*1.0*b2_in*d2_in*(fpc_psi**0.5)*(1/1000.0)
         
@@ -2538,9 +2647,9 @@ class main_window:
             self.ftg2_text = self.ftg2_text + 'Vu < Phi*Vc -- OK'
 
         #Right - Flexure - E/W
-        self.ftg2_text = self.ftg2_text + '\n\nFlexure - E/W:\n'
+        self.ftg2_text = self.ftg2_text + '\n\n-- {0:-<82}\n'.format('Flexure - E/W : ')
         d2_inew = h2_in - 3 - bar_right[0] - (bar_right[0]/2.0)
-        self.ftg2_text = self.ftg2_text + 'd = H - 3" - Øbar/2 = {0:.2f} - 3 - {1:.2f} - {1:.2f}/2 = {2:.2f} in\n'.format(h2_in,bar_right[0], d2_inew)
+        self.ftg2_text = self.ftg2_text + 'd = H - 3" - Dia. bar - Dia. bar/2 = {0:.2f} - 3 - {1:.2f} - {1:.2f}/2 = {2:.2f} in\n'.format(h2_in,bar_right[0], d2_inew)
         x_mew = cb2_ft/2.0
         xc_mew = lcc_ft - (cb2_ft/2.0)
         
@@ -2577,7 +2686,7 @@ class main_window:
             self.ftg2_text = self.ftg2_text + 'Bars for Max. Spacing = ({0})#{1} --- Use ({2})#{1} Bars\n'.format(bars_max2ew,bar_right_size, max(bars_max2ew, bars2ew))
             
         #right - Shear - E/W
-        self.ftg2_text = self.ftg2_text + '\nFlexural Shear - E/W:\n'
+        self.ftg2_text = self.ftg2_text + '\n-- {0:-<82}\n'.format('Flexural Shear - E/W : ')
         #ACI 318-08 equation 11-3
         aci_11_32ew = 2.0*1.0*d2ftg_in*d2_inew*(fpc_psi**0.5)*(1/1000.0)
         
@@ -2622,7 +2731,7 @@ class main_window:
     def strap_design(self):
         self.strap_calc_txtbox.delete(1.0,tk.END)
         
-        self.strap_text = 'Strap Beam Design: \n'
+        self.strap_text = '\n{1:-^85}\n-- {0:-<82}\n{2:-^85}\n'.format('Strap Beam Calculations: ','-','-')
         self.strap_text = self.strap_text + 'Cover to Shear Bars: 1-1/2 in.\n'
         
         cover = 1.50
@@ -2661,7 +2770,7 @@ class main_window:
         bar_v_size = int(self.strap_vbar_size.get())
         bar_m_size = int(self.strap_bar_size.get())
         
-        self.strap_text = self.strap_text + '\nFlexure:\n'
+        self.strap_text = self.strap_text + '\n-- {0:-<82}\n'.format('Flexure : ')
         
         mu = min(self.momentc_u)
         mu_inlbs = abs(mu) * 12.0 * 1000.0
@@ -2669,7 +2778,7 @@ class main_window:
         self.strap_text = self.strap_text + 'Mu = {0:.2f} ft-kips\n'.format(mu)
         
         d_in = hs_in - cover - bar_v[0] - (bar_m[0]/2.0)
-        self.strap_text = self.strap_text + 'd = h - cover - Øshear bar - Øflexure bar/2.0 = {0:.2f} in.\n'.format(d_in)
+        self.strap_text = self.strap_text + 'd = h - cover - Dia. shear bar - Dia. flexure bar/2.0 = {0:.2f} in.\n'.format(d_in)
         
         R = mu_inlbs / (0.9*bs_in*d_in*d_in)
         
@@ -2710,7 +2819,7 @@ class main_window:
             self.strap_text = self.strap_text + 'As,req = max[As,As,min] = {0:.2f} in^2 -- ({1})#{2} Bars\n'.format(as_req, m.ceil(bars), bar_m_size)
         
         #Shear
-        self.strap_text = self.strap_text + '\nShear:\n'
+        self.strap_text = self.strap_text + '\n-- {0:-<82}\n'.format('Shear : ')
         #ACI 318-08 equation 11-3
         aci_11_3 = 2.0*1.0*bs_in*d_in*(fpc_psi**0.5)*(1/1000.0)
         
@@ -2774,6 +2883,29 @@ class main_window:
                 self.strap_text = self.strap_text + '\nVu < 0.5*Phi*Vc -- OK, No Shear Reinforcement Required'
             
         self.strap_calc_txtbox.insert(tk.END, self.strap_text)
+        
+        self.save_output()
+        
+    def save_output(self):
+        file = open('strap_results.txt','w')
+        
+        file.write(self.commons_out_text)
+        file.write(self.left_fnd_out_text)
+        file.write(self.left_col_out_text)
+        file.write(self.right_fnd_out_text)
+        file.write(self.right_col_out_text)
+        file.write(self.strap_out_text)
+        file.write(self.statics_out_text)
+        file.write(self.service_out_text)
+        file.write(self.ultimate_out_text)
+        file.write(self.ftg1_text)
+        file.write('\n')
+        file.write(self.ftg2_text)
+        file.write('\n')
+        file.write(self.strap_text)
+        file.write(self.ult_results_out_text)
+        
+        file.close()
         
 def main():
     root = tk.Tk()
