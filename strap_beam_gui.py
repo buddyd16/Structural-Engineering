@@ -166,6 +166,7 @@ class main_window:
         self.g_fbd_canvas = tk.Canvas(self.g_fbd_frame, width=50, height=50, bd=2, relief='sunken', background="gray60")
         self.g_fbd_canvas.bind("<Configure>", self.draw_fbd)
         self.g_fbd_canvas.pack(side = tk.LEFT, anchor='c', padx= 1, pady= 1, fill=tk.BOTH, expand=1)
+        
         #Beam Diagram
         self.g_beam = ttk.Frame(self.nb_graphs)
         self.nb_graphs.add(self.g_beam, text='Static Beam Diagram')
@@ -239,6 +240,13 @@ class main_window:
         self.strap_design_frame = tk.Frame(self.strap_design_tab, bd=2, relief='sunken', padx=1,pady=1)
         self.strap_design_frame.pack(fill=tk.BOTH,expand=1, padx=5, pady=5)
 
+        #Load Casing
+        self.load_case_tab = ttk.Frame(self.nb_data)
+        self.nb_data.add(self.load_case_tab, text='Multiple Load Cases')
+
+        self.load_case_frame = tk.Frame(self.load_case_tab, bd=2, relief='sunken', padx=1,pady=1)
+        self.load_case_frame.pack(fill=tk.BOTH,expand=1, padx=5, pady=5)
+        
         #Data/Calc Frame Items
         #Geometry and Basic items
         self.data_frame_builder()
@@ -253,43 +261,85 @@ class main_window:
         self.ftg_design_frame_builder()
 
         #Strap Beam Design Items
-        self.strap_inputs_frame = tk.Frame(self.strap_design_frame)
-        self.strap_inputs_frame.pack(side=tk.LEFT, anchor='nw')
-        self.strap_calc_frame = tk.Frame(self.strap_design_frame)
-        self.strap_calc_frame.pack(side=tk.RIGHT ,anchor='ne', fill=tk.BOTH, expand=1)
-
-
-        tk.Label(self.strap_inputs_frame, text="B = ", font=self.helv).grid(row=0, column=0, sticky = tk.E)
-        tk.Entry(self.strap_inputs_frame, textvariable=self.bs, width=10, validate="key", validatecommand=self.reset_status).grid(row=0, column=1)
-        tk.Label(self.strap_inputs_frame, text="in", font=self.helv).grid(row=0, column=2)
-
-        tk.Label(self.strap_inputs_frame, text="H = ", font=self.helv).grid(row=1, column=0, sticky = tk.E)
-        tk.Entry(self.strap_inputs_frame, textvariable=self.hs, width=10, validate="key", validatecommand=self.reset_status).grid(row=1, column=1)
-        tk.Label(self.strap_inputs_frame, text="in", font=self.helv).grid(row=1, column=2)
-
-        self.strap_vbar_size = tk.StringVar()
-        self.strap_vbar_size.set('3')
-        self.strap_vbar_size_label = tk.Label(self.strap_inputs_frame, text="Shear\nBar Size (#) : ", font=self.helv)
-        self.strap_vbar_size_label.grid(row=2,column=0, pady=2)
-        self.strap_vbar_size_menu = tk.OptionMenu(self.strap_inputs_frame, self.strap_vbar_size, '3', '4', '5', command=self.reset_status)
-        self.strap_vbar_size_menu.config(font=self.helv)
-        self.strap_vbar_size_menu.grid(row=2, column=1, padx= 2, sticky=tk.W)
-
-        self.strap_bar_size = tk.StringVar()
-        self.strap_bar_size.set('3')
-        self.strap_bar_size_label = tk.Label(self.strap_inputs_frame, text="Flexure\nBar Size (#) : ", font=self.helv)
-        self.strap_bar_size_label.grid(row=4,column=0, pady=2)
-        self.strap_bar_size_menu = tk.OptionMenu(self.strap_inputs_frame, self.strap_bar_size, '3', '4', '5','6','7','8','9','10','11','14','18', command=self.reset_status)
-        self.strap_bar_size_menu.config(font=self.helv)
-        self.strap_bar_size_menu.grid(row=4, column=1, padx= 2, sticky=tk.W)
-
-        self.strap_calc_txtbox = tk.Text(self.strap_calc_frame, height = 25, width = 70, bg= "grey90", font= self.helv_norm, wrap=tk.WORD)
-        self.strap_calc_txtbox.grid(row=0, column=0, sticky='nsew')
-
-        self.strap_scroll = tk.Scrollbar(self.strap_calc_frame, command=self.strap_calc_txtbox.yview)
-        self.strap_scroll.grid(row=0, column=1, sticky='nsew')
-        self.strap_calc_txtbox['yscrollcommand'] = self.strap_scroll.set
-
+        self.strap_design_frame_builder()
+        
+        #Load Case Tab Items
+        self.load_case_count = 0
+        self.load_case_list = []
+        self.load_case_res_list = []
+        self.load_clicked = False
+        
+        self.load_case_add_frame = tk.Frame(self.load_case_frame, bd=2, relief='sunken', padx=1,pady=1)
+        self.load_case_add_frame.pack(side=tk.LEFT ,anchor='nw', fill=tk.BOTH,expand=1)
+        
+        self.load_case_add_button_frame = tk.Frame(self.load_case_add_frame, bd=2, relief='sunken', padx=1,pady=1)
+        self.load_case_add_button_frame.pack(side=tk.TOP)
+        
+        self.load_case_add_list_frame = tk.Frame(self.load_case_add_frame, bd=2, relief='sunken', padx=1,pady=1)
+        self.load_case_add_list_frame.pack(side=tk.TOP)
+        
+        tk.Label(self.load_case_add_button_frame, text="P1,service: (kips) ", font=self.helv_res).grid(row=0, column=1, padx=4)
+        tk.Label(self.load_case_add_button_frame, text="P1,ultimate: (kips) ", font=self.helv_res).grid(row=0, column=2, padx=4)
+        tk.Label(self.load_case_add_button_frame, text="P2,service: (kips) ", font=self.helv_res).grid(row=0, column=3, padx=4)
+        tk.Label(self.load_case_add_button_frame, text="P2,ultimate: (kips) ", font=self.helv_res).grid(row=0, column=4, padx=4)
+        tk.Label(self.load_case_add_button_frame, text="DL,service factor:", font=self.helv_res).grid(row=0, column=5, padx=4)
+        tk.Label(self.load_case_add_button_frame, text="DL,ultimate factor:", font=self.helv_res).grid(row=0, column=6, padx=4)
+        
+        self.p1s_case = tk.StringVar()
+        self.p1s_case.set(100)
+        self.p1s_case_entry = tk.Entry(self.load_case_add_button_frame, textvariable=self.p1s_case, width=10)
+        self.p1s_case_entry.grid(row=1, column=1)
+        
+        self.p1u_case = tk.StringVar()
+        self.p1u_case.set(140)
+        self.p1u_case_entry = tk.Entry(self.load_case_add_button_frame, textvariable=self.p1u_case, width=10)
+        self.p1u_case_entry.grid(row=1, column=2)
+        
+        self.p2s_case = tk.StringVar()
+        self.p2s_case.set(200)
+        self.p2s_case_entry = tk.Entry(self.load_case_add_button_frame, textvariable=self.p2s_case, width=10)
+        self.p2s_case_entry.grid(row=1, column=3)
+        
+        self.p2u_case = tk.StringVar()
+        self.p2u_case.set(280)
+        self.p2u_case_entry = tk.Entry(self.load_case_add_button_frame, textvariable=self.p2u_case, width=10)
+        self.p2u_case_entry.grid(row=1, column=4)
+        
+        self.dls_case = tk.StringVar()
+        self.dls_case.set(1.0)
+        self.dls_case_entry = tk.Entry(self.load_case_add_button_frame, textvariable=self.dls_case, width=10)
+        self.dls_case_entry.grid(row=1, column=5)
+        
+        self.dlu_case = tk.StringVar()
+        self.dlu_case.set(1.0)
+        self.dlu_case_entry = tk.Entry(self.load_case_add_button_frame, textvariable=self.dlu_case, width=10)
+        self.dlu_case_entry.grid(row=1, column=6)
+        
+        self.b_add_case = tk.Button(self.load_case_add_button_frame,text="Add Load Case", command=self.add_load_case, font=self.helv, width=15, height=1, bg=color)
+        self.b_add_case.grid(row=2, column=1, padx=4, pady=4)
+        
+        self.b_change_case = tk.Button(self.load_case_add_button_frame,text="Change Selected", command=self.change_load_case, font=self.helv, width=15, height=1, bg=color)
+        self.b_change_case.grid(row=2, column=2, padx=4, pady=4)
+        
+        self.b_del_case = tk.Button(self.load_case_add_button_frame,text="Remove Selected", command=self.del_load_case, font=self.helv, width=15, height=1, bg=color)
+        self.b_del_case.grid(row=2, column=3, padx=4, pady=4)
+        
+        self.b_del_case = tk.Button(self.load_case_add_button_frame,text="Import CSV", command=self.import_csv, font=self.helv, width=15, height=1, bg=color)
+        self.b_del_case.grid(row=2, column=4, padx=4, pady=4)
+        
+        self.b_run_case = tk.Button(self.load_case_add_button_frame,text="Run All", command=self.run_load_cases, font=self.helv, width=10, height=1, bg=color)
+        self.b_run_case.grid(row=2, column=6, padx=4, pady=4)
+        
+        self.load_case_scrollbar = tk.Scrollbar(self.load_case_add_list_frame, orient="vertical", command=self.load_case_scroll)
+        self.load_case_scrollbar.grid(row=0, column=2, sticky=tk.NS)
+        
+        self.load_case_listbox = tk.Listbox(self.load_case_add_list_frame, height = 22, width = 60, font=self.helv, yscrollcommand=self.load_case_scrollbar.set)
+        self.load_case_listbox.grid(row=0, column=0)
+        self.load_case_listbox.bind("<<ListboxSelect>>",self.load_case_click)
+        
+        self.load_case_res_listbox = tk.Listbox(self.load_case_add_list_frame, height = 22, width = 130, font=self.helv, yscrollcommand=self.load_case_scrollbar.set)
+        self.load_case_res_listbox.grid(row=0, column=3)
+        
         self.draw_plan()
         self.draw_elevation()
 
@@ -512,33 +562,39 @@ class main_window:
         self.qa_entry = tk.Entry(self.geo_data_frame, textvariable=self.Qa_ksf, width=10, validate="key", validatecommand=self.reset_status)
         self.qa_entry.grid(row=1, column=14)
         tk.Label(self.geo_data_frame, text="ksf", font=self.helv).grid(row=1, column=15)
-
-        tk.Label(self.geo_data_frame, text="DL,factor = ", font=self.helv).grid(row=2, column=13, sticky = tk.E)
+        
+        tk.Label(self.geo_data_frame, text="DL,Service factor = ", font=self.helv).grid(row=2, column=13, sticky = tk.E)
+        self.dl_service_factor = tk.StringVar()
+        self.dl_service_factor.set(1.0)
+        self.dl_service_factor_entry = tk.Entry(self.geo_data_frame, textvariable=self.dl_service_factor, width=10, validate="key", validatecommand=self.reset_status)
+        self.dl_service_factor_entry.grid(row=2, column=14)
+        
+        tk.Label(self.geo_data_frame, text="DL,Ult. factor = ", font=self.helv).grid(row=3, column=13, sticky = tk.E)
         self.dl_factor = tk.StringVar()
         self.dl_factor.set(1.2)
         self.dl_factor_entry = tk.Entry(self.geo_data_frame, textvariable=self.dl_factor, width=10, validate="key", validatecommand=self.reset_status)
-        self.dl_factor_entry.grid(row=2, column=14)
+        self.dl_factor_entry.grid(row=3, column=14)
 
-        tk.Label(self.geo_data_frame, text="Fy = ", font=self.helv).grid(row=3, column=13, sticky = tk.E)
+        tk.Label(self.geo_data_frame, text="Fy = ", font=self.helv).grid(row=4, column=13, sticky = tk.E)
         self.Fy_ksi = tk.StringVar()
         self.Fy_ksi.set(60)
         self.fy_entry = tk.Entry(self.geo_data_frame, textvariable=self.Fy_ksi, width=10, validate="key", validatecommand=self.reset_status)
-        self.fy_entry.grid(row=3, column=14)
-        tk.Label(self.geo_data_frame, text="ksi", font=self.helv).grid(row=3, column=15)
+        self.fy_entry.grid(row=4, column=14)
+        tk.Label(self.geo_data_frame, text="ksi", font=self.helv).grid(row=4, column=15)
 
-        tk.Label(self.geo_data_frame, text="F'c = ", font=self.helv).grid(row=4, column=13, sticky = tk.E)
+        tk.Label(self.geo_data_frame, text="F'c = ", font=self.helv).grid(row=5, column=13, sticky = tk.E)
         self.Fpc_ksi = tk.StringVar()
         self.Fpc_ksi.set(3)
         self.fpc_entry = tk.Entry(self.geo_data_frame, textvariable=self.Fpc_ksi, width=10, validate="key", validatecommand=self.reset_status)
-        self.fpc_entry.grid(row=4, column=14)
-        tk.Label(self.geo_data_frame, text="ksi", font=self.helv).grid(row=4, column=15)
+        self.fpc_entry.grid(row=5, column=14)
+        tk.Label(self.geo_data_frame, text="ksi", font=self.helv).grid(row=5, column=15)
 
-        tk.Label(self.geo_data_frame, text="Density = ", font=self.helv).grid(row=5, column=13, sticky = tk.E)
+        tk.Label(self.geo_data_frame, text="Density = ", font=self.helv).grid(row=6, column=13, sticky = tk.E)
         self.density_pcf = tk.StringVar()
         self.density_pcf.set(150)
         self.density_entry = tk.Entry(self.geo_data_frame, textvariable=self.density_pcf, width=10, validate="key", validatecommand=self.reset_status)
-        self.density_entry.grid(row=5, column=14)
-        tk.Label(self.geo_data_frame, text="pcf", font=self.helv).grid(row=5, column=15)
+        self.density_entry.grid(row=6, column=14)
+        tk.Label(self.geo_data_frame, text="pcf", font=self.helv).grid(row=6, column=15)
 
     def static_analysis_frame_builder(self):
         self.stat_service_frame = tk.LabelFrame(self.statics_data_frame, text="Service:", bd=1, relief='sunken', padx=5, pady=2)
@@ -767,6 +823,44 @@ class main_window:
         self.right_ftg_scroll.grid(row=0, column=1, sticky='nsew')
         self.right_ftg_calc_txtbox['yscrollcommand'] = self.right_ftg_scroll.set
 
+    def strap_design_frame_builder(self):
+        self.strap_inputs_frame = tk.Frame(self.strap_design_frame)
+        self.strap_inputs_frame.pack(side=tk.LEFT, anchor='nw')
+        self.strap_calc_frame = tk.Frame(self.strap_design_frame)
+        self.strap_calc_frame.pack(side=tk.RIGHT ,anchor='ne', fill=tk.BOTH, expand=1)
+
+
+        tk.Label(self.strap_inputs_frame, text="B = ", font=self.helv).grid(row=0, column=0, sticky = tk.E)
+        tk.Entry(self.strap_inputs_frame, textvariable=self.bs, width=10, validate="key", validatecommand=self.reset_status).grid(row=0, column=1)
+        tk.Label(self.strap_inputs_frame, text="in", font=self.helv).grid(row=0, column=2)
+
+        tk.Label(self.strap_inputs_frame, text="H = ", font=self.helv).grid(row=1, column=0, sticky = tk.E)
+        tk.Entry(self.strap_inputs_frame, textvariable=self.hs, width=10, validate="key", validatecommand=self.reset_status).grid(row=1, column=1)
+        tk.Label(self.strap_inputs_frame, text="in", font=self.helv).grid(row=1, column=2)
+
+        self.strap_vbar_size = tk.StringVar()
+        self.strap_vbar_size.set('3')
+        self.strap_vbar_size_label = tk.Label(self.strap_inputs_frame, text="Shear\nBar Size (#) : ", font=self.helv)
+        self.strap_vbar_size_label.grid(row=2,column=0, pady=2)
+        self.strap_vbar_size_menu = tk.OptionMenu(self.strap_inputs_frame, self.strap_vbar_size, '3', '4', '5', command=self.reset_status)
+        self.strap_vbar_size_menu.config(font=self.helv)
+        self.strap_vbar_size_menu.grid(row=2, column=1, padx= 2, sticky=tk.W)
+
+        self.strap_bar_size = tk.StringVar()
+        self.strap_bar_size.set('3')
+        self.strap_bar_size_label = tk.Label(self.strap_inputs_frame, text="Flexure\nBar Size (#) : ", font=self.helv)
+        self.strap_bar_size_label.grid(row=4,column=0, pady=2)
+        self.strap_bar_size_menu = tk.OptionMenu(self.strap_inputs_frame, self.strap_bar_size, '3', '4', '5','6','7','8','9','10','11','14','18', command=self.reset_status)
+        self.strap_bar_size_menu.config(font=self.helv)
+        self.strap_bar_size_menu.grid(row=4, column=1, padx= 2, sticky=tk.W)
+
+        self.strap_calc_txtbox = tk.Text(self.strap_calc_frame, height = 25, width = 70, bg= "grey90", font= self.helv_norm, wrap=tk.WORD)
+        self.strap_calc_txtbox.grid(row=0, column=0, sticky='nsew')
+
+        self.strap_scroll = tk.Scrollbar(self.strap_calc_frame, command=self.strap_calc_txtbox.yview)
+        self.strap_scroll.grid(row=0, column=1, sticky='nsew')
+        self.strap_calc_txtbox['yscrollcommand'] = self.strap_scroll.set
+        
     def det_res_scroll(self, *args):
         self.xc_listbox.yview(*args)
         self.cv_listbox.yview(*args)
@@ -782,6 +876,10 @@ class main_window:
         self.rv_listbox.yview(*args)
         self.rm_listbox.yview(*args)
 
+    def load_case_scroll(self, *args):
+        self.load_case_listbox.yview(*args)
+        self.load_case_res_listbox.yview(*args)
+        
     def reset_status(self,*args):
         self.status_ftg1_q.set(0)
         self.status_ftg2_q.set(0)
@@ -1003,6 +1101,7 @@ class main_window:
         sw_pcf = float(self.density_pcf.get())
         fpc_psi = fpc_ksi * 1000.0
         dl_factor = float(self.dl_factor.get())
+        dl_service_factor = float(self.dl_service_factor.get())
         fy_ksi = float(self.Fy_ksi.get())
 
         self.rebar = concbeam.reinforcement(fy_ksi)
@@ -1017,7 +1116,8 @@ class main_window:
         self.commons_out_text = self.commons_out_text + '{0:<22} {1:<12.3f}ksf  (Allowable Soil Bearing)\n'.format('Q,allow :', qa_ksf)
         self.commons_out_text = self.commons_out_text + "{0:<22} {1:<12.3f}ksi  (Used for both Foundations and Strap Beam)\n".format("F'c :",fpc_ksi)
         self.commons_out_text = self.commons_out_text + '{0:<22} {1:<12.3f}pcf  (Used for self weights)\n'.format('Concrete Density :',sw_pcf)
-        self.commons_out_text = self.commons_out_text + '{0:<22} {1:<12.3f}(Used to factor self weight for Ultimate values)\n'.format('Dead Load Factor :', dl_factor)
+        self.commons_out_text = self.commons_out_text + '{0:<22} {1:<12.3f}(Used to factor self weight for Service values)\n'.format('DL Factor Service :', dl_service_factor)
+        self.commons_out_text = self.commons_out_text + '{0:<22} {1:<12.3f}(Used to factor self weight for Ultimate values)\n'.format('DL Factor Ultimate :', dl_factor)
         self.commons_out_text = self.commons_out_text + '{0:<22} {1:<12.3f}ksi  (Reinforcing Steel Yield Strength)\n'.format('Fy :',fy_ksi)
         self.commons_out_text = self.commons_out_text + '\n{0:<22} {1:<12.3f}ft  (Center to Center distance between columns)\n'.format('L,cc :',lcc_ft)
         #Strap
@@ -1142,6 +1242,7 @@ class main_window:
         fpc_ksi = float(self.Fpc_ksi.get())
         fpc_psi = fpc_ksi * 1000.0
         dl_factor = float(self.dl_factor.get())
+        dl_service_factor = float(self.dl_service_factor.get())
 
         #Strap
         bs_in = float(self.bs.get())
@@ -1189,17 +1290,17 @@ class main_window:
         ftg1_sw_loc = 0
         ftg1_sw_u_kips = dl_factor * ftg1_sw_kips
 
-        service.append(['FTG_L', ftg1_sw_kips, b1_ft/2.0, 0, 0])
+        service.append(['FTG_L', ftg1_sw_kips * dl_service_factor, b1_ft/2.0, 0, 0])
         ultimate.append(['FTG_L', ftg1_sw_u_kips, b1_ft/2.0, 0, 0])
 
         strap_h_over_ftg1 = hs_ft - h1_ft + (s_elev/12.0)
         s_sw_over_ftg1 = (strap_h_over_ftg1 * bs_ft*sw_pcf)/1000.0
         s_swl_kips = b1_ft*s_sw_over_ftg1
 
-        service.append(['Strap/FTG_L', s_swl_kips, (b1_ft/2.0), 0, 0])
+        service.append(['Strap/FTG_L', s_swl_kips * dl_service_factor, (b1_ft/2.0), 0, 0])
         ultimate.append(['Strap/FTG_L', s_swl_kips*dl_factor, (b1_ft/2.0), 0, 0])
 
-        service.append(['Strap', strap_sw_klf*ls_ft, b1_ft + (ls_ft/2.0), (b1_ft/2.0) + (ls_ft/2.0), (strap_sw_klf*ls_ft)*((b1_ft/2.0) + (ls_ft/2.0))])
+        service.append(['Strap', strap_sw_klf*ls_ft * dl_service_factor, b1_ft + (ls_ft/2.0), (b1_ft/2.0) + (ls_ft/2.0), (strap_sw_klf*ls_ft * dl_service_factor)*((b1_ft/2.0) + (ls_ft/2.0))])
         ultimate.append(['Strap', strap_sw_klf*ls_ft*dl_factor, b1_ft + (ls_ft/2.0), (b1_ft/2.0) + (ls_ft/2.0), (strap_sw_klf*ls_ft*dl_factor)*((b1_ft/2.0) + (ls_ft/2.0))])
 
         strap_h_over_ftg2 = hs_ft - h2_ft + (s_elev/12.0)
@@ -1213,7 +1314,7 @@ class main_window:
         xm = (b1_ft/2.0) + ls_ft + (strap_l_over_ftg2/2.0)
         ms = ps*xm
         mu = pu*xm
-        service.append(['Strap/FTG_R', ps, x, xm, ms])
+        service.append(['Strap/FTG_R', ps * dl_service_factor, x, xm, ms * dl_service_factor])
         ultimate.append(['Strap/FTG_R', pu, x, xm, mu])
 
 
@@ -1225,7 +1326,7 @@ class main_window:
         xm = (b1_ft/2.0) + ls_ft + (b2_ft/2.0)
         ms = ps*xm
         mu = pu*xm
-        service.append(['FTG_R', ps, x, xm, ms])
+        service.append(['FTG_R', ps * dl_service_factor, x, xm, ms * dl_service_factor])
         ultimate.append(['FTG_R', pu, x, xm, mu])
 
         p2s_kips = float(self.p2_service_kips.get())
@@ -2408,6 +2509,8 @@ class main_window:
         r1u = self.ultimate[-2][1]
         qa1 = r1s / a1
         qu1 = r1u / a1
+        
+        self.ftg1_qa = qa1
 
         self.ftg1_text = self.ftg1_text + '\n-- {0:-<82}\n'.format('Bearing: ')
         if qa1 <= qa_ksf:
@@ -2438,6 +2541,8 @@ class main_window:
         max_spacing = min(3*h1_in,18)
         bars_max = m.ceil((b1_in - 6.0) / max_spacing) + 1
         spacing_act = (b1_in - 6.0) / (max(bars1,bars_max)-1)
+        
+        self.ftg1_bars_text = '({1})#{0}'.format(bar_left_size, max(bars_max,bars1))
 
         #development - ACI 318-08 12.2.3
         cb_l = min(3+(bar_left[0]/2), 0.5*spacing_act)
@@ -2530,6 +2635,8 @@ class main_window:
         r2u = self.ultimate[-1][1]
         qa2 = r2s / a2
         qu2 = r2u / a2
+        
+        self.ftg2_qa = qa2
 
         self.ftg2_text = self.ftg2_text + '\n-- {0:-<82}\n'.format('Bearing: ')
         if qa2 <= qa_ksf:
@@ -2563,7 +2670,9 @@ class main_window:
         max_spacing2 = min(3*h2_in,18)
         bars_max2 = m.ceil((b2_in - 6.0) / max_spacing2) + 1
         spacing_act2 = (b2_in - 6.0) / (max(bars2,bars_max2)-1)
-
+        
+        self.ftg2_barsns_text = '({1})#{0}'.format(bar_right_size, max(bars_max2,bars2))
+        
         #development - ACI 318-08 12.2.3
         cb_l2 = min(3+(bar_right[0]/2), 0.5*spacing_act2)
         psi_t2 = 1.0
@@ -2671,7 +2780,9 @@ class main_window:
         max_spacing2ew = min(3*h2_in,18)
         bars_max2ew = m.ceil((d2ftg_in - 6.0) / max_spacing2ew) + 1
         spacing_act2ew = (d2ftg_in - 6.0) / (max(bars2ew,bars_max2ew)-1)
-
+        
+        self.ftg2_barsew_text = '({1})#{0}'.format(bar_right_size, max(bars_max2ew,bars2ew))
+        
         #development - ACI 318-08 12.2.3
         cb_l2ew = min(3+(bar_right[0]/2)+bar_right[0], 0.5*spacing_act2ew)
         psi_t2ew = 1.0
@@ -2819,8 +2930,12 @@ class main_window:
 
         mu = min(self.momentc_u)
         mu_inlbs = abs(mu) * 12.0 * 1000.0
+        
+        mu_max = max(self.momentc_u)
+        mu_max_inlbs = abs(mu_max) * 12.0 * 1000.0
 
-        self.strap_text = self.strap_text + 'Mu = {0:.2f} ft-kips\n'.format(mu)
+        self.strap_text = self.strap_text + 'Mu,min = {0:.2f} ft-kips\n'.format(mu)
+        self.strap_text = self.strap_text + 'Mu,max = {0:.2f} ft-kips\n'.format(mu_max)
 
         d_in = hs_in - cover - bar_v[0] - (bar_m[0]/2.0)
         self.strap_text = self.strap_text + 'd = h - cover - Dia. shear bar - Dia. flexure bar/2.0 = {0:.2f} in.\n'.format(d_in)
@@ -2840,6 +2955,8 @@ class main_window:
         as_min = max((3*(fpc_psi**0.5)/fy_psi)*bs_in*d_in, 200.0*bs_in*d_in*(1/fy_psi))
         as_req = max(as_calc, as_min)
         bars = as_req / bar_m[1]
+        
+        self.strap_bars_text = '({0})#{1}'.format(m.ceil(bars), bar_m_size)
 
         if rho > rho_max:
             self.status_sf.set(0)
@@ -2951,7 +3068,182 @@ class main_window:
         file.write(self.ult_results_out_text)
 
         file.close()
+    
+    def add_load_case(self, *args):
+        self.load_case_count +=1
+        
+        count = self.load_case_count
+        p1s = self.p1s_case.get()
+        p1u = self.p1u_case.get()
+        p2s = self.p2s_case.get()
+        p2u = self.p2u_case.get()
+        dls = self.dls_case.get()
+        dlu = self.dlu_case.get()
+        
+        self.load_case_list.append([count,p1s,p1u,p2s,p2u,dls,dlu])
+        
+        self.fill_case_list()
+        
+    def load_case_click(self, *args):
+        if self.load_case_listbox.size()==0:
+            self.load_clicked = False
+            pass
+        else:
+            self.case_index_click = self.load_case_listbox.curselection()[0]
+            count = self.case_index_click + 1
+            self.p1s_case.set(self.load_case_list[count-1][1])
+            self.p1u_case.set(self.load_case_list[count-1][2])
+            self.p2s_case.set(self.load_case_list[count-1][3])
+            self.p2u_case.set(self.load_case_list[count-1][4])
+            self.dls_case.set(self.load_case_list[count-1][5])
+            self.dlu_case.set(self.load_case_list[count-1][6])
+            
+            self.p1_service_kips.set(self.load_case_list[count-1][1])
+            self.p1_ultimate_kips.set(self.load_case_list[count-1][2])
+            self.p2_service_kips.set(self.load_case_list[count-1][3])
+            self.p2_ultimate_kips.set(self.load_case_list[count-1][4])
+            self.dl_service_factor.set(self.load_case_list[count-1][5])
+            self.dl_factor.set(self.load_case_list[count-1][6])
+            
+            self.run_calcs()
+            
+            self.load_clicked = True
+    
+    def change_load_case(self, *args):
+        if self.load_clicked == False or self.load_case_listbox.size()==0:
+            pass
+        else:
+            count = self.case_index_click + 1
+            p1s = self.p1s_case.get()
+            p1u = self.p1u_case.get()
+            p2s = self.p2s_case.get()
+            p2u = self.p2u_case.get()
+            dls = self.dls_case.get()
+            dlu = self.dlu_case.get()
+            
+            self.load_case_list[count-1] = [count,p1s,p1u,p2s,p2u,dls,dlu]
+            
+            self.fill_case_list()
+        
+    def del_load_case(self, *args):
+        if self.load_clicked == False or self.load_case_listbox.size()==0:
+            pass
+        else:
+            count = self.case_index_click + 1
 
+            del self.load_case_list[count-1]
+            self.load_case_count -=1
+            
+            i = 1
+            for case in self.load_case_list:
+                case[0] = i
+                i+=1
+            
+            if len(self.load_case_list) >= 1:
+                self.fill_case_list()
+            else:
+                pass
+            
+    def fill_case_list(self, *args):
+        self.load_case_res_listbox.delete(0,tk.END)
+        self.load_case_listbox.delete(0,tk.END)
+        
+        self.load_case_res_list = []
+        
+        for case in self.load_case_list:
+            string = '{0},{1},{2},{3},{4},{5},{6}'.format(case[0],case[1],case[2],case[3],case[4],case[5],case[6])
+            self.load_case_listbox.insert(tk.END,string)
+            
+            if case[0] % 2 == 0:
+                self.load_case_listbox.itemconfigure(case[0]-1, background='pale green')
+            else:
+                pass
+        
+    def import_csv(self, *args):
+    
+        file = open('strap_loads.csv','r') 
+        
+        data_raw = file.readlines()
+
+        file.close()
+        
+        self.load_case_list = []
+        
+        i = 0
+        for line in data_raw:
+            data_split = line.split(',')
+            data_split[-1] = data_split[-1].rstrip('\n')
+            data_split.insert(0,i)
+            if i == 0:
+                pass
+            else:
+                self.load_case_list.append(data_split)
+            
+            i+=1
+        
+        self.fill_case_list()
+        
+    def run_load_cases(self, *args):
+        self.load_case_res_listbox.delete(0,tk.END)
+        self.load_case_res_list = []
+        
+        if len(self.load_case_list) >= 1:
+            for case in self.load_case_list:
+                p1s = case[1]
+                p1u = case[2]
+                p2s = case[3]
+                p2u = case[4]
+                dls = case[5]
+                dlu = case[6]
+                
+                self.p1_service_kips.set(p1s)
+                self.p1_ultimate_kips.set(p1u)
+                self.p2_service_kips.set(p2s)
+                self.p2_ultimate_kips.set(p2u)
+                self.dl_service_factor.set(dls)
+                self.dl_factor.set(dlu)
+                
+                self.run_calcs()
+                
+                
+                status_list = [self.status_ftg1_q.get(), self.status_ftg2_q.get(), 
+                                self.status_sumv.get(), self.status_summ.get(), 
+                                self.status_ftg1v.get(), self.status_ftg1f.get(), 
+                                self.status_ftg2v.get(), self.status_ftg2f.get(), 
+                                self.status_sv.get(), self.status_sf.get()]
+                
+                if len(status_list) == sum(status_list):
+                    status = 'OK'
+                else:
+                    status = 'NG'
+                
+                qal = self.ftg1_qa
+                barsl = self.ftg1_bars_text
+                qar = self.ftg2_qa
+                barsrew = self.ftg2_barsew_text
+                barsrns = self.ftg2_barsns_text
+                strap_bars = self.strap_bars_text
+                
+                run_list = [case[0],status,qal,barsl,qar,barsrew,barsrns,strap_bars]
+                
+                self.load_case_res_list.append(run_list)
+            
+            for result in self.load_case_res_list:
+                string = '{0} -- Qa,left:{1:.2f} ksf - left ftg: {2} -- Qa,right: {3:.2f} ksf - right ftg: {4} E/W - {5} N/S -- Strap Bm: {6}'.format(result[1],result[2],result[3],result[4],result[5],result[6],result[7])
+                
+                self.load_case_res_listbox.insert(tk.END,string)
+                    
+                if result[0] % 2 == 0 and result[1]=='OK':
+                    self.load_case_res_listbox.itemconfigure(result[0]-1, background='pale green')
+                    self.load_case_listbox.itemconfigure(result[0]-1, background='pale green')
+                elif result[1]=='NG':
+                    self.load_case_listbox.itemconfigure(result[0]-1, background='red')
+                    self.load_case_res_listbox.itemconfigure(result[0]-1, background='red')
+                else:
+                    pass
+        else:
+            pass
+        
 def main():
     root = tk.Tk()
     root.title("Strap Beam - Alpha")
