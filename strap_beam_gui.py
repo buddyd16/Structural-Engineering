@@ -3178,6 +3178,7 @@ class main_window:
                 pass
             else:
                 self.load_case_list.append(data_split)
+                self.load_case_count = i
             
             i+=1
         
