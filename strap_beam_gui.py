@@ -3237,11 +3237,13 @@ class main_window:
                 if result[0] % 2 == 0 and result[1]=='OK':
                     self.load_case_res_listbox.itemconfigure(result[0]-1, background='pale green')
                     self.load_case_listbox.itemconfigure(result[0]-1, background='pale green')
+                
                 elif result[1]=='NG':
                     self.load_case_listbox.itemconfigure(result[0]-1, background='red')
                     self.load_case_res_listbox.itemconfigure(result[0]-1, background='red')
                 else:
-                    pass
+                    self.load_case_res_listbox.itemconfigure(result[0]-1, background='white')
+                    self.load_case_listbox.itemconfigure(result[0]-1, background='white')
         else:
             pass
         
