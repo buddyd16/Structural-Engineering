@@ -339,11 +339,11 @@ class main_window:
         self.load_case_scrollbar = tk.Scrollbar(self.load_case_add_list_frame, orient="vertical", command=self.load_case_scroll)
         self.load_case_scrollbar.grid(row=0, column=2, sticky=tk.NS)
         
-        self.load_case_listbox = tk.Listbox(self.load_case_add_list_frame, height = 22, width = 60, font=self.helv, yscrollcommand=self.load_case_scrollbar.set)
+        self.load_case_listbox = tk.Listbox(self.load_case_add_list_frame, height = 22, width = 60, font=self.helv, yscrollcommand=self.load_case_scrollbar.set, exportselection=0)
         self.load_case_listbox.grid(row=0, column=0)
         self.load_case_listbox.bind("<<ListboxSelect>>",self.load_case_click)
         
-        self.load_case_res_listbox = tk.Listbox(self.load_case_add_list_frame, height = 22, width = 130, font=self.helv, yscrollcommand=self.load_case_scrollbar.set)
+        self.load_case_res_listbox = tk.Listbox(self.load_case_add_list_frame, height = 22, width = 130, font=self.helv, yscrollcommand=self.load_case_scrollbar.set, exportselection=0)
         self.load_case_res_listbox.grid(row=0, column=3)
         
         self.draw_plan()
@@ -3149,6 +3149,14 @@ class main_window:
             self.dl_factor.set(self.load_case_list[count-1][6])
             
             self.run_calcs()
+            
+            if self.load_case_res_listbox.size()==0:
+                pass
+            else:
+                self.load_case_res_listbox.select_clear(0, self.load_case_res_listbox.size() - 1)   #Clear the current selected item
+                self.load_case_res_listbox.select_set(self.case_index_click)           #Select the new item
+                if self.load_case_res_listbox.yview != self.load_case_listbox.yview():
+                    self.load_case_res_listbox.yview_moveto(self.load_case_listbox.yview()[0])                #Set the scrollbar to the selection of the listbox
             
             self.load_clicked = True
     
