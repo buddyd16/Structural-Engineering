@@ -26,6 +26,7 @@ import Concrete.concrete_beam_classes as concbeam
 from numpy import zeros
 import numpy as np
 import Tkinter as tk
+import tkMessageBox
 import ttk
 import tkFont
 import tkFileDialog
@@ -3219,29 +3220,41 @@ class main_window:
                 pass
         
     def import_csv(self, *args):
-    
-        file = open('strap_loads.csv','r') 
         
-        data_raw = file.readlines()
-
-        file.close()
+        filename = tkFileDialog.askopenfilename()
         
-        self.load_case_list = []
+        extension = filename.split('.')[-1]
         
-        i = 0
-        for line in data_raw:
-            data_split = line.split(',')
-            data_split[-1] = data_split[-1].rstrip('\n')
-            data_split.insert(0,i)
-            if i == 0:
-                pass
-            else:
-                self.load_case_list.append(data_split)
-                self.load_case_count = i
+        if filename is None:
+            return
+        
+        elif extension not in ['csv','CSV']:
+            tkMessageBox.showerror("ERROR!!","Selected File not a .csv or .CSV file")
+            return
+        
+        else:
+            file = open(filename,'r') 
             
-            i+=1
-        
-        self.fill_case_list()
+            data_raw = file.readlines()
+
+            file.close()
+            
+            self.load_case_list = []
+            
+            i = 0
+            for line in data_raw:
+                data_split = line.split(',')
+                data_split[-1] = data_split[-1].rstrip('\n')
+                data_split.insert(0,i)
+                if i == 0:
+                    pass
+                else:
+                    self.load_case_list.append(data_split)
+                    self.load_case_count = i
+                
+                i+=1
+            
+            self.fill_case_list()
         
     def run_load_cases(self, *args):
         self.load_case_res_listbox.delete(0,tk.END)
@@ -3322,15 +3335,25 @@ class main_window:
     def open_existing(self, *args):
     
         filename = tkFileDialog.askopenfilename()
-        calc_file = open(filename,'r')
-        calc_data = calc_file.readlines()
-        calc_file.close()
         
-        i=0
-        for line in calc_data:
-            value = line.rstrip('\n')
-            self.inputs[i].set(value)
-            i+=1
+        extension = filename.split('.')[-1]
+        
+        
+        if filename is None:
+            return
+        elif extension not in ['strapbm']:
+            tkMessageBox.showerror("ERROR!!","Selected File not a .strapbm file")
+            return
+        else:
+            calc_file = open(filename,'r')
+            calc_data = calc_file.readlines()
+            calc_file.close()
+            
+            i=0
+            for line in calc_data:
+                value = line.rstrip('\n')
+                self.inputs[i].set(value)
+                i+=1
         
 def main():
     root = tk.Tk()
