@@ -200,6 +200,9 @@ class main_window:
         self.show_mu = tk.IntVar()
         self.show_mu.set(1)
         tk.Checkbutton(self.graph_b_frame , text=' : Show Mu', variable=self.show_mu, command = self.draw_static_beam, font=self.helv).grid(row=3, column=1, sticky = tk.W)
+        self.show_m_tension = tk.IntVar()
+        self.show_m_tension.set(1)
+        tk.Checkbutton(self.graph_b_frame , text=' : Show M\nOn Tension\nFace', variable=self.show_m_tension, command = self.draw_static_beam, font=self.helv).grid(row=4, column=1, sticky = tk.W)
 
         self.graph_b_frame.pack(side=tk.RIGHT, anchor='e')
 
@@ -2171,6 +2174,11 @@ class main_window:
         xl = self.xsl
         xc = self.xsc
         xr = self.xsr
+        
+        if self.show_m_tension.get() == 1:
+            factor = -1.0
+        else:
+            factor = 1.0
 
         if self.static_run == 1:
             section_string = ['P1','Face of FTG_L', 'Face of FTG_R','P2']
@@ -2216,15 +2224,15 @@ class main_window:
             pass
 
         if self.show_ms.get() == 1 and self.show_mu.get() == 0:
-            if max(max(max(self.momentc_s),max(self.momentl_s),max(self.momentr_s)), abs(min(min(self.momentc_s),min(self.momentl_s),min(self.momentr_s)))) == 0:
+            if max(max(max(self.momentc_s*factor),max(self.momentl_s*factor),max(self.momentr_s*factor)), abs(min(min(self.momentc_s*factor),min(self.momentl_s*factor),min(self.momentr_s*factor)))) == 0:
                 m_sf = (hg - 10)
             else:
-                m_sf = (hg - 10) / max(max(max(self.momentc_s),max(self.momentl_s),max(self.momentr_s)), abs(min(min(self.momentc_s),min(self.momentl_s),min(self.momentr_s))))
+                m_sf = (hg - 10) / max(max(max(self.momentc_s*factor),max(self.momentl_s*factor),max(self.momentr_s*factor)), abs(min(min(self.momentc_s*factor),min(self.momentl_s*factor),min(self.momentr_s*factor))))
 
             for i in range(1,len(self.momentc_s)):
-                self.g_beam_canvas.create_line((xl[i-1] * sf) + initial, hg - (self.momentl_s[i-1] * m_sf),(xl[i] * sf) + initial,hg - (self.momentl_s[i] * m_sf),fill="green", width=2)
-                self.g_beam_canvas.create_line((xc[i-1] * sf) + initial, hg - (self.momentc_s[i-1] * m_sf),(xc[i] * sf) + initial,hg - (self.momentc_s[i] * m_sf),fill="green", width=2)
-                self.g_beam_canvas.create_line((xr[i-1] * sf) + initial, hg - (self.momentr_s[i-1] * m_sf),(xr[i] * sf) + initial,hg - (self.momentr_s[i] * m_sf),fill="green", width=2)
+                self.g_beam_canvas.create_line((xl[i-1] * sf) + initial, hg - (self.momentl_s[i-1]*factor * m_sf),(xl[i] * sf) + initial,hg - (self.momentl_s[i]*factor * m_sf),fill="green", width=2)
+                self.g_beam_canvas.create_line((xc[i-1] * sf) + initial, hg - (self.momentc_s[i-1]*factor * m_sf),(xc[i] * sf) + initial,hg - (self.momentc_s[i]*factor * m_sf),fill="green", width=2)
+                self.g_beam_canvas.create_line((xr[i-1] * sf) + initial, hg - (self.momentr_s[i-1]*factor * m_sf),(xr[i] * sf) + initial,hg - (self.momentr_s[i]*factor * m_sf),fill="green", width=2)
         else:
             pass
 
@@ -2260,25 +2268,25 @@ class main_window:
             pass
 
         if self.show_mu.get() == 1:
-            if max(max(max(self.momentc_u),max(self.momentl_u),max(self.momentr_u)), abs(min(min(self.momentc_u),min(self.momentl_u),min(self.momentr_u)))) == 0:
+            if max(max(max(self.momentc_u*factor),max(self.momentl_u*factor),max(self.momentr_u*factor)), abs(min(min(self.momentc_u*factor),min(self.momentl_u*factor),min(self.momentr_u*factor)))) == 0:
                 m_uf = (hg - 10)
             else:
-                m_uf = (hg - 10) / max(max(max(self.momentc_u),max(self.momentl_u),max(self.momentr_u)), abs(min(min(self.momentc_u),min(self.momentl_u),min(self.momentr_u))))
+                m_uf = (hg - 10) / max(max(max(self.momentc_u*factor),max(self.momentl_u*factor),max(self.momentr_u*factor)), abs(min(min(self.momentc_u*factor),min(self.momentl_u*factor),min(self.momentr_u*factor))))
 
             for i in range(1,len(self.momentc_u)):
-                self.g_beam_canvas.create_line((xl[i-1] * sf) + initial, hg - (self.momentl_u[i-1] * m_uf),(xl[i] * sf) + initial,hg - (self.momentl_u[i] * m_uf),fill="dark green", width=2)
-                self.g_beam_canvas.create_line((xc[i-1] * sf) + initial, hg - (self.momentc_u[i-1] * m_uf),(xc[i] * sf) + initial,hg - (self.momentc_u[i] * m_uf),fill="dark green", width=2)
-                self.g_beam_canvas.create_line((xr[i-1] * sf) + initial, hg - (self.momentr_u[i-1] * m_uf),(xr[i] * sf) + initial,hg - (self.momentr_u[i] * m_uf),fill="dark green", width=2)
+                self.g_beam_canvas.create_line((xl[i-1] * sf) + initial, hg - (self.momentl_u[i-1]*factor * m_uf),(xl[i] * sf) + initial,hg - (self.momentl_u[i]*factor * m_uf),fill="dark green", width=2)
+                self.g_beam_canvas.create_line((xc[i-1] * sf) + initial, hg - (self.momentc_u[i-1]*factor * m_uf),(xc[i] * sf) + initial,hg - (self.momentc_u[i]*factor * m_uf),fill="dark green", width=2)
+                self.g_beam_canvas.create_line((xr[i-1] * sf) + initial, hg - (self.momentr_u[i-1]*factor * m_uf),(xr[i] * sf) + initial,hg - (self.momentr_u[i]*factor * m_uf),fill="dark green", width=2)
 
-                self.g_beam_canvas.create_line((xl[i-1] * sf) + initial, hg - (self.momentl_u[i-1] * m_uf),(xl[i-1] * sf) + initial,hg,fill="green4", width=1)
-                self.g_beam_canvas.create_line((xc[i-1] * sf) + initial, hg - (self.momentc_u[i-1] * m_uf),(xc[i-1] * sf) + initial,hg,fill="green4", width=1)
-                self.g_beam_canvas.create_line((xr[i-1] * sf) + initial, hg - (self.momentr_u[i-1] * m_uf),(xr[i-1] * sf) + initial,hg,fill="green4", width=1)
+                self.g_beam_canvas.create_line((xl[i-1] * sf) + initial, hg - (self.momentl_u[i-1]*factor * m_uf),(xl[i-1] * sf) + initial,hg,fill="green4", width=1)
+                self.g_beam_canvas.create_line((xc[i-1] * sf) + initial, hg - (self.momentc_u[i-1]*factor * m_uf),(xc[i-1] * sf) + initial,hg,fill="green4", width=1)
+                self.g_beam_canvas.create_line((xr[i-1] * sf) + initial, hg - (self.momentr_u[i-1]*factor * m_uf),(xr[i-1] * sf) + initial,hg,fill="green4", width=1)
 
             if self.show_ms.get() == 1:
                 for i in range(1,len(self.momentc_s)):
-                    self.g_beam_canvas.create_line((xl[i-1] * sf) + initial, hg - (self.momentl_s[i-1] * m_uf),(xl[i] * sf) + initial,hg - (self.momentl_s[i] * m_uf),fill="green", width=2)
-                    self.g_beam_canvas.create_line((xc[i-1] * sf) + initial, hg - (self.momentc_s[i-1] * m_uf),(xc[i] * sf) + initial,hg - (self.momentc_s[i] * m_uf),fill="green", width=2)
-                    self.g_beam_canvas.create_line((xr[i-1] * sf) + initial, hg - (self.momentr_s[i-1] * m_uf),(xr[i] * sf) + initial,hg - (self.momentr_s[i] * m_uf),fill="green", width=2)
+                    self.g_beam_canvas.create_line((xl[i-1] * sf) + initial, hg - (self.momentl_s[i-1]*factor * m_uf),(xl[i] * sf) + initial,hg - (self.momentl_s[i]*factor * m_uf),fill="green", width=2)
+                    self.g_beam_canvas.create_line((xc[i-1] * sf) + initial, hg - (self.momentc_s[i-1]*factor * m_uf),(xc[i] * sf) + initial,hg - (self.momentc_s[i]*factor * m_uf),fill="green", width=2)
+                    self.g_beam_canvas.create_line((xr[i-1] * sf) + initial, hg - (self.momentr_s[i-1]*factor * m_uf),(xr[i] * sf) + initial,hg - (self.momentr_s[i]*factor * m_uf),fill="green", width=2)
             else:
                 pass
         else:
