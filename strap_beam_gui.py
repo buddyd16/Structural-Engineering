@@ -28,6 +28,7 @@ import numpy as np
 import Tkinter as tk
 import ttk
 import tkFont
+import tkFileDialog
 
 class main_window:
 
@@ -60,7 +61,9 @@ class main_window:
         self.lr = 4
 
         self.static_run = 0
-
+        
+        self.inputs = []
+        
         self.f_size = 8
         self.helv = tkFont.Font(family=' Courier New',size=self.f_size, weight='bold')
         self.helv_norm = tkFont.Font(family=' Courier New',size=self.f_size)
@@ -70,6 +73,9 @@ class main_window:
         self.menu = tk.Menu(self.menubar, tearoff=0)
         self.menu_props = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label = "File", menu=self.menu)
+        self.menu.add_command(label="Save", command=self.save_inputs)
+        self.menu.add_command(label="Open", command=self.open_existing)
+        self.menu.add_separator()
         self.menu.add_command(label="Quit", command=self.quit_app)
         try:
             self.master.config(menu=self.menubar)
@@ -347,6 +353,7 @@ class main_window:
         #Left
         tk.Label(self.geo_data_frame, text="Left Foundation:", font=self.helv_res).grid(row=0, column=0)
         self.b1 = tk.StringVar()
+        self.inputs.append(self.b1)
         self.b1.set(4)
         tk.Label(self.geo_data_frame, text="B,left = ", font=self.helv).grid(row=1, column=0, sticky = tk.E)
         self.b1_entry = tk.Entry(self.geo_data_frame, textvariable=self.b1, width=10, validate="key", validatecommand=self.reset_status)
@@ -354,6 +361,7 @@ class main_window:
         tk.Label(self.geo_data_frame, text="ft", font=self.helv).grid(row=1, column=2)
 
         self.d1 = tk.StringVar()
+        self.inputs.append(self.d1)
         self.d1.set(4)
         tk.Label(self.geo_data_frame, text="D,left = ", font=self.helv).grid(row=2, column=0, sticky = tk.E)
         self.d1_entry = tk.Entry(self.geo_data_frame, textvariable=self.d1, width=10, validate="key", validatecommand=self.reset_status)
@@ -361,6 +369,7 @@ class main_window:
         tk.Label(self.geo_data_frame, text="ft", font=self.helv).grid(row=2, column=2)
 
         self.h1 = tk.StringVar()
+        self.inputs.append(self.h1)
         self.h1.set(12)
         tk.Label(self.geo_data_frame, text="H,left = ", font=self.helv).grid(row=3, column=0, sticky = tk.E)
         self.h1_entry = tk.Entry(self.geo_data_frame, textvariable=self.h1, width=10, validate="key", validatecommand=self.reset_status)
@@ -369,6 +378,7 @@ class main_window:
         tk.Label(self.geo_data_frame, text="Left Column:", font=self.helv_res).grid(row=4, column=0, pady=5)
 
         self.cb1 = tk.StringVar()
+        self.inputs.append(self.cb1)
         self.cb1.set(12)
         tk.Label(self.geo_data_frame, text="Bc,left = ", font=self.helv).grid(row=5, column=0, sticky = tk.E)
         self.cb1_entry = tk.Entry(self.geo_data_frame, textvariable=self.cb1, width=10, validate="key", validatecommand=self.reset_status)
@@ -376,6 +386,7 @@ class main_window:
         tk.Label(self.geo_data_frame, text="in", font=self.helv).grid(row=5, column=2)
 
         self.cd1 = tk.StringVar()
+        self.inputs.append(self.cd1)
         self.cd1.set(12)
         tk.Label(self.geo_data_frame, text="Dc,left = ", font=self.helv).grid(row=6, column=0, sticky = tk.E)
         self.cd1_entry = tk.Entry(self.geo_data_frame, textvariable=self.cd1, width=10, validate="key", validatecommand=self.reset_status)
@@ -384,6 +395,7 @@ class main_window:
 
         tk.Label(self.geo_data_frame, text="Left Eccentricty:", font=self.helv_res).grid(row=7, column=0, pady=5)
         self.ce1 = tk.StringVar()
+        self.inputs.append(self.ce1)
         self.ce1.set(12)
         tk.Label(self.geo_data_frame, text="e,left = ", font=self.helv).grid(row=8, column=0, sticky = tk.E)
         self.ce1_entry = tk.Entry(self.geo_data_frame, textvariable=self.ce1, width=10, validate="key", validatecommand=self.reset_status)
@@ -392,6 +404,7 @@ class main_window:
 
         tk.Label(self.geo_data_frame, text="Loads: ", font=self.helv_res).grid(row=9, column=0)
         self.p1_service_kips = tk.StringVar()
+        self.inputs.append(self.p1_service_kips)
         self.p1_service_kips.set(100)
         tk.Label(self.geo_data_frame, text="Pl,service = ", font=self.helv).grid(row=10, column=0, sticky = tk.E)
         self.p1_service_entry = tk.Entry(self.geo_data_frame, textvariable=self.p1_service_kips, width=10, validate="key", validatecommand=self.reset_status)
@@ -399,6 +412,7 @@ class main_window:
         tk.Label(self.geo_data_frame, text="kips", font=self.helv).grid(row=10, column=2)
 
         self.p1_ultimate_kips = tk.StringVar()
+        self.inputs.append(self.p1_ultimate_kips)
         self.p1_ultimate_kips.set(140)
         tk.Label(self.geo_data_frame, text="Pl,ultimate = ", font=self.helv).grid(row=11, column=0, sticky = tk.E)
         self.p1_ultimate_entry = tk.Entry(self.geo_data_frame, textvariable=self.p1_ultimate_kips, width=10, validate="key", validatecommand=self.reset_status)
@@ -417,38 +431,50 @@ class main_window:
         #Right
         tk.Label(self.geo_data_frame, text="Right Foundation:", font=self.helv_res).grid(row=0, column=3)
         self.b2 = tk.StringVar()
+        self.inputs.append(self.b2)
         self.b2.set(6)
         tk.Label(self.geo_data_frame, text="B,right = ", font=self.helv).grid(row=1, column=3, sticky = tk.E)
         self.b2_entry = tk.Entry(self.geo_data_frame, textvariable=self.b2, width=10, validate="key", validatecommand=self.reset_status)
         self.b2_entry.grid(row=1, column=4)
-        tk.Label(self.geo_data_frame, text="ft", font=self.helv).grid(row=1, column=5)
+        
+        tk.Label(self.geo_data_frame, text="ft", font=self.helv).grid(row=1, column=5)        
         self.d2 = tk.StringVar()
+        self.inputs.append(self.d2)
         self.d2.set(6)
         tk.Label(self.geo_data_frame, text="D,right = ", font=self.helv).grid(row=2, column=3, sticky = tk.E)
         self.d2_entry = tk.Entry(self.geo_data_frame, textvariable=self.d2, width=10, validate="key", validatecommand=self.reset_status)
         self.d2_entry.grid(row=2, column=4)
+        
         tk.Label(self.geo_data_frame, text="ft", font=self.helv).grid(row=2, column=5)
         self.h2 = tk.StringVar()
+        self.inputs.append(self.h2)
         self.h2.set(12)
         tk.Label(self.geo_data_frame, text="H,right = ", font=self.helv).grid(row=3, column=3, sticky = tk.E)
         self.h2_entry = tk.Entry(self.geo_data_frame, textvariable=self.h2, width=10, validate="key", validatecommand=self.reset_status)
         self.h2_entry.grid(row=3, column=4)
         tk.Label(self.geo_data_frame, text="in", font=self.helv).grid(row=3, column=5)
+        
         tk.Label(self.geo_data_frame, text="Right Column:", font=self.helv_res).grid(row=4, column=3, pady=5)
+        
         self.cb2 = tk.StringVar()
+        self.inputs.append(self.cb2)
         self.cb2.set(12)
         tk.Label(self.geo_data_frame, text="Bc,right = ", font=self.helv).grid(row=5, column=3, sticky = tk.E)
         self.cb2_entry = tk.Entry(self.geo_data_frame, textvariable=self.cb2, width=10, validate="key", validatecommand=self.reset_status)
         self.cb2_entry.grid(row=5, column=4)
         tk.Label(self.geo_data_frame, text="in", font=self.helv).grid(row=5, column=5)
+        
         self.cd2 = tk.StringVar()
+        self.inputs.append(self.cd2)
         self.cd2.set(12)
         tk.Label(self.geo_data_frame, text="Dc,right = ", font=self.helv).grid(row=6, column=3, sticky = tk.E)
         self.cd2_entry = tk.Entry(self.geo_data_frame, textvariable=self.cd2, width=10, validate="key", validatecommand=self.reset_status)
         self.cd2_entry.grid(row=6, column=4)
         tk.Label(self.geo_data_frame, text="in", font=self.helv).grid(row=6, column=5)
+        
         tk.Label(self.geo_data_frame, text="Right Eccentricty:", font=self.helv_res).grid(row=7, column=3, pady=5)
         self.ce2 = tk.StringVar()
+        self.inputs.append(self.ce2)
         self.ce2.set(0)
         tk.Label(self.geo_data_frame, text="e,right = ", font=self.helv).grid(row=8, column=3, sticky = tk.E)
         self.ce2_entry = tk.Entry(self.geo_data_frame, textvariable=self.ce2, width=10, validate="key", validatecommand=self.reset_status)
@@ -457,6 +483,7 @@ class main_window:
 
         tk.Label(self.geo_data_frame, text="Loads: ", font=self.helv_res).grid(row=9, column=3, pady=5)
         self.p2_service_kips = tk.StringVar()
+        self.inputs.append(self.p2_service_kips)
         self.p2_service_kips.set(100)
         tk.Label(self.geo_data_frame, text="Pr,service = ", font=self.helv).grid(row=10, column=3, sticky = tk.E)
         self.p2_service_entry = tk.Entry(self.geo_data_frame, textvariable=self.p2_service_kips, width=10, validate="key", validatecommand=self.reset_status)
@@ -464,6 +491,7 @@ class main_window:
         tk.Label(self.geo_data_frame, text="kips", font=self.helv).grid(row=10, column=5)
 
         self.p2_ultimate_kips = tk.StringVar()
+        self.inputs.append(self.p2_ultimate_kips)
         self.p2_ultimate_kips.set(140)
         tk.Label(self.geo_data_frame, text="Pr,ultimate = ", font=self.helv).grid(row=11, column=3, sticky = tk.E)
         self.p2_ultimate_entry = tk.Entry(self.geo_data_frame, textvariable=self.p2_ultimate_kips, width=10, validate="key", validatecommand=self.reset_status)
@@ -482,6 +510,7 @@ class main_window:
         #Strap
         tk.Label(self.geo_data_frame, text="Strap:", font=self.helv_res).grid(row=0, column=6)
         self.bs = tk.StringVar()
+        self.inputs.append(self.bs)
         self.bs.set(12)
         tk.Label(self.geo_data_frame, text="Bs = ", font=self.helv).grid(row=1, column=7, sticky = tk.E)
         self.bs_entry = tk.Entry(self.geo_data_frame, textvariable=self.bs, width=10, validate="key", validatecommand=self.reset_status)
@@ -489,6 +518,7 @@ class main_window:
         tk.Label(self.geo_data_frame, text="in", font=self.helv).grid(row=1, column=9)
 
         self.hs = tk.StringVar()
+        self.inputs.append(self.hs)
         self.hs.set(24)
         tk.Label(self.geo_data_frame, text="Hs = ", font=self.helv).grid(row=2, column=7, sticky = tk.E)
         self.hs_entry = tk.Entry(self.geo_data_frame, textvariable=self.hs, width=10, validate="key", validatecommand=self.reset_status)
@@ -496,6 +526,7 @@ class main_window:
         tk.Label(self.geo_data_frame, text="in", font=self.helv).grid(row=2, column=9)
 
         self.s_extension_in = tk.StringVar()
+        self.inputs.append(self.s_extension_in)
         self.s_extension_in.set('3')
         tk.Label(self.geo_data_frame, text="Extension Beyond C2 = ", font=self.helv).grid(row=3, column=7, sticky = tk.E)
         self.s_ls_entry = tk.Entry(self.geo_data_frame, textvariable=self.s_extension_in, width=10)
@@ -503,6 +534,7 @@ class main_window:
         tk.Label(self.geo_data_frame, text="in", font=self.helv).grid(row=3, column=9)
 
         self.s_elev_in = tk.StringVar()
+        self.inputs.append(self.s_elev_in)
         self.s_elev_in.set('3')
         tk.Label(self.geo_data_frame, text="B/strap - B/ftg = ", font=self.helv).grid(row=4, column=7, sticky = tk.E)
         self.s_ls_entry = tk.Entry(self.geo_data_frame, textvariable=self.s_elev_in, width=10)
@@ -548,6 +580,7 @@ class main_window:
         tk.Label(self.geo_data_frame, text="Distance Between Columns:", font=self.helv_res).grid(row=0, column=10)
         tk.Label(self.geo_data_frame, text="Lc-c = ", font=self.helv).grid(row=1, column=10, sticky = tk.E)
         self.lcc = tk.StringVar()
+        self.inputs.append(self.lcc)
         self.lcc.set(20)
         self.lcc_entry = tk.Entry(self.geo_data_frame, textvariable=self.lcc, width=10, validate="key", validatecommand=self.reset_status)
         self.lcc_entry.grid(row=1, column=11)
@@ -558,6 +591,7 @@ class main_window:
 
         tk.Label(self.geo_data_frame, text="Q,allow = ", font=self.helv).grid(row=1, column=13, sticky = tk.E)
         self.Qa_ksf = tk.StringVar()
+        self.inputs.append(self.Qa_ksf)
         self.Qa_ksf.set(3)
         self.qa_entry = tk.Entry(self.geo_data_frame, textvariable=self.Qa_ksf, width=10, validate="key", validatecommand=self.reset_status)
         self.qa_entry.grid(row=1, column=14)
@@ -565,18 +599,21 @@ class main_window:
         
         tk.Label(self.geo_data_frame, text="DL,Service factor = ", font=self.helv).grid(row=2, column=13, sticky = tk.E)
         self.dl_service_factor = tk.StringVar()
+        self.inputs.append(self.dl_service_factor)
         self.dl_service_factor.set(1.0)
         self.dl_service_factor_entry = tk.Entry(self.geo_data_frame, textvariable=self.dl_service_factor, width=10, validate="key", validatecommand=self.reset_status)
         self.dl_service_factor_entry.grid(row=2, column=14)
         
         tk.Label(self.geo_data_frame, text="DL,Ult. factor = ", font=self.helv).grid(row=3, column=13, sticky = tk.E)
         self.dl_factor = tk.StringVar()
+        self.inputs.append(self.dl_factor)
         self.dl_factor.set(1.2)
         self.dl_factor_entry = tk.Entry(self.geo_data_frame, textvariable=self.dl_factor, width=10, validate="key", validatecommand=self.reset_status)
         self.dl_factor_entry.grid(row=3, column=14)
 
         tk.Label(self.geo_data_frame, text="Fy = ", font=self.helv).grid(row=4, column=13, sticky = tk.E)
         self.Fy_ksi = tk.StringVar()
+        self.inputs.append(self.Fy_ksi)
         self.Fy_ksi.set(60)
         self.fy_entry = tk.Entry(self.geo_data_frame, textvariable=self.Fy_ksi, width=10, validate="key", validatecommand=self.reset_status)
         self.fy_entry.grid(row=4, column=14)
@@ -584,6 +621,7 @@ class main_window:
 
         tk.Label(self.geo_data_frame, text="F'c = ", font=self.helv).grid(row=5, column=13, sticky = tk.E)
         self.Fpc_ksi = tk.StringVar()
+        self.inputs.append(self.Fpc_ksi)
         self.Fpc_ksi.set(3)
         self.fpc_entry = tk.Entry(self.geo_data_frame, textvariable=self.Fpc_ksi, width=10, validate="key", validatecommand=self.reset_status)
         self.fpc_entry.grid(row=5, column=14)
@@ -591,6 +629,7 @@ class main_window:
 
         tk.Label(self.geo_data_frame, text="Density = ", font=self.helv).grid(row=6, column=13, sticky = tk.E)
         self.density_pcf = tk.StringVar()
+        self.inputs.append(self.density_pcf)
         self.density_pcf.set(150)
         self.density_entry = tk.Entry(self.geo_data_frame, textvariable=self.density_pcf, width=10, validate="key", validatecommand=self.reset_status)
         self.density_entry.grid(row=6, column=14)
@@ -755,6 +794,7 @@ class main_window:
         tk.Label(self.ftg_left_inputs_frame, text="kips", font=self.helv).grid(row=11, column=2)
 
         self.left_bar_size = tk.StringVar()
+        self.inputs.append(self.left_bar_size)
         self.left_bar_size.set('3')
         self.left_bar_size_label = tk.Label(self.ftg_left_inputs_frame, text="Bar Size (#) : ", font=self.helv)
         self.left_bar_size_label.grid(row=12,column=0, pady=2)
@@ -809,6 +849,7 @@ class main_window:
         tk.Label(self.ftg_right_inputs_frame, text="kips", font=self.helv).grid(row=11, column=2)
 
         self.right_bar_size = tk.StringVar()
+        self.inputs.append(self.right_bar_size)
         self.right_bar_size.set('3')
         self.right_bar_size_label = tk.Label(self.ftg_right_inputs_frame, text="Bar Size (#) : ", font=self.helv)
         self.right_bar_size_label.grid(row=12,column=0, pady=2)
@@ -839,6 +880,7 @@ class main_window:
         tk.Label(self.strap_inputs_frame, text="in", font=self.helv).grid(row=1, column=2)
 
         self.strap_vbar_size = tk.StringVar()
+        self.inputs.append(self.strap_vbar_size)
         self.strap_vbar_size.set('3')
         self.strap_vbar_size_label = tk.Label(self.strap_inputs_frame, text="Shear\nBar Size (#) : ", font=self.helv)
         self.strap_vbar_size_label.grid(row=2,column=0, pady=2)
@@ -847,6 +889,7 @@ class main_window:
         self.strap_vbar_size_menu.grid(row=2, column=1, padx= 2, sticky=tk.W)
 
         self.strap_bar_size = tk.StringVar()
+        self.inputs.append(self.strap_bar_size)
         self.strap_bar_size.set('3')
         self.strap_bar_size_label = tk.Label(self.strap_inputs_frame, text="Flexure\nBar Size (#) : ", font=self.helv)
         self.strap_bar_size_label.grid(row=4,column=0, pady=2)
@@ -3246,6 +3289,32 @@ class main_window:
                     self.load_case_listbox.itemconfigure(result[0]-1, background='white')
         else:
             pass
+        
+    def save_inputs(self, *args):
+        
+        out_file = tkFileDialog.asksaveasfile(mode='w', defaultextension=".strapbm")
+        
+        if out_file is None:
+            return
+        
+        for data in self.inputs:
+            text = '{0}\n'.format(data.get())
+            out_file.write(text)
+        
+        out_file.close()
+    
+    def open_existing(self, *args):
+    
+        filename = tkFileDialog.askopenfilename()
+        calc_file = open(filename,'r')
+        calc_data = calc_file.readlines()
+        calc_file.close()
+        
+        i=0
+        for line in calc_data:
+            value = line.rstrip('\n')
+            self.inputs[i].set(value)
+            i+=1
         
 def main():
     root = tk.Tk()
