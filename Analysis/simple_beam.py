@@ -76,9 +76,15 @@ class Master_window:
         
         #Beam Canvas
         self.beam_canvas_frame = tk.Frame(self.main_frame, bd=2, relief='sunken', padx=1,pady=1)
-        self.bm_canvas = tk.Canvas(self.beam_canvas_frame, width=750, height=150, bd=2, relief='sunken', background="gray30")
+        self.bm_canvas = tk.Canvas(self.beam_canvas_frame, width=750, height=200, bd=2, relief='sunken', background="black")
         self.bm_canvas.bind("<Configure>", self.bm_canvas_draw)
+        self.bm_canvas.bind("<Button-1>", self.draw_static_beam_mouse)
+        self.bm_canvas.bind("<B1-Motion>", self.draw_static_beam_mouse)
         self.bm_canvas.pack(side = tk.LEFT, anchor='c', padx= 1, pady= 1, fill=tk.BOTH, expand=1)
+        
+        self.val_at_x = self.bm_canvas.create_line(0, 0,0,0,fill="gray90", width=1, dash=(4,4))
+        self.val_at_x_text = self.bm_canvas.create_line(0, 0,0,0,fill="gray90", width=1, dash=(4,4))
+        
         self.beam_canvas_frame.pack(side=tk.TOP, anchor='c', padx= 1, pady= 1, fill=tk.BOTH, expand=1)
         
         self.graph_b_frame = tk.Frame(self.beam_canvas_frame, bd=2, relief='sunken', padx=4 ,pady=1)
@@ -182,35 +188,15 @@ class Master_window:
             
         self.res_frame.pack(side=tk.LEFT, anchor='nw', padx=4 ,pady=1)
         
-        self.res_calc_frame = tk.Frame(self.pg1_frame, bd=2, relief='sunken', padx=4 ,pady=1)
-        
-        self.b_solveredundant = tk.Button(self.res_calc_frame, text="Solve and Apply \nInternal Reaction @ X", command = self.redundantx, font=helv)
-        self.b_solveredundant.grid(row=0, column=0, padx=4)
-        
-        self.redundant_reaction_label = tk.Label(self.res_calc_frame, text= '-- kips', font=helv_res)
-        self.redundant_reaction_label.grid(row=0, column=1)
-        
-        self.b_solvefixedend = tk.Button(self.res_calc_frame, text="Solve and Apply\n Fixed End Reactions", command = self.fixed_end_moments, font=helv)
-        self.b_solvefixedend.grid(row=1, column=0, padx=4)
-        
-        self.fixedendmoment_label = tk.Label(self.res_calc_frame, text= '-- ft-kips\n-- ft-kips', font=helv_res)
-        self.fixedendmoment_label.grid(row=1, column=1)
-        
-        self.b_moment_area = tk.Button(self.res_calc_frame, text="Area of Moment Curve and Centroid", command = self.moment_area, font=helv)
-        self.b_moment_area.grid(row=2, column=0, padx=4)
-        
-        self.moment_area_label = tk.Label(self.res_calc_frame, text= '-- ft-kips\n-- ft-kips', font=helv_res)
-        self.moment_area_label.grid(row=2, column=1)
-        
-        self.res_calc_frame.pack(side=tk.LEFT, anchor='nw', padx=4 ,pady=1)
-        
         self.res_calc_multi_frame = tk.Frame(self.pg1_frame, bd=2, relief='sunken', padx=4 ,pady=1)
         
         self.fixed_left = tk.IntVar()
-        tk.Checkbutton(self.res_calc_multi_frame , text=' : Fixed Left', variable=self.fixed_left, font=helv).grid(row=0, column=0, sticky = tk.W)
+        self.fixed_left_check = tk.Checkbutton(self.res_calc_multi_frame , text=' : Fixed Left', variable=self.fixed_left, font=helv)
+        self.fixed_left_check.grid(row=0, column=0, sticky = tk.W)
         
         self.fixed_right = tk.IntVar()
-        tk.Checkbutton(self.res_calc_multi_frame , text=' : Fixed Right', variable=self.fixed_right, font=helv).grid(row=0, column=2, sticky = tk.W)
+        self.fixed_right_check = tk.Checkbutton(self.res_calc_multi_frame , text=' : Fixed Right', variable=self.fixed_right, font=helv)
+        self.fixed_right_check.grid(row=0, column=2, sticky = tk.W)
         
         tk.Label(self.res_calc_multi_frame, text = 'Support Locations (ft):\nex. 10,20,30,...,Xi', font=helv).grid(row=1, column=0, columnspan= 3)
         self.internal_supports = tk.StringVar()
@@ -221,6 +207,12 @@ class Master_window:
         
         self.multi_result_label = tk.Label(self.res_calc_multi_frame, text = 'Mo = --\nML = --', font=helv)
         self.multi_result_label.grid(row=4, column=0, columnspan= 3)
+        
+        self.b_moment_area = tk.Button(self.res_calc_multi_frame, text="Area of Moment Curve and Centroid", command = self.moment_area, font=helv)
+        self.b_moment_area.grid(row=5, column=0, columnspan=3)
+        
+        self.moment_area_label = tk.Label(self.res_calc_multi_frame, text= '-- ft-kips\n-- ft-kips', font=helv_res)
+        self.moment_area_label.grid(row=6, column=0, columnspan=3)
         
         self.res_calc_multi_frame.pack(side=tk.LEFT, anchor='nw', padx=4 ,pady=1)
         
@@ -335,15 +327,15 @@ class Master_window:
         self.results_scrollbar_l = tk.Scrollbar(self.res_l_frame, orient="vertical", command=self.det_res_scroll_l)
         self.results_scrollbar_l.grid(row=1, column=6, sticky=tk.NS)
 
-        self.xl_listbox = tk.Listbox(self.res_l_frame, height = 30, width = 16, font=helv, yscrollcommand=self.results_scrollbar_l.set)
+        self.xl_listbox = tk.Listbox(self.res_l_frame, height = 20, width = 16, font=helv, yscrollcommand=self.results_scrollbar_l.set)
         self.xl_listbox.grid(row=1, column=1)
-        self.lv_listbox = tk.Listbox(self.res_l_frame, height = 30, width = 16, font=helv, yscrollcommand=self.results_scrollbar_l.set)
+        self.lv_listbox = tk.Listbox(self.res_l_frame, height = 20, width = 16, font=helv, yscrollcommand=self.results_scrollbar_l.set)
         self.lv_listbox.grid(row=1, column=2)
-        self.lm_listbox = tk.Listbox(self.res_l_frame, height = 30, width = 16, font=helv, yscrollcommand=self.results_scrollbar_l.set)
+        self.lm_listbox = tk.Listbox(self.res_l_frame, height = 20, width = 16, font=helv, yscrollcommand=self.results_scrollbar_l.set)
         self.lm_listbox.grid(row=1, column=3)
-        self.ls_listbox = tk.Listbox(self.res_l_frame, height = 30, width = 16, font=helv, yscrollcommand=self.results_scrollbar_l.set)
+        self.ls_listbox = tk.Listbox(self.res_l_frame, height = 20, width = 16, font=helv, yscrollcommand=self.results_scrollbar_l.set)
         self.ls_listbox.grid(row=1, column=4)
-        self.ld_listbox = tk.Listbox(self.res_l_frame, height = 30, width = 16, font=helv, yscrollcommand=self.results_scrollbar_l.set)
+        self.ld_listbox = tk.Listbox(self.res_l_frame, height = 20, width = 16, font=helv, yscrollcommand=self.results_scrollbar_l.set)
         self.ld_listbox.grid(row=1, column=5)
         
         self.res_l_frame.pack(anchor='c', padx= 1, pady= 1, fill=tk.BOTH, expand=1)
@@ -438,17 +430,19 @@ class Master_window:
             lc = float(self.span_ft.get())
             lr = float(self.right_cant_ft.get())
             
-            initial = 75
+            initial = 50
             
             sf = (w-(2*initial)) / (ll+lc+lr)
+            
+            self.canvas_scale_x = sf
             
             l = (w-(2*initial)) + initial
             s1 = (sf * ll) + initial
             s2 = ((ll+lc) * sf) + initial
             
-            self.bm_canvas.create_line(initial, h/2, l, h/2, fill="black", width=2)
-            self.bm_canvas.create_line(s1, h/2, (s1+20), (h/2)+20, (s1-20), (h/2)+20,s1, h/2, fill="black", width=2)
-            self.bm_canvas.create_line(s2, h/2, (s2+20), (h/2)+20, (s2-20), (h/2)+20,s2, h/2, fill="black", width=2)
+            self.bm_canvas.create_line(initial, h/2, l, h/2, fill="white", width=2)
+            self.bm_canvas.create_line(s1, h/2, (s1+20), (h/2)+20, (s1-20), (h/2)+20,s1, h/2, fill="white", width=2)
+            self.bm_canvas.create_line(s2, h/2, (s2+20), (h/2)+20, (s2-20), (h/2)+20,s2, h/2, fill="white", width=2)
             
             if self.show_l.get() == 1:
                 
@@ -535,8 +529,8 @@ class Master_window:
                     r_sf = (hg - 10) / max(max(max(self.rly),max(self.rry)), abs(min(min(self.rlx),min(self.rly))))
                 
                 for i in range(1,len(self.rlx)):
-                    self.bm_canvas.create_line((self.rlx[i-1] * sf) + initial, hg - (self.rly[i-1] * r_sf),(self.rlx[i] * sf) + initial,hg - (self.rly[i] * r_sf),fill="black", width=2)
-                    self.bm_canvas.create_line((self.rrx[i-1] * sf) + initial, hg - (self.rry[i-1] * r_sf),(self.rrx[i] * sf) + initial,hg - (self.rry[i] * r_sf),fill="black", width=2)
+                    self.bm_canvas.create_line((self.rlx[i-1] * sf) + initial, hg - (self.rly[i-1] * r_sf),(self.rlx[i] * sf) + initial,hg - (self.rly[i] * r_sf),fill="light blue", width=2)
+                    self.bm_canvas.create_line((self.rrx[i-1] * sf) + initial, hg - (self.rry[i-1] * r_sf),(self.rrx[i] * sf) + initial,hg - (self.rry[i] * r_sf),fill="light blue", width=2)
 
     def det_res_scroll(self, *args):
         self.xc_listbox.yview(*args)
@@ -737,7 +731,6 @@ class Master_window:
         self.build_loads_gui()
         self.build_loads()        
 
-
     def remove_load(self, *event):
         '''  
         for load in self.loads_gui[-1]:
@@ -753,14 +746,9 @@ class Master_window:
 
         self.build_loads()
         
-
     def reaction_graph(self,r,x):
         r = -1.0 * r
-        #arrow_height = r/6.0
-        if r < 0.0:
-            arrow_height = -0.5
-        else:
-            arrow_height = 0.5
+        arrow_height = r/6.0
         #30 degree arrow
         arrow_plus= x+(arrow_height*math.tan(math.radians(30)))
         arrow_minus= x-(arrow_height*math.tan(math.radians(30)))
@@ -1318,32 +1306,6 @@ class Master_window:
             d = [deltalx, deltacx, deltarx]
             
             return v,m,s,d
-                                                    
-    def redundantx(self, *event):
-        self.runx()
-        E = float(self.E_ksi.get()) * 144        #144 is conversion from ksi to ksf - 12^2
-        I = float(self.I_in4.get()) / 12.0**4    #covert from in^4 to ft^4
-        a = float(self.resx_var.get())
-        b = self.lc - a
-        
-        p = ((self.deltacx/12.0) * 3.0 * E * I * self.lc) / (a**2 * b**2)
-        
-        self.redundant_reaction_label.configure(text='R,int = {0:.3f} kips'.format(p))
-        
-        #Add Redundant Interior Reaction as Point Load on Center Span
-        self.loads_gui_select_var.append([tk.IntVar(), tk.StringVar(), tk.StringVar(), tk.StringVar(), tk.StringVar(), tk.StringVar(), tk.StringVar()])
-        
-        n = len(self.loads_gui_select_var)
-        self.loads_gui_select_var[n-1][0].set(1)
-        self.loads_gui_select_var[n-1][1].set(p)
-        self.loads_gui_select_var[n-1][2].set(0)
-        self.loads_gui_select_var[n-1][3].set(a)
-        self.loads_gui_select_var[n-1][4].set(0)
-        self.loads_gui_select_var[n-1][5].set('Center')
-        self.loads_gui_select_var[n-1][6].set('Point')
-        
-        self.build_loads_gui()
-        self.build_loads()       
     
     def update(self, *event):
         
@@ -1352,6 +1314,18 @@ class Master_window:
         lr = float(self.right_cant_ft.get())
         
         n=0
+        
+        if ll > 0:
+            self.fixed_left.set(0)
+            self.fixed_left_check.configure(state=tk.DISABLED)
+        else:
+            self.fixed_left_check.configure(state=tk.NORMAL)
+            
+        if lr > 0:
+            self.fixed_right.set(0)
+            self.fixed_right_check.configure(state=tk.DISABLED)
+        else:
+            self.fixed_right_check.configure(state=tk.NORMAL)
         
         for load in self.loads_gui_select_var:
             
@@ -1421,80 +1395,6 @@ class Master_window:
             
             n = n+1
             
-        self.build_loads()
-
-    def fixed_end_moments(self, *event):
-        if self.has_run == 1:
-            pass
-        else:
-            self.run()
-        
-        E = float(self.E_ksi.get()) #ksi
-        I = float(self.I_in4.get()) #in4
-        L_ft = float(self.span_ft.get())
-        L_in = 12.0 * L_ft
-        
-        eis0 = self.slopec[0] * E * I
-        eisL = self.slopec[-1] * E * I
-
-        ll = float(self.left_cant_ft.get())
-        lr = float(self.right_cant_ft.get())
-        
-        if ll == 0 and lr == 0:
-            end = [1,1]
-        
-        elif ll == 0:
-            end = [1,0]
-        
-        elif lr == 0:
-            end = [0,1]
-        
-        else:
-            end = [0,0]
-        
-        
-        if end[0] == 1 and end[1] == 1:
-            s = np.array([[eis0],[eisL]])
-            
-            ems = np.array([[-1.0*L_in/3.0 , L_in/6.0],[L_in/6.0 , -1.0*L_in/3.0]])
-            
-            fem = np.linalg.solve(ems,s)
-            
-            fem_kft = fem / (-1.0 * 12.0)
-            
-        elif end[0] == 1 and end[1] == 0:
-            fel_kft = ((eis0 * -3.0) / L_in)/ ( -1.0*12.0)
-            fem_kft = np.array([[fel_kft],[0]])
-        
-        elif end[0] == 0 and end[1] == 1:
-            fer_kft = ((eisL * -3.0) / L_in)/(-1.0*12.0)
-            fem_kft = np.array([[0],[fer_kft]])
-        
-        else:
-            fem_kft = np.array([[0],[0]])
-        
-        self.fixedendmoment_label.configure(text='M0 = {0:.4f} ft-kips\nML = {1:.4f} ft-kips'.format(fem_kft[0][0],fem_kft[1][0]))
-        
-        #Apply Fixed End Moments
-        i=0
-        for fem in fem_kft:
-            if fem == 0:
-                pass
-            else:
-                self.loads_gui_select_var.append([tk.IntVar(), tk.StringVar(), tk.StringVar(), tk.StringVar(), tk.StringVar(), tk.StringVar(), tk.StringVar()])
-                
-                n = len(self.loads_gui_select_var)
-                self.loads_gui_select_var[n-1][0].set(1)
-                self.loads_gui_select_var[n-1][1].set(fem[0])
-                self.loads_gui_select_var[n-1][2].set(0)
-                self.loads_gui_select_var[n-1][3].set(i*L_ft)
-                self.loads_gui_select_var[n-1][4].set(0)
-                self.loads_gui_select_var[n-1][5].set('Center')
-                self.loads_gui_select_var[n-1][6].set('Moment')
-                
-            i+=1
-            
-        self.build_loads_gui()
         self.build_loads() 
 
     def moment_area(self, *event):
@@ -1707,8 +1607,7 @@ class Master_window:
         
         fem = [self.fixed_left.get(),self.fixed_right.get()]
         
-        reaction_points_string = self.internal_supports.get().split(',')
-        reaction_points = [float(point) for point in reaction_points_string]
+
         
         #Solve Simultaneous equation for internal reactions knowing deflection of simple beam at support points
         #[d1....di] = [p1....pi]*[eid_p11.....eid_p1i
@@ -1732,34 +1631,40 @@ class Master_window:
         coeff_matrix.append([mo.eisx(0)*fem[0],ml.eisx(0)*fem[1]])
         coeff_matrix.append([mo.eisx(l_ft)*fem[0],ml.eisx(l_ft)*fem[1]])
         
-        for support in reaction_points:
-        
-            l = l_ft
-            a = support
+        if self.internal_supports.get() == '':
+            pass
+        else:
+            reaction_points_string = self.internal_supports.get().split(',')
+            reaction_points = [float(point) for point in reaction_points_string]
             
-            pl = ppbeam.pl(1,a,l)
+            for support in reaction_points:
             
-            #Deflection at each support location
-            v,m,s,d = self.analysisx(a)
-            delta.append(d[1])
-            
-            coeff_row = []
-            
-            coeff_row.append(mo.eidx(a)*fem[0])
-            coeff_row.append(ml.eidx(a)*fem[1])
+                l = l_ft
+                a = support
                 
-            for point in reaction_points:
-                        
-                x = point
-                eid_p = pl.eidx(x)
+                pl = ppbeam.pl(1,a,l)
                 
-                coeff_row.append(eid_p)
-                       
-            coeff_matrix[0].append(pl.eisx(0))
-            coeff_matrix[1].append(pl.eisx(l))
+                #Deflection at each support location
+                v,m,s,d = self.analysisx(a)
+                delta.append(d[1])
                 
-            
-            coeff_matrix.append(coeff_row)
+                coeff_row = []
+                
+                coeff_row.append(mo.eidx(a)*fem[0])
+                coeff_row.append(ml.eidx(a)*fem[1])
+                    
+                for point in reaction_points:
+                            
+                    x = point
+                    eid_p = pl.eidx(x)
+                    
+                    coeff_row.append(eid_p)
+                           
+                coeff_matrix[0].append(pl.eisx(0))
+                coeff_matrix[1].append(pl.eisx(l))
+                    
+                
+                coeff_matrix.append(coeff_row)
             
         d = np.array(delta)
         coeff = np.array(coeff_matrix)
@@ -1845,29 +1750,81 @@ class Master_window:
         else:
             pass
         
-        for reaction in reaction_points:
-            
-            res_string = res_string + 'R @ {0:.3f} ft = {1:.4f} kips\n'.format(reaction,-1*R[count])
-            
-            #Add Redundant Interior Reaction as Point Load on Center Span
-            self.loads_gui_select_var.append([tk.IntVar(), tk.StringVar(), tk.StringVar(), tk.StringVar(), tk.StringVar(), tk.StringVar(), tk.StringVar()])
-            
-            n = len(self.loads_gui_select_var)
-            self.loads_gui_select_var[n-1][0].set(1)
-            self.loads_gui_select_var[n-1][1].set(-1*R[count])
-            self.loads_gui_select_var[n-1][2].set(0)
-            self.loads_gui_select_var[n-1][3].set(reaction)
-            self.loads_gui_select_var[n-1][4].set(0)
-            self.loads_gui_select_var[n-1][5].set('Center')
-            self.loads_gui_select_var[n-1][6].set('Point')
-            
-            count+=1
+        if self.internal_supports.get() == '':
+            pass
+        else:
+            for reaction in reaction_points:
+                
+                res_string = res_string + 'R @ {0:.3f} ft = {1:.4f} kips\n'.format(reaction,-1*R[count])
+                
+                #Add Redundant Interior Reaction as Point Load on Center Span
+                self.loads_gui_select_var.append([tk.IntVar(), tk.StringVar(), tk.StringVar(), tk.StringVar(), tk.StringVar(), tk.StringVar(), tk.StringVar()])
+                
+                n = len(self.loads_gui_select_var)
+                self.loads_gui_select_var[n-1][0].set(1)
+                self.loads_gui_select_var[n-1][1].set(-1*R[count])
+                self.loads_gui_select_var[n-1][2].set(0)
+                self.loads_gui_select_var[n-1][3].set(reaction)
+                self.loads_gui_select_var[n-1][4].set(0)
+                self.loads_gui_select_var[n-1][5].set('Center')
+                self.loads_gui_select_var[n-1][6].set('Point')
+                
+                count+=1
             
         self.multi_result_label.configure(text=res_string)
         
         self.build_loads_gui()
         self.build_loads()
+
+    def draw_static_beam_mouse(self, event, *args):
+        w = self.bm_canvas.winfo_width()
+        h = self.bm_canvas.winfo_height()
+
+        self.bm_canvas.delete(self.val_at_x)
+        self.bm_canvas.delete(self.val_at_x_text)
+        initial = 50
+
+        sf = self.canvas_scale_x
+
+        ll = float(self.left_cant_ft.get())
+        lc = float(self.span_ft.get())
+        lr = float(self.right_cant_ft.get())
+
+        x_screen = event.x
+        x = x_screen - initial
         
+        E = float(self.E_ksi.get()) * 144        #144 is conversion from ksi to ksf - 12^2
+        I = float(self.I_in4.get()) / 12.0**4    #covert from in^4 to ft^4
+        
+        if x > (ll*sf) and x < ((ll+lc) * sf):
+            x_anal = (x/sf) - ll
+
+            v,m,s,d = self.analysisx(x_anal)
+
+            self.val_at_x_text = self.bm_canvas.create_text(w/2.0, (h-26), justify=tk.CENTER, text= '@ Xc = {0:.2f} ft\nV: {1:.2f} kips  M: {2:.2f} ft-kips  S: {3:.5f} rad  D: {4:.4f} in'.format(x_anal,v[1],m[1],s[1]/(E*I),(d[1]/(E*I))*12.0), fill='white')
+            
+        elif x > ((ll+lc)*sf):
+            x_anal = (x/sf) - (ll+lc)
+
+            if x_anal > lr:
+                pass
+            else:
+                v,m,s,d = self.analysisx(x_anal)
+
+                self.val_at_x_text = self.bm_canvas.create_text(w/2.0, (h-26), justify=tk.CENTER, text= '@ Xr = {0:.2f} ft\nV: {1:.2f} kips  M: {2:.2f} ft-kips  S: {3:.5f} rad  D: {4:.4f} in'.format(x_anal,v[2],m[2],s[2]/(E*I),(d[2]/(E*I))*12.0), fill='white')
+        else:
+            x_anal = x/sf
+            if x_anal < 0:
+                pass
+            else:
+                v,m,s,d = self.analysisx(x_anal)
+
+                self.val_at_x_text = self.bm_canvas.create_text(w/2.0, (h-26), justify=tk.CENTER, text= '@ Xl = {0:.2f} ft\nV: {1:.2f} kips  M: {2:.2f} ft-kips  S: {3:.5f} rad  D: {4:.4f} in'.format(x_anal,v[0],m[0],s[0]/(E*I),(d[0]/(E*I))*12.0), fill='white')
+
+        self.val_at_x = self.bm_canvas.create_line(x_screen, 0,x_screen,h,fill="blue", width=1, dash=(6,6))
+
+
+      
         
             
             
@@ -1876,7 +1833,7 @@ def main():
     root = tk.Tk()
     root.title("Simple Beam")
     Master_window(root)
-    root.minsize(1024,768)
+    root.minsize(1280,720)
     root.mainloop()
 
 if __name__ == '__main__':
