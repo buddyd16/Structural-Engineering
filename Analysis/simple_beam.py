@@ -1626,11 +1626,57 @@ class Master_window:
         
         fem = [self.fixed_left.get(),self.fixed_right.get()]
         
-
-        
-        #Solve Simultaneous equation for internal reactions knowing deflection of simple beam at support points
-        #[d1....di] = [p1....pi]*[eid_p11.....eid_p1i
-        #                         eid_pi1.....eid_pii]
+        #######################################################################################################
+        #######################################################################################################
+        # Solve Simultaneous equation for internal reactions and fixed end moments knowing 
+        # deflection and end slopes of simple beam at support points:
+        #
+        # By compatibility for fixed ends initial and final slope should be 0, and deflection
+        # at each interior support location should be 0.
+        #
+        # Function expects consistent units for values, should produce accurate results for
+        # both metric and imperial units.
+        #
+        #[s0, sL, d1....di] = [M0,ML,p1....pi]*[eis0_M0, eis0_ML, eis0_p1......eis0_pi
+        #                                       eisL_M0, eisL_ML, eisL_p1......eisL_pi
+        #                                       eid_M0_p1,  eid_ML_p1, eid_p11.....eid_pi1
+        #                                       eid_M0_pi,  eid_ML_pi, eid_p1i.....eid_pii]
+        # Where:
+        # s0 = slope at 0 ft, or left end of beam, calculated for the single span simply supported beam
+        # sL = slope at L ft, or right end of beam, calculated for the single span simply supported beam
+        # d1 = deflection at first interior support 1 location calculated for the single span simply supported beam
+        # di = deflection at ith interior support i location calculated for the single span simply supported beam
+        #
+        # s and d are to be independant of E, modulus of elasticity, and I, moment of inertia, therefore
+        # either need to divide by E*I or provide s and d in terms of E*I*s and E*I*d
+        #
+        # M0 = fixed end moment at 0 ft, or left end
+        # Ml = fixed end moment at L ft, or right end
+        # p1 = reaction at first interior support
+        # pi = reaction at ith interior support
+        #
+        # eis0_M0 = slope coefficient for M0 at 0 ft, or left end
+        # eis0_Ml = slope coefficient for ML at 0 ft, or left end
+        # eis0_p1 = slope coefficient for first interior support at 0 ft, or left end
+        # eis0_pi = slope coefficient for ith interior support at 0 ft, or left end
+        #
+        # eisL_M0 = slope coefficient for M0 at L ft, or right end
+        # eisL_Ml = slope coefficient for ML at L ft, or right end
+        # eisL_p1 = slope coefficient for first interior support at L ft, or right end
+        # eisL_pi = slope coefficient for ith interior support at L ft, or right end
+        #
+        # eid_M0_p1 = deflection coefficient at first interior support for M0
+        # eid_M0_p1 = deflection coefficient at first interior support for ML
+        # eid_p11 = deflection coefficient at first interior support for first interior reaction
+        # eid_pi1 = deflection coefficient at first interior support for ith interior reaction
+        #
+        # eid_M0_pi = deflection coefficient at ith interior support for M0
+        # eid_M0_pi = deflection coefficient at ith interior support for ML
+        # eid_p1i = deflection coefficient at ith interior support for first interior reaction
+        # eid_pii = deflection coefficient at ith interior support for ith interior reaction
+        #
+        #######################################################################################################
+        #######################################################################################################
         
         #build the coefficient matrix rows and the deflection values
         delta = []
