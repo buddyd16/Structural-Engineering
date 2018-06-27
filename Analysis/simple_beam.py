@@ -480,10 +480,17 @@ class Master_window:
                 else:
                     v_sf = (hg - 10) / max(max(max(self.shearc), max(self.shearl), max(self.shearr)), abs(min(min(self.shearc), min(self.shearl), min(self.shearr))))
                 
+                self.bm_canvas.create_line((xl[-1] * sf) + initial, hg - (self.shearl[-1] * v_sf),(xc[0] * sf) + initial,hg - (self.shearc[0] * v_sf),fill="red", width=2)
+                self.bm_canvas.create_line((xc[-1] * sf) + initial, hg - (self.shearc[-1] * v_sf),(xr[0] * sf) + initial,hg - (self.shearr[0] * v_sf),fill="red", width=2)
+            
                 for i in range(1,len(self.shearc)):
                     self.bm_canvas.create_line((xl[i-1] * sf) + initial, hg - (self.shearl[i-1] * v_sf),(xl[i] * sf) + initial,hg - (self.shearl[i] * v_sf),fill="red", width=2)
                     self.bm_canvas.create_line((xc[i-1] * sf) + initial, hg - (self.shearc[i-1] * v_sf),(xc[i] * sf) + initial,hg - (self.shearc[i] * v_sf),fill="red", width=2)
                     self.bm_canvas.create_line((xr[i-1] * sf) + initial, hg - (self.shearr[i-1] * v_sf),(xr[i] * sf) + initial,hg - (self.shearr[i] * v_sf),fill="red", width=2)
+                    
+                    self.bm_canvas.create_line((xl[i-1] * sf) + initial, hg - (self.shearl[i-1] * v_sf),(xl[i-1] * sf) + initial,hg,fill="red3", width=1)
+                    self.bm_canvas.create_line((xc[i-1] * sf) + initial, hg - (self.shearc[i-1] * v_sf),(xc[i-1] * sf) + initial,hg,fill="red3", width=1)
+                    self.bm_canvas.create_line((xr[i-1] * sf) + initial, hg - (self.shearr[i-1] * v_sf),(xr[i-1] * sf) + initial,hg,fill="red3", width=1)
             
             if self.show_m.get() == 1:
                 
@@ -496,6 +503,10 @@ class Master_window:
                     self.bm_canvas.create_line((xl[i-1] * sf) + initial, hg - (self.momentl[i-1] * m_sf),(xl[i] * sf) + initial,hg - (self.momentl[i] * m_sf),fill="green", width=2)
                     self.bm_canvas.create_line((xc[i-1] * sf) + initial, hg - (self.momentc[i-1] * m_sf),(xc[i] * sf) + initial,hg - (self.momentc[i] * m_sf),fill="green", width=2)
                     self.bm_canvas.create_line((xr[i-1] * sf) + initial, hg - (self.momentr[i-1] * m_sf),(xr[i] * sf) + initial,hg - (self.momentr[i] * m_sf),fill="green", width=2)
+                    
+                    self.bm_canvas.create_line((xl[i-1] * sf) + initial, hg - (self.momentl[i-1] * m_sf),(xl[i-1] * sf) + initial,hg,fill="PaleGreen3", width=1)
+                    self.bm_canvas.create_line((xc[i-1] * sf) + initial, hg - (self.momentc[i-1] * m_sf),(xc[i-1] * sf) + initial,hg,fill="PaleGreen3", width=1)
+                    self.bm_canvas.create_line((xr[i-1] * sf) + initial, hg - (self.momentr[i-1] * m_sf),(xr[i-1] * sf) + initial,hg,fill="PaleGreen3", width=1)
             
             if self.show_s.get() == 1:
                                   
@@ -508,6 +519,10 @@ class Master_window:
                     self.bm_canvas.create_line((xl[i-1] * sf) + initial, hg - (self.slopel[i-1] * s_sf),(xl[i] * sf) + initial,hg - (self.slopel[i] * s_sf),fill="magenta", width=2)
                     self.bm_canvas.create_line((xc[i-1] * sf) + initial, hg - (self.slopec[i-1] * s_sf),(xc[i] * sf) + initial,hg - (self.slopec[i] * s_sf),fill="magenta", width=2)
                     self.bm_canvas.create_line((xr[i-1] * sf) + initial, hg - (self.sloper[i-1] * s_sf),(xr[i] * sf) + initial,hg - (self.sloper[i] * s_sf),fill="magenta", width=2)
+                    
+                    self.bm_canvas.create_line((xl[i-1] * sf) + initial, hg - (self.slopel[i-1] * s_sf),(xl[i-1] * sf) + initial,hg,fill="orchid2", width=1)
+                    self.bm_canvas.create_line((xc[i-1] * sf) + initial, hg - (self.slopec[i-1] * s_sf),(xc[i-1] * sf) + initial,hg,fill="orchid2", width=1)
+                    self.bm_canvas.create_line((xr[i-1] * sf) + initial, hg - (self.sloper[i-1] * s_sf),(xr[i-1] * sf) + initial,hg,fill="orchid2", width=1)
             
             if self.show_d.get() == 1:
                                   
@@ -520,6 +535,10 @@ class Master_window:
                     self.bm_canvas.create_line((xl[i-1] * sf) + initial, hg - (self.deltal[i-1] * d_sf),(xl[i] * sf) + initial,hg - (self.deltal[i] * d_sf),fill="grey", width=2)
                     self.bm_canvas.create_line((xc[i-1] * sf) + initial, hg - (self.deltac[i-1] * d_sf),(xc[i] * sf) + initial,hg - (self.deltac[i] * d_sf),fill="grey", width=2)
                     self.bm_canvas.create_line((xr[i-1] * sf) + initial, hg - (self.deltar[i-1] * d_sf),(xr[i] * sf) + initial,hg - (self.deltar[i] * d_sf),fill="grey", width=2)
+                    
+                    self.bm_canvas.create_line((xl[i-1] * sf) + initial, hg - (self.deltal[i-1] * d_sf),(xl[i-1] * sf) + initial,hg,fill="light grey", width=1)
+                    self.bm_canvas.create_line((xc[i-1] * sf) + initial, hg - (self.deltac[i-1] * d_sf),(xc[i-1] * sf) + initial,hg,fill="light grey", width=1)
+                    self.bm_canvas.create_line((xr[i-1] * sf) + initial, hg - (self.deltar[i-1] * d_sf),(xr[i-1] * sf) + initial,hg,fill="light grey", width=1)
 
             if self.show_r.get() == 1:
                 
@@ -1796,12 +1815,14 @@ class Master_window:
         E = float(self.E_ksi.get()) * 144        #144 is conversion from ksi to ksf - 12^2
         I = float(self.I_in4.get()) / 12.0**4    #covert from in^4 to ft^4
         
+        text_color = 'yellow'
+        
         if x > (ll*sf) and x < ((ll+lc) * sf):
             x_anal = (x/sf) - ll
 
             v,m,s,d = self.analysisx(x_anal)
 
-            self.val_at_x_text = self.bm_canvas.create_text(w/2.0, (h-26), justify=tk.CENTER, text= '@ Xc = {0:.2f} ft\nV: {1:.2f} kips  M: {2:.2f} ft-kips  S: {3:.5f} rad  D: {4:.4f} in'.format(x_anal,v[1],m[1],s[1]/(E*I),(d[1]/(E*I))*12.0), fill='white')
+            self.val_at_x_text = self.bm_canvas.create_text(w/2.0, (h-26), justify=tk.CENTER, text= '@ Xc = {0:.2f} ft\nV: {1:.2f} kips  M: {2:.2f} ft-kips  S: {3:.5f} rad  D: {4:.4f} in'.format(x_anal,v[1],m[1],s[1]/(E*I),(d[1]/(E*I))*12.0), fill=text_color)
             
         elif x > ((ll+lc)*sf):
             x_anal = (x/sf) - (ll+lc)
@@ -1811,7 +1832,7 @@ class Master_window:
             else:
                 v,m,s,d = self.analysisx(x_anal)
 
-                self.val_at_x_text = self.bm_canvas.create_text(w/2.0, (h-26), justify=tk.CENTER, text= '@ Xr = {0:.2f} ft\nV: {1:.2f} kips  M: {2:.2f} ft-kips  S: {3:.5f} rad  D: {4:.4f} in'.format(x_anal,v[2],m[2],s[2]/(E*I),(d[2]/(E*I))*12.0), fill='white')
+                self.val_at_x_text = self.bm_canvas.create_text(w/2.0, (h-26), justify=tk.CENTER, text= '@ Xr = {0:.2f} ft\nV: {1:.2f} kips  M: {2:.2f} ft-kips  S: {3:.5f} rad  D: {4:.4f} in'.format(x_anal,v[2],m[2],s[2]/(E*I),(d[2]/(E*I))*12.0), fill=text_color)
         else:
             x_anal = x/sf
             if x_anal < 0:
@@ -1819,7 +1840,7 @@ class Master_window:
             else:
                 v,m,s,d = self.analysisx(x_anal)
 
-                self.val_at_x_text = self.bm_canvas.create_text(w/2.0, (h-26), justify=tk.CENTER, text= '@ Xl = {0:.2f} ft\nV: {1:.2f} kips  M: {2:.2f} ft-kips  S: {3:.5f} rad  D: {4:.4f} in'.format(x_anal,v[0],m[0],s[0]/(E*I),(d[0]/(E*I))*12.0), fill='white')
+                self.val_at_x_text = self.bm_canvas.create_text(w/2.0, (h-26), justify=tk.CENTER, text= '@ Xl = {0:.2f} ft\nV: {1:.2f} kips  M: {2:.2f} ft-kips  S: {3:.5f} rad  D: {4:.4f} in'.format(x_anal,v[0],m[0],s[0]/(E*I),(d[0]/(E*I))*12.0), fill=text_color)
 
         self.val_at_x = self.bm_canvas.create_line(x_screen, 0,x_screen,h,fill="blue", width=1, dash=(6,6))
 
