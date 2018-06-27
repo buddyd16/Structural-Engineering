@@ -28,6 +28,10 @@ can solve for shear, moment, slope, and deflection of a simply supported beam wi
 
 Can be used to verify frame or fixed beam FEM results by applying point end moments returned by your 3rd party software, works on basis of superposition.
 
+
+In action:
+![Simple Beam gif](images/simple_gif.gif?raw=true "Simple Beam")
+
 ## Three Moment Method
 ### Reworking to use the pin-pin class file and directly compute slope and deflection rather than rely on approx. integration. Also adding in point moments as a load type.
 Contains a class for the Three Moment Method for continuous beam analysis. Refer to the comments in the py file for additional information.
