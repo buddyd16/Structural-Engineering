@@ -8,6 +8,10 @@ requires the analysis folder and contained py files and the concrete folder and 
 
 Currently an alpha level program there are several validation checks not being performed such as number of bars required in the strap actually fitting in the strap, etc.  No handling of foundation uplift base assumption of the program is positive bearing.
 
+In action:
+![Strap Beam gif](images/strap_gif.gif?raw=true "Strap Beam")
+
+
 ## Concrete T beam - depends on concrete_beam_classes in the same directory
 Tkinter GUI based Python program.
 Provides various code defined capacities based on strain compatibility. Currently based on ACI 318-08. Calculates elevation
