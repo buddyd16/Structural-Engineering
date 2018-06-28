@@ -101,7 +101,9 @@ class Master_window:
         self.show_d = tk.IntVar()
         tk.Checkbutton(self.graph_b_frame, text=' : Show D', variable=self.show_d, command = self.bm_canvas_draw, font=helv).grid(row=5, column=1, sticky = tk.W)
         self.show_r = tk.IntVar()
-        tk.Checkbutton(self.graph_b_frame, text=' : Show Reactions', variable=self.show_r, command = self.bm_canvas_draw, font=helv).grid(row=6, column=1, sticky = tk.W) 
+        tk.Checkbutton(self.graph_b_frame, text=' : Show Reactions', variable=self.show_r, command = self.bm_canvas_draw, font=helv).grid(row=6, column=1, sticky = tk.W)
+        self.show_stations = tk.IntVar()
+        tk.Checkbutton(self.graph_b_frame, text=' : Show Stations', variable=self.show_stations, command = self.bm_canvas_draw, font=helv).grid(row=7, column=1, sticky = tk.W)
         
         self.graph_b_frame.pack(side=tk.RIGHT, anchor='e')
         
@@ -488,9 +490,10 @@ class Master_window:
                     self.bm_canvas.create_line((xc[i-1] * sf) + initial, hg - (self.shearc[i-1] * v_sf),(xc[i] * sf) + initial,hg - (self.shearc[i] * v_sf),fill="red", width=2)
                     self.bm_canvas.create_line((xr[i-1] * sf) + initial, hg - (self.shearr[i-1] * v_sf),(xr[i] * sf) + initial,hg - (self.shearr[i] * v_sf),fill="red", width=2)
                     
-                    self.bm_canvas.create_line((xl[i-1] * sf) + initial, hg - (self.shearl[i-1] * v_sf),(xl[i-1] * sf) + initial,hg,fill="red3", width=1)
-                    self.bm_canvas.create_line((xc[i-1] * sf) + initial, hg - (self.shearc[i-1] * v_sf),(xc[i-1] * sf) + initial,hg,fill="red3", width=1)
-                    self.bm_canvas.create_line((xr[i-1] * sf) + initial, hg - (self.shearr[i-1] * v_sf),(xr[i-1] * sf) + initial,hg,fill="red3", width=1)
+                    if self.show_stations.get() == 1:
+                        self.bm_canvas.create_line((xl[i-1] * sf) + initial, hg - (self.shearl[i-1] * v_sf),(xl[i-1] * sf) + initial,hg,fill="red3", width=1)
+                        self.bm_canvas.create_line((xc[i-1] * sf) + initial, hg - (self.shearc[i-1] * v_sf),(xc[i-1] * sf) + initial,hg,fill="red3", width=1)
+                        self.bm_canvas.create_line((xr[i-1] * sf) + initial, hg - (self.shearr[i-1] * v_sf),(xr[i-1] * sf) + initial,hg,fill="red3", width=1)
             
             if self.show_m.get() == 1:
                 
@@ -504,9 +507,10 @@ class Master_window:
                     self.bm_canvas.create_line((xc[i-1] * sf) + initial, hg - (self.momentc[i-1] * m_sf),(xc[i] * sf) + initial,hg - (self.momentc[i] * m_sf),fill="green", width=2)
                     self.bm_canvas.create_line((xr[i-1] * sf) + initial, hg - (self.momentr[i-1] * m_sf),(xr[i] * sf) + initial,hg - (self.momentr[i] * m_sf),fill="green", width=2)
                     
-                    self.bm_canvas.create_line((xl[i-1] * sf) + initial, hg - (self.momentl[i-1] * m_sf),(xl[i-1] * sf) + initial,hg,fill="PaleGreen3", width=1)
-                    self.bm_canvas.create_line((xc[i-1] * sf) + initial, hg - (self.momentc[i-1] * m_sf),(xc[i-1] * sf) + initial,hg,fill="PaleGreen3", width=1)
-                    self.bm_canvas.create_line((xr[i-1] * sf) + initial, hg - (self.momentr[i-1] * m_sf),(xr[i-1] * sf) + initial,hg,fill="PaleGreen3", width=1)
+                    if self.show_stations.get() == 1:
+                        self.bm_canvas.create_line((xl[i-1] * sf) + initial, hg - (self.momentl[i-1] * m_sf),(xl[i-1] * sf) + initial,hg,fill="PaleGreen3", width=1)
+                        self.bm_canvas.create_line((xc[i-1] * sf) + initial, hg - (self.momentc[i-1] * m_sf),(xc[i-1] * sf) + initial,hg,fill="PaleGreen3", width=1)
+                        self.bm_canvas.create_line((xr[i-1] * sf) + initial, hg - (self.momentr[i-1] * m_sf),(xr[i-1] * sf) + initial,hg,fill="PaleGreen3", width=1)
             
             if self.show_s.get() == 1:
                                   
@@ -520,9 +524,10 @@ class Master_window:
                     self.bm_canvas.create_line((xc[i-1] * sf) + initial, hg - (self.slopec[i-1] * s_sf),(xc[i] * sf) + initial,hg - (self.slopec[i] * s_sf),fill="magenta", width=2)
                     self.bm_canvas.create_line((xr[i-1] * sf) + initial, hg - (self.sloper[i-1] * s_sf),(xr[i] * sf) + initial,hg - (self.sloper[i] * s_sf),fill="magenta", width=2)
                     
-                    self.bm_canvas.create_line((xl[i-1] * sf) + initial, hg - (self.slopel[i-1] * s_sf),(xl[i-1] * sf) + initial,hg,fill="orchid2", width=1)
-                    self.bm_canvas.create_line((xc[i-1] * sf) + initial, hg - (self.slopec[i-1] * s_sf),(xc[i-1] * sf) + initial,hg,fill="orchid2", width=1)
-                    self.bm_canvas.create_line((xr[i-1] * sf) + initial, hg - (self.sloper[i-1] * s_sf),(xr[i-1] * sf) + initial,hg,fill="orchid2", width=1)
+                    if self.show_stations.get() == 1:
+                        self.bm_canvas.create_line((xl[i-1] * sf) + initial, hg - (self.slopel[i-1] * s_sf),(xl[i-1] * sf) + initial,hg,fill="orchid2", width=1)
+                        self.bm_canvas.create_line((xc[i-1] * sf) + initial, hg - (self.slopec[i-1] * s_sf),(xc[i-1] * sf) + initial,hg,fill="orchid2", width=1)
+                        self.bm_canvas.create_line((xr[i-1] * sf) + initial, hg - (self.sloper[i-1] * s_sf),(xr[i-1] * sf) + initial,hg,fill="orchid2", width=1)
             
             if self.show_d.get() == 1:
                                   
@@ -536,9 +541,10 @@ class Master_window:
                     self.bm_canvas.create_line((xc[i-1] * sf) + initial, hg - (self.deltac[i-1] * d_sf),(xc[i] * sf) + initial,hg - (self.deltac[i] * d_sf),fill="grey", width=2)
                     self.bm_canvas.create_line((xr[i-1] * sf) + initial, hg - (self.deltar[i-1] * d_sf),(xr[i] * sf) + initial,hg - (self.deltar[i] * d_sf),fill="grey", width=2)
                     
-                    self.bm_canvas.create_line((xl[i-1] * sf) + initial, hg - (self.deltal[i-1] * d_sf),(xl[i-1] * sf) + initial,hg,fill="light grey", width=1)
-                    self.bm_canvas.create_line((xc[i-1] * sf) + initial, hg - (self.deltac[i-1] * d_sf),(xc[i-1] * sf) + initial,hg,fill="light grey", width=1)
-                    self.bm_canvas.create_line((xr[i-1] * sf) + initial, hg - (self.deltar[i-1] * d_sf),(xr[i-1] * sf) + initial,hg,fill="light grey", width=1)
+                    if self.show_stations.get() == 1:
+                        self.bm_canvas.create_line((xl[i-1] * sf) + initial, hg - (self.deltal[i-1] * d_sf),(xl[i-1] * sf) + initial,hg,fill="light grey", width=1)
+                        self.bm_canvas.create_line((xc[i-1] * sf) + initial, hg - (self.deltac[i-1] * d_sf),(xc[i-1] * sf) + initial,hg,fill="light grey", width=1)
+                        self.bm_canvas.create_line((xr[i-1] * sf) + initial, hg - (self.deltar[i-1] * d_sf),(xr[i-1] * sf) + initial,hg,fill="light grey", width=1)
 
             if self.show_r.get() == 1:
                 
@@ -987,21 +993,33 @@ class Master_window:
             self.res_labels[1].configure(text = 'Rl = {0:.3f} kips'.format(reaction_left))
             self.res_labels[2].configure(text = 'Rr = {0:.3f} kips'.format(reaction_right))
             
-            self.res_labels[4].configure(text = 'Vmax = {0:.3f} kips - Vmin = {1:.3f} kips'.format(max(shearl), min(shearl)))
-            self.res_labels[5].configure(text = 'Mmax = {0:.3f} ft-kips - Mmin = {1:.3f} ft-kips'.format(max(momentl), min(momentl)))
-            self.res_labels[6].configure(text = 'Smax = {0:.5f} rad - Smin = {1:.5f} rad'.format(max(self.slopel), min(self.slopel)))
-            self.res_labels[7].configure(text = 'Dmax = {0:.4f} in - Dmin = {1:.4f} in'.format(max(self.deltal), min(self.deltal)))
+            if self.ll == 0:
+                self.res_labels[4].configure(text = '--')
+                self.res_labels[5].configure(text = '--')
+                self.res_labels[6].configure(text = '--')
+                self.res_labels[7].configure(text = '--')
+            else:
+                self.res_labels[4].configure(text = 'Vmax = {0:.3f} kips - Vmin = {1:.3f} kips'.format(max(shearl), min(shearl)))
+                self.res_labels[5].configure(text = 'Mmax = {0:.3f} ft-kips - Mmin = {1:.3f} ft-kips'.format(max(momentl), min(momentl)))
+                self.res_labels[6].configure(text = 'Smax = {0:.5f} rad - Smin = {1:.5f} rad'.format(max(self.slopel), min(self.slopel)))
+                self.res_labels[7].configure(text = 'Dmax = {0:.4f} in - Dmin = {1:.4f} in'.format(max(self.deltal), min(self.deltal)))
             
             self.res_labels[9].configure(text = 'Vmax = {0:.3f} kips - Vmin = {1:.3f} kips'.format(max(shearc), min(shearc)))
             self.res_labels[10].configure(text = 'Mmax = {0:.3f} ft-kips - Mmin = {1:.3f} ft-kips'.format(max(momentc), min(momentc)))
             self.res_labels[11].configure(text = 'Smax = {0:.5f} rad - Smin = {1:.5f} rad'.format(max(self.slopec), min(self.slopec)))
             self.res_labels[12].configure(text = 'Dmax = {0:.4f} in - Dmin = {1:.4f} in'.format(max(self.deltac), min(self.deltac)))
             
-            self.res_labels[14].configure(text = 'Vmax = {0:.3f} kips - Vmin = {1:.3f} kips'.format(max(shearr), min(shearr)))
-            self.res_labels[15].configure(text = 'Mmax = {0:.3f} ft-kips - Mmin = {1:.3f} ft-kips'.format(max(momentr), min(momentr)))
-            self.res_labels[16].configure(text = 'Smax = {0:.5f} rad - Smin = {1:.5f} rad'.format(max(self.sloper), min(self.sloper)))
-            self.res_labels[17].configure(text = 'Dmax = {0:.4f} in - Dmin = {1:.4f} in'.format(max(self.deltar), min(self.deltar)))
-            
+            if self.lr == 0:
+                self.res_labels[14].configure(text = '--')
+                self.res_labels[15].configure(text = '--')
+                self.res_labels[16].configure(text = '--')
+                self.res_labels[17].configure(text = '--')
+            else:
+                self.res_labels[14].configure(text = 'Vmax = {0:.3f} kips - Vmin = {1:.3f} kips'.format(max(shearr), min(shearr)))
+                self.res_labels[15].configure(text = 'Mmax = {0:.3f} ft-kips - Mmin = {1:.3f} ft-kips'.format(max(momentr), min(momentr)))
+                self.res_labels[16].configure(text = 'Smax = {0:.5f} rad - Smin = {1:.5f} rad'.format(max(self.sloper), min(self.sloper)))
+                self.res_labels[17].configure(text = 'Dmax = {0:.4f} in - Dmin = {1:.4f} in'.format(max(self.deltar), min(self.deltar)))
+                
             #Left detailed results to GUI
             color = "pale green"
             i=0
