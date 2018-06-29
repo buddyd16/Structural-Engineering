@@ -15,6 +15,7 @@
 from __future__ import division
 from numpy import sign
 from numpy import zeros
+import numpy as np
 import math
 
 class no_load:
@@ -181,7 +182,7 @@ class point_moment:
         self.c3 = 0
         self.c4 = ((-1.0*self.rl*l**3)/6.0) - (0.5*ma*l**2) - (self.c2*l)
 
-        r = (self.ma/2.0)
+        r = (self.ma/8.0)
         arrow_height = r/6.0
         #30 degree arrow
         arrow_minus= (arrow_height*math.tan(math.radians(30)))
@@ -577,6 +578,8 @@ class cant_right_nl:
 
         self.rl = 0
         self.ml = 0
+        
+        self.kind = 'NL'
 
     def v(self,x):
         iters = len(x)
@@ -634,6 +637,8 @@ class cant_right_point:
         self.l = float(l)
         self.lb = float(lb)
         self.b = self.l - self.a
+        
+        self.kind = 'Point'
 
         if self.a > self.l:
             self.rl = 'Error a > l'
@@ -749,6 +754,8 @@ class cant_right_point_moment:
         self.l = float(l)
         self.lb = float(lb)
         self.b = self.l - self.a
+        
+        self.kind = 'Moment'
 
         if self.a > self.l:
             self.rl = 'Error a > l'
@@ -770,7 +777,7 @@ class cant_right_point_moment:
         self.c3 = self.ml*self.a + self.c1
         self.c4 = 0.5*self.ml*self.a**2 + self.c1 * self.a + self.c2 - self.c3 * self.a
 
-        r = (self.ma/2.0)
+        r = (self.ma/8.0)
         arrow_height = r/6.0
         #30 degree arrow
         arrow_minus= (arrow_height*math.tan(math.radians(30)))
@@ -885,6 +892,8 @@ class cant_right_udl:
         self.c = self.b - self.a
         self.w_tot = self.w1*self.c
         self.lb = float(lb)
+        
+        self.kind = 'UDL'
 
         if self.a > self.b:
             self.rl = 'Error a > b'
@@ -1025,6 +1034,8 @@ class cant_right_trap:
         self.b = float(b)
         self.lb = float(lb)
         self.c = self.b-self.a
+        
+        self.kind = 'TRAP'
 
         if self.a > self.b:
             self.rl = 'Error a > b'
@@ -1168,6 +1179,8 @@ class cant_left_nl:
         self.slope = slope
         self.c1 = self.slope
         self.c2 = -1.0*self.c1*self.l
+        
+        self.kind = 'NL'
 
         self.rr = 0
         self.mr = 0
@@ -1226,7 +1239,9 @@ class cant_left_point:
         self.p = float(p)
         self.a = float(a)
         self.l = float(l)
+        self.lb = float(lb)
 
+        self.kind = 'Point'
 
         if self.a > self.l:
             self.rr = 'Error a > l'
@@ -1237,11 +1252,11 @@ class cant_left_point:
             self.mr = -1*self.p*(self.l-self.a)
 
         # 0 length backspan indicates fixed-free beam initialize slope to 0
-        if lb == 0:
+        if self.lb == 0:
             self.backspan = no_load()
             self.c3 = 0 + (0.5*self.p * (self.l-self.a)**2)
         else:
-            self.backspan = point_moment(self.mr,0,lb)
+            self.backspan = point_moment(self.mr,0,self.lb)
             self.c3 = self.backspan.eisx(0) + (0.5*self.p * (self.l-self.a)**2)
 
         self.c4 = ((1/6.0)*self.p*(self.l-self.a)**3) - (self.c3*self.l)
@@ -1337,6 +1352,7 @@ class cant_left_point_moment:
         self.l = float(l)
         self.lb = float(lb)
 
+        self.kind = 'Moment'
 
         if self.a > self.l:
             self.rr = 'Error a > l'
@@ -1358,7 +1374,7 @@ class cant_left_point_moment:
         self.c1 = (1.0*self.ma*self.a) + self.c3
         self.c2 = 0.5*self.ma*self.a**2 + self.c3*self.a + self.c4 - self.c1*self.a
 
-        r = (self.ma/2.0)
+        r = (self.ma/8.0)
         arrow_height = r/6.0
         #30 degree arrow
         arrow_minus= (arrow_height*math.tan(math.radians(30)))
@@ -1473,6 +1489,8 @@ class cant_left_udl:
         self.b = float(b)
         self.c = self.b-self.a
         self.w_tot = self.w1*self.c
+        
+        self.kind = 'UDL'
 
         if self.a > self.b:
             self.rr = 'Error a > b'
@@ -1600,6 +1618,7 @@ class cant_left_udl:
         return eid
 
 class cant_left_trap:
+
     def __init__(self, w1, w2, a, b, l, lb):
 
         self.w1 = float(w1)
@@ -1609,6 +1628,8 @@ class cant_left_trap:
         self.b = float(b)
         self.lb = float(lb)
         self.c = self.b-self.a
+        
+        self.kind = 'TRAP'
 
         self.w = 0.5*(self.w1+self.w2)*self.c
         self.dl = self.a+(((self.w1+(2*self.w2))/(3*(self.w2+self.w1)))*self.c)
@@ -1745,3 +1766,207 @@ class cant_left_trap:
         else:
             eid = ((-1.0/6.0)*self.w*(x-self.cc)**3) + (self.c6*x) + self.c7
         return eid
+
+def fixed_free_left_by_stations(loads, number_of_stations):
+    
+    # Take a list of loads and integer ammount of stations and return 
+    # lists of stations, shears, moments,E*I*Slopes, and E*I*Deflections
+    #
+    # loads should already be defined using the classes in this file
+    #
+    # Assumptions:
+    # - all loads coming in will have the same span length
+    # defined. Validation of this will be added at a later date.
+    #
+    # -Consistent unit definitions across load values and lengths
+    
+    l = loads[0].l
+    
+    iters = int(number_of_stations)
+    
+    # Review loads and add additional stations to capture load start
+    # and end points. For Point/Point Moments add station directly before
+    # and directly after load.
+    extra_stations = np.array([0])
+    
+    for load in loads:
+        if load.kind == 'Point':
+            a = load.a
+            b = min(load.l,a + 0.0001)
+            c = max(0,a - 0.0001)
+            extra_stations = np.append(extra_stations, [c,a,b])
+
+        elif load.kind == 'Moment':
+            a = load.a
+            b = min(load.l,a + 0.0001)
+            c = max(0,a - 0.0001)
+            extra_stations = np.append(extra_stations, [c,a,b])
+
+        elif load.kind == 'UDL':
+            extra_stations = np.append(extra_stations, [load.a,load.b])
+        
+        elif load.kind == 'TRAP':
+            extra_stations = np.append(extra_stations, [load.a,load.b])
+            
+        else:
+            pass
+    
+    extra_stations = np.unique(extra_stations)
+    
+    # Generate station coordinates based on a step size of l / number of stations
+    
+    step = l / (number_of_stations * 1.00) # multply by 1.00 to force Float division
+    
+    xs = zeros(iters+1)
+    
+    xs[0] = 0
+    
+    for i in range(1,(iters+1)):
+        if xs[i-1] + step > l:
+            xs[i] = l
+        else:
+            xs[i] = xs[i-1] + step
+    
+    xs = np.append(xs, extra_stations)
+    
+    xs = np.sort(xs)
+    
+    xs = np.unique(xs)
+    
+    i = xs.shape[0]
+    
+    r = 0
+    mr = 0
+    v = zeros(i)
+    m = zeros(i)
+    eis = zeros(i)
+    eid = zeros(i)
+    
+    
+    for load in loads:
+        r = r + load.rr
+        mr = mr + load.mr
+        v = v + load.v(xs)
+        m = m + load.m(xs)
+        eis = eis + load.eis(xs)
+        eid = eid + load.eid(xs)
+    
+    result_list = [xs,r,mr,v,m,eis,eid]
+    
+    return result_list
+    
+def fixed_free_right_by_stations(loads, number_of_stations):
+    
+    # Take a list of loads and integer ammount of stations and return 
+    # lists of stations, shears, moments,E*I*Slopes, and E*I*Deflections
+    #
+    # loads should already be defined using the classes in this file
+    #
+    # Assumptions:
+    # - all loads coming in will have the same span length
+    # defined. Validation of this will be added at a later date.
+    #
+    # -Consistent unit definitions across load values and lengths
+    
+    l = loads[0].l
+    
+    iters = int(number_of_stations)
+    
+    # Review loads and add additional stations to capture load start
+    # and end points. For Point/Point Moments add station directly before
+    # and directly after load.
+    extra_stations = np.array([0])
+    
+    for load in loads:
+        if load.kind == 'Point':
+            a = load.a
+            b = min(load.l,a + 0.0001)
+            c = max(0,a - 0.0001)
+            extra_stations = np.append(extra_stations, [c,a,b])
+
+        elif load.kind == 'Moment':
+            a = load.a
+            b = min(load.l,a + 0.0001)
+            c = max(0,a - 0.0001)
+            extra_stations = np.append(extra_stations, [c,a,b])
+
+        elif load.kind == 'UDL':
+            extra_stations = np.append(extra_stations, [load.a,load.b])
+        
+        elif load.kind == 'TRAP':
+            extra_stations = np.append(extra_stations, [load.a,load.b])
+            
+        else:
+            pass
+    
+    extra_stations = np.unique(extra_stations)
+    
+    # Generate station coordinates based on a step size of l / number of stations
+    
+    step = l / (number_of_stations * 1.00) # multply by 1.00 to force Float division
+    
+    xs = zeros(iters+1)
+    
+    xs[0] = 0
+    
+    for i in range(1,(iters+1)):
+        if xs[i-1] + step > l:
+            xs[i] = l
+        else:
+            xs[i] = xs[i-1] + step
+    
+    xs = np.append(xs, extra_stations)
+    
+    xs = np.sort(xs)
+    
+    xs = np.unique(xs)
+    
+    i = xs.shape[0]
+    
+    r = 0
+    ml = 0
+    v = zeros(i)
+    m = zeros(i)
+    eis = zeros(i)
+    eid = zeros(i)
+    
+    
+    for load in loads:
+        r = r + load.rl
+        ml = ml + load.ml
+        v = v + load.v(xs)
+        m = m + load.m(xs)
+        eis = eis + load.eis(xs)
+        eid = eid + load.eid(xs)
+    
+    result_list = [xs,r,ml,v,m,eis,eid]
+    
+    return result_list
+
+def fixed_free_at_x(loads,x):
+
+    # Take a list of loads and x locatoin in span and return 
+    # shear, moment,E*I*Slope, and E*I*Deflection
+    #
+    # loads should already be defined using the classes in this file
+    #
+    # Assumptions:
+    # - all loads coming in will have the same span length
+    # defined. Validation of this will be added at a later date.
+    #
+    # -Consistent unit definitions across load values and lengths
+    
+    v = 0
+    m = 0
+    eis = 0
+    eid = 0
+    
+    for load in loads:
+        v = v + load.vx(x)
+        m = m + load.mx(x)
+        eis = eis + load.eisx(x)
+        eid = eid + load.eidx(x)
+    
+    result_list = [v,m,eis,eid]
+    
+    return result_list
