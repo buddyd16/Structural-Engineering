@@ -2096,7 +2096,7 @@ def pin_pin_single_span_by_stations(loads, number_of_stations):
     
     return result_list
 
-def fixed_end_moments_from_end_slopes(eis0,eisL,fed, L):\
+def fixed_end_moments_from_end_slopes(eis0,eisL,fed, L):
     #######################################################################################################
     #
     # Solve Simultaneous equation for internal reactions and fixed end moments knowing 
