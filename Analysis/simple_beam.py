@@ -1739,7 +1739,8 @@ class Master_window:
                 for point in reaction_points:
                             
                     x = point
-                    eid_p = pl.eidx(x)
+                    new_pl = ppbeam.pl(1,x,l)
+                    eid_p = new_pl.eidx(a)
                     
                     coeff_row.append(eid_p)
                            

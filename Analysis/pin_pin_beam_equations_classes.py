@@ -2250,7 +2250,8 @@ def single_span_solve_fixed_ends_and_redundant_interiors(delta,reaction_points, 
         for point in reaction_points:
                     
             x = point
-            eid_p = point_load.eidx(x)
+            new_pl = pl(1,x,L)
+            eid_p = new_pl.eidx(a)
             
             coeff_row.append(eid_p)
                    
