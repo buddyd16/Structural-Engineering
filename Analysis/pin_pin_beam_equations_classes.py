@@ -71,17 +71,18 @@ class pl:
         self.b = self.l - self.a
         
         self.kind = 'Point'
-
+        
+        self.error = ''
+        
         if self.a > self.l:
-            self.rl = 'Error a > l'
-            self.rr = 'Error a > l'
+            self.error = 'Error a > l'
+            self.error = 'Error a > l'
 
-        else:
-            self.rl = (self.p*self.b)/self.l
-            self.rr = (self.p*self.a)/self.l
-            self.c4 = ((-1*self.rl * self.a ** 3) / 3) - ((self.rr * self.a ** 3) / 3) + ((self.rr * self.l * self.a ** 2) / 2)
-            self.c2 = (-1 / self.l) * ((self.c4) + ((self.rr * self.l ** 3) / 3))
-            self.c1 = ((-1*self.rr * self.a ** 2) / 2) - ((self.rl * self.a ** 2) / 2) + (self.rr * self.l * self.a) + self.c2
+        self.rl = (self.p*self.b)/self.l
+        self.rr = (self.p*self.a)/self.l
+        self.c4 = ((-1*self.rl * self.a ** 3) / 3) - ((self.rr * self.a ** 3) / 3) + ((self.rr * self.l * self.a ** 2) / 2)
+        self.c2 = (-1 / self.l) * ((self.c4) + ((self.rr * self.l ** 3) / 3))
+        self.c1 = ((-1*self.rr * self.a ** 2) / 2) - ((self.rl * self.a ** 2) / 2) + (self.rr * self.l * self.a) + self.c2
 
         arrow_height = self.p/6.0
         #30 degree arrow
@@ -180,7 +181,12 @@ class point_moment:
         self.l = l
         
         self.kind = 'Moment'
-
+        
+        self.error = ''
+        
+        if a > l:
+            self.error = 'Error a > L'
+            
         self.rr = ma/l
         self.rl = -1.0*self.rr
 
@@ -315,28 +321,32 @@ class udl:
         self.c = b-a
         
         self.kind = 'UDL'
-
+        
+        self.error = ''
+        
         if self.a > self.b:
-            self.rl = 'Error a > b'
-            self.rr = 'Error a > b'
+            self.error = 'Error a > b'
+            self.error = 'Error a > b'
         elif self.a > self.l:
-            self.rl = 'Error a > l'
-            self.rr = 'Error a > l'
+            self.error = 'Error a > l'
+            self.error = 'Error a > l'
         elif self.b > self.l:
-            self.rl = 'Error b > l'
-            self.rr = 'Error b > l'
+            self.error = 'Error b > l'
+            self.error = 'Error b > l'
         else:
-            self.rl = (self.w1 * self.c) - (((self.w1 * self.c) * (self.a + (self.c / 2))) / self.l)
-            self.rr = (((self.w1 * self.c) * (self.a + (self.c / 2))) / self.l)
-            self.c1 = 0
-            self.c2 = ((-1 * self.w1 * self.a ** 2) / 2)
-            self.c3 = self.rr * self.l
-            self.c7 = 0
-            self.c8 = ((-1 * self.c1 * self.a ** 2) / 2) + ((self.c2 * self.a ** 2) / 2) + ((5 * self.w1 * self.a ** 4) / 24) + self.c7
-            self.c9 = ((-1 * self.rl * self.b ** 3) / 3) - ((self.rr * self.b ** 3) / 3) + ((self.w1 * self.b ** 4) / 8) - ((self.w1 * self.a * self.b ** 3) / 3) - ((self.c2 * self.b ** 2) / 2) + ((self.c3 * self.b ** 2) / 2) + self.c8
-            self.c6 = ((self.rr * self.l ** 2) / 6) - ((self.c3 * self.l) / 2) - (self.c9 / self.l)
-            self.c5 = ((-1 * self.rl * self.b ** 2) / 2) + ((self.w1 * self.b ** 3) / 6) - ((self.w1 * self.a * self.b ** 2) / 2) - ((self.rr * self.b ** 2) / 2) + (self.c3 * self.b) - (self.c2 * self.b) + self.c6
-            self.c4 = ((self.w1 * self.a ** 3) / 3) + (self.c2 * self.a) + self.c5 - (self.c1 * self.a)
+            pass
+            
+        self.rl = (self.w1 * self.c) - (((self.w1 * self.c) * (self.a + (self.c / 2))) / self.l)
+        self.rr = (((self.w1 * self.c) * (self.a + (self.c / 2))) / self.l)
+        self.c1 = 0
+        self.c2 = ((-1 * self.w1 * self.a ** 2) / 2)
+        self.c3 = self.rr * self.l
+        self.c7 = 0
+        self.c8 = ((-1 * self.c1 * self.a ** 2) / 2) + ((self.c2 * self.a ** 2) / 2) + ((5 * self.w1 * self.a ** 4) / 24) + self.c7
+        self.c9 = ((-1 * self.rl * self.b ** 3) / 3) - ((self.rr * self.b ** 3) / 3) + ((self.w1 * self.b ** 4) / 8) - ((self.w1 * self.a * self.b ** 3) / 3) - ((self.c2 * self.b ** 2) / 2) + ((self.c3 * self.b ** 2) / 2) + self.c8
+        self.c6 = ((self.rr * self.l ** 2) / 6) - ((self.c3 * self.l) / 2) - (self.c9 / self.l)
+        self.c5 = ((-1 * self.rl * self.b ** 2) / 2) + ((self.w1 * self.b ** 3) / 6) - ((self.w1 * self.a * self.b ** 2) / 2) - ((self.rr * self.b ** 2) / 2) + (self.c3 * self.b) - (self.c2 * self.b) + self.c6
+        self.c4 = ((self.w1 * self.a ** 3) / 3) + (self.c2 * self.a) + self.c5 - (self.c1 * self.a)
 
         arrow_height = self.w1/12.0
         #30 degree arrow
@@ -451,34 +461,39 @@ class trap:
         self.c = self.b-self.a
         
         self.kind = 'TRAP'
-
+        
+        
+        self.error = ''
+        
         if self.a > self.b:
-            self.rl = 'Error a > b'
-            self.rr = 'Error a > b'
+            self.error = 'Error a > b'
+            self.error = 'Error a > b'
         elif self.a > self.l:
-            self.rl = 'Error a > l'
-            self.rr = 'Error a > l'
+            self.error = 'Error a > l'
+            self.error = 'Error a > l'
         elif self.b > self.l:
-            self.rl = 'Error b > l'
-            self.rr = 'Error b > l'
+            self.error = 'Error b > l'
+            self.error = 'Error b > l'
         elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
-            self.rl = 'Error w1 and w2 change direction'
-            self.rr = 'Error w1 and w2 change direction'
+            self.error = 'Error w1 and w2 change direction'
+            self.error = 'Error w1 and w2 change direction'
         else:
-            self.s = (self.w2 -self.w1)/self.c
-            self.xbar = (self.c * ((2 * self.w2) + self.w1)) / (3 * (self.w2 + self.w1))
-            self.W = self.c * ((self.w1 + self.w2) / 2)
-            self.rr = (self.W * (self.a + self.xbar)) / self.l
-            self.rl = self.W - self.rr
-            self.c1 = 0
-            self.c2 = self.c1 + ((self.a ** 3 * self.s) / 6) + ((self.a ** 2 * (self.w1 - (self.s * self.a))) / 2) + ((((self.s * self.a) - (2 * self.w1)) * self.a ** 2) / 2)
-            self.c3 = self.rr * self.l
-            self.c7 = 0
-            self.c8 = ((-1 * self.c1 * self.a ** 2) / 2) - ((self.a ** 5 * self.s) / 30) - ((self.a ** 4 * (self.w1 - (self.s * self.a))) / 8) - ((((self.s * self.a) - (2 * self.w1)) * self.a ** 4) / 6) + ((self.c2 * self.a ** 2) / 2) + self.c7
-            self.c9 = ((-1 * self.rl * self.b ** 3) / 3) + ((self.b ** 5 * self.s) / 30) + ((self.b ** 4 * (self.w1 - (self.s * self.a))) / 8) + ((((self.s * self.a) - (2 * self.w1)) * self.a * self.b ** 3) / 6) - ((self.c2 * self.b ** 2) / 2) + self.c8 - ((self.rr * self.b ** 3) / 3) + ((self.c3 * self.b ** 2) / 2)
-            self.c6 = (((self.rr * self.l ** 3) / 6) - ((self.c3 * self.l ** 2) / 2) - self.c9) / self.l
-            self.c5 = ((-1 * self.rr * self.b ** 2) / 2) + (self.c3 * self.b) + self.c6 - ((self.rl * self.b ** 2) / 2) + ((self.b ** 4 * self.s) / 24) + ((self.b ** 3 * (self.w1 - (self.s * self.a))) / 6) + ((((self.s * self.a) - (2 * self.w1)) * self.a * self.b ** 2) / 4) - (self.c2 * self.b)
-            self.c4 = ((-1 * self.a ** 4 * self.s) / 24) - ((self.a ** 3 * (self.w1 - (self.s * self.a))) / 6) - ((((self.s * self.a) - (2 * self.w1)) * self.a ** 3) / 4) + (self.c2 * self.a) + self.c5 - (self.c1 * self.a)
+            pass
+            
+        self.s = (self.w2 -self.w1)/self.c
+        self.xbar = (self.c * ((2 * self.w2) + self.w1)) / (3 * (self.w2 + self.w1))
+        self.W = self.c * ((self.w1 + self.w2) / 2)
+        self.rr = (self.W * (self.a + self.xbar)) / self.l
+        self.rl = self.W - self.rr
+        self.c1 = 0
+        self.c2 = self.c1 + ((self.a ** 3 * self.s) / 6) + ((self.a ** 2 * (self.w1 - (self.s * self.a))) / 2) + ((((self.s * self.a) - (2 * self.w1)) * self.a ** 2) / 2)
+        self.c3 = self.rr * self.l
+        self.c7 = 0
+        self.c8 = ((-1 * self.c1 * self.a ** 2) / 2) - ((self.a ** 5 * self.s) / 30) - ((self.a ** 4 * (self.w1 - (self.s * self.a))) / 8) - ((((self.s * self.a) - (2 * self.w1)) * self.a ** 4) / 6) + ((self.c2 * self.a ** 2) / 2) + self.c7
+        self.c9 = ((-1 * self.rl * self.b ** 3) / 3) + ((self.b ** 5 * self.s) / 30) + ((self.b ** 4 * (self.w1 - (self.s * self.a))) / 8) + ((((self.s * self.a) - (2 * self.w1)) * self.a * self.b ** 3) / 6) - ((self.c2 * self.b ** 2) / 2) + self.c8 - ((self.rr * self.b ** 3) / 3) + ((self.c3 * self.b ** 2) / 2)
+        self.c6 = (((self.rr * self.l ** 3) / 6) - ((self.c3 * self.l ** 2) / 2) - self.c9) / self.l
+        self.c5 = ((-1 * self.rr * self.b ** 2) / 2) + (self.c3 * self.b) + self.c6 - ((self.rl * self.b ** 2) / 2) + ((self.b ** 4 * self.s) / 24) + ((self.b ** 3 * (self.w1 - (self.s * self.a))) / 6) + ((((self.s * self.a) - (2 * self.w1)) * self.a * self.b ** 2) / 4) - (self.c2 * self.b)
+        self.c4 = ((-1 * self.a ** 4 * self.s) / 24) - ((self.a ** 3 * (self.w1 - (self.s * self.a))) / 6) - ((((self.s * self.a) - (2 * self.w1)) * self.a ** 3) / 4) + (self.c2 * self.a) + self.c5 - (self.c1 * self.a)
 
         arrow_height = self.w1/6.0
         arrow_height2 = self.w2/6.0
@@ -650,14 +665,15 @@ class cant_right_point:
         self.b = self.l - self.a
         
         self.kind = 'Point'
-
+        
+        self.error = ''
+        
         if self.a > self.l:
-            self.rl = 'Error a > l'
-            self.ml = 'Error a > l'
+            self.error = 'Error a > l'
+            self.error = 'Error a > l'
 
-        else:
-            self.rl = self.p
-            self.ml = -1.0*self.p*self.a
+        self.rl = self.p
+        self.ml = -1.0*self.p*self.a
 
         # 0 length backspan indicates fixed-free beam initialize slope to 0
         if lb == 0:
@@ -768,13 +784,14 @@ class cant_right_point_moment:
         
         self.kind = 'Moment'
 
+        self.error = ''
+        
         if self.a > self.l:
-            self.rl = 'Error a > l'
-            self.ml = 'Error a > l'
+            self.error = 'Error a > l'
+            self.error = 'Error a > l'
 
-        else:
-            self.rl = 0
-            self.ml = -1.0*self.ma
+        self.rl = 0
+        self.ml = -1.0*self.ma
 
         # 0 length backspan indicates fixed-free beam initialize slope to 0
         if lb == 0:
@@ -905,19 +922,23 @@ class cant_right_udl:
         self.lb = float(lb)
         
         self.kind = 'UDL'
-
+        
+        self.error = ''
+        
         if self.a > self.b:
-            self.rl = 'Error a > b'
-            self.ml = 'Error a > b'
+            self.error = 'Error a > b'
+            self.error = 'Error a > b'
         elif self.a > self.l:
-            self.rl = 'Error a > l'
-            self.ml = 'Error a > l'
+            self.error = 'Error a > l'
+            self.error = 'Error a > l'
         elif self.b > self.l:
-            self.rl = 'Error b > l'
-            self.ml = 'Error b > l'
+            self.error = 'Error b > l'
+            self.error = 'Error b > l'
         else:
-            self.rl = self.w_tot
-            self.ml = -1.0*self.w_tot*(self.b-(self.c/2))
+            pass
+            
+        self.rl = self.w_tot
+        self.ml = -1.0*self.w_tot*(self.b-(self.c/2))
 
         # 0 length backspan indicates fixed-free beam initialize slope to 0
         if lb == 0:
@@ -1048,24 +1069,28 @@ class cant_right_trap:
         
         self.kind = 'TRAP'
 
+        self.error = ''
+        
         if self.a > self.b:
-            self.rl = 'Error a > b'
-            self.ml = 'Error a > b'
+            self.error = 'Error a > b'
+            self.error = 'Error a > b'
         elif self.a > self.l:
-            self.rl = 'Error a > l'
-            self.ml = 'Error a > l'
+            self.error = 'Error a > l'
+            self.error = 'Error a > l'
         elif self.b > self.l:
-            self.rl = 'Error b > l'
-            self.ml = 'Error b > l'
+            self.error = 'Error b > l'
+            self.error = 'Error b > l'
         elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
-            self.rl = 'Error w1 and w2 change direction'
-            self.ml = 'Error w1 and w2 change direction'
+            self.error = 'Error w1 and w2 change direction'
+            self.error = 'Error w1 and w2 change direction'
         else:
-            self.w = 0.5*(self.w1+self.w2)*self.c
-            self.d = self.a+(((self.w1+(2*self.w2))/(3*(self.w2+self.w1)))*self.c)
-            self.s = (self.w1-self.w2)/self.c
-            self.rl = self.w
-            self.ml = -1*self.w*self.d
+            pass
+            
+        self.w = 0.5*(self.w1+self.w2)*self.c
+        self.d = self.a+(((self.w1+(2*self.w2))/(3*(self.w2+self.w1)))*self.c)
+        self.s = (self.w1-self.w2)/self.c
+        self.rl = self.w
+        self.ml = -1*self.w*self.d
 
         # 0 length backspan indicates fixed-free beam initialize slope to 0
         if lb == 0:
@@ -1254,13 +1279,14 @@ class cant_left_point:
 
         self.kind = 'Point'
 
+        self.error = ''
+        
         if self.a > self.l:
-            self.rr = 'Error a > l'
-            self.mr = 'Error a > l'
+            self.error = 'Error a > l'
+            self.error = 'Error a > l'
 
-        else:
-            self.rr = self.p
-            self.mr = -1*self.p*(self.l-self.a)
+        self.rr = self.p
+        self.mr = -1*self.p*(self.l-self.a)
 
         # 0 length backspan indicates fixed-free beam initialize slope to 0
         if self.lb == 0:
@@ -1364,14 +1390,15 @@ class cant_left_point_moment:
         self.lb = float(lb)
 
         self.kind = 'Moment'
-
+        
+        self.error = ''
+        
         if self.a > self.l:
-            self.rr = 'Error a > l'
-            self.mr = 'Error a > l'
+            self.error = 'Error a > l'
+            self.error = 'Error a > l'
 
-        else:
-            self.rr = 0
-            self.mr = self.ma
+        self.rr = 0
+        self.mr = self.ma
 
         # 0 length backspan indicates fixed-free beam initialize slope to 0
         if lb == 0:
@@ -1503,18 +1530,22 @@ class cant_left_udl:
         
         self.kind = 'UDL'
 
+        self.error = ''
+        
         if self.a > self.b:
-            self.rr = 'Error a > b'
-            self.mr = 'Error a > b'
+            self.error = 'Error a > b'
+            self.error = 'Error a > b'
         elif self.a > self.l:
-            self.rr = 'Error a > l'
-            self.mr = 'Error a > l'
+            self.error = 'Error a > l'
+            self.error = 'Error a > l'
         elif self.b > self.l:
-            self.rr = 'Error b > l'
-            self.mr = 'Error b > l'
+            self.error = 'Error b > l'
+            self.error = 'Error b > l'
         else:
-            self.rr = self.w_tot
-            self.mr = -1.0*self.w_tot*(self.l-(a+(self.c/2.0)))
+            pass
+            
+        self.rr = self.w_tot
+        self.mr = -1.0*self.w_tot*(self.l-(a+(self.c/2.0)))
 
         # 0 length backspan indicates fixed-free beam initialize slope to 0
         if lb == 0:
@@ -1641,28 +1672,31 @@ class cant_left_trap:
         self.c = self.b-self.a
         
         self.kind = 'TRAP'
-
+        
+        self.error = ''
+        
+        if self.a > self.b:
+            self.error = 'Error a > b'
+            self.error = 'Error a > b'
+        elif self.a > self.l:
+            self.error = 'Error a > l'
+            self.error = 'Error a > l'
+        elif self.b > self.l:
+            self.error = 'Error b > l'
+            self.error = 'Error b > l'
+        elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
+            self.error = 'Error w1 and w2 change direction'
+            self.error = 'Error w1 and w2 change direction'
+        else:
+            pass
+            
         self.w = 0.5*(self.w1+self.w2)*self.c
         self.dl = self.a+(((self.w1+(2*self.w2))/(3*(self.w2+self.w1)))*self.c)
         self.dr = self.l-self.dl
         self.s = (self.w1-self.w2)/self.c
         self.cc = (((self.w1+(2*self.w2))/(3*(self.w2+self.w1)))*self.c) + self.a
-
-        if self.a > self.b:
-            self.rr = 'Error a > b'
-            self.mr = 'Error a > b'
-        elif self.a > self.l:
-            self.rr = 'Error a > l'
-            self.mr = 'Error a > l'
-        elif self.b > self.l:
-            self.rr = 'Error b > l'
-            self.mr = 'Error b > l'
-        elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
-            self.rr = 'Error w1 and w2 change direction'
-            self.mr = 'Error w1 and w2 change direction'
-        else:
-            self.rr = self.w
-            self.mr = -1*self.rr*(self.l-self.cc)
+        self.rr = self.w
+        self.mr = -1*self.rr*(self.l-self.cc)
 
         # 0 length backspan indicates fixed-free beam initialize slope to 0
         if lb == 0:
@@ -1853,7 +1887,6 @@ def fixed_free_left_by_stations(loads, number_of_stations):
     eis = zeros(i)
     eid = zeros(i)
     
-    
     for load in loads:
         r = r + load.rr
         mr = mr + load.mr
@@ -1954,8 +1987,8 @@ def fixed_free_right_by_stations(loads, number_of_stations):
     
     return result_list
 
-def fixed_free_at_x(loads,x):
-    # Take a list of loads and x locatoin in span and return 
+def fixed_free_at_x(loads, x):
+    # Take a list of loads and x location in span and return 
     # shear, moment,E*I*Slope, and E*I*Deflection
     #
     # loads should already be defined using the classes in this file
@@ -2096,14 +2129,13 @@ def pin_pin_single_span_by_stations(loads, number_of_stations):
     
     return result_list
 
-def fixed_end_moments_from_end_slopes(eis0,eisL,fed, L):
+def fixed_end_moments_from_end_slopes(eis0, eisL, fed, L):
     #######################################################################################################
     #
-    # Solve Simultaneous equation for internal reactions and fixed end moments knowing 
-    # deflection and end slopes of simple beam at support points:
+    # Solve Simultaneous equation for fixed end moments knowing 
+    # end slopes of simple beam at support points:
     #
-    # By compatibility for fixed ends initial and final slope should be 0, and deflection
-    # at each interior support location should be 0.
+    # By compatibility for fixed ends initial and final slope should be 0.
     #
     # Function expects consistent units for values, should produce accurate results for
     # both metric and imperial units.
@@ -2158,7 +2190,7 @@ def fixed_end_moments_from_end_slopes(eis0,eisL,fed, L):
     
     return fem
 
-def single_span_solve_fixed_ends_and_redundant_interiors(delta,reaction_points, L,fem):
+def single_span_solve_fixed_ends_and_redundant_interiors(delta, reaction_points, L, fem):
     
     #######################################################################################################
     #
@@ -2209,11 +2241,10 @@ def single_span_solve_fixed_ends_and_redundant_interiors(delta,reaction_points, 
     # eid_p1i = deflection coefficient at ith interior support for first interior reaction
     # eid_pii = deflection coefficient at ith interior support for ith interior reaction
     #
-    #
     # Inputs:
-    # delta = [eis0, eisL, eid1,...,eidi] list of deformation results for pin-pin beam from loading
+    # delta = [eis0, eisL, eid1,...,eidi], list of deformation results for pin-pin beam from loading
     #   --note: deformation results must be in the order shown--
-    # reaction_points = [p1,....,pi] list of locations of redundant interior supports
+    # reaction_points = [p1,....,pi], list of locations of redundant interior supports
     # L = beam span
     # fem = [1,1], where a 1 signifies the location is fixed
     #
@@ -2221,7 +2252,6 @@ def single_span_solve_fixed_ends_and_redundant_interiors(delta,reaction_points, 
     # 1. consistent units are used for the inputs
     # 2. the deformations entered are the actual deformations not 
     #    the inverse ie not the restoring deformation.
-    #
     #
     #######################################################################################################
     
@@ -2293,7 +2323,7 @@ def single_span_solve_fixed_ends_and_redundant_interiors(delta,reaction_points, 
     
     #List of reactions defined as loads from class types above
     reactions_as_loads = []
-    print reaction_points
+
     i = 0
     for reaction in R:
         if (fem == [1,0] or fem == [1,1]) and i == 0:
@@ -2316,3 +2346,4 @@ def single_span_solve_fixed_ends_and_redundant_interiors(delta,reaction_points, 
         i+=1
 
     return R, reactions_as_loads
+
