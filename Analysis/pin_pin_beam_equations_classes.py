@@ -63,26 +63,26 @@ class no_load:
         return eid
 
 class pl:
-    def __init__(self, p, a, l):
+    def __init__(self, p, a, L):
 
         self.p = float(p)
         self.a = float(a)
-        self.l = float(l)
-        self.b = self.l - self.a
+        self.L = float(L)
+        self.b = self.L - self.a
         
         self.kind = 'Point'
         
         self.error = ''
         
-        if self.a > self.l:
+        if self.a > self.L:
             self.error = 'Error a > l'
             self.error = 'Error a > l'
 
-        self.rl = (self.p*self.b)/self.l
-        self.rr = (self.p*self.a)/self.l
-        self.c4 = ((-1*self.rl * self.a ** 3) / 3) - ((self.rr * self.a ** 3) / 3) + ((self.rr * self.l * self.a ** 2) / 2)
-        self.c2 = (-1 / self.l) * ((self.c4) + ((self.rr * self.l ** 3) / 3))
-        self.c1 = ((-1*self.rr * self.a ** 2) / 2) - ((self.rl * self.a ** 2) / 2) + (self.rr * self.l * self.a) + self.c2
+        self.rl = (self.p*self.b)/self.L
+        self.rr = (self.p*self.a)/self.L
+        self.c4 = ((-1*self.rl * self.a ** 3) / 3) - ((self.rr * self.a ** 3) / 3) + ((self.rr * self.L * self.a ** 2) / 2)
+        self.c2 = (-1 / self.L) * ((self.c4) + ((self.rr * self.L ** 3) / 3))
+        self.c1 = ((-1*self.rr * self.a ** 2) / 2) - ((self.rl * self.a ** 2) / 2) + (self.rr * self.L * self.a) + self.c2
 
         arrow_height = self.p/6.0
         #30 degree arrow
@@ -114,7 +114,7 @@ class pl:
             if x[i] <= self.a:
                 m[i] = self.rl * x[i]
             else:
-                m[i] = (-1 * self.rr * x[i]) + (self.rr * self.l)
+                m[i] = (-1 * self.rr * x[i]) + (self.rr * self.L)
         return m
 
     def eis(self,x):
@@ -125,7 +125,7 @@ class pl:
             if x[i] <= self.a:
                 eis[i] = ((self.rl * x[i] ** 2)  / 2) + self.c1
             else:
-                eis[i] = ((-1.0 * self.rr * x[i] ** 2)/2.0) + (self.rr * self.l * x[i]) + self.c2
+                eis[i] = ((-1.0 * self.rr * x[i] ** 2)/2.0) + (self.rr * self.L * x[i]) + self.c2
         return eis
 
     def eid(self,x):
@@ -136,7 +136,7 @@ class pl:
             if x[i] <= self.a:
                 eid[i] = ((self.rl * x[i] ** 3) / 6) + (self.c1 * x[i])
             else:
-                eid[i] = ((-1*self.rr * x[i] ** 3) / 6) + ((self.rr * self.l * x[i] ** 2) / 2) + (self.c2 * x[i]) + self.c4
+                eid[i] = ((-1*self.rr * x[i] ** 3) / 6) + ((self.rr * self.L * x[i] ** 2) / 2) + (self.c2 * x[i]) + self.c4
         return eid
 
     def vx(self,x):
@@ -155,7 +155,7 @@ class pl:
         if x <= self.a:
             m = self.rl * x
         else:
-            m = (-1 * self.rr * x) + (self.rr * self.l)
+            m = (-1 * self.rr * x) + (self.rr * self.L)
         return m
 
     def eisx(self,x):
@@ -163,7 +163,7 @@ class pl:
         if x <= self.a:
             eisx = ((self.rl * x ** 2)  / 2) + self.c1
         else:
-            eisx = ((-1.0 * self.rr * x ** 2)/2.0) + (self.rr * self.l * x) + self.c2
+            eisx = ((-1.0 * self.rr * x ** 2)/2.0) + (self.rr * self.L * x) + self.c2
         return eisx
 
     def eidx(self,x):
@@ -171,29 +171,29 @@ class pl:
         if x <= self.a:
             eid = ((self.rl * x ** 3) / 6) + (self.c1 * x)
         else:
-            eid = ((-1*self.rr * x ** 3) / 6) + ((self.rr * self.l * x ** 2) / 2) + (self.c2 * x) + self.c4
+            eid = ((-1*self.rr * x ** 3) / 6) + ((self.rr * self.L * x ** 2) / 2) + (self.c2 * x) + self.c4
         return eid
 
 class point_moment:
-    def __init__(self, ma, a, l):
-        self.ma = ma
-        self.a = a
-        self.l = l
+    def __init__(self, ma, a, L):
+        self.ma = float(ma)
+        self.a = float(a)
+        self.L = float(L)
         
         self.kind = 'Moment'
         
         self.error = ''
         
-        if a > l:
+        if a > self.L:
             self.error = 'Error a > L'
             
-        self.rr = ma/l
+        self.rr = self.ma/self.L
         self.rl = -1.0*self.rr
 
-        self.c2 = (-1.0/l) * ((ma*a**2) - (0.5*ma*a**2) + (self.rl * (l**3/6.0)) + (0.5*ma*l**2))
+        self.c2 = (-1.0/self.L) * ((self.ma*self.a**2) - (0.5*self.ma*self.a**2) + (self.rl * (self.L**3/6.0)) + (0.5*self.ma*self.L**2))
         self.c1 = ma*a + self.c2
         self.c3 = 0
-        self.c4 = ((-1.0*self.rl*l**3)/6.0) - (0.5*ma*l**2) - (self.c2*l)
+        self.c4 = ((-1.0*self.rl*self.L**3)/6.0) - (0.5*self.ma*self.L**2) - (self.c2*self.L)
 
         r = (self.ma/8.0)
         arrow_height = r/6.0
@@ -246,7 +246,7 @@ class point_moment:
             if x[i] <= self.a:
                 if x[i] == 0 and self.a == 0:
                     m[i] = self.ma
-                elif x[i] == self.l and self.a == self.l:
+                elif x[i] == self.L and self.a == self.L:
                     m[i] = -1.0*self.ma
                 else:
                     m[i] = self.rl * x[i]
@@ -287,7 +287,7 @@ class point_moment:
         if x <= self.a:
             if x == 0 and self.a == 0:
                 m = self.ma
-            elif x == self.l and self.a == self.l:
+            elif x == self.L and self.a == self.L:
                 m = -1.0*self.ma
             else:
                 m = self.rl * x
@@ -312,11 +312,11 @@ class point_moment:
         return eid
 
 class udl:
-    def __init__(self, w1, a, b, l):
+    def __init__(self, w1, a, b, L):
 
         self.w1 = float(w1)
         self.a = float(a)
-        self.l = float(l)
+        self.L = float(L)
         self.b = float(b)
         self.c = b-a
         
@@ -327,24 +327,24 @@ class udl:
         if self.a > self.b:
             self.error = 'Error a > b'
             self.error = 'Error a > b'
-        elif self.a > self.l:
+        elif self.a > self.L:
             self.error = 'Error a > l'
             self.error = 'Error a > l'
-        elif self.b > self.l:
+        elif self.b > self.L:
             self.error = 'Error b > l'
             self.error = 'Error b > l'
         else:
             pass
             
-        self.rl = (self.w1 * self.c) - (((self.w1 * self.c) * (self.a + (self.c / 2))) / self.l)
-        self.rr = (((self.w1 * self.c) * (self.a + (self.c / 2))) / self.l)
+        self.rl = (self.w1 * self.c) - (((self.w1 * self.c) * (self.a + (self.c / 2))) / self.L)
+        self.rr = (((self.w1 * self.c) * (self.a + (self.c / 2))) / self.L)
         self.c1 = 0
         self.c2 = ((-1 * self.w1 * self.a ** 2) / 2)
-        self.c3 = self.rr * self.l
+        self.c3 = self.rr * self.L
         self.c7 = 0
         self.c8 = ((-1 * self.c1 * self.a ** 2) / 2) + ((self.c2 * self.a ** 2) / 2) + ((5 * self.w1 * self.a ** 4) / 24) + self.c7
         self.c9 = ((-1 * self.rl * self.b ** 3) / 3) - ((self.rr * self.b ** 3) / 3) + ((self.w1 * self.b ** 4) / 8) - ((self.w1 * self.a * self.b ** 3) / 3) - ((self.c2 * self.b ** 2) / 2) + ((self.c3 * self.b ** 2) / 2) + self.c8
-        self.c6 = ((self.rr * self.l ** 2) / 6) - ((self.c3 * self.l) / 2) - (self.c9 / self.l)
+        self.c6 = ((self.rr * self.L ** 2) / 6) - ((self.c3 * self.L) / 2) - (self.c9 / self.L)
         self.c5 = ((-1 * self.rl * self.b ** 2) / 2) + ((self.w1 * self.b ** 3) / 6) - ((self.w1 * self.a * self.b ** 2) / 2) - ((self.rr * self.b ** 2) / 2) + (self.c3 * self.b) - (self.c2 * self.b) + self.c6
         self.c4 = ((self.w1 * self.a ** 3) / 3) + (self.c2 * self.a) + self.c5 - (self.c1 * self.a)
 
@@ -451,12 +451,12 @@ class udl:
         return eid
 
 class trap:
-    def __init__(self, w1, w2, a, b, l):
+    def __init__(self, w1, w2, a, b, L):
 
         self.w1 = float(w1)
         self.w2 = float(w2)
         self.a = float(a)
-        self.l = float(l)
+        self.L = float(L)
         self.b = float(b)
         self.c = self.b-self.a
         
@@ -468,10 +468,10 @@ class trap:
         if self.a > self.b:
             self.error = 'Error a > b'
             self.error = 'Error a > b'
-        elif self.a > self.l:
+        elif self.a > self.L:
             self.error = 'Error a > l'
             self.error = 'Error a > l'
-        elif self.b > self.l:
+        elif self.b > self.L:
             self.error = 'Error b > l'
             self.error = 'Error b > l'
         elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
@@ -483,15 +483,15 @@ class trap:
         self.s = (self.w2 -self.w1)/self.c
         self.xbar = (self.c * ((2 * self.w2) + self.w1)) / (3 * (self.w2 + self.w1))
         self.W = self.c * ((self.w1 + self.w2) / 2)
-        self.rr = (self.W * (self.a + self.xbar)) / self.l
+        self.rr = (self.W * (self.a + self.xbar)) / self.L
         self.rl = self.W - self.rr
         self.c1 = 0
         self.c2 = self.c1 + ((self.a ** 3 * self.s) / 6) + ((self.a ** 2 * (self.w1 - (self.s * self.a))) / 2) + ((((self.s * self.a) - (2 * self.w1)) * self.a ** 2) / 2)
-        self.c3 = self.rr * self.l
+        self.c3 = self.rr * self.L
         self.c7 = 0
         self.c8 = ((-1 * self.c1 * self.a ** 2) / 2) - ((self.a ** 5 * self.s) / 30) - ((self.a ** 4 * (self.w1 - (self.s * self.a))) / 8) - ((((self.s * self.a) - (2 * self.w1)) * self.a ** 4) / 6) + ((self.c2 * self.a ** 2) / 2) + self.c7
         self.c9 = ((-1 * self.rl * self.b ** 3) / 3) + ((self.b ** 5 * self.s) / 30) + ((self.b ** 4 * (self.w1 - (self.s * self.a))) / 8) + ((((self.s * self.a) - (2 * self.w1)) * self.a * self.b ** 3) / 6) - ((self.c2 * self.b ** 2) / 2) + self.c8 - ((self.rr * self.b ** 3) / 3) + ((self.c3 * self.b ** 2) / 2)
-        self.c6 = (((self.rr * self.l ** 3) / 6) - ((self.c3 * self.l ** 2) / 2) - self.c9) / self.l
+        self.c6 = (((self.rr * self.L ** 3) / 6) - ((self.c3 * self.L ** 2) / 2) - self.c9) / self.L
         self.c5 = ((-1 * self.rr * self.b ** 2) / 2) + (self.c3 * self.b) + self.c6 - ((self.rl * self.b ** 2) / 2) + ((self.b ** 4 * self.s) / 24) + ((self.b ** 3 * (self.w1 - (self.s * self.a))) / 6) + ((((self.s * self.a) - (2 * self.w1)) * self.a * self.b ** 2) / 4) - (self.c2 * self.b)
         self.c4 = ((-1 * self.a ** 4 * self.s) / 24) - ((self.a ** 3 * (self.w1 - (self.s * self.a))) / 6) - ((((self.s * self.a) - (2 * self.w1)) * self.a ** 3) / 4) + (self.c2 * self.a) + self.c5 - (self.c1 * self.a)
 
@@ -656,19 +656,19 @@ class cant_right_nl:
         return eid
 
 class cant_right_point:
-    def __init__(self, p, a, l, lb):
+    def __init__(self, p, a, L, Lb):
 
         self.p = float(p)
         self.a = float(a)
-        self.l = float(l)
-        self.lb = float(lb)
-        self.b = self.l - self.a
+        self.L = float(L)
+        self.Lb = float(Lb)
+        self.b = self.L - self.a
         
         self.kind = 'Point'
         
         self.error = ''
         
-        if self.a > self.l:
+        if self.a > self.L:
             self.error = 'Error a > l'
             self.error = 'Error a > l'
 
@@ -676,12 +676,12 @@ class cant_right_point:
         self.ml = -1.0*self.p*self.a
 
         # 0 length backspan indicates fixed-free beam initialize slope to 0
-        if lb == 0:
+        if Lb == 0:
             self.backspan = no_load()
             self.c1 = 0
         else:
-            self.backspan = point_moment(-1.0*self.ml,self.lb,self.lb)
-            self.c1 = self.backspan.eisx(self.lb)
+            self.backspan = point_moment(-1.0*self.ml,self.Lb,self.Lb)
+            self.c1 = self.backspan.eisx(self.Lb)
 
         self.c2 = 0
         self.c3 = 0.5*self.rl*self.a**2 + self.ml*self.a + self.c1
@@ -774,19 +774,19 @@ class cant_right_point:
         return eid
 
 class cant_right_point_moment:
-    def __init__(self, ma, a, l, lb):
+    def __init__(self, ma, a, L, Lb):
 
         self.ma = float(ma)
         self.a = float(a)
-        self.l = float(l)
-        self.lb = float(lb)
-        self.b = self.l - self.a
+        self.L = float(L)
+        self.Lb = float(Lb)
+        self.b = self.L - self.a
         
         self.kind = 'Moment'
 
         self.error = ''
         
-        if self.a > self.l:
+        if self.a > self.L:
             self.error = 'Error a > l'
             self.error = 'Error a > l'
 
@@ -794,12 +794,12 @@ class cant_right_point_moment:
         self.ml = -1.0*self.ma
 
         # 0 length backspan indicates fixed-free beam initialize slope to 0
-        if lb == 0:
+        if Lb == 0:
             self.backspan = no_load()
             self.c1 = 0
         else:
-            self.backspan = point_moment(-1.0*self.ml,self.lb,self.lb)
-            self.c1 = self.backspan.eisx(self.lb)
+            self.backspan = point_moment(-1.0*self.ml,self.Lb,self.Lb)
+            self.c1 = self.backspan.eisx(self.Lb)
 
         self.c2 = 0
         self.c3 = self.ml*self.a + self.c1
@@ -911,15 +911,15 @@ class cant_right_point_moment:
         return eid
 
 class cant_right_udl:
-    def __init__(self, w1, a, b, l, lb):
+    def __init__(self, w1, a, b, L, Lb):
 
         self.w1 = float(w1)
         self.a = float(a)
-        self.l = float(l)
+        self.L = float(L)
         self.b = float(b)
         self.c = self.b - self.a
         self.w_tot = self.w1*self.c
-        self.lb = float(lb)
+        self.Lb = float(Lb)
         
         self.kind = 'UDL'
         
@@ -928,10 +928,10 @@ class cant_right_udl:
         if self.a > self.b:
             self.error = 'Error a > b'
             self.error = 'Error a > b'
-        elif self.a > self.l:
+        elif self.a > self.L:
             self.error = 'Error a > l'
             self.error = 'Error a > l'
-        elif self.b > self.l:
+        elif self.b > self.L:
             self.error = 'Error b > l'
             self.error = 'Error b > l'
         else:
@@ -941,12 +941,12 @@ class cant_right_udl:
         self.ml = -1.0*self.w_tot*(self.b-(self.c/2))
 
         # 0 length backspan indicates fixed-free beam initialize slope to 0
-        if lb == 0:
+        if Lb == 0:
             self.backspan = no_load()
             self.c1 = 0
         else:
-            self.backspan = point_moment(-1.0*self.ml,self.lb,self.lb)
-            self.c1 = self.backspan.eisx(self.lb)
+            self.backspan = point_moment(-1.0*self.ml,self.Lb,self.Lb)
+            self.c1 = self.backspan.eisx(self.Lb)
 
         self.c2 = 0
 
@@ -1057,14 +1057,14 @@ class cant_right_udl:
         return eid
 
 class cant_right_trap:
-    def __init__(self, w1, w2, a, b, l, lb):
+    def __init__(self, w1, w2, a, b, L, Lb):
 
         self.w1 = float(w1)
         self.w2 = float(w2)
         self.a = float(a)
-        self.l = float(l)
+        self.L = float(L)
         self.b = float(b)
-        self.lb = float(lb)
+        self.Lb = float(Lb)
         self.c = self.b-self.a
         
         self.kind = 'TRAP'
@@ -1074,10 +1074,10 @@ class cant_right_trap:
         if self.a > self.b:
             self.error = 'Error a > b'
             self.error = 'Error a > b'
-        elif self.a > self.l:
+        elif self.a > self.L:
             self.error = 'Error a > l'
             self.error = 'Error a > l'
-        elif self.b > self.l:
+        elif self.b > self.L:
             self.error = 'Error b > l'
             self.error = 'Error b > l'
         elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
@@ -1093,12 +1093,12 @@ class cant_right_trap:
         self.ml = -1*self.w*self.d
 
         # 0 length backspan indicates fixed-free beam initialize slope to 0
-        if lb == 0:
+        if Lb == 0:
             self.backspan = no_load()
             self.c1 = 0
         else:
-            self.backspan = point_moment(-1.0*self.ml,self.lb,self.lb)
-            self.c1 = self.backspan.eisx(self.lb)
+            self.backspan = point_moment(-1.0*self.ml,self.Lb,self.Lb)
+            self.c1 = self.backspan.eisx(self.Lb)
 
         self.c2 = 0
 
@@ -1210,11 +1210,11 @@ class cant_right_trap:
         return eid
 
 class cant_left_nl:
-    def __init__(self, slope, l):
-        self.l = l
-        self.slope = slope
+    def __init__(self, slope, L):
+        self.L = float(L)
+        self.slope = float(slope)
         self.c1 = self.slope
-        self.c2 = -1.0*self.c1*self.l
+        self.c2 = -1.0*self.c1*self.L
         
         self.kind = 'NL'
 
@@ -1270,33 +1270,33 @@ class cant_left_nl:
         return eid
 
 class cant_left_point:
-    def __init__(self, p, a, l,lb):
+    def __init__(self, p, a, L,Lb):
 
         self.p = float(p)
         self.a = float(a)
-        self.l = float(l)
-        self.lb = float(lb)
+        self.L = float(L)
+        self.Lb = float(Lb)
 
         self.kind = 'Point'
 
         self.error = ''
         
-        if self.a > self.l:
+        if self.a > self.L:
             self.error = 'Error a > l'
             self.error = 'Error a > l'
 
         self.rr = self.p
-        self.mr = -1*self.p*(self.l-self.a)
+        self.mr = -1*self.p*(self.L-self.a)
 
         # 0 length backspan indicates fixed-free beam initialize slope to 0
-        if self.lb == 0:
+        if self.Lb == 0:
             self.backspan = no_load()
-            self.c3 = 0 + (0.5*self.p * (self.l-self.a)**2)
+            self.c3 = 0 + (0.5*self.p * (self.L-self.a)**2)
         else:
-            self.backspan = point_moment(self.mr,0,self.lb)
-            self.c3 = self.backspan.eisx(0) + (0.5*self.p * (self.l-self.a)**2)
+            self.backspan = point_moment(self.mr,0,self.Lb)
+            self.c3 = self.backspan.eisx(0) + (0.5*self.p * (self.L-self.a)**2)
 
-        self.c4 = ((1/6.0)*self.p*(self.l-self.a)**3) - (self.c3*self.l)
+        self.c4 = ((1/6.0)*self.p*(self.L-self.a)**3) - (self.c3*self.L)
         self.c1 = self.c3
         self.c2 = (self.c3*self.a) + self.c4 - (self.c1*self.a)
 
@@ -1382,18 +1382,18 @@ class cant_left_point:
         return eid
 
 class cant_left_point_moment:
-    def __init__(self, ma, a, l,lb):
+    def __init__(self, ma, a, L,Lb):
 
         self.ma = float(ma)
         self.a = float(a)
-        self.l = float(l)
-        self.lb = float(lb)
+        self.L = float(L)
+        self.Lb = float(Lb)
 
         self.kind = 'Moment'
         
         self.error = ''
         
-        if self.a > self.l:
+        if self.a > self.L:
             self.error = 'Error a > l'
             self.error = 'Error a > l'
 
@@ -1401,14 +1401,14 @@ class cant_left_point_moment:
         self.mr = self.ma
 
         # 0 length backspan indicates fixed-free beam initialize slope to 0
-        if lb == 0:
+        if Lb == 0:
             self.backspan = no_load()
-            self.c3 = 0 - (self.ma*self.l)
+            self.c3 = 0 - (self.ma*self.L)
         else:
-            self.backspan = point_moment(self.mr,0,lb)
-            self.c3 = self.backspan.eisx(0) - (self.ma*self.l)
+            self.backspan = point_moment(self.mr,0,Lb)
+            self.c3 = self.backspan.eisx(0) - (self.ma*self.L)
 
-        self.c4 = (-0.5*self.ma*self.l**2) - self.c3*self.l
+        self.c4 = (-0.5*self.ma*self.L**2) - self.c3*self.L
         self.c1 = (1.0*self.ma*self.a) + self.c3
         self.c2 = 0.5*self.ma*self.a**2 + self.c3*self.a + self.c4 - self.c1*self.a
 
@@ -1518,12 +1518,12 @@ class cant_left_point_moment:
         return eid
 
 class cant_left_udl:
-    def __init__(self, w1, a, b, l, lb):
+    def __init__(self, w1, a, b, L, Lb):
 
         self.w1 = float(w1)
         self.a = float(a)
-        self.l = float(l)
-        self.lb = float(lb)
+        self.L = float(L)
+        self.Lb = float(Lb)
         self.b = float(b)
         self.c = self.b-self.a
         self.w_tot = self.w1*self.c
@@ -1535,27 +1535,27 @@ class cant_left_udl:
         if self.a > self.b:
             self.error = 'Error a > b'
             self.error = 'Error a > b'
-        elif self.a > self.l:
+        elif self.a > self.L:
             self.error = 'Error a > l'
             self.error = 'Error a > l'
-        elif self.b > self.l:
+        elif self.b > self.L:
             self.error = 'Error b > l'
             self.error = 'Error b > l'
         else:
             pass
             
         self.rr = self.w_tot
-        self.mr = -1.0*self.w_tot*(self.l-(a+(self.c/2.0)))
+        self.mr = -1.0*self.w_tot*(self.L-(a+(self.c/2.0)))
 
         # 0 length backspan indicates fixed-free beam initialize slope to 0
-        if lb == 0:
+        if Lb == 0:
             self.backspan = no_load()
-            self.c5 = 0 + (0.5 * self.w_tot * (self.l - (self.a + (0.5*self.c)))**2)
+            self.c5 = 0 + (0.5 * self.w_tot * (self.L - (self.a + (0.5*self.c)))**2)
         else:
-            self.backspan = point_moment(self.mr,0,lb)
-            self.c5 = self.backspan.eisx(0) + (0.5 * self.w_tot * (self.l - (self.a + (0.5*self.c)))**2)
+            self.backspan = point_moment(self.mr,0,Lb)
+            self.c5 = self.backspan.eisx(0) + (0.5 * self.w_tot * (self.L - (self.a + (0.5*self.c)))**2)
 
-        self.c6 = ((1.0/6.0)*self.w_tot * (self.l - (self.a + (0.5*self.c)))**3) - (self.c5*self.l)
+        self.c6 = ((1.0/6.0)*self.w_tot * (self.L - (self.a + (0.5*self.c)))**3) - (self.c5*self.L)
         self.c3 =((-0.5)*self.w_tot * (self.b - (self.a + (0.5*self.c)))**2) + self.c5 + ((1.0/6.0)*self.w1*(b-a)**3)
         self.c1 = self.c3
         self.c4 = ((-1.0/6.0)*self.w_tot * (self.b - (self.a + (0.5*self.c)))**3) + (self.c5*self.b) + self.c6 + ((1.0/24.0)*self.w1*(self.b-self.a)**4) - (self.c3*self.b)
@@ -1661,14 +1661,14 @@ class cant_left_udl:
 
 class cant_left_trap:
 
-    def __init__(self, w1, w2, a, b, l, lb):
+    def __init__(self, w1, w2, a, b, L, Lb):
 
         self.w1 = float(w1)
         self.w2 = float(w2)
         self.a = float(a)
-        self.l = float(l)
+        self.L = float(L)
         self.b = float(b)
-        self.lb = float(lb)
+        self.Lb = float(Lb)
         self.c = self.b-self.a
         
         self.kind = 'TRAP'
@@ -1678,10 +1678,10 @@ class cant_left_trap:
         if self.a > self.b:
             self.error = 'Error a > b'
             self.error = 'Error a > b'
-        elif self.a > self.l:
+        elif self.a > self.L:
             self.error = 'Error a > l'
             self.error = 'Error a > l'
-        elif self.b > self.l:
+        elif self.b > self.L:
             self.error = 'Error b > l'
             self.error = 'Error b > l'
         elif sign(self.w1) != sign(self.w2) and self.w1 !=0 and self.w2 !=0:
@@ -1692,21 +1692,21 @@ class cant_left_trap:
             
         self.w = 0.5*(self.w1+self.w2)*self.c
         self.dl = self.a+(((self.w1+(2*self.w2))/(3*(self.w2+self.w1)))*self.c)
-        self.dr = self.l-self.dl
+        self.dr = self.L-self.dl
         self.s = (self.w1-self.w2)/self.c
         self.cc = (((self.w1+(2*self.w2))/(3*(self.w2+self.w1)))*self.c) + self.a
         self.rr = self.w
-        self.mr = -1*self.rr*(self.l-self.cc)
+        self.mr = -1*self.rr*(self.L-self.cc)
 
         # 0 length backspan indicates fixed-free beam initialize slope to 0
-        if lb == 0:
+        if Lb == 0:
             self.backspan = no_load()
-            self.c6 = 0 + (0.5*self.w*(self.l-self.cc)**2)
+            self.c6 = 0 + (0.5*self.w*(self.L-self.cc)**2)
         else:
-            self.backspan = point_moment(self.mr,0,lb)
-            self.c6 = self.backspan.eisx(0) + (0.5*self.w*(self.l-self.cc)**2)
+            self.backspan = point_moment(self.mr,0,Lb)
+            self.c6 = self.backspan.eisx(0) + (0.5*self.w*(self.L-self.cc)**2)
 
-        self.c7 = ((1.0/6.0)*self.w*(self.l-self.cc)**3) - (self.c6*self.l)
+        self.c7 = ((1.0/6.0)*self.w*(self.L-self.cc)**3) - (self.c6*self.L)
         self.c3 = -1.0*((1.0/6.0)*self.a*((self.a**2 * self.s) - (3*self.a*((self.a*self.s) + self.w1)) + (3*self.a*((self.a*self.s) + (2*self.w1)))))
         self.c4 = (-0.5*self.w*(self.b-self.cc)**2) + self.c6 - (self.c3*self.b) - ((1.0/24.0)*self.b**2 *((self.b**2 * self.s) - (4*self.b*((self.a*self.s) + self.w1)) + (6*self.a*((self.a*self.s) + (2*self.w1)))))
         self.c5 = ((-1.0/6.0)*self.w*(self.b-self.cc)**3) + (self.c6*self.b)+self.c7-(0.5*self.c3*self.b**2)-(self.c4*self.b)-((1.0/120.0)*self.b**3 *((self.b**2 * self.s) - (5*self.b*((self.a*self.s) + self.w1)) + (10*self.a*((self.a*self.s) + (2*self.w1)))))
@@ -1825,7 +1825,7 @@ def fixed_free_left_by_stations(loads, number_of_stations):
     #
     # -Consistent unit definitions across load values and lengths
     
-    l = loads[0].l
+    L = loads[0].L
     
     iters = int(number_of_stations)
     
@@ -1837,13 +1837,13 @@ def fixed_free_left_by_stations(loads, number_of_stations):
     for load in loads:
         if load.kind == 'Point':
             a = load.a
-            b = min(load.l,a + 0.0001)
+            b = min(load.L,a + 0.0001)
             c = max(0,a - 0.0001)
             extra_stations = np.append(extra_stations, [c,a,b])
 
         elif load.kind == 'Moment':
             a = load.a
-            b = min(load.l,a + 0.0001)
+            b = min(load.L,a + 0.0001)
             c = max(0,a - 0.0001)
             extra_stations = np.append(extra_stations, [c,a,b])
 
@@ -1860,15 +1860,15 @@ def fixed_free_left_by_stations(loads, number_of_stations):
     
     # Generate station coordinates based on a step size of l / number of stations
     
-    step = l / (number_of_stations * 1.00) # multply by 1.00 to force Float division
+    step = L / (number_of_stations * 1.00) # multply by 1.00 to force Float division
     
     xs = zeros(iters+1)
     
     xs[0] = 0
     
     for i in range(1,(iters+1)):
-        if xs[i-1] + step > l:
-            xs[i] = l
+        if xs[i-1] + step > L:
+            xs[i] = L
         else:
             xs[i] = xs[i-1] + step
     
@@ -1912,7 +1912,7 @@ def fixed_free_right_by_stations(loads, number_of_stations):
     #
     # -Consistent unit definitions across load values and lengths
     
-    l = loads[0].l
+    L = loads[0].L
     
     iters = int(number_of_stations)
     
@@ -1924,13 +1924,13 @@ def fixed_free_right_by_stations(loads, number_of_stations):
     for load in loads:
         if load.kind == 'Point':
             a = load.a
-            b = min(load.l,a + 0.0001)
+            b = min(load.L,a + 0.0001)
             c = max(0,a - 0.0001)
             extra_stations = np.append(extra_stations, [c,a,b])
 
         elif load.kind == 'Moment':
             a = load.a
-            b = min(load.l,a + 0.0001)
+            b = min(load.L,a + 0.0001)
             c = max(0,a - 0.0001)
             extra_stations = np.append(extra_stations, [c,a,b])
 
@@ -1947,15 +1947,15 @@ def fixed_free_right_by_stations(loads, number_of_stations):
     
     # Generate station coordinates based on a step size of l / number of stations
     
-    step = l / (number_of_stations * 1.00) # multply by 1.00 to force Float division
+    step = L / (number_of_stations * 1.00) # multply by 1.00 to force Float division
     
     xs = zeros(iters+1)
     
     xs[0] = 0
     
     for i in range(1,(iters+1)):
-        if xs[i-1] + step > l:
-            xs[i] = l
+        if xs[i-1] + step > L:
+            xs[i] = L
         else:
             xs[i] = xs[i-1] + step
     
@@ -2054,7 +2054,7 @@ def pin_pin_single_span_by_stations(loads, number_of_stations):
     #
     # -Consistent unit definitions across load values and lengths
     
-    l = loads[0].l
+    L = loads[0].L
     
     iters = int(number_of_stations)
     
@@ -2066,13 +2066,13 @@ def pin_pin_single_span_by_stations(loads, number_of_stations):
     for load in loads:
         if load.kind == 'Point':
             a = load.a
-            b = min(load.l,a + 0.0001)
+            b = min(load.L,a + 0.0001)
             c = max(0,a - 0.0001)
             extra_stations = np.append(extra_stations, [c,a,b])
 
         elif load.kind == 'Moment':
             a = load.a
-            b = min(load.l,a + 0.0001)
+            b = min(load.L,a + 0.0001)
             c = max(0,a - 0.0001)
             extra_stations = np.append(extra_stations, [c,a,b])
 
@@ -2089,15 +2089,15 @@ def pin_pin_single_span_by_stations(loads, number_of_stations):
     
     # Generate station coordinates based on a step size of l / number of stations
     
-    step = l / (number_of_stations * 1.00) # multply by 1.00 to force Float division
+    step = L / (number_of_stations * 1.00) # multply by 1.00 to force Float division
     
     xs = zeros(iters+1)
     
     xs[0] = 0
     
     for i in range(1,(iters+1)):
-        if xs[i-1] + step > l:
-            xs[i] = l
+        if xs[i-1] + step > L:
+            xs[i] = L
         else:
             xs[i] = xs[i-1] + step
     
