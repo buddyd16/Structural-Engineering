@@ -431,7 +431,13 @@ class main_window:
         self.left_sw_entry = tk.Entry(self.geo_data_frame, textvariable=self.left_sw_kips, width=10, state=tk.DISABLED)
         self.left_sw_entry.grid(row=13, column=1)
         tk.Label(self.geo_data_frame, text="kips", font=self.helv).grid(row=13, column=2)
-
+        
+        self.left_ig_in4 = tk.StringVar()
+        self.left_ig_in4.set('--')
+        tk.Label(self.geo_data_frame, text="Ig,left ftg = ", font=self.helv).grid(row=14, column=0, sticky = tk.E)
+        tk.Entry(self.geo_data_frame, textvariable=self.left_ig_in4, width=10, state=tk.DISABLED).grid(row=14, column=1)
+        tk.Label(self.geo_data_frame, text="in^4", font=self.helv).grid(row=14, column=2)
+        
         #Right
         tk.Label(self.geo_data_frame, text="Right Foundation:", font=self.helv_res).grid(row=0, column=3)
         self.b2 = tk.StringVar()
@@ -510,6 +516,12 @@ class main_window:
         self.right_sw_entry = tk.Entry(self.geo_data_frame, textvariable=self.right_sw_kips, width=10, state=tk.DISABLED)
         self.right_sw_entry.grid(row=13, column=4)
         tk.Label(self.geo_data_frame, text="kips", font=self.helv).grid(row=13, column=5)
+        
+        self.right_ig_in4 = tk.StringVar()
+        self.right_ig_in4.set('--')
+        tk.Label(self.geo_data_frame, text="Ig,right ftg = ", font=self.helv).grid(row=14, column=3, sticky = tk.E)
+        tk.Entry(self.geo_data_frame, textvariable=self.right_ig_in4, width=10, state=tk.DISABLED).grid(row=14, column=4)
+        tk.Label(self.geo_data_frame, text="in^4", font=self.helv).grid(row=14, column=5)
 
         #Strap
         tk.Label(self.geo_data_frame, text="Strap:", font=self.helv_res).grid(row=0, column=6)
@@ -579,7 +591,25 @@ class main_window:
         self.s_swr_entry = tk.Entry(self.geo_data_frame, textvariable=self.s_swr_kips, width=10, state=tk.DISABLED)
         self.s_swr_entry.grid(row=9, column=8)
         tk.Label(self.geo_data_frame, text="kips", font=self.helv).grid(row=9, column=9)
-
+        
+        self.strap_ig_in4 = tk.StringVar()
+        self.strap_ig_in4.set('--')
+        tk.Label(self.geo_data_frame, text="Ig,strap = ", font=self.helv).grid(row=10, column=7, sticky = tk.E)
+        tk.Entry(self.geo_data_frame, textvariable=self.strap_ig_in4, width=10, state=tk.DISABLED).grid(row=10, column=8)
+        tk.Label(self.geo_data_frame, text="in^4", font=self.helv).grid(row=10, column=9)
+        
+        self.igs_over_igl = tk.StringVar()
+        self.igs_over_igl.set('--')
+        tk.Label(self.geo_data_frame, text="Ig,strap / Ig,left = ", font=self.helv).grid(row=11, column=7, sticky = tk.E)
+        tk.Entry(self.geo_data_frame, textvariable=self.igs_over_igl, width=10, state=tk.DISABLED).grid(row=11, column=8)
+        tk.Label(self.geo_data_frame, text="in^4", font=self.helv).grid(row=11, column=9)
+        
+        self.igs_over_igr = tk.StringVar()
+        self.igs_over_igr.set('--')
+        tk.Label(self.geo_data_frame, text="Ig,strap / Ig,right = ", font=self.helv).grid(row=12, column=7, sticky = tk.E)
+        tk.Entry(self.geo_data_frame, textvariable=self.igs_over_igr, width=10, state=tk.DISABLED).grid(row=12, column=8)
+        tk.Label(self.geo_data_frame, text="in^4", font=self.helv).grid(row=12, column=9)
+        
         #Distance between Columns
         tk.Label(self.geo_data_frame, text="Distance Between Columns:", font=self.helv_res).grid(row=0, column=10)
         tk.Label(self.geo_data_frame, text="Lc-c = ", font=self.helv).grid(row=1, column=10, sticky = tk.E)
@@ -1167,6 +1197,7 @@ class main_window:
         self.commons_out_text = self.commons_out_text + '{0:<22} {1:<12.3f}(Used to factor self weight for Ultimate values)\n'.format('DL Factor Ultimate :', dl_factor)
         self.commons_out_text = self.commons_out_text + '{0:<22} {1:<12.3f}ksi  (Reinforcing Steel Yield Strength)\n'.format('Fy :',fy_ksi)
         self.commons_out_text = self.commons_out_text + '\n{0:<22} {1:<12.3f}ft  (Center to Center distance between columns)\n'.format('L,cc :',lcc_ft)
+        
         #Strap
         bs_in = float(self.bs.get())
         bs_ft = bs_in/12.0
@@ -1174,6 +1205,9 @@ class main_window:
         hs_ft = hs_in/12.0
         s_ext_ft = float(self.s_extension_in.get())/12.0
         s_elev = float(self.s_elev_in.get())
+        
+        I_strap_in4 = (bs_in * hs_in*hs_in*hs_in) / 12.0
+        self.strap_ig_in4.set('{0:.3f}'.format(I_strap_in4))
 
         self.strap_sw_klf = (bs_ft*hs_ft*sw_pcf)/1000.0
         self.s_sw_klf.set('{0:.3f}'.format(self.strap_sw_klf))
@@ -1184,6 +1218,10 @@ class main_window:
         d1_ft = float(self.d1.get())
         h1_ft = float(self.h1.get())/12.0
         e1_ft = float(self.ce1.get())/12.0
+        
+        I_left_in4 = (d1_ft*12 * h1_ft*12* h1_ft*12* h1_ft*12)/12.0
+        self.left_ig_in4.set('{0:.3f}'.format(I_left_in4))
+        self.igs_over_igl.set('{0:.3f}'.format(I_strap_in4 / I_left_in4))
 
         cb1_ft = (float(self.cb1.get()))/12.0
         cd1_ft = (float(self.cd1.get()))/12.0
@@ -1216,6 +1254,10 @@ class main_window:
         h2_ft = float(self.h2.get())/12.0
         e2_ft = float(self.ce2.get())/12.0
 
+        I_right_in4 = (d2_ft*12 * h2_ft*12* h2_ft*12* h2_ft*12)/12.0
+        self.right_ig_in4.set('{0:.3f}'.format(I_right_in4))
+        self.igs_over_igr.set('{0:.3f}'.format(I_strap_in4 / I_right_in4))
+        
         cb2_ft = (float(self.cb2.get()))/12.0
         cd2_ft = (float(self.cd2.get()))/12.0
 
