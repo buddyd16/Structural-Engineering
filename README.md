@@ -4,8 +4,6 @@ Everything was developed using a standard install of the 2.7.10 version of Pytho
 
 This is a collection of various scripts I have been and continue to work on for various day to day calculations. I intend to keep the scripts organized by design topic ie the folder structure presented. The intent is for the scripts to cover simple one off calculations so don't plan on any full building modeling programs. When things develope beyond simple scripts I'll create additional repositories that fit a better organizational structure.
 
-If you find this useful please let me know on Patreon: https://patreon.com/user?u=12449941&utm_medium=social&utm_source=twitter&utm_campaign=creatorshare. Thank you
-
 ## Strap Beam - strap_beam_gui.py
 Tkinter GUI based Python Program
 requires the analysis folder and contained py files and the concrete folder and contained python files.
