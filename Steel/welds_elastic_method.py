@@ -173,7 +173,7 @@ class elastic_weld_group:
         self.log = self.log + 'fy = Fy/Area = {0:.3f}\n'.format(fy)
         mx = max(Mx/self.Sx_top, Mx/self.Sx_bottom)
         self.log = self.log + 'mx = max[Mx/Sx,top and Mx/Sx,bottom] = {0:.3f}\n'.format(mx)
-        my = max(My/self.Sy_left, Mx/self.Sy_right)
+        my = max(My/self.Sy_left, My/self.Sy_right)
         self.log = self.log + 'my = max[My/Sy,left and My/Sy,right] = {0:.3f}\n'.format(my)
         mzy = max((Mz*self.Cx_left)/self.Ip, (Mz*self.Cx_right)/self.Ip)
         self.log = self.log + 'mzy = max[Mz*Cx,left/Ip and Mz*Cx,right/Ip] = {0:.3f}\n'.format(mzy)
@@ -272,17 +272,27 @@ class elastic_weld_group:
             self.log = self.log + 'Rn < Rn,base rupture: **NG**\n'
         
         
+# Circle Helper
+#segments = []
+#r = 3
+#for a in range(0,360):
+#    x = r*math.sin(math.radians(a))
+#    y = r*math.cos(math.radians(a))
+#    x1 = r*math.sin(math.radians(a+1))
+#    y1 = r*math.cos(math.radians(a+1))
+#    
+#    segments.append(weld_segment([x,y],[x1,y1]))
 
-segments = [weld_segment([0,0],[0,-4]),weld_segment([0,0],[4,0])]
+segments = [weld_segment([0,0],[0,6]),weld_segment([2,0],[2,6])]
 
 weld_group = elastic_weld_group(segments)
 
 #Loads:
-Fz = 1000
-Fx = 1500
-Fy = 1500
-Mx = 5000
-My = 5000
+Fz = 0
+Fx = 5000
+Fy = 5000
+Mx = 50000
+My = 0
 Mz = 0
 
 resultant = weld_group.force_analysis(Fz,Fx,Fy,Mx,My,Mz)
@@ -295,3 +305,6 @@ Ip = weld_group.Ip
 center = weld_group.group_center
 
 log = weld_group.log
+
+
+    
