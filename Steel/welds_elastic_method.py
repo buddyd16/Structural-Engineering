@@ -85,7 +85,7 @@ class weld_segment:
         
         self.Iyo = (self.length*self.m*self.m)/12.0
         
-        self.info_text = 'Weld @ i: ({0},{1}) j: ({2},{3}) - A = {4:.3f} Ixo = {5:.3f} Iyo = {6:.3f} -- Center: ({7:.3f},{8:.3f})'.format(self.start[0],self.start[1],self.end[0],self.end[1],self.area,self.Ixo,self.Iyo,self.center[0], self.center[1])
+        self.info_text = 'Weld @ i: ({0:.3f},{1:.3f}) j: ({2:.3f},{3:.3f}) - A = {4:.3f} Ixo = {5:.3f} Iyo = {6:.3f} -- Center: ({7:.3f},{8:.3f})'.format(self.start[0],self.start[1],self.end[0],self.end[1],self.area,self.Ixo,self.Iyo,self.center[0], self.center[1])
         self.global_info_text = ''
         
         self.x_coords = [self.start[0], self.end[0]]

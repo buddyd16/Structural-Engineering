@@ -307,6 +307,15 @@ class Master_window:
                 y1 = h - (((weld.y_coords[1] - min_y) * sf_y) + initial)
                 
                 self.weld_canvas.create_line(x0,y0,x1,y1, fill='red', width=2)
+            
+            if self.group_built == 1:
+                
+                xc = ((self.weld_group.group_center[0] - min_x) * sf_x) + initial
+                yc = h - (((self.weld_group.group_center[1]-min_y) * sf_y) + initial)
+                
+                extension = initial/2
+                self.weld_canvas.create_line(extension,yc,w-extension,yc, fill='blue', width=1, dash=(6,6))
+                self.weld_canvas.create_line(xc,h-extension,xc,extension, fill='blue', width=1, dash=(6,6))
     
     def build_weld_group(self):
         if len(self.weld_segments) > 1:
@@ -318,6 +327,7 @@ class Master_window:
             for label, equation, value in zip(self.weld_group.gui_output_labels,self.weld_group.gui_output_equations,self.weld_group.gui_output_values):
                 self.group_textbox.insert(tk.END,'{0}{1}{2:.3f}\n'.format(label, equation, value))
                 i+=1
+            self.draw_weld()
         else:
             self.group_built = 0
     
