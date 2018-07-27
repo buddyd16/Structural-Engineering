@@ -114,8 +114,14 @@ class Master_window:
         self.tab_group_properties  = ttk.Frame(self.nb_output_data, height=300)
         self.nb_output_data.add(self.tab_group_properties , text='Weld Group Properties')
         
+        self.group_textbox = tk.Text(self.tab_group_properties, font=self.f_type)
+        self.group_textbox.grid(row=0, column=0, sticky="nsew", padx=4, pady=4)
+        
         self.tab_load_analysis  = ttk.Frame(self.nb_output_data, height=300)
         self.nb_output_data.add(self.tab_load_analysis , text='Load Analysis Results')
+        
+        self.load_textbox = tk.Text(self.tab_load_analysis, font=self.f_type)
+        self.load_textbox.grid(row=0, column=0, sticky="nsew", padx=4, pady=4)
         
         self.tab_aisc_design = ttk.Frame(self.nb_output_data, height=300)
         self.nb_output_data.add(self.tab_aisc_design , text='AISC Design')
@@ -307,10 +313,10 @@ class Master_window:
             del self.group_result_labels[:]
             self.weld_group = wem.elastic_weld_group(self.weld_segments)
             self.group_built = 1
-            
+            self.group_textbox.delete(1.0,tk.END)
             i=0
             for label, equation, value in zip(self.weld_group.gui_output_labels,self.weld_group.gui_output_equations,self.weld_group.gui_output_values):
-                self.group_result_labels.append(tk.Label(self.tab_group_properties, text='{0}{1}{2:.3f}'.format(label, equation, value), font=self.f_type, justify=tk.LEFT).grid(row=i,column=0, sticky = tk.W))
+                self.group_textbox.insert(tk.END,'{0}{1}{2:.3f}\n'.format(label, equation, value))
                 i+=1
         else:
             self.group_built = 0
@@ -322,9 +328,10 @@ class Master_window:
             forces.append(float(load.get()))
         if self.group_built == 1:
             self.weld_group.force_analysis(forces[0],forces[1],forces[2],forces[3],forces[4],forces[5])
+            self.load_textbox.delete(1.0,tk.END)
             i=0
             for label, equation, value in zip(self.weld_group.component_forces_key,self.weld_group.component_forces_eqs,self.weld_group.component_forces):
-                self.analysis_result_labels.append(tk.Label(self.tab_load_analysis, text='{0} = {1} = {2:.3f} lbs/in'.format(label, equation, value), font=self.f_type, justify=tk.LEFT).grid(row=i,column=0, sticky = tk.W))
+                self.load_textbox.insert(tk.END,'{0} = {1} = {2:.3f} lbs/in\n'.format(label, equation, value))
                 i+=1
                 
     def aisc_design(self):
