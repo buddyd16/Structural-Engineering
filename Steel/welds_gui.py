@@ -324,7 +324,7 @@ class Master_window:
             
 def main():
     root = tk.Tk()
-    root.title("Simple Beam")
+    root.title("Elastic Weld Analysis and AISC Design - Alpha v1")
     Master_window(root)
     root.minsize(1280,720)
     root.mainloop()
