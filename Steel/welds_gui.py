@@ -67,14 +67,14 @@ class Master_window:
         self.output_frame.pack(side=tk.RIGHT, anchor='nw', padx= 1, pady= 1, fill=tk.BOTH, expand=1)
         
         self.output_canvas_frame = tk.Frame(self.output_frame, bd=2, relief='sunken', padx=1,pady=1)
-        self.output_canvas_frame.pack(padx= 1, pady= 1, fill=tk.BOTH, expand=1)
+        self.output_canvas_frame.pack(padx= 1, pady= 1)
         
         self.output_data_frame = tk.Frame(self.output_frame, bd=2, relief='sunken', padx=1,pady=1)
-        self.output_data_frame.pack(padx= 1, pady= 1, fill=tk.BOTH, expand=1)
+        self.output_data_frame.pack(padx= 1, pady= 1, fill=tk.X, expand=1)
         
         # Canvas
-        self.weld_canvas = tk.Canvas(self.output_canvas_frame, width=200, height=200, bd=2, relief='sunken', background="black")
-        self.weld_canvas.pack(side = tk.LEFT, anchor='c', padx= 1, pady= 1, fill=tk.BOTH, expand=1)
+        self.weld_canvas = tk.Canvas(self.output_canvas_frame, width=300, height=300, bd=2, relief='sunken', background="black")
+        self.weld_canvas.pack(side = tk.LEFT, anchor='c', padx= 1, pady= 1)
         self.weld_canvas.bind("<Configure>", self.draw_weld)
         
         # Input/output Notebooks
@@ -111,14 +111,21 @@ class Master_window:
         self.nb_inputs.add(self.tab_loads , text='Applied Loads and Base Materials - Input')
         
         # Output Notebooks
-        self.tab_group_properties  = ttk.Frame(self.nb_output_data)
+        self.tab_group_properties  = ttk.Frame(self.nb_output_data, height=300)
         self.nb_output_data.add(self.tab_group_properties , text='Weld Group Properties')
         
-        self.tab_load_analysis  = ttk.Frame(self.nb_output_data)
+        self.tab_load_analysis  = ttk.Frame(self.nb_output_data, height=300)
         self.nb_output_data.add(self.tab_load_analysis , text='Load Analysis Results')
         
-        self.tab_aisc_design = ttk.Frame(self.nb_output_data)
+        self.tab_aisc_design = ttk.Frame(self.nb_output_data, height=300)
         self.nb_output_data.add(self.tab_aisc_design , text='AISC Design')
+        
+        self.aisc_textbox = tk.Text(self.tab_aisc_design, font=self.f_type)
+        self.aisc_textbox.grid(row=0, column=0, sticky="nsew", padx=4, pady=4)
+        
+        self.aisc_scroll = tk.Scrollbar(self.tab_aisc_design, command=self.aisc_textbox.yview)
+        self.aisc_scroll.grid(row=0, column=1, sticky='ns')
+        self.aisc_textbox['yscrollcommand'] = self.aisc_scroll.set
         
         self.geometry_input_gui()
         self.loads_base_material_input_gui()
@@ -161,6 +168,20 @@ class Master_window:
         segment_label_key = """i = weld start coord.  j = segment end coord.  A = segment area = segment length\nIxo = x-axis moment of inertia about segment center   Iyo = y-axis moment of inertia about segment center\nCenter = segment center coords.   Cx = x distance to group centroid   Cy = y distance to group centroid\nIx = x-axis moment of inertia about  group center   Iy = y-axis moment of inertia about group center"""
                                    
         tk.Label(self.tab_geometry, text=segment_label_key, font=self.f_type, justify=tk.LEFT).grid(row=5,column=0,columnspan=6, sticky = tk.W, padx=5)
+        
+        self.add_circle_button = tk.Button(self.tab_geometry, text='Add a Circular Weld', command = self.add_circle_function, font=self.f_type_b)
+        self.add_circle_button.grid(row=0,column=5, sticky = tk.W, padx=5)
+        tk.Label(self.tab_geometry, text='center x (in):',font=self.f_type).grid(row=1,column=5, sticky = tk.E, padx=5)
+        tk.Label(self.tab_geometry, text='center y (in):',font=self.f_type).grid(row=2,column=5, sticky = tk.E, padx=5)
+        tk.Label(self.tab_geometry, text='radius (in):',font=self.f_type).grid(row=3,column=5, sticky = tk.E, padx=5)
+        
+        self.add_circle_ins = [tk.StringVar(),tk.StringVar(),tk.StringVar()]
+        
+        i=0
+        for circle_info in self.add_circle_ins:
+            r = 1+i
+            tk.Entry(self.tab_geometry, textvariable=circle_info, width=10).grid(row=r,column=6, sticky = tk.W)
+            i+=1
 
     def loads_base_material_input_gui(self):
         tk.Label(self.tab_loads, text="** All Loads Assumed to Act at the Weld Group Centroid**", font=self.f_type_b_big).grid(row=0,column=0,columnspan=6, sticky = tk.W)
@@ -224,8 +245,8 @@ class Master_window:
         self.fill_segment_list()
     
     def remove_last_segment(self):
-        
         del self.weld_segments[-1]
+        self.build_weld_group()
         self.fill_segment_list()
        
     def remove_all(self):
@@ -309,7 +330,6 @@ class Master_window:
     def aisc_design(self):
         if self.group_built == 1:
             self.force_analysis()
-            del self.design_result_label[:]
             resultant = self.weld_group.resultant
             Fexx = 1000 * float(self.material_in[0].get())
             Fy_base1 = 1000 * float(self.material_in[1].get())
@@ -320,7 +340,30 @@ class Master_window:
             base_thickness2= float(self.material_in[6].get())
             asd = self.design_asd.get()
             self.weld_group.aisc_weld_check(resultant,Fexx, Fy_base1, Fu_base1, base_thickness1, Fy_base2, Fu_base2, base_thickness2, asd)
-            self.design_result_label.append(tk.Label(self.tab_aisc_design, text=self.weld_group.aisclog, font=self.f_type, justify=tk.LEFT).grid(row=0, column=0))
+            self.aisc_textbox.delete(1.0,tk.END)
+            self.aisc_textbox.insert(tk.END, self.weld_group.aisclog)
+
+            
+    def add_circle_function(self):
+        x = float(self.add_circle_ins[0].get())
+        y = float(self.add_circle_ins[1].get())
+        r = float(self.add_circle_ins[2].get())
+        
+        for a in range(0,360):
+            x0 = r*math.sin(math.radians(a))
+            y0 = r*math.cos(math.radians(a))
+            x1 = r*math.sin(math.radians(a+1))
+            y1 = r*math.cos(math.radians(a+1))
+            
+            start = [x0+x,y0+y]
+            end = [x1+x,y1+y]
+            weld = wem.weld_segment(start,end)
+        
+            self.weld_segments.append(weld)
+            
+        self.build_weld_group()
+        
+        self.fill_segment_list()
             
 def main():
     root = tk.Tk()
