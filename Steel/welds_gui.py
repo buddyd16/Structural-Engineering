@@ -367,10 +367,10 @@ class Master_window:
         r = float(self.add_circle_ins[2].get())
         
         for a in range(0,360):
-            x0 = r*math.sin(math.radians(a))
-            y0 = r*math.cos(math.radians(a))
-            x1 = r*math.sin(math.radians(a+1))
-            y1 = r*math.cos(math.radians(a+1))
+            x0 = r*math.cos(math.radians(a))
+            y0 = r*math.sin(math.radians(a))
+            x1 = r*math.cos(math.radians(a+1))
+            y1 = r*math.sin(math.radians(a+1))
             
             start = [x0+x,y0+y]
             end = [x1+x,y1+y]
