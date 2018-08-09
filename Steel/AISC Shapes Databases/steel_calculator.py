@@ -184,6 +184,8 @@ class Master_window:
         self.shear_weak_label.pack()
         
         self.definitions = self.aisc_db.definitions
+        
+        self.shape_change()
                 
 
     def quit_app(self):
