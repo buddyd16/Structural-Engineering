@@ -210,8 +210,9 @@ class Master_window:
         material_labels = ['Fexx,weld (ksi)= ','Fy,base 1 (ksi) = ','Fu,base 1 (ksi)= ','t,base 1 (in) = ','Fy,base 2 (ksi) = ','Fu,base 2 (ksi)= ','t,base 2 (in) = ']
         self.material_in = [tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar()]
         
-        for material in self.material_in:
-            material.set('0.00')
+        default_material = ['70.00','36.00','58.00','0.375','36.00','58.00','0.375']
+        for material, default in zip(self.material_in, default_material):
+            material.set(default)
         
         y=0
         for material_label, material in zip(material_labels,self.material_in):
@@ -274,6 +275,16 @@ class Master_window:
         self.draw_weld()
     
     def draw_weld(self,*event):
+        self.weld_canvas.delete("all")
+        w = self.weld_canvas.winfo_width()
+        h = self.weld_canvas.winfo_height()
+        
+        # x y arrows
+        coord_start = 10
+        self.weld_canvas.create_line(coord_start,h-coord_start,coord_start+50,h-coord_start, fill='green', width=1, arrow=tk.LAST)
+        self.weld_canvas.create_text(coord_start+50,h-(coord_start+8), text='x', fill='green')
+        self.weld_canvas.create_line(coord_start,h-coord_start,coord_start,h-(coord_start+50), fill='green', width=1, arrow=tk.LAST)
+        self.weld_canvas.create_text(coord_start+8,h-(coord_start+50), text='y', fill='green')
         
         if len(self.weld_segments)<1:
             pass
@@ -286,9 +297,6 @@ class Master_window:
            
             initial = 50
            
-            self.weld_canvas.delete("all")
-            w = self.weld_canvas.winfo_width()
-            h = self.weld_canvas.winfo_height()
             
             if max_x == 0:
                 sf_x = (w - (2*initial))
