@@ -39,6 +39,7 @@ class Master_window:
         self.analysis_result_labels = []
         self.design_result_label = []
         self.group_built = 0
+        self.forces_run = 0
         
         self.f_size = 8
         self.f_type = tkFont.Font(family=' Courier New',size=self.f_size)
@@ -122,6 +123,10 @@ class Master_window:
         
         self.load_textbox = tk.Text(self.tab_load_analysis, font=self.f_type)
         self.load_textbox.grid(row=0, column=0, sticky="nsew", padx=4, pady=4)
+        
+        self.load_scroll = tk.Scrollbar(self.tab_load_analysis, command=self.load_textbox.yview)
+        self.load_scroll.grid(row=0, column=1, sticky='ns')
+        self.load_textbox['yscrollcommand'] = self.load_scroll.set
         
         self.tab_aisc_design = ttk.Frame(self.nb_output_data, height=300)
         self.nb_output_data.add(self.tab_aisc_design , text='AISC Design')
@@ -221,8 +226,11 @@ class Master_window:
             tk.Entry(self.tab_loads, textvariable=material, width=15).grid(row=current_material_row_count,column=4, sticky = tk.W)
             y+=1
         
-        self.run_analysis_button = tk.Button(self.tab_loads,text = "Run Analysis", command = self.force_analysis, font=self.f_type_b)
+        self.run_analysis_button = tk.Button(self.tab_loads,text = "Run Analysis (Quadrant)", command = self.force_analysis, font=self.f_type_b)
         self.run_analysis_button.grid(row=current_load_row_count+1, column=0, columnspan=2, pady=10)
+        
+        self.run_analysis_segment_button = tk.Button(self.tab_loads,text = "Run Analysis (Segment)", command = self.force_analysis_segment, font=self.f_type_b)
+        self.run_analysis_segment_button.grid(row=current_load_row_count+2, column=0, columnspan=2, pady=10)
         
         self.design_asd = tk.IntVar()
         tk.Checkbutton(self.tab_loads , text=' : Loads are Nominal (ASD)', variable=self.design_asd, font=self.f_type_b).grid(row=current_material_row_count+1, column=4, sticky = tk.W)
@@ -346,16 +354,31 @@ class Master_window:
             forces.append(float(load.get()))
         if self.group_built == 1:
             self.weld_group.force_analysis(forces[0],forces[1],forces[2],forces[3],forces[4],forces[5])
+            self.forces_run = 1
+            self.resultant = self.weld_group.resultant
             self.load_textbox.delete(1.0,tk.END)
             i=0
             for label, equation, value in zip(self.weld_group.component_forces_key,self.weld_group.component_forces_eqs,self.weld_group.component_forces):
                 self.load_textbox.insert(tk.END,'{0} = {1} = {2:.3f} lbs/in\n'.format(label, equation, value))
                 i+=1
                 
-    def aisc_design(self):
+    def force_analysis_segment(self):
+        forces = []
+        for load in self.loads_in:
+            forces.append(float(load.get()))
         if self.group_built == 1:
-            self.force_analysis()
-            resultant = self.weld_group.resultant
+            self.weld_group.force_analysis_segment(forces[0],forces[1],forces[2],forces[3],forces[4],forces[5])
+            self.forces_run = 1
+            self.resultant = self.weld_group.segment_resultant
+            self.load_textbox.delete(1.0,tk.END)
+            self.load_textbox.insert(tk.END,'Resultant = {0:.3f} \n'.format(self.resultant))
+            
+            for label, result in zip(self.weld_group.gui_forces_segment,self.weld_group.gui_forces_stresses):
+                self.load_textbox.insert(tk.END,'{0} : {1}\n'.format(label, result))
+            
+    def aisc_design(self):
+        if self.group_built == 1 and self.forces_run == 1:
+            resultant = self.resultant
             Fexx = 1000 * float(self.material_in[0].get())
             Fy_base1 = 1000 * float(self.material_in[1].get())
             Fu_base1 = 1000 * float(self.material_in[2].get())
@@ -368,7 +391,6 @@ class Master_window:
             self.aisc_textbox.delete(1.0,tk.END)
             self.aisc_textbox.insert(tk.END, self.weld_group.aisclog)
 
-            
     def add_circle_function(self):
         x = float(self.add_circle_ins[0].get())
         y = float(self.add_circle_ins[1].get())

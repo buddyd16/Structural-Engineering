@@ -102,9 +102,95 @@ class weld_segment:
         self.global_info_text = ' -- Cx = {0:.3f}  Cy = {1:.3f} -- Ix = {2:.3f}  Iy = {3:.3f}'.format(Cx, Cy, self.Ix, self.Iy)
         
         return [self.Ix, self.Iy]
+    
+    def segment_force_analysis(self, Ix, Iy, Ip, group_area, x_center, y_center, Fz, Fx, Fy, Mx, My, Mz):
+        # Direct Stresses
+        fz = Fz/group_area
+        fx = Fx/group_area
+        fy = Fy/group_area
+        
+        # Signed distance from point of interest to the
+        # weld group centroid
+        # i = segment start
+        # j = segment end
+        # ij = segment mid point
+        cxi = x_center - self.start[0]
+        cyi = y_center - self.start[1]
+        cxj = x_center - self.end[0]
+        cyj = y_center - self.end[1]
+        cxij = x_center - self.center[0]
+        cyij = y_center - self.center[1]
+        
+        # First Moment of Area x = I/y
+        # Mx Stresses = Mx /Sx
+        if cyi == 0:
+            sxi = 0
+            mxi = 0
+        else:
+            sxi = Ix / cyi
+            mxi = Mx / sxi
+            
+        if cyj == 0:
+            sxj = 0
+            mxj = 0
+        else:
+            sxj = Ix / cyj
+            mxj = Mx / sxj
+            
+        if cyij == 0:
+            sxij = 0
+            mxij = 0
+        else:
+            sxij = Ix / cyij
+            mxij = Mx / sxij
+
+        # First Moment of Area y = I/x
+        # My Stresses = My / Sy
+        if cxi == 0:
+            syi = 0
+            myi = 0
+        else:
+            syi = Iy / cxi
+            myi = My / syi
+            
+        if cxj == 0:
+            syj = 0
+            myj = 0
+        else:
+            syj = Iy / cxj
+            myj = My / syj
+            
+        if cxij == 0:
+            syij = 0
+            myij = 0
+        else:
+            syij = Iy / cxij
+            myij = My / syij
+        
+        # Mz stresses = Mz * cx,y / Ip
+        mzxi = (Mz*cyi) / Ip
+        mzxj = (Mz*cyj) / Ip
+        mzxij = (Mz*cyij) / Ip
+        
+        mzyi = (Mz*cxi) / Ip
+        mzyj = (Mz*cxj) / Ip
+        mzyij = (Mz*cxij) / Ip
+        
+        # Stress Combination:
+        # Axial = fz + mx + my
+        # Shear X = fx + mzx
+        # Shear Y = fy + mzy
+        # Resultant = sqrt(Axial^2 + Shear X^2 + Shear Y^2)
+        fi = math.sqrt(((fz+mxi+myi)*(fz+mxi+myi))+((fx+mzxi)*(fx+mzxi))+((fy+mzyi)*(fy+mzyi)))
+        fj = math.sqrt(((fz+mxj+myj)*(fz+mxj+myj))+((fx+mzxj)*(fx+mzxj))+((fy+mzyj)*(fy+mzyj)))
+        fij = math.sqrt(((fz+mxij+myij)*(fz+mxij+myij))+((fx+mzxij)*(fx+mzxij))+((fy+mzyij)*(fy+mzyij)))
+        
+        return [fi,fj,fij]
 
 class elastic_weld_group:
     def __init__(self, weld_segments=[weld_segment([0,0],[0,1])]):
+        
+        self.weld_segments = weld_segments
         
         self.log = '--Elastic Weld Group Analysis--\nSegment Areas and Centroids:\n'
         
@@ -207,6 +293,8 @@ class elastic_weld_group:
                   
     
     def force_analysis(self, Fz, Fx, Fy, Mx, My, Mz):
+        # Force Analysis by Quadrants
+        
         self.log = self.log + '\n\n---Elastic Force Analysis of Weld Group---\n**All Loads Assumed to be applied at the weld group centroid.**\n'
         self.log = self.log + 'Fz,Axial = {0:.3f}\nFx,Shear X = {1:.3f}\nFy,Shear Y = {2:.3f}\nMx,Moment about x-axis = {3:.3f}\nMy,Moment about y-axis = {4:.3f}\nMz,Torsion aboiut the z-axis = {5:.3f}\n'.format(Fz, Fx, Fy, Mx, My, Mz)
         #Component Forces
@@ -254,7 +342,31 @@ class elastic_weld_group:
         self.component_forces_eqs.extend(['[(fz+mx,top+my,right)^2 + (fx-mzx,top)^2 + (fy-mzy,right)^2]^1/2','[(fz+mx,top-my,left)^2 + (fx-mzx,top)^2 + (fy+mzy,left)^2]^1/2','[(fz-mx,bottom-my,left)^2 + (fx+mzx,bottom)^2 + (fy+mzy,left)^2]^1/2','[(fz-mx,bottom+my,right)^2 + (fx+mzx,bottom)^2 + (fy-mzy,right)^2]^1/2','max(abs(fi))'])
         
         return self.resultant
-    
+        
+    def force_analysis_segment(self, Fz, Fx, Fy, Mx, My, Mz):
+        # Force Analysis by weld segments
+        stresses = []
+        
+        self.gui_forces_segment = []
+        self.gui_forces_stresses = []
+        
+        x_center = self.group_center[0]
+        y_center = self.group_center[1]
+        
+        i=1
+        for weld in self.weld_segments:
+            segment_stresses = weld.segment_force_analysis(self.Ix, self.Iy, self.Ip, self.Area, x_center, y_center, Fz, Fx, Fy, Mx, My, Mz)
+            
+            stresses.extend(segment_stresses)
+            segment_string = 'Segment {0}'.format(i)
+            segment_stresses_string = 'i: {0:.3f} , j: {1:.3f}, mid-point: {2:.3f}'.format(segment_stresses[0],segment_stresses[1],segment_stresses[2])
+            self.gui_forces_segment.append(segment_string)
+            self.gui_forces_stresses.append(segment_stresses_string)
+            i+=1
+        
+        self.segment_resultant = max(stresses)
+        
+        
     def aisc_weld_check(self, resultant, Fexx, Fy_base1, Fu_base1, base_thickness1, Fy_base2, Fu_base2, base_thickness2, asd=0):
         
         base_thickness = min(base_thickness1,base_thickness2)
@@ -376,28 +488,28 @@ class elastic_weld_group:
 #    
 #    segments.append(weld_segment([x,y],[x1,y1]))
 
-segments = [weld_segment([2,2],[2,8]),weld_segment([4,2],[4,8])]
+# segments = [weld_segment([2,2],[2,8]),weld_segment([4,2],[4,8])]
 
-weld_group = elastic_weld_group(segments)
+# weld_group = elastic_weld_group(segments)
 
-#Loads:
-Fz = 0
-Fx = 5000
-Fy = 5000
-Mx = 50000
-My = 0
-Mz = 0
+# #Loads:
+# Fz = 0
+# Fx = 5000
+# Fy = 5000
+# Mx = 50000
+# My = 0
+# Mz = 0
 
-resultant = weld_group.force_analysis(Fz,Fx,Fy,Mx,My,Mz)
+# resultant = weld_group.force_analysis(Fz,Fx,Fy,Mx,My,Mz)
 
-weld_group.aisc_weld_check(resultant,70000,36000,58000,0.5,36000,58000,0.5,0)
+# weld_group.aisc_weld_check(resultant,70000,36000,58000,0.5,36000,58000,0.5,0)
 
-Ix = weld_group.Ix
-Iy = weld_group.Iy
-Ip = weld_group.Ip
-center = weld_group.group_center
+# Ix = weld_group.Ix
+# Iy = weld_group.Iy
+# Ip = weld_group.Ip
+# center = weld_group.group_center
 
-log = weld_group.log
+# log = weld_group.log
 
 
     
