@@ -216,34 +216,42 @@ class elastic_weld_group:
         self.log = self.log + 'fx = Fx/Area = {0:.3f}\n'.format(fx)
         fy = Fy/self.Area
         self.log = self.log + 'fy = Fy/Area = {0:.3f}\n'.format(fy)
-        mx = max(Mx/self.Sx_top, Mx/self.Sx_bottom)
-        self.log = self.log + 'mx = max[Mx/Sx,top and Mx/Sx,bottom] = {0:.3f}\n'.format(mx)
-        my = max(My/self.Sy_left, My/self.Sy_right)
-        self.log = self.log + 'my = max[My/Sy,left and My/Sy,right] = {0:.3f}\n'.format(my)
-        mzy = max((Mz*self.Cx_left)/self.Ip, (Mz*self.Cx_right)/self.Ip)
-        self.log = self.log + 'mzy = max[Mz*Cx,left/Ip and Mz*Cx,right/Ip] = {0:.3f}\n'.format(mzy)
-        mzx = max((Mz*self.Cy_bottom)/self.Ip,(Mz*self.Cy_top)/self.Ip)
-        self.log = self.log + 'mzx = max[Mz*Cy,top/Ip and Mz*Cy,bottom/Ip] = {0:.3f}\n'.format(mzx)
+        mx_top = Mx/self.Sx_top
+        mx_bottom = Mx/self.Sx_bottom
+        self.log = self.log + 'mx,top = Mx/Sx,top and Mx/Sx,bottom] = {0:.3f}\n'.format(mx_top)
+        self.log = self.log + 'mx,bottom = Mx/Sx,bottom = {0:.3f}\n'.format(mx_bottom)
+        my_left = My/self.Sy_left
+        my_right = My/self.Sy_right
+        self.log = self.log + 'my,left = My/Sy,left = {0:.3f}\n'.format(my_left)
+        self.log = self.log + 'my,right = My/Sy,right = {0:.3f}\n'.format(my_right)
+        mzy_left = (Mz*self.Cx_left)/self.Ip
+        mzy_right = (Mz*self.Cx_right)/self.Ip
+        self.log = self.log + 'mzy,left = Mz*Cx,left/Ip = {0:.3f}\n'.format(mzy_left)
+        self.log = self.log + 'mzy,right = Mz*Cx,right/Ip = {0:.3f}\n'.format(mzy_right)
+        mzx_top = (Mz*self.Cy_top)/self.Ip
+        mzx_bottom = (Mz*self.Cy_bottom)/self.Ip
+        self.log = self.log + 'mzx,top = Mz*Cy,top/Ip = {0:.3f}\n'.format(mzx_top)
+        self.log = self.log + 'mzx,bottom = Mz*Cy,bottom/Ip = {0:.3f}\n'.format(mzx_bottom)
         
-        self.component_forces = [fz,fx,fy,mx,my,mzy,mzx]
-        self.component_forces_key = ['fz', 'fx', 'fy', 'mx', 'my', 'mzy', 'mzx']
-        self.component_forces_eqs = ['Fz/Area','Fx/Area','Fy/Area','max[Mx/Sx,top and Mx/Sx,bottom]','max[My/Sy,left and My/Sy,right]','max[Mz*Cx,left/Ip and Mz*Cx,right/Ip]','max[Mz*Cy,top/Ip and Mz*Cy,bottom/Ip]']
+        self.component_forces = [fz,fx,fy,mx_top,mx_bottom,my_left,my_right,mzy_left,mzy_right,mzx_top,mzx_bottom]
+        self.component_forces_key = ['fz', 'fx', 'fy', 'mx,top','mx,bottom', 'my,left','my,right', 'mzy,left','mzy,right', 'mzx,top','mzx,bottom']
+        self.component_forces_eqs = ['Fz/Area','Fx/Area','Fy/Area','Mx/Sx,top','Mx/Sx,bottom','My/Sy,left', 'My/Sy,right','Mz*Cx,left/Ip','Mz*Cx,right/Ip','Mz*Cy,top/Ip','Mz*Cy,bottom/Ip]']
         
         #Resultant Force
-        self.f1 = math.sqrt(((fz+mx+my)*(fz+mx+my)) + ((fx-mzx)*(fx-mzx)) + ((fy-mzy)*(fy-mzy)))
-        self.log = self.log + '\nf1 = [(fz+mx+my)^2 + (fx-mzx)^2 + (fy-mzy)^2]^1/2= {0:.3f}'.format(self.f1)
-        self.f2 = math.sqrt(((fz+mx-my)*(fz+mx-my)) + ((fx-mzx)*(fx-mzx)) + ((fy+mzy)*(fy+mzy)))
-        self.log = self.log + '\nf2 = [(fz+mx-my)^2 + (fx-mzx)^2 + (fy+mzy)^2]^1/2= {0:.3f}'.format(self.f2)
-        self.f3 = math.sqrt(((fz-mx-my)*(fz-mx-my)) + ((fx+mzx)*(fx+mzx)) + ((fy+mzy)*(fy+mzy)))
-        self.log = self.log + '\nf3 = [(fz-mx-my)^2 + (fx+mzx)^2 + (fy+mzy)^2]^1/2= {0:.3f}'.format(self.f3)
-        self.f4 = math.sqrt(((fz-mx+my)*(fz-mx+my)) + ((fx+mzx)*(fx+mzx)) + ((fy-mzy)*(fy-mzy)))
-        self.log = self.log + '\nf4 = [(fz-mx-my)^2 + (fx+mzx)^2 + (fy-mzy)^2]^1/2= {0:.3f}'.format(self.f4)
+        self.f1 = math.sqrt(((fz-mx_top+my_right)*(fz-mx_top+my_right)) + ((fx+mzx_top)*(fx+mzx_top)) + ((fy-mzy_right)*(fy-mzy_right)))
+        self.log = self.log + '\nf1 = [(fz-mx,top+my,right)^2 + (fx+mzx,top)^2 + (fy-mzy,right)^2]^1/2= {0:.3f}'.format(self.f1)
+        self.f2 = math.sqrt(((fz-mx_top-my_left)*(fz-mx_top-my_left)) + ((fx+mzx_top)*(fx+mzx_top)) + ((fy+mzy_left)*(fy+mzy_left)))
+        self.log = self.log + '\nf2 = [(fz-mx,top-my,left)^2 + (fx+mzx,top)^2 + (fy+mzy,left)^2]^1/2= {0:.3f}'.format(self.f2)
+        self.f3 = math.sqrt(((fz+mx_bottom-my_left)*(fz+mx_bottom-my_left)) + ((fx-mzx_bottom)*(fx-mzx_bottom)) + ((fy+mzy_left)*(fy+mzy_left)))
+        self.log = self.log + '\nf3 = [(fz+mx,bottom-my,left)^2 + (fx-mzx,bottom)^2 + (fy+mzy,left)^2]^1/2= {0:.3f}'.format(self.f3)
+        self.f4 = math.sqrt(((fz+mx_bottom+my_right)*(fz+mx_bottom+my_right)) + ((fx-mzx_bottom)*(fx-mzx_bottom)) + ((fy+mzy_right)*(fy+mzy_right)))
+        self.log = self.log + '\nf4 = [(fz+mx,bottom+my,right)^2 + (fx-mzx,bottom)^2 + (fy+mzy,right)^2]^1/2= {0:.3f}'.format(self.f4)
         self.resultant = max(abs(self.f1),abs(self.f2),abs(self.f3),abs(self.f4))
         self.log = self.log + '\nResulatant force per unit length = max(abs(fi)) = {0:.3f}'.format(self.resultant)
         
         self.component_forces.extend([self.f1, self.f2, self.f3, self.f4, self.resultant])
         self.component_forces_key.extend(['f1','f2','f3','f4','Resultant'])
-        self.component_forces_eqs.extend(['[(fz+mx+my)^2 + (fx-mzx)^2 + (fy-mzy)^2]^1/2','[(fz+mx-my)^2 + (fx-mzx)^2 + (fy+mzy)^2]^1/2','[(fz-mx-my)^2 + (fx+mzx)^2 + (fy+mzy)^2]^1/2','[(fz-mx+my)^2 + (fx+mzx)^2 + (fy-mzy)^2]^1/2','max(abs(fi))'])
+        self.component_forces_eqs.extend(['[(fz+mx,top+my,right)^2 + (fx-mzx,top)^2 + (fy-mzy,right)^2]^1/2','[(fz+mx,top-my,left)^2 + (fx-mzx,top)^2 + (fy+mzy,left)^2]^1/2','[(fz-mx,bottom-my,left)^2 + (fx+mzx,bottom)^2 + (fy+mzy,left)^2]^1/2','[(fz-mx,bottom+my,right)^2 + (fx+mzx,bottom)^2 + (fy-mzy,right)^2]^1/2','max(abs(fi))'])
         
         return self.resultant
     
