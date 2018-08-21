@@ -114,12 +114,12 @@ class weld_segment:
         # i = segment start
         # j = segment end
         # ij = segment mid point
-        cxi = self.start[0] - x_center
-        cyi = y_center - self.start[1]
-        cxj = self.end[0] - x_center
-        cyj = y_center - self.end[1]
+        cxi = x_center - self.start[0]
+        cyi = self.start[1] - y_center
+        cxj = x_center - self.end[0]
+        cyj = self.end[1] - y_center
         cxij = x_center - self.center[0]
-        cyij = y_center - self.center[1]
+        cyij = self.center[1] - y_center
 
         
         # First Moment of Area x = I/y
@@ -327,20 +327,20 @@ class elastic_weld_group:
         self.component_forces_eqs = ['Fz/Area','Fx/Area','Fy/Area','Mx/Sx,top','Mx/Sx,bottom','My/Sy,left', 'My/Sy,right','Mz*Cx,left/Ip','Mz*Cx,right/Ip','Mz*Cy,top/Ip','Mz*Cy,bottom/Ip]']
         
         #Resultant Force
-        self.f1 = math.sqrt(((fz-mx_top+my_right)*(fz-mx_top+my_right)) + ((fx+mzx_top)*(fx+mzx_top)) + ((fy-mzy_right)*(fy-mzy_right)))
-        self.log = self.log + '\nf1 = [(fz-mx,top+my,right)^2 + (fx+mzx,top)^2 + (fy-mzy,right)^2]^1/2= {0:.3f}'.format(self.f1)
-        self.f2 = math.sqrt(((fz-mx_top-my_left)*(fz-mx_top-my_left)) + ((fx+mzx_top)*(fx+mzx_top)) + ((fy+mzy_left)*(fy+mzy_left)))
-        self.log = self.log + '\nf2 = [(fz-mx,top-my,left)^2 + (fx+mzx,top)^2 + (fy+mzy,left)^2]^1/2= {0:.3f}'.format(self.f2)
-        self.f3 = math.sqrt(((fz+mx_bottom-my_left)*(fz+mx_bottom-my_left)) + ((fx-mzx_bottom)*(fx-mzx_bottom)) + ((fy+mzy_left)*(fy+mzy_left)))
-        self.log = self.log + '\nf3 = [(fz+mx,bottom-my,left)^2 + (fx-mzx,bottom)^2 + (fy+mzy,left)^2]^1/2= {0:.3f}'.format(self.f3)
-        self.f4 = math.sqrt(((fz+mx_bottom+my_right)*(fz+mx_bottom+my_right)) + ((fx-mzx_bottom)*(fx-mzx_bottom)) + ((fy-mzy_right)*(fy-mzy_right)))
-        self.log = self.log + '\nf4 = [(fz+mx,bottom+my,right)^2 + (fx-mzx,bottom)^2 + (fy-mzy,right)^2]^1/2= {0:.3f}'.format(self.f4)
+        self.f1 = math.sqrt(((fz+mx_top-my_right)*(fz+mx_top-my_right)) + ((fx+mzx_top)*(fx+mzx_top)) + ((fy-mzy_right)*(fy-mzy_right)))
+        self.log = self.log + '\nf1 = [(fz+mx,top-my,right)^2 + (fx+mzx,top)^2 + (fy-mzy,right)^2]^1/2= {0:.3f}'.format(self.f1)
+        self.f2 = math.sqrt(((fz+mx_top+my_left)*(fz+mx_top+my_left)) + ((fx+mzx_top)*(fx+mzx_top)) + ((fy+mzy_left)*(fy+mzy_left)))
+        self.log = self.log + '\nf2 = [(fz+mx,top+my,left)^2 + (fx+mzx,top)^2 + (fy+mzy,left)^2]^1/2= {0:.3f}'.format(self.f2)
+        self.f3 = math.sqrt(((fz-mx_bottom+my_left)*(fz-mx_bottom+my_left)) + ((fx-mzx_bottom)*(fx-mzx_bottom)) + ((fy+mzy_left)*(fy+mzy_left)))
+        self.log = self.log + '\nf3 = [(fz-mx,bottom+my,left)^2 + (fx-mzx,bottom)^2 + (fy+mzy,left)^2]^1/2= {0:.3f}'.format(self.f3)
+        self.f4 = math.sqrt(((fz-mx_bottom-my_right)*(fz-mx_bottom-my_right)) + ((fx-mzx_bottom)*(fx-mzx_bottom)) + ((fy-mzy_right)*(fy-mzy_right)))
+        self.log = self.log + '\nf4 = [(fz-mx,bottom-my,right)^2 + (fx-mzx,bottom)^2 + (fy-mzy,right)^2]^1/2= {0:.3f}'.format(self.f4)
         self.resultant = max(abs(self.f1),abs(self.f2),abs(self.f3),abs(self.f4))
         self.log = self.log + '\nResulatant force per unit length = max(abs(fi)) = {0:.3f}'.format(self.resultant)
         
         self.component_forces.extend([self.f1, self.f2, self.f3, self.f4, self.resultant])
         self.component_forces_key.extend(['f1','f2','f3','f4','Resultant'])
-        self.component_forces_eqs.extend(['[(fz-mx,top+my,right)^2 + (fx+mzx,top)^2 + (fy-mzy,right)^2]^1/2','[(fz-mx,top-my,left)^2 + (fx+mzx,top)^2 + (fy+mzy,left)^2]^1/2','[(fz+mx,bottom-my,left)^2 + (fx-mzx,bottom)^2 + (fy+mzy,left)^2]^1/2','[(fz+mx,bottom+my,right)^2 + (fx+mzx,bottom)^2 + (fy-mzy,right)^2]^1/2','max(abs(fi))'])
+        self.component_forces_eqs.extend(['[(fz+mx,top-my,right)^2 + (fx+mzx,top)^2 + (fy-mzy,right)^2]^1/2','[(fz+mx,top+my,left)^2 + (fx+mzx,top)^2 + (fy+mzy,left)^2]^1/2','[(fz-mx,bottom+my,left)^2 + (fx-mzx,bottom)^2 + (fy+mzy,left)^2]^1/2','[(fz-mx,bottom-my,right)^2 + (fx-mzx,bottom)^2 + (fy-mzy,right)^2]^1/2','max(abs(fi))'])
         
         return self.resultant
         
