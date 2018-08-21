@@ -114,12 +114,13 @@ class weld_segment:
         # i = segment start
         # j = segment end
         # ij = segment mid point
-        cxi = x_center - self.start[0]
+        cxi = self.start[0] - x_center
         cyi = y_center - self.start[1]
-        cxj = x_center - self.end[0]
+        cxj = self.end[0] - x_center
         cyj = y_center - self.end[1]
         cxij = x_center - self.center[0]
         cyij = y_center - self.center[1]
+
         
         # First Moment of Area x = I/y
         # Mx Stresses = Mx /Sx
