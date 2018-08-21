@@ -236,14 +236,14 @@ class elastic_weld_group:
         self.log = self.log + '\nf2 = [(fz+mx-my)^2 + (fx-mzx)^2 + (fy+mzy)^2]^1/2= {0:.3f}'.format(self.f2)
         self.f3 = math.sqrt(((fz-mx-my)*(fz-mx-my)) + ((fx+mzx)*(fx+mzx)) + ((fy+mzy)*(fy+mzy)))
         self.log = self.log + '\nf3 = [(fz-mx-my)^2 + (fx+mzx)^2 + (fy+mzy)^2]^1/2= {0:.3f}'.format(self.f3)
-        self.f4 = math.sqrt(((fz-mx-my)*(fz-mx-my)) + ((fx+mzx)*(fx+mzx)) + ((fy-mzy)*(fy-mzy)))
+        self.f4 = math.sqrt(((fz-mx+my)*(fz-mx+my)) + ((fx+mzx)*(fx+mzx)) + ((fy-mzy)*(fy-mzy)))
         self.log = self.log + '\nf4 = [(fz-mx-my)^2 + (fx+mzx)^2 + (fy-mzy)^2]^1/2= {0:.3f}'.format(self.f4)
         self.resultant = max(abs(self.f1),abs(self.f2),abs(self.f3),abs(self.f4))
         self.log = self.log + '\nResulatant force per unit length = max(abs(fi)) = {0:.3f}'.format(self.resultant)
         
         self.component_forces.extend([self.f1, self.f2, self.f3, self.f4, self.resultant])
         self.component_forces_key.extend(['f1','f2','f3','f4','Resultant'])
-        self.component_forces_eqs.extend(['[(fz+mx+my)^2 + (fx-mzx)^2 + (fy-mzy)^2]^1/2','[(fz+mx-my)^2 + (fx-mzx)^2 + (fy+mzy)^2]^1/2','[(fz-mx-my)^2 + (fx+mzx)^2 + (fy+mzy)^2]^1/2','[(fz-mx-my)^2 + (fx+mzx)^2 + (fy-mzy)^2]^1/2','max(abs(fi))'])
+        self.component_forces_eqs.extend(['[(fz+mx+my)^2 + (fx-mzx)^2 + (fy-mzy)^2]^1/2','[(fz+mx-my)^2 + (fx-mzx)^2 + (fy+mzy)^2]^1/2','[(fz-mx-my)^2 + (fx+mzx)^2 + (fy+mzy)^2]^1/2','[(fz-mx+my)^2 + (fx+mzx)^2 + (fy-mzy)^2]^1/2','max(abs(fi))'])
         
         return self.resultant
     
