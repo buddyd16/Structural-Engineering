@@ -232,6 +232,9 @@ class Master_window:
         self.run_analysis_segment_button = tk.Button(self.tab_loads,text = "Run Analysis (Segment)", command = self.force_analysis_segment, font=self.f_type_b)
         self.run_analysis_segment_button.grid(row=current_load_row_count+2, column=0, columnspan=2, pady=10)
         
+        self.run_analysis_conservative_button = tk.Button(self.tab_loads,text = "Run Analysis (Conservative)", command = self.force_analysis_conservative, font=self.f_type_b)
+        self.run_analysis_conservative_button.grid(row=current_load_row_count+3, column=0, columnspan=2, pady=10)
+        
         self.design_asd = tk.IntVar()
         tk.Checkbutton(self.tab_loads , text=' : Loads are Nominal (ASD)', variable=self.design_asd, font=self.f_type_b).grid(row=current_material_row_count+1, column=4, sticky = tk.W)
         
@@ -375,6 +378,21 @@ class Master_window:
             
             for label, result in zip(self.weld_group.gui_forces_segment,self.weld_group.gui_forces_stresses):
                 self.load_textbox.insert(tk.END,'{0} : {1}\n'.format(label, result))
+            
+    def force_analysis_conservative(self):
+        del self.analysis_result_labels[:]
+        forces = []
+        for load in self.loads_in:
+            forces.append(float(load.get()))
+        if self.group_built == 1:
+            self.weld_group.force_analysis_conservative(forces[0],forces[1],forces[2],forces[3],forces[4],forces[5])
+            self.forces_run = 1
+            self.resultant = self.weld_group.resultant_conservative
+            self.load_textbox.delete(1.0,tk.END)
+            i=0
+            for label, equation, value in zip(self.weld_group.component_forces_key_conservative,self.weld_group.component_forces_eqs_conservative,self.weld_group.component_forces_conservative):
+                self.load_textbox.insert(tk.END,'{0} = {1} = {2:.3f} lbs/in\n'.format(label, equation, value))
+                i+=1
             
     def aisc_design(self):
         if self.group_built == 1 and self.forces_run == 1:
