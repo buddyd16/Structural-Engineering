@@ -104,6 +104,9 @@ class Master_window:
         tk.Checkbutton(self.graph_b_frame, text=' : Show Reactions', variable=self.show_r, command = self.bm_canvas_draw, font=helv).grid(row=6, column=1, sticky = tk.W)
         self.show_stations = tk.IntVar()
         tk.Checkbutton(self.graph_b_frame, text=' : Show Stations', variable=self.show_stations, command = self.bm_canvas_draw, font=helv).grid(row=7, column=1, sticky = tk.W)
+        self.show_m_tension = tk.IntVar()
+        self.show_m_tension.set(1)
+        tk.Checkbutton(self.graph_b_frame, text=' : Show M on\ntension face', variable=self.show_m_tension, command = self.bm_canvas_draw, font=helv).grid(row=8, column=1, sticky = tk.W)
         
         self.graph_b_frame.pack(side=tk.RIGHT, anchor='e')
         
@@ -496,11 +499,15 @@ class Master_window:
                         self.bm_canvas.create_line((xr[i-1] * sf) + initial, hg - (self.shearr[i-1] * v_sf),(xr[i-1] * sf) + initial,hg,fill="red3", width=1)
             
             if self.show_m.get() == 1:
-                
-                if max(max(max(self.momentc),max(self.momentl),max(self.momentr)), abs(min(min(self.momentc),min(self.momentl),min(self.momentr)))) == 0:
-                    m_sf = (hg - 10)
+                if self.show_m_tension.get() == 1:
+                    m_factor = -1.0
                 else:
-                    m_sf = (hg - 10) / max(max(max(self.momentc),max(self.momentl),max(self.momentr)), abs(min(min(self.momentc),min(self.momentl),min(self.momentr))))
+                    m_factor = 1.0
+                    
+                if max(max(max(self.momentc),max(self.momentl),max(self.momentr)), abs(min(min(self.momentc),min(self.momentl),min(self.momentr)))) == 0:
+                    m_sf = ((hg - 10))*m_factor
+                else:
+                    m_sf = ((hg - 10) / max(max(max(self.momentc),max(self.momentl),max(self.momentr)), abs(min(min(self.momentc),min(self.momentl),min(self.momentr)))))*m_factor
                 
                 for i in range(1,len(self.momentc)):
                     self.bm_canvas.create_line((xl[i-1] * sf) + initial, hg - (self.momentl[i-1] * m_sf),(xl[i] * sf) + initial,hg - (self.momentl[i] * m_sf),fill="green", width=2)
@@ -1637,7 +1644,8 @@ class Master_window:
         #plt.subplots_adjust(left=0.125, bottom=0.1, right=0.9, top=0.9, wspace=0.2, hspace=0.4)
 
         fig.savefig('simple_beam.pdf', dpi=600)
-        plt.close('all')    
+        plt.close('all')
+        self.write_html_results()
 
     def multi_solve(self, *args):
         l_ft = float(self.span_ft.get())
@@ -1908,11 +1916,149 @@ class Master_window:
                 self.val_at_x_text = self.bm_canvas.create_text(w/2.0, (h-26), justify=tk.CENTER, text= '@ Xl = {0:.2f} ft\nV: {1:.2f} kips  M: {2:.2f} ft-kips  S: {3:.5f} rad  D: {4:.4f} in'.format(x_anal,v[0],m[0],s[0]/(E*I),(d[0]/(E*I))*12.0), fill=text_color)
 
         self.val_at_x = self.bm_canvas.create_line(x_screen, 0,x_screen,h,fill="blue", width=1, dash=(6,6))
-
-
-      
+    
+    def write_html_results(self,*args):
         
-            
+        file = open('simple_beam.html','w')
+        file.write('<!doctype html>\n')
+        file.write('<html>\n\n')
+        file.write('<head>\n')
+        file.write('<title>Line Styles</title>\n')
+        file.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>\n')
+        file.write('<style>\n')
+        file.write('canvas{\n')
+        file.write('-moz-user-select: none;\n')
+        file.write('-webkit-user-select: none;\n')
+        file.write('-ms-user-select: none;\n')
+        file.write('}\n')
+        file.write('</style>\n')
+        file.write('</head>\n\n<body>\n')
+        file.write('<div style="width:75%;">\n<canvas id="canvas"></canvas>\n</div>\n')
+        file.write("<script>\nvar scatterData = {\ndatasets: [{\n")
+        file.write("label: 'Shear',\nshowLine: true,\nlineTension: 0,\ndata: [\n")
+        
+        #Shear
+        i=0
+        text = ''
+        for x in self.xsl:
+            text = text+'{x: '
+            text = text+'{0:.3f},\ny: {1:.3f}'.format(x, self.shearl[i])
+            text = text+'},\n'
+            i+=1
+        i=0
+        for x  in self.xsc:
+            text = text+'{x: '
+            text = text+'{0:.3f},\ny: {1:.3f}'.format(x, self.shearc[i])
+            text = text+'},\n'
+            i+=1
+        i=0
+        for x  in self.xsr:
+            text = text+'{x: '
+            text = text+'{0:.3f},\ny: {1:.3f}'.format(x, self.shearr[i])
+            text = text+'},\n'
+            i+=1
+        text = text[:-3]
+        text = text + '}]'
+        
+        file.write(text)
+        file.write('},{')
+        file.write("label: 'Moment',\nshowLine: true,\nlineTension: 0,\ndata: [\n")
+        
+        #moment
+        i=0
+        text = ''
+        for x in self.xsl:
+            text = text+'{x: '
+            text = text+'{0:.3f},\ny: {1:.3f}'.format(x, self.momentl[i])
+            text = text+'},\n'
+            i+=1
+        i=0
+        for x  in self.xsc:
+            text = text+'{x: '
+            text = text+'{0:.3f},\ny: {1:.3f}'.format(x, self.momentc[i])
+            text = text+'},\n'
+            i+=1
+        i=0
+        for x  in self.xsr:
+            text = text+'{x: '
+            text = text+'{0:.3f},\ny: {1:.3f}'.format(x, self.momentr[i])
+            text = text+'},\n'
+            i+=1
+        text = text[:-3]
+        text = text + '}]'
+        
+        file.write(text)
+        file.write('},{')
+        file.write("label: 'Slope',\nshowLine: true,\nlineTension: 0,\ndata: [\n")
+        
+        #slope
+        i=0
+        text = ''
+        for x in self.xsl:
+            text = text+'{x: '
+            text = text+'{0:.5f},\ny: {1:.8f}'.format(x, self.slopel[i])
+            text = text+'},\n'
+            i+=1
+        i=0
+        for x  in self.xsc:
+            text = text+'{x: '
+            text = text+'{0:.5f},\ny: {1:.8f}'.format(x, self.slopec[i])
+            text = text+'},\n'
+            i+=1
+        i=0
+        for x  in self.xsr:
+            text = text+'{x: '
+            text = text+'{0:.5f},\ny: {1:.8f}'.format(x, self.sloper[i])
+            text = text+'},\n'
+            i+=1
+        text = text[:-3]
+        text = text + '}]'
+        
+        file.write(text)
+        file.write('},{')
+        file.write("label: 'Deflection',\nshowLine: true,\nlineTension: 0,\ndata: [\n")
+        
+        #deflection
+        i=0
+        text = ''
+        for x in self.xsl:
+            text = text+'{x: '
+            text = text+'{0:.5f},\ny: {1:.5f}'.format(x, self.deltal[i])
+            text = text+'},\n'
+            i+=1
+        i=0
+        for x  in self.xsc:
+            text = text+'{x: '
+            text = text+'{0:.5f},\ny: {1:.5f}'.format(x, self.deltac[i])
+            text = text+'},\n'
+            i+=1
+        i=0
+        for x  in self.xsr:
+            text = text+'{x: '
+            text = text+'{0:.5f},\ny: {1:.5f}'.format(x, self.deltar[i])
+            text = text+'},\n'
+            i+=1
+        text = text[:-3]
+        text = text + '}]'
+        
+        file.write(text)
+        file.write('}]};\n')
+        
+        file.write("var ctx = document.getElementById('canvas').getContext('2d');\n")
+        file.write('window.myScatter = new Chart(ctx, {\n')
+        file.write("type: 'scatter',\n")
+        file.write('data: scatterData, \n')
+        file.write('options: {\n')
+        file.write('title: {\n')
+        file.write('display: true,\n')
+        file.write("text: 'Chart.js Scatter Chart'\n")
+        file.write('},\n')
+        file.write('}\n')
+        file.write('});\n')
+        file.write('</script>\n')
+        file.write('</body>\n')
+        file.write('</html>\n')
+        file.close()
             
        
 def main():
