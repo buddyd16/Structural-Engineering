@@ -1933,8 +1933,11 @@ class Master_window:
         file.write('}\n')
         file.write('</style>\n')
         file.write('</head>\n\n<body>\n')
-        file.write('<div style="width:75%;">\n<canvas id="canvas"></canvas>\n</div>\n')
-        file.write("<script>\nvar scatterData = {\ndatasets: [{\n")
+        file.write('<div style="width:75%;">\n<canvas id="shear"></canvas>\n</div>\n')
+        file.write('<div style="width:75%;">\n<canvas id="moment"></canvas>\n</div>\n')
+        file.write('<div style="width:75%;">\n<canvas id="slope"></canvas>\n</div>\n')
+        file.write('<div style="width:75%;">\n<canvas id="deflection"></canvas>\n</div>\n')
+        file.write("<script>\nvar scatterShear = {\ndatasets: [{\n")
         file.write("label: 'Shear',\nshowLine: true,\nlineTension: 0,\ndata: [\n")
         
         #Shear
@@ -1961,7 +1964,8 @@ class Master_window:
         text = text + '}]'
         
         file.write(text)
-        file.write('},{')
+        file.write('}]};')
+        file.write("\nvar scatterMoment = {\ndatasets: [{\n")
         file.write("label: 'Moment',\nshowLine: true,\nlineTension: 0,\ndata: [\n")
         
         #moment
@@ -1988,7 +1992,8 @@ class Master_window:
         text = text + '}]'
         
         file.write(text)
-        file.write('},{')
+        file.write('}]};')
+        file.write("\nvar scatterSlope = {\ndatasets: [{\n")
         file.write("label: 'Slope',\nshowLine: true,\nlineTension: 0,\ndata: [\n")
         
         #slope
@@ -2015,7 +2020,8 @@ class Master_window:
         text = text + '}]'
         
         file.write(text)
-        file.write('},{')
+        file.write('}]};')
+        file.write("\nvar scatterDeflection = {\ndatasets: [{\n")
         file.write("label: 'Deflection',\nshowLine: true,\nlineTension: 0,\ndata: [\n")
         
         #deflection
@@ -2044,14 +2050,47 @@ class Master_window:
         file.write(text)
         file.write('}]};\n')
         
-        file.write("var ctx = document.getElementById('canvas').getContext('2d');\n")
+        file.write("var ctx = document.getElementById('shear').getContext('2d');\n")
         file.write('window.myScatter = new Chart(ctx, {\n')
         file.write("type: 'scatter',\n")
-        file.write('data: scatterData, \n')
+        file.write('data: scatterShear, \n')
         file.write('options: {\n')
         file.write('title: {\n')
         file.write('display: true,\n')
-        file.write("text: 'Chart.js Scatter Chart'\n")
+        file.write("text: 'Shear (kips)'\n")
+        file.write('},\n')
+        file.write('}\n')
+        file.write('});\n')
+        file.write("var ctx = document.getElementById('moment').getContext('2d');\n")
+        file.write('window.myScatter = new Chart(ctx, {\n')
+        file.write("type: 'scatter',\n")
+        file.write('data: scatterMoment, \n')
+        file.write('options: {\n')
+        file.write('title: {\n')
+        file.write('display: true,\n')
+        file.write("text: 'Moment (ft-kips)'\n")
+        file.write('},\n')
+        file.write('}\n')
+        file.write('});\n')
+        file.write("var ctx = document.getElementById('slope').getContext('2d');\n")
+        file.write('window.myScatter = new Chart(ctx, {\n')
+        file.write("type: 'scatter',\n")
+        file.write('data: scatterSlope, \n')
+        file.write('options: {\n')
+        file.write('title: {\n')
+        file.write('display: true,\n')
+        file.write("text: 'Slope (rad)'\n")
+        file.write('},\n')
+        file.write('}\n')
+        file.write('});\n')
+        file.write("var ctx = document.getElementById('deflection').getContext('2d');\n")
+        file.write('window.myScatter = new Chart(ctx, {\n')
+        file.write("type: 'scatter',\n")
+        file.write('data: scatterDeflection, \n')
+        file.write('options: {\n')
+        file.write('title: {\n')
+        file.write('display: true,\n')
+        file.write("text: 'Deflection (in)'\n")
         file.write('},\n')
         file.write('}\n')
         file.write('});\n')
