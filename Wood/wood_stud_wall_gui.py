@@ -114,6 +114,10 @@ class Master_window:
         self.num_plates_entry = tk.Entry(self.geo_frame, textvariable=self.num_plates, width=5)
         self.num_plates_entry.grid(row=4,column=5)
         
+        #Consider plate crushing for common capacities
+        self.consider_crushing = tk.IntVar()
+        tk.Checkbutton(self.geo_frame, text=': Consider plate crushing for common capacities (y/n)', variable=self.consider_crushing).grid(row=5, column=4)
+        
         self.geo_frame.pack(fill=tk.X, padx=5, pady=5)
         
         #Reference Stud Design Values - Frame
@@ -780,7 +784,7 @@ class Master_window:
         ##Create Text String and write Axial result to text box        
         axial_string = '\n\n-- Pmax_allow = {0:.2f} lbs ({2:.2f} plf) {1} --'.format(p_lbs,e_string, p_lbs/(self.wall.spacing_in/12.0))
         axial_string = axial_string + '\n-- PL Crushing (Cb): {0:.2f} lbs ({2:.2f} plf) --\n-- PL Crushing (w/o Cb): {1:.2f} lbs ({3:.2f} plf) --'.format(self.wall.crushing_limit_lbs,self.wall.crushing_limit_lbs_no_cb,self.wall.crushing_limit_lbs/(self.wall.spacing_in/12.0),self.wall.crushing_limit_lbs_no_cb/(self.wall.spacing_in/12.0))
-        common_capacities = self.wall.cap_at_common_spacing(cd,pressure_psf,self.e_in)
+        common_capacities = self.wall.cap_at_common_spacing(cd,pressure_psf,self.e_in,self.consider_crushing.get())
         axial_string = axial_string + '\n\n--Common Spacing Capacities--\n' + common_capacities
         self.results_text_box.insert(tk.END, axial_string)
         

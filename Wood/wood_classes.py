@@ -569,7 +569,7 @@ class wood_stud_wall:
         d.append((5 * (w_plf) * (self.height_in/12)**4)/(384*self.E_prime_psi*self.I_in4)*1728)
         return x,y,d
         
-    def cap_at_common_spacing(self, cd,lateral_w_psf, e_in):
+    def cap_at_common_spacing(self, cd,lateral_w_psf, e_in, crush=1):
         spacings = [4,6,8,12,16,24]
         res_string = 'Axial Capacity at 4" - 6" - 8" - 12" - 16" - 24" spacings:\n'
         self.cap_at_common = []
@@ -580,6 +580,11 @@ class wood_stud_wall:
             deflection = (5 * (w_plf) * (self.height_in/12)**4)/(384*self.E_prime_psi*self.I_in4)*1728
             
             p_lbs = self.axial_capacity_w_moment(cd,m_inlbs,e_in)
+            if crush == 1:
+                p_lbs = min(p_lbs,self.crushing_limit_lbs)
+            else:
+                p_lbs = p_lbs
+                
             p_plf = p_lbs / (s/12.0)
             
             if e_in ==0:
