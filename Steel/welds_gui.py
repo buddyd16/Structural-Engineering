@@ -305,6 +305,8 @@ class Master_window:
             
             max_x = max(max([weld.start[0] for weld in self.weld_segments]), max([weld.end[0] for weld in self.weld_segments])) - min_x
             max_y = max(max([weld.start[1] for weld in self.weld_segments]), max([weld.end[1] for weld in self.weld_segments])) - min_y
+            
+            max_dim_for_scale = max(max_x, max_y)
            
             initial = 50
            
@@ -312,12 +314,12 @@ class Master_window:
             if max_x == 0:
                 sf_x = (w - (2*initial))
             else:
-                sf_x = (w - (2*initial)) / max_x
+                sf_x = (w - (2*initial)) / max_dim_for_scale
             
             if max_y == 0:
                 sf_y = (h - (2*initial))
             else:
-                sf_y = (h - (2*initial)) / max_y
+                sf_y = (h - (2*initial)) / max_dim_for_scale
             
             for weld in self.weld_segments:
                 x0 = ((weld.x_coords[0] - min_x) * sf_x) + initial
