@@ -185,13 +185,18 @@ class Master_window:
         tk.Label(self.tab_geometry, text='center x (in):',font=self.f_type).grid(row=1,column=5, sticky = tk.E, padx=5)
         tk.Label(self.tab_geometry, text='center y (in):',font=self.f_type).grid(row=2,column=5, sticky = tk.E, padx=5)
         tk.Label(self.tab_geometry, text='radius (in):',font=self.f_type).grid(row=3,column=5, sticky = tk.E, padx=5)
+        tk.Label(self.tab_geometry, text='start (deg.):',font=self.f_type).grid(row=1,column=7, sticky = tk.E, padx=5)
+        tk.Label(self.tab_geometry, text='end (deg.):',font=self.f_type).grid(row=2,column=7, sticky = tk.E, padx=5)
         
-        self.add_circle_ins = [tk.StringVar(),tk.StringVar(),tk.StringVar()]
+        self.add_circle_ins = [tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar()]
         
         i=0
         for circle_info in self.add_circle_ins:
             r = 1+i
-            tk.Entry(self.tab_geometry, textvariable=circle_info, width=10).grid(row=r,column=6, sticky = tk.W)
+            if r<4:
+                tk.Entry(self.tab_geometry, textvariable=circle_info, width=10).grid(row=r,column=6, sticky = tk.W)
+            else:
+                tk.Entry(self.tab_geometry, textvariable=circle_info, width=10).grid(row=r-3,column=8, sticky = tk.W)
             i+=1
 
     def loads_base_material_input_gui(self):
@@ -415,8 +420,10 @@ class Master_window:
         x = float(self.add_circle_ins[0].get())
         y = float(self.add_circle_ins[1].get())
         r = float(self.add_circle_ins[2].get())
+        start = int(self.add_circle_ins[3].get())
+        end = int(self.add_circle_ins[4].get())
         
-        for a in range(0,360):
+        for a in range(start,end):
             x0 = r*math.cos(math.radians(a))
             y0 = r*math.sin(math.radians(a))
             x1 = r*math.cos(math.radians(a+1))

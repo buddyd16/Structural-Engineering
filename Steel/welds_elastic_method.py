@@ -475,7 +475,7 @@ class elastic_weld_group:
             self.aisclog = self.aisclog + 'Required Fillet > AISC Maximum - **NG**\nIf Possible Increase Overall Weld Group Geometry\n\n'
             
         # Check if Base Material Ok
-        Ag1 = base_thickness
+        Ag1 = base_thickness1
         Anv1 = Ag1
         self.aisclog = self.aisclog + '--Base Material Checks--\nAg1 = Anv1 = t,base1*1.0 = {0:.3f}\n\n'.format(Ag1)
         
