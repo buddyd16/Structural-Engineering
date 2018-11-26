@@ -794,14 +794,17 @@ class Master_window:
         ##Create Text String and write Axial result to text box        
         axial_string = '\n\n-- Pmax_allow = {0:.2f} lbs ({2:.2f} plf) {1} --'.format(p_lbs,e_string, p_lbs/(self.wall.spacing_in/12.0))
         axial_string = axial_string + '\n-- PL Crushing (Cb): {0:.2f} lbs ({2:.2f} plf) --\n-- PL Crushing (w/o Cb): {1:.2f} lbs ({3:.2f} plf) --'.format(self.wall.crushing_limit_lbs,self.wall.crushing_limit_lbs_no_cb,self.wall.crushing_limit_lbs/(self.wall.spacing_in/12.0),self.wall.crushing_limit_lbs_no_cb/(self.wall.spacing_in/12.0))
-        common_capacities = self.wall.cap_at_common_spacing(cd,pressure_psf,self.e_in,self.consider_crushing.get())
-        axial_string = axial_string + '\n\n--Common Spacing Capacities--\n' + common_capacities
         
+        ##Write out any warnings that occured during the wall creation or axial run
         if self.wall.warning == '':
             pass
         else:
             self.results_text_box.insert(tk.END, "*** ERROR/WARNING ***\n")
             self.results_text_box.insert(tk.END, self.wall.warning)
+            
+        common_capacities = self.wall.cap_at_common_spacing(cd,pressure_psf,self.e_in,self.consider_crushing.get())
+        axial_string = axial_string + '\n\n--Common Spacing Capacities--\n' + common_capacities
+        
             
         self.results_text_box.insert(tk.END, axial_string)
         
