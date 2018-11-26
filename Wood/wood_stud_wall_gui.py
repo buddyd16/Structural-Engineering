@@ -799,7 +799,7 @@ class Master_window:
         if self.wall.warning == '':
             pass
         else:
-            self.results_text_box.insert(tk.END, "*** ERROR/WARNING ***\n")
+            self.results_text_box.insert(tk.END, "\n*** ERROR/WARNING ***\n")
             self.results_text_box.insert(tk.END, self.wall.warning)
             
         common_capacities = self.wall.cap_at_common_spacing(cd,pressure_psf,self.e_in,self.consider_crushing.get())
