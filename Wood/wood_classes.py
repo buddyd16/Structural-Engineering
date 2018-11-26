@@ -23,7 +23,7 @@ from __future__ import division
 #import matplotlib.pyplot as plt
 
 class wood_stud_wall:
-    def __init__(self,b_in=1.5,d_in=3.5,height_ft=10, spacing_in=12, grade="No.2", fb_psi=875, fv_psi= 150, fc_psi=1150, E_psi=1400000, Emin_psi=510000, fc_perp_pl_psi=565, moisture_percent = 19, temp = 90, incised = 0,  num_plates = 0, c_frt=[1,1,1,1,1,1], compression_face=1, blocking_ft=0):
+    def __init__(self,b_in=1.5,d_in=3.5,height_ft=10, spacing_in=12, grade="No.2", fb_psi=875, fv_psi= 150, fc_psi=1150, E_psi=1400000, Emin_psi=510000, fc_perp_pl_psi=565, moisture_percent = 19, temp = 90, incised = 0,  num_plates = 0, c_frt=[1,1,1,1,1,1], compression_face=1, blocking_ft=0, no_sheathing=0):
         self.b_in = b_in
         self.d_in = d_in
         
@@ -46,6 +46,7 @@ class wood_stud_wall:
         self.c_frt = c_frt
         self.compression_face = compression_face
         self.blocking_in = 12*blocking_ft
+        self.no_sheathing = no_sheathing
         self.defl_180 = self.height_in/180.0
         self.defl_240 = self.height_in/240.0
         self.defl_360 = self.height_in/360.0
@@ -303,8 +304,15 @@ class wood_stud_wall:
         kb = 1.0
         kd = 1.0
         self.assumptions_ke = '\nKe = 1.0 for both depth and breadth of studs - Ref NDS 2005 appendix G pin top and bottom\n'
-        leb = 12 * kb
-        self.assumptions_leb = 'Le_b = 12.0 in. - continuously braced by sheathing 12" field nailing assumed\n'
+        if self.no_sheathing == 1 and self.blocking_in > 0:
+            leb = self.blocking_in
+            self.assumptions_leb = 'Le_b = {0:.2f} in. - no sheathing weak axis only braced by blocking\n Confirm load path exists for bracing force.\n'.format(leb)
+        elif self.no_sheathing == 1 and self.blocking_in <= 0:
+            leb = self.height_in
+            self.assumptions_leb = 'Le_b = {0:.2f} in. - no sheathing and no blocking - weak axis unbraced.\n'.format(leb)
+        else:
+            leb = 12 * kb
+            self.assumptions_leb = 'Le_b = 12.0 in. - continuously braced by sheathing 12" field nailing assumed\n'
         led = self.height_in * kd
         
         #Check Le/d,b ratios less than 50 - NDS 2005 Section 3.7.1.4
@@ -323,8 +331,11 @@ class wood_stud_wall:
             self.fc_prime_psi = self.fc_star_psi * self.cp
             self.assumptions_cp = 'Wall studs are not tapered and not subject to NDS 2005 - 3.7.2\n'
         else:
-            self.fc_prime_psi = 0
+            self.fc_prime_psi = 1
+            self.fcE_psi = 1
+            self.cp = 0.001
             self.warning=self.warning + 'Slenderness ratio greater than 50, suggest increase stud size or reducing wall height'
+            self.assumptions_cp = ''
     
         return self.fc_prime_psi
     
@@ -384,29 +395,33 @@ class wood_stud_wall:
             fc_prime = self.fc_prime_calc(cd)       
             fb_prime = self.fb_prime_calc(cd)
             
-            #Check that fc is less than FcE per NDS 2005 - Section 3.9.2
-            if fc_psi < self.fcE_psi:
-                if e_in ==0:
-                    #Combine ration per NDS 2005 equation (3.9-3)
-                    #[fc/Fc]'^2 + fb / Fb' [ 1- (fc / FcE)] <= 1.0
-                    ratio = (fc_psi/fc_prime)**2 + (fb_psi / (fb_prime*(1-(fc_psi/self.fcE_psi))))
-                else:
-                    #Combined Ratio per NDS 2005 equation 15.4-1
-                    #[fc/Fc]'^2 + (fb + fc(6e/d)[1 + 0.234 (fc / FcE)])/ Fb' [ 1- (fc / FcE)] <= 1.0
-                    ratio = (fc_psi/fc_prime)**2 + ((fb_psi+(fc_psi*(6*e_in/self.d_in)*(1+(0.234*(fc_psi/self.fcE_psi)))))/ (fb_prime*(1-(fc_psi/self.fcE_psi))))
-            else:
-                ratio = 2.0
-            
-            if ratio > 1.0:
-                b = c
-            else:
-                a = c
-            
-            if (b-a)/2.0 <= tol:
+            if self.fc_prime_psi == 1 and self.fcE_psi == 1:
+                p_lbs = 1
                 loop = loop_max
-                p_lbs = c
-            else:
-                loop+=1
+            else:            
+                #Check that fc is less than FcE per NDS 2005 - Section 3.9.2
+                if fc_psi < self.fcE_psi:
+                    if e_in ==0:
+                        #Combine ration per NDS 2005 equation (3.9-3)
+                        #[fc/Fc]'^2 + fb / Fb' [ 1- (fc / FcE)] <= 1.0
+                        ratio = (fc_psi/fc_prime)**2 + (fb_psi / (fb_prime*(1-(fc_psi/self.fcE_psi))))
+                    else:
+                        #Combined Ratio per NDS 2005 equation 15.4-1
+                        #[fc/Fc]'^2 + (fb + fc(6e/d)[1 + 0.234 (fc / FcE)])/ Fb' [ 1- (fc / FcE)] <= 1.0
+                        ratio = (fc_psi/fc_prime)**2 + ((fb_psi+(fc_psi*(6*e_in/self.d_in)*(1+(0.234*(fc_psi/self.fcE_psi)))))/ (fb_prime*(1-(fc_psi/self.fcE_psi))))
+                else:
+                    ratio = 2.0
+                
+                if ratio > 1.0:
+                    b = c
+                else:
+                    a = c
+                
+                if (b-a)/2.0 <= tol:
+                    loop = loop_max
+                    p_lbs = c
+                else:
+                    loop+=1
         
         return p_lbs
     

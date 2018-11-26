@@ -285,11 +285,14 @@ class Master_window:
         self.com_lat_brace_yn = tk.IntVar()
         self.com_lat_brace_yn.set(1)
         tk.Checkbutton(self.lateral_frame, text=': Stud laterally braced on compression face (y/n)', variable=self.com_lat_brace_yn).grid(row=4, column=1)
-        self.blocking_label = tk.Label(self.lateral_frame, text = 'Blocking (ft):').grid(row=5, column=1)
+        self.no_sheathing_yn = tk.IntVar()
+        self.no_sheathing_yn.set(0)
+        tk.Checkbutton(self.lateral_frame, text=': No Sheathing (y/n)', variable=self.no_sheathing_yn, command=self.no_sheating_func).grid(row=5, column=1)
+        self.blocking_label = tk.Label(self.lateral_frame, text = 'Blocking (ft):').grid(row=6, column=1)
         self.blocking_ft = tk.StringVar()
         self.blocking_ft.set(0.0)
         self.blocking_entry = tk.Entry(self.lateral_frame, textvariable = self.blocking_ft, width=10)
-        self.blocking_entry.grid(row=5, column=2)
+        self.blocking_entry.grid(row=6, column=2)
         self.lateral_frame.pack(fill=tk.X, padx=5, pady=5)
         
         self.b_run = tk.Button(self.input_frame,text="Calc", command=self.run, font=helv)
@@ -705,6 +708,12 @@ class Master_window:
         self.nb.tab(3,state=tk.NORMAL)
         self.nb.tab(4,state=tk.NORMAL)
     
+    def no_sheating_func(self, *event):
+        if self.no_sheathing_yn.get() == 1:
+            self.com_lat_brace_yn.set(0)
+        else:
+            pass
+    
     def actual_stud_size(self, *event):
         w = self.b_nom.get()
         
@@ -770,8 +779,9 @@ class Master_window:
             self.e_in = 0
             e_string =''
         
-        self.wall = wood.wood_stud_wall(b,d,height,spacing,grade,fb,fv,fc,E,Emin,fc_perp,moisture,temp,incise,num_pl, cfrt, self.com_lat_brace_yn.get(), float(self.blocking_ft.get()))
+        self.wall = wood.wood_stud_wall(b,d,height,spacing,grade,fb,fv,fc,E,Emin,fc_perp,moisture,temp,incise,num_pl, cfrt, self.com_lat_brace_yn.get(), float(self.blocking_ft.get()), self.no_sheathing_yn.get())
         
+            
         pressure_psf = float(self.pressure.get())
         
         self.pressure_moment_inlbs = (((pressure_psf*(self.wall.spacing_in/12.0))*(self.wall.height_in/12.0)**2)/8.0) * 12.0
@@ -786,6 +796,13 @@ class Master_window:
         axial_string = axial_string + '\n-- PL Crushing (Cb): {0:.2f} lbs ({2:.2f} plf) --\n-- PL Crushing (w/o Cb): {1:.2f} lbs ({3:.2f} plf) --'.format(self.wall.crushing_limit_lbs,self.wall.crushing_limit_lbs_no_cb,self.wall.crushing_limit_lbs/(self.wall.spacing_in/12.0),self.wall.crushing_limit_lbs_no_cb/(self.wall.spacing_in/12.0))
         common_capacities = self.wall.cap_at_common_spacing(cd,pressure_psf,self.e_in,self.consider_crushing.get())
         axial_string = axial_string + '\n\n--Common Spacing Capacities--\n' + common_capacities
+        
+        if self.wall.warning == '':
+            pass
+        else:
+            self.results_text_box.insert(tk.END, "*** ERROR/WARNING ***\n")
+            self.results_text_box.insert(tk.END, self.wall.warning)
+            
         self.results_text_box.insert(tk.END, axial_string)
         
         ##Pull Section properties from wall class and write out to results text box
