@@ -334,7 +334,7 @@ class wood_stud_wall:
             self.fc_prime_psi = 1
             self.fcE_psi = 1
             self.cp = 0.001
-            self.warning=self.warning + 'Slenderness ratio greater than 50, suggest increase stud size or reducing wall height'
+            self.warning=self.warning + 'Slenderness ratio greater than 50, suggest increase stud size or reducing wall height\n'
             self.assumptions_cp = ''
     
         return self.fc_prime_psi
@@ -368,12 +368,12 @@ class wood_stud_wall:
             #[fc/Fc]'^2 + fb / Fb' [ 1- (fc / FcE)] <= 1.0
             ratio = (fc_psi/fc_prime)**2 + (fb_psi / (fb_prime*(1-(fc_psi/self.fcE_psi))))
             if ratio > 1.0:
-                self.warning=self.warning + 'Combined Axial and Bending ratio > 1.0'
+                self.warning=self.warning + 'Combined Axial and Bending ratio > 1.0\n'
                 return 'NG'
             else:
                 return 'OK'
         else:
-            self.warning=self.warning + 'fc is greater than FcE'
+            self.warning=self.warning + 'fc is greater than FcE\n'
             return 'NG'
         
     def axial_capacity_w_moment(self,cd,m_inlbs,e_in):
