@@ -90,33 +90,33 @@ class Master_window:
         
         #stud Spacing
         self.spacing_label = tk.Label(self.geo_frame, text='Stud Spacing: ')
-        self.spacing_label.grid(row=3,column=1)
+        self.spacing_label.grid(row=3,column=1, sticky=tk.E)
         self.stud_spacing = tk.StringVar()
         self.spacing_entry = tk.Entry(self.geo_frame, textvariable=self.stud_spacing, width=10)
-        self.spacing_entry.grid(row=3,column=2)
+        self.spacing_entry.grid(row=3,column=2, sticky=tk.W)
         tk.Label(self.geo_frame, text='in').grid(row=3,column=3)
         
         #Wall Height
         self.height_label = tk.Label(self.geo_frame, text='Wall Height: ')
-        self.height_label.grid(row=4,column=1)
+        self.height_label.grid(row=4,column=1, sticky=tk.E)
         self.wall_height = tk.StringVar()
         self.height_entry = tk.Entry(self.geo_frame, textvariable=self.wall_height, width=10)
-        self.height_entry.grid(row=4,column=2)
+        self.height_entry.grid(row=4,column=2, sticky=tk.W)
         tk.Label(self.geo_frame, text='ft').grid(row=4,column=3)
         
         #subtract wall plates from height
         self.sub_plates = tk.IntVar()
-        tk.Checkbutton(self.geo_frame, text=': Subtract Wall Plates from Height (y/n)', variable=self.sub_plates).grid(row=3, column=4)
+        tk.Checkbutton(self.geo_frame, text=': Subtract Wall Plates from Height (y/n)', variable=self.sub_plates).grid(row=3, column=4, sticky=tk.W)
         self.plates_label = tk.Label(self.geo_frame, text='# of 1.5" Plates to subtract: ')
-        self.plates_label.grid(row=4,column=4)        
+        self.plates_label.grid(row=4,column=4, sticky=tk.E)        
         self.num_plates = tk.StringVar()
         self.num_plates.set(0)
         self.num_plates_entry = tk.Entry(self.geo_frame, textvariable=self.num_plates, width=5)
-        self.num_plates_entry.grid(row=4,column=5)
+        self.num_plates_entry.grid(row=4,column=5, sticky=tk.W)
         
         #Consider plate crushing for common capacities
         self.consider_crushing = tk.IntVar()
-        tk.Checkbutton(self.geo_frame, text=': Consider plate crushing for common capacities (y/n)', variable=self.consider_crushing).grid(row=5, column=4)
+        tk.Checkbutton(self.geo_frame, text=': Consider plate crushing for common capacities (y/n)', variable=self.consider_crushing).grid(row=5, column=4, sticky=tk.W)
         
         self.geo_frame.pack(fill=tk.X, padx=5, pady=5)
         
@@ -125,7 +125,7 @@ class Master_window:
         
         #Wall Stud Grade
         self.grade_label = tk.Label(self.ref_stud_properties_frame,text = 'Grade :')
-        self.grade_label.grid(row=1, column=1)
+        self.grade_label.grid(row=1, column=1, sticky=tk.E)
         self.grade = tk.StringVar()
         self.grade.set('No.1/No.2')
         grades = ['Select Structural','No.1 & Better','No.1/No.2','No.1','No.2','No.3','Stud','Construction','Utility']
@@ -134,100 +134,100 @@ class Master_window:
         
         #Fb
         self.fb_label = tk.Label(self.ref_stud_properties_frame,text = 'Fb :')
-        self.fb_label.grid(row=2, column=1)
+        self.fb_label.grid(row=2, column=1, sticky=tk.E)
         self.fb_psi = tk.StringVar()
         self.fb_psi.set(875)
         self.fb_entry = tk.Entry(self.ref_stud_properties_frame, textvariable=self.fb_psi, width=10)
-        self.fb_entry.grid(row=2, column=2)
-        tk.Label(self.ref_stud_properties_frame, text='psi').grid(row=2,column=3)
+        self.fb_entry.grid(row=2, column=2, sticky=tk.W)
+        tk.Label(self.ref_stud_properties_frame, text='psi').grid(row=2,column=3, sticky=tk.W)
         
         #Fv
         self.fv_label = tk.Label(self.ref_stud_properties_frame,text = 'Fv :')
-        self.fv_label.grid(row=3, column=1)
+        self.fv_label.grid(row=3, column=1, sticky=tk.E)
         self.fv_psi = tk.StringVar()
         self.fv_psi.set(135)
         self.fv_entry = tk.Entry(self.ref_stud_properties_frame, textvariable=self.fv_psi, width=10)
-        self.fv_entry.grid(row=3, column=2)
-        tk.Label(self.ref_stud_properties_frame, text='psi').grid(row=3,column=3)
+        self.fv_entry.grid(row=3, column=2, sticky=tk.W)
+        tk.Label(self.ref_stud_properties_frame, text='psi').grid(row=3,column=3, sticky=tk.W)
 
         #Fc
         self.fc_label = tk.Label(self.ref_stud_properties_frame,text = 'Fc :')
-        self.fc_label.grid(row=4, column=1)
+        self.fc_label.grid(row=4, column=1, sticky=tk.E)
         self.fc_psi = tk.StringVar()
         self.fc_psi.set(1150)
         self.fc_entry = tk.Entry(self.ref_stud_properties_frame, textvariable=self.fc_psi, width=10)
-        self.fc_entry.grid(row=4, column=2)
-        tk.Label(self.ref_stud_properties_frame, text='psi').grid(row=4,column=3) 
+        self.fc_entry.grid(row=4, column=2, sticky=tk.W)
+        tk.Label(self.ref_stud_properties_frame, text='psi').grid(row=4,column=3, sticky=tk.W) 
 
         #E
         self.E_label = tk.Label(self.ref_stud_properties_frame,text = 'E :')
-        self.E_label.grid(row=5, column=1)
+        self.E_label.grid(row=5, column=1, sticky=tk.E)
         self.E_psi = tk.StringVar()
         self.E_psi.set(1400000)
         self.E_entry = tk.Entry(self.ref_stud_properties_frame, textvariable=self.E_psi, width=15)
-        self.E_entry.grid(row=5, column=2)
-        tk.Label(self.ref_stud_properties_frame, text='psi').grid(row=5,column=3)
+        self.E_entry.grid(row=5, column=2, sticky=tk.W)
+        tk.Label(self.ref_stud_properties_frame, text='psi').grid(row=5,column=3, sticky=tk.W)
 
         #Emin
         self.Emin_label = tk.Label(self.ref_stud_properties_frame,text = 'Emin :')
-        self.Emin_label.grid(row=6, column=1)
+        self.Emin_label.grid(row=6, column=1, sticky=tk.E)
         self.Emin_psi = tk.StringVar()
         self.Emin_psi.set(510000)
         self.Emin_entry = tk.Entry(self.ref_stud_properties_frame, textvariable=self.Emin_psi, width=15)
-        self.Emin_entry.grid(row=6, column=2)
-        tk.Label(self.ref_stud_properties_frame, text='psi').grid(row=6,column=3)
+        self.Emin_entry.grid(row=6, column=2, sticky=tk.W)
+        tk.Label(self.ref_stud_properties_frame, text='psi').grid(row=6,column=3, sticky=tk.W)
         
         #Fc_perp_pl
         self.fc_perp_label = tk.Label(self.ref_stud_properties_frame,text = 'Fc_perp,bottom pl :')
-        self.fc_perp_label.grid(row=7, column=1)
+        self.fc_perp_label.grid(row=7, column=1, sticky=tk.E)
         self.fc_perp_psi = tk.StringVar()
         self.fc_perp_psi.set(425)
         self.fc_perp_entry = tk.Entry(self.ref_stud_properties_frame, textvariable=self.fc_perp_psi, width=10)
-        self.fc_perp_entry.grid(row=7, column=2)
-        tk.Label(self.ref_stud_properties_frame, text='psi').grid(row=7,column=3)
+        self.fc_perp_entry.grid(row=7, column=2, sticky=tk.W)
+        tk.Label(self.ref_stud_properties_frame, text='psi').grid(row=7,column=3, sticky=tk.W)
         
         #FRT?
         self.frt_yn = tk.IntVar()
         tk.Checkbutton(self.ref_stud_properties_frame, text=': FRT (y/n)', variable=self.frt_yn).grid(row=1, column=4)
         self.frt_fb_label = tk.Label(self.ref_stud_properties_frame,text = 'Cfrt,fb :')
-        self.frt_fb_label.grid(row=2,column=4)
+        self.frt_fb_label.grid(row=2,column=4, sticky=tk.E)
         self.frt_fb = tk.StringVar()
         self.frt_fb.set(0.88)
         self.frt_fb_entry = tk.Entry(self.ref_stud_properties_frame, textvariable=self.frt_fb, width=10)
-        self.frt_fb_entry.grid(row=2,column=5)
+        self.frt_fb_entry.grid(row=2,column=5, sticky=tk.W)
         self.frt_fv_label = tk.Label(self.ref_stud_properties_frame,text = 'Cfrt,fv :')
-        self.frt_fv_label.grid(row=3,column=4)
+        self.frt_fv_label.grid(row=3,column=4, sticky=tk.E)
         self.frt_fv = tk.StringVar()
         self.frt_fv.set(0.93)
         self.frt_fv_entry = tk.Entry(self.ref_stud_properties_frame, textvariable=self.frt_fv, width=10)
-        self.frt_fv_entry.grid(row=3,column=5)
+        self.frt_fv_entry.grid(row=3,column=5, sticky=tk.W)
         self.frt_fc_label = tk.Label(self.ref_stud_properties_frame,text = 'Cfrt,fc :')
-        self.frt_fc_label.grid(row=4,column=4)
+        self.frt_fc_label.grid(row=4,column=4, sticky=tk.E)
         self.frt_fc = tk.StringVar()
         self.frt_fc.set(0.94)
         self.frt_fc_entry = tk.Entry(self.ref_stud_properties_frame, textvariable=self.frt_fc, width=10)
-        self.frt_fc_entry.grid(row=4,column=5)
+        self.frt_fc_entry.grid(row=4,column=5, sticky=tk.W)
         self.frt_fc_perp_label = tk.Label(self.ref_stud_properties_frame,text = 'Cfrt,fc_perp :')
-        self.frt_fc_perp_label.grid(row=5,column=4)
+        self.frt_fc_perp_label.grid(row=5,column=4, sticky=tk.E)
         self.frt_fc_perp = tk.StringVar()
         self.frt_fc_perp.set(0.95)
         self.frt_fc_perp_entry = tk.Entry(self.ref_stud_properties_frame, textvariable=self.frt_fc_perp, width=10)
-        self.frt_fc_perp_entry.grid(row=5,column=5)
+        self.frt_fc_perp_entry.grid(row=5,column=5, sticky=tk.W)
         self.frt_E_label = tk.Label(self.ref_stud_properties_frame,text = 'Cfrt,E :')
-        self.frt_E_label.grid(row=6,column=4)
+        self.frt_E_label.grid(row=6,column=4, sticky=tk.E)
         self.frt_E = tk.StringVar()
         self.frt_E.set(0.94)
         self.frt_E_entry = tk.Entry(self.ref_stud_properties_frame, textvariable=self.frt_E, width=10)
-        self.frt_E_entry.grid(row=6,column=5)
+        self.frt_E_entry.grid(row=6,column=5, sticky=tk.W)
         self.frt_Emin_label = tk.Label(self.ref_stud_properties_frame,text = 'Cfrt,Emin :')
-        self.frt_Emin_label.grid(row=7,column=4)
+        self.frt_Emin_label.grid(row=7,column=4, sticky=tk.E)
         self.frt_Emin = tk.StringVar()
         self.frt_Emin.set(0.94)
         self.frt_Emin_entry = tk.Entry(self.ref_stud_properties_frame, textvariable=self.frt_Emin, width=10)
-        self.frt_Emin_entry.grid(row=7,column=5)         
+        self.frt_Emin_entry.grid(row=7,column=5, sticky=tk.W)         
         
         self.species_label = tk.Label(self.ref_stud_properties_frame,text = 'Species :')
-        self.species_label.grid(row=8,column=1)
+        self.species_label.grid(row=8,column=1, sticky=tk.E)
         self.species = tk.StringVar()
         self.species.set('Spruce-Pine-Fur')
         self.species_entry = tk.Entry(self.ref_stud_properties_frame, textvariable=self.species, width=50)
@@ -239,23 +239,23 @@ class Master_window:
         
         #Moisture %
         self.moisture_label = tk.Label(self.enviro_treatment_frame,text = 'Moisture % :')
-        self.moisture_label.grid(row=1,column=1)
+        self.moisture_label.grid(row=1,column=1, sticky=tk.E)
         self.moisture = tk.StringVar()
         self.moisture.set(19.0)
         self.moisture_entry = tk.Entry(self.enviro_treatment_frame, textvariable=self.moisture, width=10)
-        self.moisture_entry.grid(row=1,column=2)   
+        self.moisture_entry.grid(row=1,column=2, sticky=tk.W)   
         
         #Temp F
         self.temp_label = tk.Label(self.enviro_treatment_frame,text = 'Temperature (F) - <= 150 :')
-        self.temp_label.grid(row=2,column=1)
+        self.temp_label.grid(row=2,column=1, sticky=tk.E)
         self.temp = tk.StringVar()
         self.temp.set(90.0)
         self.temp_entry = tk.Entry(self.enviro_treatment_frame, textvariable=self.temp, width=10)
-        self.temp_entry.grid(row=2,column=2)
+        self.temp_entry.grid(row=2,column=2, sticky=tk.W)
         
         #Incised?
         self.incised_yn = tk.IntVar()
-        tk.Checkbutton(self.enviro_treatment_frame, text=': Incised (y/n)', variable=self.incised_yn).grid(row=3, column=1)       
+        tk.Checkbutton(self.enviro_treatment_frame, text=': Incised (y/n)', variable=self.incised_yn).grid(row=3, column=1, sticky=tk.W)       
         
         self.enviro_treatment_frame.pack(fill=tk.X, padx=5, pady=5)
 
@@ -263,14 +263,15 @@ class Master_window:
         
         #Pressure
         self.pressure_label = tk.Label(self.lateral_frame,text = 'Pressure (psf) :')
-        self.pressure_label.grid(row=1,column=1)
+        self.pressure_label.grid(row=1,column=1, sticky=tk.E)
         self.pressure = tk.StringVar()
+        self.pressure.set("5.0")
         self.pressure_entry = tk.Entry(self.lateral_frame, textvariable=self.pressure, width=10)
-        self.pressure_entry.grid(row=1,column=2)
+        self.pressure_entry.grid(row=1,column=2, sticky=tk.W)
         
         #Cd
         self.cd_label = tk.Label(self.lateral_frame,text = 'Cd :')
-        self.cd_label.grid(row=2,column=1)
+        self.cd_label.grid(row=2,column=1, sticky=tk.E)
         self.cd = tk.StringVar()
         self.cd.set('0.9')
         cds = ['0.9','1.0','1.15','1.25','1.6','2.0']
@@ -279,18 +280,18 @@ class Master_window:
         
         #Min Eccentricity?
         self.min_ecc_yn = tk.IntVar()
-        tk.Checkbutton(self.lateral_frame, text=': Min. Eccentricty of d/6 (y/n)', variable=self.min_ecc_yn).grid(row=3, column=1) 
+        tk.Checkbutton(self.lateral_frame, text=': Min. Eccentricty of d/6 (y/n)', variable=self.min_ecc_yn).grid(row=3, column=1, sticky=tk.W) 
         
         #Stud Lateral Braced on Compression Face
         self.com_lat_brace_yn = tk.IntVar()
         self.com_lat_brace_yn.set(1)
-        tk.Checkbutton(self.lateral_frame, text=': Stud laterally braced on compression face (y/n)', variable=self.com_lat_brace_yn).grid(row=4, column=1)
+        tk.Checkbutton(self.lateral_frame, text=': Stud laterally braced on compression face (y/n)', variable=self.com_lat_brace_yn, command=self.com_lat_brace_func).grid(row=4, column=1, sticky=tk.W)
         self.no_sheathing_yn = tk.IntVar()
         self.no_sheathing_yn.set(0)
-        tk.Checkbutton(self.lateral_frame, text=': No Sheathing (y/n)', variable=self.no_sheathing_yn, command=self.no_sheating_func).grid(row=5, column=1)
-        self.blocking_label = tk.Label(self.lateral_frame, text = 'Blocking (ft):').grid(row=6, column=1)
+        tk.Checkbutton(self.lateral_frame, text=': No Sheathing (y/n)', variable=self.no_sheathing_yn, command=self.no_sheating_func).grid(row=5, column=1, sticky=tk.W)
+        self.blocking_label = tk.Label(self.lateral_frame, text = 'Blocking (ft):').grid(row=6, column=1, sticky=tk.E)
         self.blocking_ft = tk.StringVar()
-        self.blocking_ft.set(0.0)
+        self.blocking_ft.set("4.0")
         self.blocking_entry = tk.Entry(self.lateral_frame, textvariable = self.blocking_ft, width=10)
         self.blocking_entry.grid(row=6, column=2)
         self.lateral_frame.pack(fill=tk.X, padx=5, pady=5)
@@ -708,6 +709,12 @@ class Master_window:
         self.nb.tab(3,state=tk.NORMAL)
         self.nb.tab(4,state=tk.NORMAL)
     
+    def com_lat_brace_func(self, *event):
+        if self.com_lat_brace_yn.get() == 1:
+            self.no_sheathing_yn.set(0)
+        else:
+            pass
+            
     def no_sheating_func(self, *event):
         if self.no_sheathing_yn.get() == 1:
             self.com_lat_brace_yn.set(0)
