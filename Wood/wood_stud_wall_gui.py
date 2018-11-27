@@ -871,7 +871,7 @@ class Master_window:
         
         ##Calculation of Cp
         self.cp_string = '\n\n--Calculation of Cp--'
-        self.cp_string=self.cp_string + '\nFc* = reference compression design value parallel to grain multiplied by all applicable adjusment factors except Cp\nFc* = {0:.2f} psi\nc = 0.8 - NDS 2005 3.7.1'.format(self.wall.fc_star_psi)
+        self.cp_string=self.cp_string + '\nFc* = reference compression design value parallel to grain multiplied by all applicable adjusment factors except Cp\nFc* = Fc*Cd*Cm*Ct*Cf*Ci = {1:.2f}*{2:.2f}*{3:.2f}*{4:.2f}*{5:.2f}*{6:.2f} = {0:.2f} psi\nc = 0.8 - NDS 2005 3.7.1'.format(self.wall.fc_star_psi,self.wall.fc_psi,cd,self.wall.cm_fc,self.wall.ct_fc,self.wall.cf_fc,self.wall.ci_fc)
         self.cp_string=self.cp_string + self.wall.assumptions_ke + self.wall.assumptions_leb
         self.cp_string = self.cp_string + 'Ke * Le_d / d = {0:.3f} in < 50'.format(self.wall.height_in/d)
         self.cp_string = self.cp_string + "\nFcE = 0.822 * Emin' / (Le_d/d)^2 - NDS 2005 Section 3.7.1\nFcE = {0:.3f} psi".format(self.wall.fcE_psi)
