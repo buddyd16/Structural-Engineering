@@ -273,7 +273,7 @@ class Master_window:
         self.cd_label = tk.Label(self.lateral_frame,text = 'Cd :')
         self.cd_label.grid(row=2,column=1, sticky=tk.E)
         self.cd = tk.StringVar()
-        self.cd.set('0.9')
+        self.cd.set('1.0')
         cds = ['0.9','1.0','1.15','1.25','1.6','2.0']
         self.cd_selection = tk.OptionMenu(self.lateral_frame, self.cd, *cds)
         self.cd_selection.grid(row=2, column=2)
@@ -874,7 +874,8 @@ class Master_window:
         self.cp_string=self.cp_string + '\nFc* = reference compression design value parallel to grain multiplied by all applicable adjusment factors except Cp\nFc* = Fc*Cd*Cm*Ct*Cf*Ci = {1:.2f}*{2:.2f}*{3:.2f}*{4:.2f}*{5:.2f}*{6:.2f} = {0:.2f} psi\nc = 0.8 - NDS 2005 3.7.1'.format(self.wall.fc_star_psi,self.wall.fc_psi,cd,self.wall.cm_fc,self.wall.ct_fc,self.wall.cf_fc,self.wall.ci_fc)
         self.cp_string=self.cp_string + self.wall.assumptions_ke + self.wall.assumptions_leb
         self.cp_string = self.cp_string + 'Ke * Le_d / d = {0:.3f} in < 50'.format(self.wall.height_in/d)
-        self.cp_string = self.cp_string + "\nFcE = 0.822 * Emin' / (Le_d/d)^2 - NDS 2005 Section 3.7.1\nFcE = {0:.3f} psi".format(self.wall.fcE_psi)
+        self.cp_string = self.cp_string + '\nKe * Le_b / b = {0:.3f} in < 50'.format(self.wall.le_b/b)
+        self.cp_string = self.cp_string + "\nFcE = 0.822 * Emin' / (max[Le_d/d,Le_b/b])^2 - NDS 2005 Section 3.7.1\nFcE = {0:.3f} psi".format(self.wall.fcE_psi)
         self.cp_string = self.cp_string + "\nCp = ([1 + (FcE / Fc*)] / 2c ) - sqrt[ [1 + (FcE / Fc*) / 2c]^2 - (FcE / Fc*) / c] = {0:.3f} - NDS 2005 Section 3.7.1".format(self.wall.cp)
         self.results_text_box.insert(tk.END, self.cp_string)
         
