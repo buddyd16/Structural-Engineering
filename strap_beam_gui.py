@@ -352,7 +352,25 @@ class main_window:
         
         self.draw_plan()
         self.draw_elevation()
+        self.license_display()
+    
+    def license_display(self, *event):
+        license_string = ("This program is free software; you can redistribute it and/or modify\n"
+                    "it under the terms of the GNU General Public License as published by\n"
+                    "the Free Software Foundation; either version 2 of the License, or\n"
+                    "(at your option) any later version.\n\n"
 
+                    "This program is distributed in the hope that it will be useful,\n"
+                    "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+                    "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+                    "GNU General Public License for more details.\n\n"
+
+                    "You should have received a copy of the GNU General Public License along"
+                    "with this program; if not, write to the Free Software Foundation, Inc.,"
+                    "51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA\n"
+                    "\nA copy of the License can be viewed at:\n https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE")
+        tkMessageBox.showerror("License Information",license_string)
+        
     def data_frame_builder(self):
         #Left
         tk.Label(self.geo_data_frame, text="Left Foundation:", font=self.helv_res).grid(row=0, column=0)
@@ -602,13 +620,11 @@ class main_window:
         self.igs_over_igl.set('--')
         tk.Label(self.geo_data_frame, text="Ig,strap / Ig,left = ", font=self.helv).grid(row=11, column=7, sticky = tk.E)
         tk.Entry(self.geo_data_frame, textvariable=self.igs_over_igl, width=10, state=tk.DISABLED).grid(row=11, column=8)
-        tk.Label(self.geo_data_frame, text="in^4", font=self.helv).grid(row=11, column=9)
         
         self.igs_over_igr = tk.StringVar()
         self.igs_over_igr.set('--')
         tk.Label(self.geo_data_frame, text="Ig,strap / Ig,right = ", font=self.helv).grid(row=12, column=7, sticky = tk.E)
         tk.Entry(self.geo_data_frame, textvariable=self.igs_over_igr, width=10, state=tk.DISABLED).grid(row=12, column=8)
-        tk.Label(self.geo_data_frame, text="in^4", font=self.helv).grid(row=12, column=9)
         
         #Distance between Columns
         tk.Label(self.geo_data_frame, text="Distance Between Columns:", font=self.helv_res).grid(row=0, column=10)
