@@ -1933,6 +1933,7 @@ class Main_window:
                     "51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA\n"
                     "\nA copy of the License can be viewed at:\n https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE")
         tkMessageBox.showerror("License Information",license_string)
+        self.master.focus_force()
         
     def _reset_option_menu(self, spans):
         '''reset the values in the option menu

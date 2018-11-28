@@ -436,6 +436,7 @@ class Master_window:
                     "51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA\n"
                     "\nA copy of the License can be viewed at:\n https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE")
         tkMessageBox.showerror("License Information",license_string)
+        self.master.focus_force()
         
     def ScrollFrameConfig(self, *event):
         self.loads_canvas.configure(scrollregion=self.loads_canvas.bbox("all"))
