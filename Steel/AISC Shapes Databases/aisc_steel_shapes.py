@@ -21,6 +21,7 @@ Created on Wed Apr 26 14:50:25 2017
 
 import Tkinter as tk
 import tkFont
+import tkMessageBox
 
 class Master_window:
 
@@ -119,8 +120,8 @@ class Master_window:
         z=0
         for i in range(0,len(self.properties_labels)):
             self.widgets.append(self.properties_labels[i])
-            self.properties_labels[i].grid(row = j, column = z, padx=4, pady=3)
-            if z<8:
+            self.properties_labels[i].grid(row = j, column = z, padx=1, pady=1)
+            if z<10:
                 z+=1
             else:
                 z=0
@@ -177,7 +178,25 @@ class Master_window:
         self.b_quit = tk.Button(self.base_frame,text="Quit", command=self.quit_app, font=helv)
         self.widgets.append(self.b_quit)
         self.b_quit.pack(side=tk.RIGHT)
+        self.license_display()
+    
+    def license_display(self, *event):
+        license_string = ("This program is free software; you can redistribute it and/or modify\n"
+                    "it under the terms of the GNU General Public License as published by\n"
+                    "the Free Software Foundation; either version 2 of the License, or\n"
+                    "(at your option) any later version.\n\n"
 
+                    "This program is distributed in the hope that it will be useful,\n"
+                    "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+                    "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+                    "GNU General Public License for more details.\n\n"
+
+                    "You should have received a copy of the GNU General Public License along"
+                    "with this program; if not, write to the Free Software Foundation, Inc.,"
+                    "51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA\n"
+                    "\nA copy of the License can be viewed at:\n https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE")
+        tkMessageBox.showerror("License Information",license_string)
+        
     def value_filter_menu_switch(self, *event):
         option = self.value_filter.get()
         if option == 'Between':
