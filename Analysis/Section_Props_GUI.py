@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt
 import Tkinter as tk
 import os
 import math
-
+import tkMessageBox
 
 def path_exists(path):
     res_folder_exist = os.path.isdir(path)
@@ -154,6 +154,24 @@ class Main_window:
         self.label_error.pack(side=tk.LEFT)
         
         self.ins_validate()
+        self.license_display()
+    
+    def license_display(self, *event):
+        license_string = ("This program is free software; you can redistribute it and/or modify\n"
+                    "it under the terms of the GNU General Public License as published by\n"
+                    "the Free Software Foundation; either version 2 of the License, or\n"
+                    "(at your option) any later version.\n\n"
+
+                    "This program is distributed in the hope that it will be useful,\n"
+                    "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+                    "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+                    "GNU General Public License for more details.\n\n"
+
+                    "You should have received a copy of the GNU General Public License along"
+                    "with this program; if not, write to the Free Software Foundation, Inc.,"
+                    "51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA\n"
+                    "\nA copy of the License can be viewed at:\n https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE")
+        tkMessageBox.showerror("License Information",license_string)
         
     def quit_app(self):
         self.master.destroy()

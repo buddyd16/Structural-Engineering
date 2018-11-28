@@ -23,7 +23,10 @@ from numpy import zeros
 import numpy as np
 import scipy.integrate as sci_int
 import math
-import matplotlib.pyplot as plt
+import os
+import webbrowser
+import tkMessageBox
+# import matplotlib.pyplot as plt
 
 class Master_window:
 
@@ -399,8 +402,10 @@ class Master_window:
 
         self.pg3_frame.pack(anchor='c', padx= 1, pady= 1, fill=tk.BOTH, expand=1)
       
-        self.b_export_pdf = tk.Button(self.base_frame,text="Export PDF", command=self.export_pdf, font=helv)
-        self.b_export_pdf.pack(side=tk.RIGHT)
+        #self.b_export_pdf = tk.Button(self.base_frame,text="Export PDF", command=self.export_pdf, font=helv)
+        #self.b_export_pdf.pack(side=tk.RIGHT)
+        self.b_export_html = tk.Button(self.base_frame,text="Export HTML", command=self.write_html_results, font=helv)
+        self.b_export_html.pack(side=tk.RIGHT)
         self.b_quit = tk.Button(self.base_frame,text="Quit", command=self.quit_app, font=helv)
         self.b_quit.pack(side=tk.RIGHT)
         
@@ -413,7 +418,25 @@ class Master_window:
         self.build_loads()
         self.run()
 
+        self.license_display()
+    
+    def license_display(self, *event):
+        license_string = ("This program is free software; you can redistribute it and/or modify\n"
+                    "it under the terms of the GNU General Public License as published by\n"
+                    "the Free Software Foundation; either version 2 of the License, or\n"
+                    "(at your option) any later version.\n\n"
 
+                    "This program is distributed in the hope that it will be useful,\n"
+                    "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+                    "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+                    "GNU General Public License for more details.\n\n"
+
+                    "You should have received a copy of the GNU General Public License along"
+                    "with this program; if not, write to the Free Software Foundation, Inc.,"
+                    "51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA\n"
+                    "\nA copy of the License can be viewed at:\n https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE")
+        tkMessageBox.showerror("License Information",license_string)
+        
     def ScrollFrameConfig(self, *event):
         self.loads_canvas.configure(scrollregion=self.loads_canvas.bbox("all"))
         
@@ -1486,166 +1509,166 @@ class Master_window:
         
         self.moment_area_label.configure(text=res_string)
                     
-    def export_pdf(self, *event):
-        fig = plt.figure(figsize=(11,17),dpi=600)
+    # def export_pdf(self, *event):
+        # fig = plt.figure(figsize=(11,17),dpi=600)
         
-        axb_l = plt.subplot2grid((8, 1), (0, 0))
-        axb_p = plt.subplot2grid((8, 1), (1, 0))
-        axb_m = plt.subplot2grid((8, 1), (2, 0))
+        # axb_l = plt.subplot2grid((8, 1), (0, 0))
+        # axb_p = plt.subplot2grid((8, 1), (1, 0))
+        # axb_m = plt.subplot2grid((8, 1), (2, 0))
 
-        axr = plt.subplot2grid((8, 1), (3, 0))
-        axv = plt.subplot2grid((8, 1), (4, 0))
-        axm = plt.subplot2grid((8, 1), (5, 0))
-        axs = plt.subplot2grid((8, 1), (6, 0))
-        axd = plt.subplot2grid((8, 1), (7, 0))
+        # axr = plt.subplot2grid((8, 1), (3, 0))
+        # axv = plt.subplot2grid((8, 1), (4, 0))
+        # axm = plt.subplot2grid((8, 1), (5, 0))
+        # axs = plt.subplot2grid((8, 1), (6, 0))
+        # axd = plt.subplot2grid((8, 1), (7, 0))
 
-        for load in self.loads_left:
-            if len(load.x_graph) > 11:
-                axb_m.plot(load.x_graph,load.y_graph)
-            elif len(load.x_graph) > 6:
-                axb_l.plot(load.x_graph,load.y_graph)
-            else:
-                axb_p.plot(load.x_graph,load.y_graph)
+        # for load in self.loads_left:
+            # if len(load.x_graph) > 11:
+                # axb_m.plot(load.x_graph,load.y_graph)
+            # elif len(load.x_graph) > 6:
+                # axb_l.plot(load.x_graph,load.y_graph)
+            # else:
+                # axb_p.plot(load.x_graph,load.y_graph)
                 
-        for load in self.loads_center:
-            if len(load.x_graph) > 11:
-                axb_m.plot(load.x_graph+self.xsl[-1],load.y_graph)
-            elif len(load.x_graph) > 6:
-                axb_l.plot(load.x_graph+self.xsl[-1],load.y_graph)
-            else:
-                axb_p.plot(load.x_graph+self.xsl[-1],load.y_graph)
+        # for load in self.loads_center:
+            # if len(load.x_graph) > 11:
+                # axb_m.plot(load.x_graph+self.xsl[-1],load.y_graph)
+            # elif len(load.x_graph) > 6:
+                # axb_l.plot(load.x_graph+self.xsl[-1],load.y_graph)
+            # else:
+                # axb_p.plot(load.x_graph+self.xsl[-1],load.y_graph)
                 
-        for load in self.loads_right:
-            if len(load.x_graph) > 11:
-                axb_m.plot(load.x_graph+self.xsc[-1],load.y_graph)
-            elif len(load.x_graph) > 6:
-                axb_l.plot(load.x_graph+self.xsc[-1],load.y_graph)
-            else:
-                axb_p.plot(load.x_graph+self.xsc[-1],load.y_graph)
+        # for load in self.loads_right:
+            # if len(load.x_graph) > 11:
+                # axb_m.plot(load.x_graph+self.xsc[-1],load.y_graph)
+            # elif len(load.x_graph) > 6:
+                # axb_l.plot(load.x_graph+self.xsc[-1],load.y_graph)
+            # else:
+                # axb_p.plot(load.x_graph+self.xsc[-1],load.y_graph)
                 
-        axb_l.plot([0,0,0],[0.5,0,-0.5], alpha=0)
-        axb_l.plot(self.xsl,[0]*len(self.xsl))
-        axb_l.plot(self.xsc,[0]*len(self.xsc))
-        axb_l.plot(self.xsr,[0]*len(self.xsr))
+        # axb_l.plot([0,0,0],[0.5,0,-0.5], alpha=0)
+        # axb_l.plot(self.xsl,[0]*len(self.xsl))
+        # axb_l.plot(self.xsc,[0]*len(self.xsc))
+        # axb_l.plot(self.xsr,[0]*len(self.xsr))
         
-        axb_m.plot([0,0,0],[0.5,0,-0.5], alpha=0)
-        axb_m.plot(self.xsl,[0]*len(self.xsl))
-        axb_m.plot(self.xsc,[0]*len(self.xsc))
-        axb_m.plot(self.xsr,[0]*len(self.xsr))
+        # axb_m.plot([0,0,0],[0.5,0,-0.5], alpha=0)
+        # axb_m.plot(self.xsl,[0]*len(self.xsl))
+        # axb_m.plot(self.xsc,[0]*len(self.xsc))
+        # axb_m.plot(self.xsr,[0]*len(self.xsr))
         
-        axb_p.plot([0,0,0],[0.5,0,-0.5], alpha=0)
-        axb_p.plot(self.xsl,[0]*len(self.xsl))
-        axb_p.plot(self.xsc,[0]*len(self.xsc))
-        axb_p.plot(self.xsr,[0]*len(self.xsr))
+        # axb_p.plot([0,0,0],[0.5,0,-0.5], alpha=0)
+        # axb_p.plot(self.xsl,[0]*len(self.xsl))
+        # axb_p.plot(self.xsc,[0]*len(self.xsc))
+        # axb_p.plot(self.xsr,[0]*len(self.xsr))
         
-        #support symbols
-        x0 = self.ll
-        x2 = self.ll+self.lc
-        axb_l.plot([x0,x0-0.25,x0+0.25,x0],[0,-0.25,-0.25,0], color='k')
-        axb_l.plot([x2,x2-0.25,x2+0.25,x2],[0,-0.25,-0.25,0], color='k')
-        axb_l.minorticks_on()
-        axb_l.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
-        axb_l.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
+        # #support symbols
+        # x0 = self.ll
+        # x2 = self.ll+self.lc
+        # axb_l.plot([x0,x0-0.25,x0+0.25,x0],[0,-0.25,-0.25,0], color='k')
+        # axb_l.plot([x2,x2-0.25,x2+0.25,x2],[0,-0.25,-0.25,0], color='k')
+        # axb_l.minorticks_on()
+        # axb_l.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
+        # axb_l.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
         
-        axb_m.plot([x0,x0-0.25,x0+0.25,x0],[0,-0.25,-0.25,0], color='k')
-        axb_m.plot([x2,x2-0.25,x2+0.25,x2],[0,-0.25,-0.25,0], color='k')
-        axb_m.minorticks_on()
-        axb_m.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
-        axb_m.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
+        # axb_m.plot([x0,x0-0.25,x0+0.25,x0],[0,-0.25,-0.25,0], color='k')
+        # axb_m.plot([x2,x2-0.25,x2+0.25,x2],[0,-0.25,-0.25,0], color='k')
+        # axb_m.minorticks_on()
+        # axb_m.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
+        # axb_m.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
         
-        axb_p.plot([x0,x0-0.25,x0+0.25,x0],[0,-0.25,-0.25,0], color='k')
-        axb_p.plot([x2,x2-0.25,x2+0.25,x2],[0,-0.25,-0.25,0], color='k')
-        axb_p.minorticks_on()
-        axb_p.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
-        axb_p.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
+        # axb_p.plot([x0,x0-0.25,x0+0.25,x0],[0,-0.25,-0.25,0], color='k')
+        # axb_p.plot([x2,x2-0.25,x2+0.25,x2],[0,-0.25,-0.25,0], color='k')
+        # axb_p.minorticks_on()
+        # axb_p.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
+        # axb_p.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
         
-        axb_l.set_ylabel('Applied Loads\n(klf)')
-        axb_m.set_ylabel('Applied Moments\n(ft-kips)')
-        axb_p.set_ylabel('Applied Point Loads\n(kips)')
-        axb_l.set_xlabel('L (ft)')
-        axb_m.set_xlabel('L (ft)')
-        axb_p.set_xlabel('L (ft)')
+        # axb_l.set_ylabel('Applied Loads\n(klf)')
+        # axb_m.set_ylabel('Applied Moments\n(ft-kips)')
+        # axb_p.set_ylabel('Applied Point Loads\n(kips)')
+        # axb_l.set_xlabel('L (ft)')
+        # axb_m.set_xlabel('L (ft)')
+        # axb_p.set_xlabel('L (ft)')
 
-        axr.plot(self.rlx,self.rly)
-        axr.annotate('RL = {0:.3f} kips'.format(self.reaction_left), xy=(self.ll,min(self.rly)))
-        axr.plot(self.rrx,self.rry)
-        axr.annotate('RR = {0:.3f} kips'.format(self.reaction_right), xy=(self.ll+self.lc,min(self.rry)), ha="right")
-        axr.plot([0,0,0],[0.5,0,-0.5], alpha=0)
-        axr.plot(self.xsl,[0]*len(self.xsl))
-        axr.plot(self.xsc,[0]*len(self.xsc))
-        axr.plot(self.xsr,[0]*len(self.xsr))
-        axr.minorticks_on()
-        axr.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
-        axr.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
-        axr.set_ylabel('Reaction (kips)')
-        axr.set_xlabel('L (ft)')
+        # axr.plot(self.rlx,self.rly)
+        # axr.annotate('RL = {0:.3f} kips'.format(self.reaction_left), xy=(self.ll,min(self.rly)))
+        # axr.plot(self.rrx,self.rry)
+        # axr.annotate('RR = {0:.3f} kips'.format(self.reaction_right), xy=(self.ll+self.lc,min(self.rry)), ha="right")
+        # axr.plot([0,0,0],[0.5,0,-0.5], alpha=0)
+        # axr.plot(self.xsl,[0]*len(self.xsl))
+        # axr.plot(self.xsc,[0]*len(self.xsc))
+        # axr.plot(self.xsr,[0]*len(self.xsr))
+        # axr.minorticks_on()
+        # axr.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
+        # axr.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
+        # axr.set_ylabel('Reaction (kips)')
+        # axr.set_xlabel('L (ft)')
 
-        axv.plot(self.xsl,self.shearl)
-        axv.plot(self.xsc,self.shearc)
-        axv.plot(self.xsr,self.shearr)
-        axv.plot(self.xsl,[0]*len(self.xsl))
-        axv.plot(self.xsc,[0]*len(self.xsc))
-        axv.plot(self.xsr,[0]*len(self.xsr))
-        axv.fill_between(self.xsl,self.shearl,[0]*len(self.xsl), facecolor='blue', alpha=0.2)
-        axv.fill_between(self.xsc,self.shearc,[0]*len(self.xsc), facecolor='blue', alpha=0.2)
-        axv.fill_between(self.xsr,self.shearr,[0]*len(self.xsr), facecolor='blue', alpha=0.2)
-        axv.minorticks_on()
-        axv.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
-        axv.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
-        axv.set_ylabel('V (kips)')
-        axv.set_xlabel('L (ft)')
+        # axv.plot(self.xsl,self.shearl)
+        # axv.plot(self.xsc,self.shearc)
+        # axv.plot(self.xsr,self.shearr)
+        # axv.plot(self.xsl,[0]*len(self.xsl))
+        # axv.plot(self.xsc,[0]*len(self.xsc))
+        # axv.plot(self.xsr,[0]*len(self.xsr))
+        # axv.fill_between(self.xsl,self.shearl,[0]*len(self.xsl), facecolor='blue', alpha=0.2)
+        # axv.fill_between(self.xsc,self.shearc,[0]*len(self.xsc), facecolor='blue', alpha=0.2)
+        # axv.fill_between(self.xsr,self.shearr,[0]*len(self.xsr), facecolor='blue', alpha=0.2)
+        # axv.minorticks_on()
+        # axv.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
+        # axv.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
+        # axv.set_ylabel('V (kips)')
+        # axv.set_xlabel('L (ft)')
 
-        axm.plot(self.xsl,self.momentl)
-        axm.plot(self.xsc,self.momentc)
-        axm.plot(self.xsr,self.momentr)
-        axm.plot(self.xsl,[0]*len(self.xsl))
-        axm.plot(self.xsc,[0]*len(self.xsc))
-        axm.plot(self.xsr,[0]*len(self.xsr))
-        axm.fill_between(self.xsl,self.momentl,[0]*len(self.xsl), facecolor='red', alpha=0.2)
-        axm.fill_between(self.xsc,self.momentc,[0]*len(self.xsc), facecolor='red', alpha=0.2)
-        axm.fill_between(self.xsr,self.momentr,[0]*len(self.xsr), facecolor='red', alpha=0.2)
-        axm.minorticks_on()
-        axm.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
-        axm.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
-        axm.set_ylabel('M (ft-kips)')
-        axm.set_xlabel('L (ft)')
+        # axm.plot(self.xsl,self.momentl)
+        # axm.plot(self.xsc,self.momentc)
+        # axm.plot(self.xsr,self.momentr)
+        # axm.plot(self.xsl,[0]*len(self.xsl))
+        # axm.plot(self.xsc,[0]*len(self.xsc))
+        # axm.plot(self.xsr,[0]*len(self.xsr))
+        # axm.fill_between(self.xsl,self.momentl,[0]*len(self.xsl), facecolor='red', alpha=0.2)
+        # axm.fill_between(self.xsc,self.momentc,[0]*len(self.xsc), facecolor='red', alpha=0.2)
+        # axm.fill_between(self.xsr,self.momentr,[0]*len(self.xsr), facecolor='red', alpha=0.2)
+        # axm.minorticks_on()
+        # axm.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
+        # axm.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
+        # axm.set_ylabel('M (ft-kips)')
+        # axm.set_xlabel('L (ft)')
 
-        axs.plot(self.xsl,self.slopel)
-        axs.plot(self.xsc,self.slopec)
-        axs.plot(self.xsr,self.sloper)
-        axs.plot(self.xsl,[0]*len(self.xsl))
-        axs.plot(self.xsc,[0]*len(self.xsc))
-        axs.plot(self.xsr,[0]*len(self.xsr))
-        axs.fill_between(self.xsl,self.slopel,[0]*len(self.xsl), facecolor='green', alpha=0.2)
-        axs.fill_between(self.xsc,self.slopec,[0]*len(self.xsc), facecolor='green', alpha=0.2)
-        axs.fill_between(self.xsr,self.sloper,[0]*len(self.xsr), facecolor='green', alpha=0.2)
-        axs.minorticks_on()
-        axs.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
-        axs.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
-        axs.set_ylabel('S (rad)')
-        axs.set_xlabel('L (ft)')
+        # axs.plot(self.xsl,self.slopel)
+        # axs.plot(self.xsc,self.slopec)
+        # axs.plot(self.xsr,self.sloper)
+        # axs.plot(self.xsl,[0]*len(self.xsl))
+        # axs.plot(self.xsc,[0]*len(self.xsc))
+        # axs.plot(self.xsr,[0]*len(self.xsr))
+        # axs.fill_between(self.xsl,self.slopel,[0]*len(self.xsl), facecolor='green', alpha=0.2)
+        # axs.fill_between(self.xsc,self.slopec,[0]*len(self.xsc), facecolor='green', alpha=0.2)
+        # axs.fill_between(self.xsr,self.sloper,[0]*len(self.xsr), facecolor='green', alpha=0.2)
+        # axs.minorticks_on()
+        # axs.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
+        # axs.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
+        # axs.set_ylabel('S (rad)')
+        # axs.set_xlabel('L (ft)')
 
-        axd.plot(self.xsl,self.deltal)
-        axd.plot(self.xsc,self.deltac)
-        axd.plot(self.xsr,self.deltar)
-        axd.plot(self.xsl,[0]*len(self.xsl))
-        axd.plot(self.xsc,[0]*len(self.xsc))
-        axd.plot(self.xsr,[0]*len(self.xsr))
-        axd.fill_between(self.xsl,self.deltal,[0]*len(self.xsl), facecolor='yellow', alpha=0.2)
-        axd.fill_between(self.xsc,self.deltac,[0]*len(self.xsc), facecolor='yellow', alpha=0.2)
-        axd.fill_between(self.xsr,self.deltar,[0]*len(self.xsr), facecolor='yellow', alpha=0.2)
-        axd.minorticks_on()
-        axd.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
-        axd.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
-        axd.set_ylabel('D (in)')
-        axd.set_xlabel('L (ft)')
+        # axd.plot(self.xsl,self.deltal)
+        # axd.plot(self.xsc,self.deltac)
+        # axd.plot(self.xsr,self.deltar)
+        # axd.plot(self.xsl,[0]*len(self.xsl))
+        # axd.plot(self.xsc,[0]*len(self.xsc))
+        # axd.plot(self.xsr,[0]*len(self.xsr))
+        # axd.fill_between(self.xsl,self.deltal,[0]*len(self.xsl), facecolor='yellow', alpha=0.2)
+        # axd.fill_between(self.xsc,self.deltac,[0]*len(self.xsc), facecolor='yellow', alpha=0.2)
+        # axd.fill_between(self.xsr,self.deltar,[0]*len(self.xsr), facecolor='yellow', alpha=0.2)
+        # axd.minorticks_on()
+        # axd.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
+        # axd.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
+        # axd.set_ylabel('D (in)')
+        # axd.set_xlabel('L (ft)')
 
-        plt.tight_layout()
-        #plt.subplots_adjust(left=0.125, bottom=0.1, right=0.9, top=0.9, wspace=0.2, hspace=0.4)
+        # plt.tight_layout()
+        # #plt.subplots_adjust(left=0.125, bottom=0.1, right=0.9, top=0.9, wspace=0.2, hspace=0.4)
 
-        fig.savefig('simple_beam.pdf', dpi=600)
-        plt.close('all')
-        self.write_html_results()
+        # fig.savefig('simple_beam.pdf', dpi=600)
+        # plt.close('all')
+        # self.write_html_results()
 
     def multi_solve(self, *args):
         l_ft = float(self.span_ft.get())
@@ -1923,7 +1946,7 @@ class Master_window:
         file.write('<!doctype html>\n')
         file.write('<html>\n\n')
         file.write('<head>\n')
-        file.write('<title>Line Styles</title>\n')
+        file.write('<title>Simple Beam Diagrams</title>\n')
         file.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>\n')
         file.write('<style>\n')
         file.write('canvas{\n')
@@ -2098,7 +2121,8 @@ class Master_window:
         file.write('</body>\n')
         file.write('</html>\n')
         file.close()
-            
+        
+        webbrowser.open('file://'+ os.path.realpath('simple_beam.html'))
        
 def main():
     root = tk.Tk()

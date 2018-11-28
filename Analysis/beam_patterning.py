@@ -1,19 +1,5 @@
 #!/usr/bin/env python
 
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-
 from __future__ import division
 import matplotlib
 matplotlib.use('TKAgg')
@@ -32,6 +18,8 @@ import matplotlib.pyplot as plt
 import os
 import itertools
 import math
+import tkMessageBox
+import time
 
 def load_pattern(num_spans):
     test = []
@@ -1927,7 +1915,25 @@ class Main_window:
         self.bresults.configure(state="disabled", bg='red')
 
         self.ins_validate()
+        self.license_display()
+    
+    def license_display(self, *event):
+        license_string = ("This program is free software; you can redistribute it and/or modify\n"
+                    "it under the terms of the GNU General Public License as published by\n"
+                    "the Free Software Foundation; either version 2 of the License, or\n"
+                    "(at your option) any later version.\n\n"
 
+                    "This program is distributed in the hope that it will be useful,\n"
+                    "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+                    "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+                    "GNU General Public License for more details.\n\n"
+
+                    "You should have received a copy of the GNU General Public License along"
+                    "with this program; if not, write to the Free Software Foundation, Inc.,"
+                    "51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA\n"
+                    "\nA copy of the License can be viewed at:\n https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE")
+        tkMessageBox.showerror("License Information",license_string)
+        
     def _reset_option_menu(self, spans):
         '''reset the values in the option menu
         if index is given, set the value of the menu to
@@ -2429,7 +2435,8 @@ class Main_window:
         beam_elasticmodulus=[float(x)*1000 for x in beam_elasticmodulus]
 
         E = beam_elasticmodulus[0]
-        iters = max(int(round(max(beam_spans)/1.0)),500)
+        #iters = max(int(round(max(beam_spans)/1.0)),500)
+        iters = 25
         Main_window.stations = iters
         N = len(beam_spans)
         displace_loads = [0]*(N+1)
@@ -2500,6 +2507,7 @@ class Main_window:
             Main_window.live_deflection_goal.append(span/360)
             Main_window.total_deflection_goal.append(span/240)
             
+        startt = time.time()
         print 'Perform analysis for all load types defined....'
         for i in range(0,11):
             if i in range(5,9):
@@ -2529,7 +2537,8 @@ class Main_window:
         #solve for prescribed displacements
         Main_window.xs,Main_window.displace_initial_results[0],Main_window.displace_initial_results[1],Main_window.displace_initial_results[2],Main_window.displace_initial_results[3], Main_window.displace_initial_results[4], Main_window.displace_initial_results[5] = three_moment_method(beam_spans, beam_momentofinertia, cant, [[0.00,0.00,0.00,0.00,'POINT',0,0]], E, iters, displace_initial)
         
-        print '**Analysis Complete**'
+        endt = time.time()
+        print '**Analysis Complete** in {0:.4f} sec'.format(endt-startt)
         
         Main_window.load_results = loads
         Main_window.bm = np.zeros((iters+1,N))
@@ -3346,8 +3355,8 @@ class Main_window:
 
 def main():
     root = tk.Tk()
-    #root.tk_setPalette(background='gray99', foreground='gray20', activeBackground='gray20', activeForeground='green yellow')
-    root.title("Continuous Beam Analysis by the 3 Moment Method")
+    #root.tk_setPalette(background='gray40', foreground='gray90', activeBackground='gray20', activeForeground='green yellow')
+    root.title("Structura Beam - Continuous Beam Analysis by the 3 Moment Method")
     app = Main_window(root)
     root.minsize(1400,600)
     root.mainloop()
