@@ -3356,7 +3356,7 @@ class Main_window:
 def main():
     root = tk.Tk()
     #root.tk_setPalette(background='gray40', foreground='gray90', activeBackground='gray20', activeForeground='green yellow')
-    root.title("Structura Beam - Continuous Beam Analysis by the 3 Moment Method")
+    root.title("Continuous Beam Analysis by the 3 Moment Method")
     app = Main_window(root)
     root.minsize(1400,600)
     root.mainloop()
