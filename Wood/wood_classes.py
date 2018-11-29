@@ -314,6 +314,7 @@ class wood_stud_wall:
             leb = 12 * kb
             self.assumptions_leb = 'Le_b = 12.0 in. - continuously braced by sheathing 12" field nailing assumed\n'
         led = self.height_in * kd
+        self.le_b = leb
         
         #Check Le/d,b ratios less than 50 - NDS 2005 Section 3.7.1.4
         if leb / self.b_in > 50 or led/self.d_in > 50:
