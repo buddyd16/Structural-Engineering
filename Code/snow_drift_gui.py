@@ -28,6 +28,7 @@ class main_window:
 
         self.master = master
         self.inputs = []
+        self.calc_balance = 0
         
         # Font Set
         self.f_size = 8
@@ -67,7 +68,7 @@ class main_window:
         
         self.graphics_frame_r.pack(side = tk.RIGHT, anchor='ne')
 
-        self.graphics_frame.pack(side=tk.TOP, padx= 1, pady= 1, fill=tk.BOTH, expand=1)
+        self.graphics_frame.pack(side=tk.RIGHT, padx= 1, pady= 1, fill=tk.BOTH, expand=1)
 
         self.data_frame = tk.Frame(master, bd=2, relief='sunken', padx=1,pady=1)
         self.data_frame.pack(anchor='c', padx= 1, pady= 1, fill=tk.BOTH, expand=1)
@@ -110,7 +111,7 @@ class main_window:
         self.snow_data_frame = tk.Frame(self.snow_input, bd=2, relief='sunken', padx=1,pady=1)
         
         # Pg - ground snow load
-        tk.Label(self.snow_data_frame, text="Pg (psf):", font=self.helv_res).grid(row=0, column=0, sticky=tk.E)
+        tk.Label(self.snow_data_frame, text="Pg (psf):", font=self.helv).grid(row=0, column=0, sticky=tk.E)
         self.pg_psf_gui = tk.StringVar()
         self.inputs.append(self.pg_psf_gui)
         self.pg_psf_gui.set('25.0')
@@ -118,7 +119,7 @@ class main_window:
         self.pg_entry.grid(row=0, column=1)
 
         # Ce - ground snow load
-        tk.Label(self.snow_data_frame, text="Ce :", font=self.helv_res).grid(row=1, column=0, sticky=tk.E)
+        tk.Label(self.snow_data_frame, text="Ce :", font=self.helv).grid(row=1, column=0, sticky=tk.E)
         self.ce_gui = tk.StringVar()
         self.inputs.append(self.ce_gui)
         self.ce_gui.set('1.0')
@@ -126,7 +127,7 @@ class main_window:
         self.ce_entry.grid(row=1, column=1)
 
         # Ct - ground snow load
-        tk.Label(self.snow_data_frame, text="Ct :", font=self.helv_res).grid(row=2, column=0, sticky=tk.E)
+        tk.Label(self.snow_data_frame, text="Ct :", font=self.helv).grid(row=2, column=0, sticky=tk.E)
         self.ct_gui = tk.StringVar()
         self.inputs.append(self.ct_gui)
         self.ct_gui.set('1.0')
@@ -134,7 +135,7 @@ class main_window:
         self.ct_entry.grid(row=2, column=1)
 
         # Cs - ground snow load
-        tk.Label(self.snow_data_frame, text="Cs :", font=self.helv_res).grid(row=3, column=0, sticky=tk.E)
+        tk.Label(self.snow_data_frame, text="Cs :", font=self.helv).grid(row=3, column=0, sticky=tk.E)
         self.cs_gui = tk.StringVar()
         self.inputs.append(self.cs_gui)
         self.cs_gui.set('1.0')
@@ -142,50 +143,109 @@ class main_window:
         self.cs_entry.grid(row=3, column=1)
 
         # I - Importance Factor
-        tk.Label(self.snow_data_frame, text="I :", font=self.helv_res).grid(row=4, column=0, sticky=tk.E)
+        tk.Label(self.snow_data_frame, text="I :", font=self.helv).grid(row=4, column=0, sticky=tk.E)
         self.I_gui = tk.StringVar()
         self.inputs.append(self.I_gui)
         self.I_gui.set('1.0')
         self.I_entry = tk.Entry(self.snow_data_frame, textvariable=self.I_gui, width=10)
         self.I_entry.grid(row=4, column=1)
         
-        self.b_snow_basic = tk.Button(self.snow_data_frame,text="Calc Initial Snow", command=self.snow_step_1, font=self.helv, width=w, height=h, bg=color)
+        self.b_snow_basic = tk.Button(self.snow_data_frame,text="Calc Balance Snow", command=self.snow_step_1, font=self.helv, width=w, height=h, bg=color)
         self.b_snow_basic.grid(row=5, column=1)
        
-        tk.Label(self.snow_data_frame, text="Snow Density (pcf) :", font=self.helv_res).grid(row=6, column=0, sticky=tk.E)
-        tk.Label(self.snow_data_frame, text="min. of:", font=self.helv_res).grid(row=7, column=0, sticky=tk.E)
-        tk.Label(self.snow_data_frame, text="0.13*Pg + 14", font=self.helv_res).grid(row=6, column=1)
-        tk.Label(self.snow_data_frame, text="30", font=self.helv_res).grid(row=7, column=1)
+        tk.Label(self.snow_data_frame, text="Snow Density (pcf) :", font=self.helv).grid(row=6, column=0, sticky=tk.E)
+        tk.Label(self.snow_data_frame, text="min. of:", font=self.helv).grid(row=7, column=0, sticky=tk.E)
+        tk.Label(self.snow_data_frame, text="0.13*Pg + 14", font=self.helv).grid(row=7, column=1)
+        tk.Label(self.snow_data_frame, text="30", font=self.helv).grid(row=8, column=1)
         self.snow_density_pcf_gui = tk.Label(self.snow_data_frame, text="--", font=self.helv_res)
-        self.snow_density_pcf_gui.grid(row=7, column=2)
+        self.snow_density_pcf_gui.grid(row=8, column=2)
         
         #Pf - Flat Roof Snow Load
-        tk.Label(self.snow_data_frame, text="Pf (psf) :", font=self.helv_res).grid(row=8, column=0, sticky=tk.E)
-        tk.Label(self.snow_data_frame, text="0.7*Ce*Ct*I*pg", font=self.helv_res).grid(row=8, column=1)
+        tk.Label(self.snow_data_frame, text="Pf (psf) :", font=self.helv).grid(row=9, column=0, sticky=tk.E)
+        tk.Label(self.snow_data_frame, text="0.7*Ce*Ct*I*Pg", font=self.helv).grid(row=9, column=1)
         self.pf_psf_gui = tk.Label(self.snow_data_frame, text="--", font=self.helv_res)
-        self.pf_psf_gui.grid(row=8, column=2)
+        self.pf_psf_gui.grid(row=9, column=2)
 
         #Ps - ??
-        tk.Label(self.snow_data_frame, text="Ps (psf) :", font=self.helv_res).grid(row=9, column=0, sticky=tk.E)
-        tk.Label(self.snow_data_frame, text="Cs*Pf", font=self.helv_res).grid(row=9, column=1)
+        tk.Label(self.snow_data_frame, text="Ps (psf) :", font=self.helv).grid(row=10, column=0, sticky=tk.E)
+        tk.Label(self.snow_data_frame, text="Cs*Pf", font=self.helv).grid(row=10, column=1)
         self.ps_psf_gui = tk.Label(self.snow_data_frame, text="--", font=self.helv_res)
-        self.ps_psf_gui.grid(row=9, column=2)       
+        self.ps_psf_gui.grid(row=10, column=2)       
         
         #Hb - depth of balance snow load
-        tk.Label(self.snow_data_frame, text="Hb (ft) :", font=self.helv_res).grid(row=10, column=0, sticky=tk.E)
-        tk.Label(self.snow_data_frame, text="Ps/Snow Density", font=self.helv_res).grid(row=10, column=1)
+        tk.Label(self.snow_data_frame, text="Hb (ft) :", font=self.helv).grid(row=11, column=0, sticky=tk.E)
+        tk.Label(self.snow_data_frame, text="Ps/Snow Density", font=self.helv).grid(row=11, column=1)
         self.hb_ft_gui = tk.Label(self.snow_data_frame, text="--", font=self.helv_res)
-        self.hb_ft_gui.grid(row=10, column=2)   
+        self.hb_ft_gui.grid(row=11, column=2)   
 
-        #snow_density_pcf = min((0.13*pg_psf) + 14, 30)
-        #Ce = 1.0
-        #Ct = 1.0
-        #Cs = 1.0
-        #I = 1.0
-        #pf_psf = 0.7*Ce*Ct*I*pg_psf
-        #ps_psf = Cs*pf_psf
-        #hb_ft = ps_psf/snow_density_pcf
         self.snow_data_frame.pack(fill=tk.BOTH,expand=1, padx=5, pady=5)
+
+        #Segment Add Frame
+        self.segment_input = ttk.Frame(self.nb_data)
+        self.nb_data.add(self.segment_input, text='Segment Input')
+
+        self.segment_data_frame = tk.Frame(self.segment_input, bd=2, relief='sunken', padx=1,pady=1)
+        #Start X
+        tk.Label(self.segment_data_frame, text="x1 (ft) :", font=self.helv).grid(row=0, column=0, sticky=tk.E)
+        self.segment_start_x_ft = tk.StringVar()
+        self.segment_start_x_ft.set('0.0')
+        self.start_x_entry = tk.Entry(self.segment_data_frame, textvariable=self.segment_start_x_ft, width=10)
+        self.start_x_entry.grid(row=0, column=1)
+
+        #Start Y
+        tk.Label(self.segment_data_frame, text="y1 (ft) :", font=self.helv).grid(row=1, column=0, sticky=tk.E)
+        self.segment_start_y_ft = tk.StringVar()
+        self.segment_start_y_ft.set('0.0')
+        self.start_y_entry= tk.Entry(self.segment_data_frame, textvariable=self.segment_start_y_ft, width=10)
+        self.start_y_entry.grid(row=1, column=1)
+
+        #End X
+        tk.Label(self.segment_data_frame, text="x2 (ft) :", font=self.helv).grid(row=2, column=0, sticky=tk.E)
+        self.segment_end_x_ft = tk.StringVar()
+        self.segment_end_x_ft.set('0.0')
+        self.end_x_entry= tk.Entry(self.segment_data_frame, textvariable=self.segment_end_x_ft, width=10)
+        self.end_x_entry.grid(row=2, column=1)
+
+        #End Y
+        tk.Label(self.segment_data_frame, text="y2 (ft) :", font=self.helv).grid(row=3, column=0, sticky=tk.E)
+        self.segment_end_y_ft = tk.StringVar()
+        self.segment_end_y_ft.set('0.0')
+        self.end_y_entry= tk.Entry(self.segment_data_frame, textvariable=self.segment_end_y_ft, width=10)
+        self.end_y_entry.grid(row=3, column=1)
+
+        #Location Exterior (Counter-Clock-Wise) vs Interior (Clock-Wise)
+        tk.Label(self.segment_data_frame, text="Location (e or i):", font=self.helv).grid(row=4, column=0, sticky=tk.E)
+        self.segment_location = tk.StringVar()
+        self.segment_location.set('e')
+        self.segment_add_menu = tk.OptionMenu(self.segment_data_frame, self.segment_location, 'e', 'i')
+        self.segment_add_menu.config(font=self.helv)
+        self.segment_add_menu.grid(row=4, column=1, padx= 2, sticky=tk.W)
+        tk.Label(self.segment_data_frame, text="e = exterior -- segments must be defined counter clockwise", font=self.helv).grid(row=5, column=0, columnspan=3, sticky=tk.W)
+        tk.Label(self.segment_data_frame, text="i = interior -- segments must be defined clockwise", font=self.helv).grid(row=6, column=0, columnspan=3, sticky=tk.W)        
+        
+        #Segment Height - min of 3" or 0.25 ft
+        tk.Label(self.segment_data_frame, text="Hc (ft): ", font=self.helv).grid(row=7, column=0, sticky=tk.E)
+        self.segment_hc_ft = tk.StringVar()
+        self.segment_hc_ft.set('0.25')
+        self.hc_entry= tk.Entry(self.segment_data_frame, textvariable=self.segment_hc_ft, width=10)
+        self.hc_entry.grid(row=7, column=1)
+        self.segment_data_frame.pack(fill=tk.BOTH,expand=1, padx=5, pady=5)
+
+        # Important note
+        tk.Label(self.segment_data_frame, text="Note: base program assumption is exterior segments form a closed polygon\nclose off free edges with an Hc = 0.001 ft.", font=self.helv).grid(row=8, column=0,columnspan=3, sticky=tk.E)
+
+        # Button to Add Segment
+
+        # Button to Change Segment
+
+        # Button to Romove Segment
+
+        # List box of segments
+        # GUI segment list is different from used segment list
+        # used segment list will be determined at run time and 
+        # will pull the most current GUI segment list to perform
+        # calculations and GUI Canvas drawing
+
 
         # Call function to display license dialog on app start
         self.license_display()
@@ -230,12 +290,14 @@ class main_window:
         self.ps_psf_gui.config(text='{0:.3f}'.format(self.ps_psf))
         self.hb_ft = self.ps_psf/self.snow_density_pcf
         self.hb_ft_gui.config(text='{0:.3f}'.format(self.hb_ft))
+        
+        self.calc_balance = 1
 
 def main():
     root = tk.Tk()
     root.title("Snow Drift by Polygons - Alpha")
     main_window(root)
-    root.minsize(1280,800)
+    root.minsize(1024,768)
     root.mainloop()
 
 if __name__ == '__main__':
