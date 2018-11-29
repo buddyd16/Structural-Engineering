@@ -516,11 +516,76 @@ def drift_all(lines, snow_density_pcf, pg_psf,number_of_points=10, logging=1):
         
     return calc_log, perp_lines, intersect_points, points_x, points_y
 
+def lines_transformation_to_origin(lines):
+    x = []
+    y = []
+
+    for line in lines:
+        x.append(line.startx)
+        y.append(line.starty)
+        x.append(line.endx)
+        y.append(line.endy)
+
+    shift_x = min(x)
+    shift_y = min(y)
+
+    max_x = max(x) - shift_x
+    max_y = max(y) - shift_y
+
+    return shift_x, shift_y, max_x, max_y
+
+def line_closest_to_point_and_point_on_line(point, lines):
+    point_x = point[0]
+    point_y = point[1]
+
+    distance_to_each_line = []
+    point_on_each_line = []
+
+    tolerance = 0.000001 
+
+    for line in lines:
+        a0x = line.startx
+        a0y = line.starty
+        a1x = line.endx
+        a1y = line.endy
+        #check point within start, end vertices of line being checked against
+        x_ok = min(a0x,a1x)-tolerance <= point_x <= max(a0x,a1x)+tolerance
+        y_ok = min(a0y,a1y)-tolerance <= point_y <= max(a0y,a1y)+tolerance
+
+        #secondary point at unit distance at 180+line perp angle
+        point_2 = point_at_angle_distance(point,line.perp_angle+180,1)
+        int_point = line_line_intersection_points(a0x,a0y,a1x,a1y,point[0],point[1],point_2[0],point_2[1])
+        
+        if int_point == 'no int':
+            distance_to_each_line.append(1000000)
+            point_on_each_line.append([line.startx,line.starty])
+        else:
+            #check point within start, end vertices of line being checked against
+            x1_ok = min(a0x,a1x)-tolerance <= int_point[0][0] <= max(a0x,a1x)+tolerance
+            y1_ok = min(a0y,a1y)-tolerance <= int_point[0][1] <= max(a0y,a1y)+tolerance
+
+            if x1_ok==False or y1_ok==False:
+                distance_to_each_line.append(1000000)
+                point_on_each_line.append([line.startx,line.starty])
+            else:
+                distance = length_by_two_points(point[0],point[1],int_point[0][0],int_point[0][1])
+                distance_to_each_line.append(distance)
+                point_on_each_line.append([int_point[0][0],int_point[0][1]])
+    
+    segment = distance_to_each_line.index(min(distance_to_each_line))
+    segment_point = point_on_each_line[segment]
+    segment += 1 
+    
+    return distance_to_each_line, point_on_each_line, segment, segment_point
+                       
+            
+            
+                   
 
 ##testing area
-logging = 1
-write_dxf = 1
-create_plot = 1
+logging = 0
+write_dxf = 0
+create_plot = 1 
 
 tolerance = 0.000001
 
@@ -536,8 +601,8 @@ hb_ft = ps_psf/snow_density_pcf
 
 hc_ft = [3,3,3,3,3,3,3,3]
 
-x = [0,50,50,50,50,25,25,25,25,10,10,10,10,0,0,0]
-y = [0,0,0,50,50,50,50,25,25,25,25,60,60,60,60,0]
+x = [1,51,51,51,51,26,26,26,26,11,11,11,11,1,1,1]
+y = [1,1,1,51,51,51,51,26,26,26,26,61,61,61,61,1]
 
 loc = ['e','e','e','e','e','e','e','e']
 
@@ -578,7 +643,19 @@ baa = ((1-0.5)*lines[0].starty) + (0.5*lines[0].endy)
 point_on_self = [aab,baa]
 a_calc_log_line, a_perp_lines_line, a_intersect_points_line, a_points_x_line, a_points_y_line, a_drift_string_line = lines[0].drift_at_point(point_on_self, lines, snow_density_pcf, pg_psf, 1)
 
-calc_log, perp_lines, intersect_points, points_x, points_y = drift_all(lines,snow_density_pcf,pg_psf,4,1)
+calc_log, perp_lines, intersect_points, points_x, points_y = drift_all(lines,snow_density_pcf,pg_psf,25,1)
+
+s_x, s_y, mx, my = lines_transformation_to_origin(lines)
+print s_x
+print s_y
+print mx
+print my
+
+test1, test2, segment, segment_point = line_closest_to_point_and_point_on_line([35.5,9.4],lines)
+print test1
+print test2
+print segment
+print segment_point
 
 colors = ['r','b','g','c','m','y','k','r','b','g','c','m','y','k','r','b','g','c','m','y','k','r','b','g','c','m','y','k','r','b','g','c','m','y','k','r','b','g','c','m','y','k','r','b','g','c','m','y','k']
 i=0
