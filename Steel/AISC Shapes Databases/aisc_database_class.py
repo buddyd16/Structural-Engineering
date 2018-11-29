@@ -274,3 +274,5 @@ db = aisc_15th_database()
 defs = db.definitions
 
 sections = db.shapes
+
+labels = db.labels
