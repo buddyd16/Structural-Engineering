@@ -110,12 +110,72 @@ class main_window:
         self.snow_data_frame = tk.Frame(self.snow_input, bd=2, relief='sunken', padx=1,pady=1)
         
         # Pg - ground snow load
-        tk.Label(self.snow_data_frame, text="Pg (psf):", font=self.helv_res).grid(row=0, column=0)
+        tk.Label(self.snow_data_frame, text="Pg (psf):", font=self.helv_res).grid(row=0, column=0, sticky=tk.E)
         self.pg_psf_gui = tk.StringVar()
         self.inputs.append(self.pg_psf_gui)
         self.pg_psf_gui.set('25.0')
         self.pg_entry = tk.Entry(self.snow_data_frame, textvariable=self.pg_psf_gui, width=10)
         self.pg_entry.grid(row=0, column=1)
+
+        # Ce - ground snow load
+        tk.Label(self.snow_data_frame, text="Ce :", font=self.helv_res).grid(row=1, column=0, sticky=tk.E)
+        self.ce_gui = tk.StringVar()
+        self.inputs.append(self.ce_gui)
+        self.ce_gui.set('1.0')
+        self.ce_entry = tk.Entry(self.snow_data_frame, textvariable=self.ce_gui, width=10)
+        self.ce_entry.grid(row=1, column=1)
+
+        # Ct - ground snow load
+        tk.Label(self.snow_data_frame, text="Ct :", font=self.helv_res).grid(row=2, column=0, sticky=tk.E)
+        self.ct_gui = tk.StringVar()
+        self.inputs.append(self.ct_gui)
+        self.ct_gui.set('1.0')
+        self.ct_entry = tk.Entry(self.snow_data_frame, textvariable=self.ct_gui, width=10)
+        self.ct_entry.grid(row=2, column=1)
+
+        # Cs - ground snow load
+        tk.Label(self.snow_data_frame, text="Cs :", font=self.helv_res).grid(row=3, column=0, sticky=tk.E)
+        self.cs_gui = tk.StringVar()
+        self.inputs.append(self.cs_gui)
+        self.cs_gui.set('1.0')
+        self.cs_entry = tk.Entry(self.snow_data_frame, textvariable=self.cs_gui, width=10)
+        self.cs_entry.grid(row=3, column=1)
+
+        # I - Importance Factor
+        tk.Label(self.snow_data_frame, text="I :", font=self.helv_res).grid(row=4, column=0, sticky=tk.E)
+        self.I_gui = tk.StringVar()
+        self.inputs.append(self.I_gui)
+        self.I_gui.set('1.0')
+        self.I_entry = tk.Entry(self.snow_data_frame, textvariable=self.I_gui, width=10)
+        self.I_entry.grid(row=4, column=1)
+        
+        self.b_snow_basic = tk.Button(self.snow_data_frame,text="Calc Initial Snow", command=self.snow_step_1, font=self.helv, width=w, height=h, bg=color)
+        self.b_snow_basic.grid(row=5, column=1)
+       
+        tk.Label(self.snow_data_frame, text="Snow Density (pcf) :", font=self.helv_res).grid(row=6, column=0, sticky=tk.E)
+        tk.Label(self.snow_data_frame, text="min. of:", font=self.helv_res).grid(row=7, column=0, sticky=tk.E)
+        tk.Label(self.snow_data_frame, text="0.13*Pg + 14", font=self.helv_res).grid(row=6, column=1)
+        tk.Label(self.snow_data_frame, text="30", font=self.helv_res).grid(row=7, column=1)
+        self.snow_density_pcf_gui = tk.Label(self.snow_data_frame, text="--", font=self.helv_res)
+        self.snow_density_pcf_gui.grid(row=7, column=2)
+        
+        #Pf - Flat Roof Snow Load
+        tk.Label(self.snow_data_frame, text="Pf (psf) :", font=self.helv_res).grid(row=8, column=0, sticky=tk.E)
+        tk.Label(self.snow_data_frame, text="0.7*Ce*Ct*I*pg", font=self.helv_res).grid(row=8, column=1)
+        self.pf_psf_gui = tk.Label(self.snow_data_frame, text="--", font=self.helv_res)
+        self.pf_psf_gui.grid(row=8, column=2)
+
+        #Ps - ??
+        tk.Label(self.snow_data_frame, text="Ps (psf) :", font=self.helv_res).grid(row=9, column=0, sticky=tk.E)
+        tk.Label(self.snow_data_frame, text="Cs*Pf", font=self.helv_res).grid(row=9, column=1)
+        self.ps_psf_gui = tk.Label(self.snow_data_frame, text="--", font=self.helv_res)
+        self.ps_psf_gui.grid(row=9, column=2)       
+        
+        #Hb - depth of balance snow load
+        tk.Label(self.snow_data_frame, text="Hb (ft) :", font=self.helv_res).grid(row=10, column=0, sticky=tk.E)
+        tk.Label(self.snow_data_frame, text="Ps/Snow Density", font=self.helv_res).grid(row=10, column=1)
+        self.hb_ft_gui = tk.Label(self.snow_data_frame, text="--", font=self.helv_res)
+        self.hb_ft_gui.grid(row=10, column=2)   
 
         #snow_density_pcf = min((0.13*pg_psf) + 14, 30)
         #Ce = 1.0
@@ -152,7 +212,25 @@ class main_window:
     def quit_app(self):
         self.master.destroy()
         self.master.quit()
-        
+
+    def snow_step_1(self, *event):
+        self.pg_psf = float(self.pg_psf_gui.get())
+        self.snow_density_pcf = min((0.13*self.pg_psf) + 14, 30)
+        self.snow_density_pcf_gui.config(text='{0:.3f}'.format(self.snow_density_pcf))
+
+        self.ce = float(self.ce_gui.get())
+        self.ct = float(self.ct_gui.get())
+        self.I = float(self.I_gui.get())
+        self.cs = float(self.cs_gui.get())
+
+        self.pf_psf = 0.7*self.ce*self.ct*self.I*self.pg_psf
+        self.pf_psf_gui.config(text='{0:.3f}'.format(self.pf_psf))
+
+        self.ps_psf = self.cs*self.pf_psf
+        self.ps_psf_gui.config(text='{0:.3f}'.format(self.ps_psf))
+        self.hb_ft = self.ps_psf/self.snow_density_pcf
+        self.hb_ft_gui.config(text='{0:.3f}'.format(self.hb_ft))
+
 def main():
     root = tk.Tk()
     root.title("Snow Drift by Polygons - Alpha")
