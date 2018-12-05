@@ -86,7 +86,7 @@ def ic_brandt(IC, xloc, yloc, Mp):
     Ry = sum(fy) * Rult
     
     
-    table = [xIC, yIC, di, deltai, ri, moment, fx, fy]
+    table = [["Bolt x to IC",xIC],["Bolt y to IC", yIC],["di", di],["deltai", deltai],["ri", ri],["Mi", moment],["Fxi", fx],["Fyi", fy]]
     
     return Rx, Ry, Mi, table
     
@@ -122,7 +122,7 @@ def brandt(xloc, yloc, P_xloc, P_yloc, P_angle):
         anchor_y_bar = y_tot/len(yloc)
      
     cg_anchors = [anchor_x_bar, anchor_y_bar]
-    detailed_output.append(cg_anchors)
+    detailed_output.append(["Anchor Group C.G.",cg_anchors])
     
     # J - Polar Moment of Inertial of Bolt Group
     # sum(x^2+y^2)
@@ -135,37 +135,37 @@ def brandt(xloc, yloc, P_xloc, P_yloc, P_angle):
         sum_y_square = sum_y_square + (yloc[i]-anchor_y_bar)**2
     
     J = sum_x_square + sum_y_square
-    detailed_output.append(['J',J])
+    detailed_output.append(['Anchor Group J',J])
     
     Px = -1*m.cos(m.radians(P_angle))
     Py = -1*m.sin(m.radians(P_angle))
     
-    detailed_output.append([Px,Py])
+    detailed_output.append(["Unit Forces",Px,Py])
     
     Mo = (-1*Px*(P_yloc-anchor_y_bar))+(Py*(P_xloc-anchor_x_bar))
     
-    detailed_output.append(Mo)
+    detailed_output.append(["Mo",Mo])
     
     ax = (-1*Py*J) / (n * Mo)
     ay = (Px*J) / (n*Mo)
     
-    detailed_output.append([ax,ay])
+    detailed_output.append(["ax",ax,"ay",ay])
     
     Mp = (-1*Px*(P_yloc-anchor_y_bar-ay))+(Py*(P_xloc-anchor_x_bar-ax))
     
-    detailed_output.append(Mp)
+    detailed_output.append(["Mp",Mp])
     
     IC_initial = [anchor_x_bar+ax,anchor_y_bar+ay]
     
     Rx, Ry, Mi, table = ic_brandt(IC_initial,xloc,yloc, Mp)
     
-    detailed_output.append([Rx, Ry, Mi, table,"First IC pass"])
+    detailed_output.append(["Rx",Rx,"Ry", Ry,"Mi", Mi,"Per Bolt Table", table,"First IC pass"])
     
     fxx = Px + Rx
     fyy = Py + Ry
     F = m.sqrt(fxx*fxx+fyy*fyy)
     
-    detailed_output.append([fxx,fyy,F,"F"])
+    detailed_output.append(["fxx",fxx,"fyy",fyy,"F",F])
     
     ax_new = (-1*fyy*J)/(n*Mo)
     ay_new = (fxx*J) / (n*Mo)
@@ -198,17 +198,17 @@ def brandt(xloc, yloc, P_xloc, P_yloc, P_angle):
             count +=1
             solution = 'no'
     
-    detailed_output.append([fxx,fyy,F])        
-    detailed_output.append(IC_new)
-    detailed_output.append([solution,iterations,count])
+    detailed_output.append(["fxx",fxx,"fyy",fyy,"F",F])        
+    detailed_output.append(["I.C.",IC_new])
+    detailed_output.append(["Solution:",solution,"# Iterations:",iterations,count])
     
-    detailed_output.append([Rx, Ry, Mi, table])
+    detailed_output.append(["Rx",Rx,"Ry", Ry,"Mi", Mi,"Per Bolt Table", table])
     
     
     
     Cu = abs(Mi/Mp_new)
     
-    detailed_output.append([Mi,Mp_new,Cu])
+    detailed_output.append(["Mi",Mi,"Mp",Mp_new,"Cu",Cu])
     
     return detailed_output, IC_new, Cu
 
@@ -220,5 +220,6 @@ P_yloc = 0
 P_angle = 60
 
 brandt = brandt(x_b, y_b, P_xloc, P_yloc, P_angle) 
-    
+
+Cu = brandt[2]
         
