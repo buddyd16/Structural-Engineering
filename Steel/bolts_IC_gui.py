@@ -316,8 +316,8 @@ class main_window:
             p_yloc = float(self.load_y_gui.get())
             p_angle = float(self.load_angle_gui.get())
             
-            px_2 = (m.cos(m.radians(p_angle))*5)+ p_xloc
-            py_2 = (m.sin(m.radians(p_angle))*5) + p_yloc
+            px_2 = (m.cos(m.radians(p_angle))*3)+ p_xloc
+            py_2 = (m.sin(m.radians(p_angle))*3) + p_yloc
             
             for x in self.bolt_x_gui:
                 xloc.append(float(x.get()))
@@ -340,7 +340,7 @@ class main_window:
             
             max_dim_for_scale = max(max_x,max_y)
             
-            initial = 70
+            initial = 80
             
             if max_x == 0:
                 sf_x = (w - (2*initial))
