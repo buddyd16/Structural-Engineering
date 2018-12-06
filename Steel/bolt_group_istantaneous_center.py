@@ -213,13 +213,13 @@ def brandt(xloc, yloc, P_xloc, P_yloc, P_angle):
     return detailed_output, IC_new, Cu
 
 # Brandt's Method Testing Zone
-x_b = [-1.5,-1.5,-1.5,-1.5,1.5,1.5,1.5,1.5]
-y_b = [-4.5,-1.5,1.5,4.5,4.5,1.5,-1.5,-4.5]
-P_xloc = 24
-P_yloc = 0
-P_angle = 60
-
-brandt = brandt(x_b, y_b, P_xloc, P_yloc, P_angle) 
-
-Cu = brandt[2]
+#x_b = [-1.5,-1.5,-1.5,-1.5,1.5,1.5,1.5,1.5]
+#y_b = [-4.5,-1.5,1.5,4.5,4.5,1.5,-1.5,-4.5]
+#P_xloc = 24
+#P_yloc = 0
+#P_angle = 60
+#
+#brandt = brandt(x_b, y_b, P_xloc, P_yloc, P_angle) 
+#
+#Cu = brandt[2]
         
