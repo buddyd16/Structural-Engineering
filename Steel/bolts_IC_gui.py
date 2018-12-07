@@ -36,6 +36,7 @@ class main_window:
         self.yloc = []
         self.bolt_count = 0
         self.hasrun=0
+        self.detailed_results_gui = []
         
         # Font Set
         self.f_size = 8
@@ -77,14 +78,27 @@ class main_window:
         self.nb_data = ttk.Notebook(self.data_frame)
         self.nb_data.pack(fill=tk.BOTH, expand=1)
         
+        self.nb_graph = ttk.Notebook(self.graphics_frame)
+        self.nb_graph.pack(fill=tk.BOTH, expand=1)
+        
         #Graphics Frame tabs and canvases
         #Geometry - Plan
-        self.g_plan_frame = tk.Frame(self.graphics_frame, bd=2, relief='sunken', padx=1,pady=1)
+        self.graph_tab = ttk.Frame(self.nb_graph)
+        self.nb_graph.add(self.graph_tab, text='Graph')
+        
+        self.g_plan_frame = tk.Frame(self.graph_tab, bd=2, relief='sunken', padx=1,pady=1)
         self.g_plan_frame.pack(fill=tk.BOTH,expand=1, padx=5, pady=5)
 
-        self.g_plan_canvas = tk.Canvas(self.g_plan_frame, width=50, height=50, bd=2, relief='sunken', background="gray60")
+        self.g_plan_canvas = tk.Canvas(self.g_plan_frame, width=50, height=50, bd=2, relief='sunken', background="black")
         self.g_plan_canvas.bind("<Configure>", self.draw_bolts)
         self.g_plan_canvas.pack(side = tk.LEFT, anchor='c', padx= 1, pady= 1, fill=tk.BOTH, expand=1)
+        
+        #Detailed Out - Tab
+        self.detail_tab = ttk.Frame(self.nb_graph)
+        self.nb_graph.add(self.detail_tab, text='Detailed Results')
+        
+        self.detailed_res_frame = tk.Frame(self.detail_tab, bd=2, relief='sunken', padx=1,pady=1)
+        self.detailed_res_frame.pack(fill=tk.BOTH,expand=1, padx=5, pady=5)
         
         #Data/calc Frame tabs
         #Load location Angle and add bolts
@@ -169,6 +183,11 @@ class main_window:
         self.cu_gui.set("--")
         tk.Label(self.data_frame, text="Cu: ", font=self.helv).grid(row=11, column=0, sticky=tk.E)
         tk.Entry(self.data_frame, textvariable=self.cu_gui, width=10).grid(row=11, column=1)
+        
+        self.solution_gui = tk.StringVar()
+        self.solution_gui.set("--")
+        tk.Label(self.data_frame, text="Solution Useable: ", font=self.helv).grid(row=12, column=0, sticky=tk.E)
+        tk.Entry(self.data_frame, textvariable=self.solution_gui, width=10).grid(row=12, column=1)
         
         self.data_frame.pack(fill=tk.BOTH,expand=1, padx=5, pady=5)
         
@@ -280,14 +299,17 @@ class main_window:
             res = bolt_ic.brandt(xloc,yloc,p_xloc,p_yloc,p_angle)
             
             self.IC = res[1]
-            Cu = res[2]
+            self.Cu = res[2]
+            self.detailed_out = res[0]
             
             self.ic_x_gui.set("{0:.3f}".format(self.IC[0]))
             self.ic_y_gui.set("{0:.3f}".format(self.IC[1]))
-            self.cu_gui.set("{0:.3f}".format(Cu))
+            self.cu_gui.set("{0:.3f}".format(self.Cu))
+            self.solution_gui.set(self.detailed_out[12][1])
             
             self.hasrun=1
             self.draw_bolts()
+            self.fill_details()
             
     def draw_bolts(self,*event):
         self.g_plan_canvas.delete("all")
@@ -373,6 +395,70 @@ class main_window:
             x1 = (((ic_x - min_x) * sf_x) + initial)+5
             y1 = h-(((ic_y - min_y)*sf_y)+initial)-5
             self.g_plan_canvas.create_oval(x0,y0,x1,y1, fill='red', width=1)
+
+    def fill_details(self,*event):
+        for element in self.detailed_results_gui:
+            element.destroy()
+        
+        if self.hasrun == 0:
+            pass
+        else:
+            b = tk.Label(self.detailed_res_frame, text="Number of Bolts: {0}".format(self.detailed_out[0]), font=self.helv)
+            b.grid(row=0, column=0, columnspan=2, sticky=tk.W)
+            self.detailed_results_gui.append(b)
+            
+            cg = tk.Label(self.detailed_res_frame, text="Bolt Group Centroid: ({0:.3f},{1:.3f})".format(self.detailed_out[1][1][0],self.detailed_out[1][1][1]), font=self.helv)
+            cg.grid(row=1, column=0, columnspan=2, sticky=tk.W)
+            self.detailed_results_gui.append(cg)
+            
+            j = tk.Label(self.detailed_res_frame, text="Bolt Group J: {0:.3f}".format(self.detailed_out[2][1]), font=self.helv)
+            j.grid(row=2, column=0, columnspan=2, sticky=tk.W)
+            self.detailed_results_gui.append(j)
+            
+            p_unit = tk.Label(self.detailed_res_frame, text="Unit Forces:", font=self.helv)
+            p_unit.grid(row=3, column=0, sticky=tk.W)
+            self.detailed_results_gui.append(p_unit)
+            
+            px = tk.Label(self.detailed_res_frame, text="Px,unit: {0:.3f}".format(self.detailed_out[3][1]), font=self.helv)
+            px.grid(row=4, column=0, sticky=tk.W)
+            self.detailed_results_gui.append(px)
+            
+            py = tk.Label(self.detailed_res_frame, text="Py,unit: {0:.3f}".format(self.detailed_out[3][2]), font=self.helv)
+            py.grid(row=4, column=1, sticky=tk.W)
+            self.detailed_results_gui.append(py)
+            
+            sol = tk.Label(self.detailed_res_frame, text="{0} {1}\n{2} {3}".format(self.detailed_out[12][0],self.detailed_out[12][1],self.detailed_out[12][2],self.detailed_out[12][3]), justify=tk.LEFT, font=self.helv)
+            sol.grid(row=5, column=0,columnspan=2, sticky=tk.W)
+            self.detailed_results_gui.append(sol)
+            
+            res_string = "Sum Rx: {0}\nSum Ry: {1}\nSum Mi: {2}\n\nFxx = Px-Rx = {3}\nFyy = Py-Ry = {4}".format(self.detailed_out[13][1],self.detailed_out[13][3],self.detailed_out[13][5],self.detailed_out[10][1],self.detailed_out[10][3])
+            f_delta = tk.Label(self.detailed_res_frame, text=res_string, justify=tk.LEFT, font=self.helv)
+            f_delta.grid(row=6, column=0,columnspan=3, sticky=tk.W)
+            self.detailed_results_gui.append(f_delta)
+            
+            labels = ["Bolt","x to IC","y to IC","di","deltai","R/Rult","Mi","Fxi","Fyi"]
+            y = 0
+            
+            for label in labels:
+                to_gui = tk.Label(self.detailed_res_frame, text=label, font=self.helv, width = 10)
+                to_gui.grid(row=7, column=y)
+                self.detailed_results_gui.append(to_gui)
+                y+=1
+            
+            for i in range(self.detailed_out[0]):
+                to_gui = tk.Label(self.detailed_res_frame, text="{0}".format(i+1), font=self.helv, width = 10)
+                to_gui.grid(row=8+i, column=0)
+                self.detailed_results_gui.append(to_gui)
+                
+            y = 1
+            for res in self.detailed_out[13][7]:
+                i=0
+                for out in res[1]:
+                    to_gui = tk.Label(self.detailed_res_frame, text="{0:.4f}".format(out), font=self.helv, width = 10)
+                    to_gui.grid(row=8+i, column=y)
+                    self.detailed_results_gui.append(to_gui)
+                    i+=1
+                y+=1
             
         
 def main():

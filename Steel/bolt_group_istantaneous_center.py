@@ -176,7 +176,7 @@ def brandt(xloc, yloc, P_xloc, P_yloc, P_angle):
     
     count = 0
     iterations = 0
-    while count<1000:
+    while count<100000:
         
         IC_new = [IC_new[0]+ax_new,IC_new[1]+ay_new]
         Mp_new = (-1*Px*(P_yloc-IC_new[1]))+(Py*(P_xloc-IC_new[0]))
@@ -190,11 +190,12 @@ def brandt(xloc, yloc, P_xloc, P_yloc, P_angle):
         ax_new = (-1*fyy*J)/(n*Mo)
         ay_new = (fxx*J) / (n*Mo)
         
-        if F <= 0.00001:
+        if F <= 0.000000001:
             iterations = count
-            count = 1000          
+            count = 100000          
             solution = 'yes'
-        else:        
+        else:   
+            iterations = count
             count +=1
             solution = 'no'
     
