@@ -327,7 +327,7 @@ class main_window:
             self.cu_gui.set("{0:.3f}".format(self.Cu))
             self.solution_gui.set(self.detailed_out[12][1])
             self.cu_maybe_gui.set("{0:.3f}".format(self.detailed_out[15][1]))
-            self.tol_achieved_gui.set(min(self.detailed_out[17][0]))
+            self.tol_achieved_gui.set("{:.3E}".format(min(self.detailed_out[17][0])))
             
             self.hasrun=1
             self.draw_bolts()
