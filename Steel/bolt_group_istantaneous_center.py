@@ -90,7 +90,7 @@ def ic_brandt(IC, xloc, yloc, Mp):
     
     return Rx, Ry, Mi, table
     
-def brandt(xloc, yloc, P_xloc, P_yloc, P_angle):
+def brandt(xloc, yloc, P_xloc, P_yloc, P_angle, tol=0.000001):
     # Bolt Group Instantaneous Center using method by G. Donald Brandt
     # Rapid Determiniation of Ultimate Strength Of Eccentrically Loaded Bolt Groups
     # AISC Journal 1982 2nd Quarter
@@ -172,12 +172,16 @@ def brandt(xloc, yloc, P_xloc, P_yloc, P_angle):
     
     detailed_output.append(["ax",ax_new,"ay",ay_new])
     
-    IC_new = IC_initial  
+    IC_new = IC_initial
+    
+    Cu = abs(Mi/Mp)
     
     count = 0
     iterations = 0
+    f_track = [F]
+    cu_track = [Cu]
     while count<100000:
-        
+
         IC_new = [IC_new[0]+ax_new,IC_new[1]+ay_new]
         Mp_new = (-1*Px*(P_yloc-IC_new[1]))+(Py*(P_xloc-IC_new[0]))
         
@@ -187,10 +191,16 @@ def brandt(xloc, yloc, P_xloc, P_yloc, P_angle):
         fyy = Py + Ry
         F = m.sqrt(fxx*fxx+fyy*fyy)
         
+        f_track.append(F)
+        
+        Cu = abs(Mi/Mp_new)
+        
+        cu_track.append(Cu)
+        
         ax_new = (-1*fyy*J)/(n*Mo)
         ay_new = (fxx*J) / (n*Mo)
-        
-        if F <= 0.000000001:
+             
+        if F <= tol:
             iterations = count
             count = 100000          
             solution = 'yes'
@@ -203,22 +213,32 @@ def brandt(xloc, yloc, P_xloc, P_yloc, P_angle):
     detailed_output.append(["I.C.",IC_new])
     detailed_output.append(["Solution:",solution,"# Iterations:",iterations,count])
     
-    detailed_output.append(["Rx",Rx,"Ry", Ry,"Mi", Mi,"Per Bolt Table", table])
-    
-    
+    detailed_output.append(["Rx",Rx,"Ry", Ry,"Mi", Mi,"Per Bolt Table", table])  
     
     Cu = abs(Mi/Mp_new)
     
+    F_old = f_track[-2]
+    F = f_track[-1]
+    Cu_old = cu_track[-2]
+    try:
+        Cu_predict = ((F_old*F_old*Cu) - (F*F*Cu_old)) / ((F_old*F_old) - (F*F))
+    except:
+        Cu_predict = 0
+        
     detailed_output.append(["Mi",Mi,"Mp",Mp_new,"Cu",Cu])
+    detailed_output.append(["Predicted Cu", Cu_predict])
+    detailed_output.append([F_old,F,Cu_old,Cu])
+    detailed_output.append([f_track,cu_track])
+    
     
     return detailed_output, IC_new, Cu
 
 # Brandt's Method Testing Zone
 #x_b = [-1.5,-1.5,-1.5,-1.5,1.5,1.5,1.5,1.5]
 #y_b = [-4.5,-1.5,1.5,4.5,4.5,1.5,-1.5,-4.5]
-#P_xloc = 24
+#P_xloc = 3
 #P_yloc = 0
-#P_angle = 60
+#P_angle = 15
 #
 #brandt = brandt(x_b, y_b, P_xloc, P_yloc, P_angle) 
 #

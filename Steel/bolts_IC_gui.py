@@ -189,6 +189,16 @@ class main_window:
         tk.Label(self.data_frame, text="Solution Useable: ", font=self.helv).grid(row=12, column=0, sticky=tk.E)
         tk.Entry(self.data_frame, textvariable=self.solution_gui, width=10).grid(row=12, column=1)
         
+        self.cu_maybe_gui = tk.StringVar()
+        self.cu_maybe_gui.set("--")
+        tk.Label(self.data_frame, text="Predicted Cu: ", font=self.helv).grid(row=13, column=0, sticky=tk.E)
+        tk.Entry(self.data_frame, textvariable=self.cu_maybe_gui, width=10).grid(row=13, column=1)
+        
+        self.tol_overide_gui = tk.StringVar()
+        self.tol_overide_gui.set("--")
+        tk.Label(self.data_frame, text="Tolerance Overide: \nDefualt:0.000001\n-- = no overide", font=self.helv).grid(row=14, column=0, sticky=tk.E)
+        tk.Entry(self.data_frame, textvariable=self.tol_overide_gui, width=10).grid(row=14, column=1)
+        
         self.data_frame.pack(fill=tk.BOTH,expand=1, padx=5, pady=5)
         
         # Call function to display license dialog on app start
@@ -295,8 +305,13 @@ class main_window:
                 
             for y in self.bolt_y_gui:
                 yloc.append(float(y.get()))
-            
-            res = bolt_ic.brandt(xloc,yloc,p_xloc,p_yloc,p_angle)
+            tol = self.tol_overide_gui.get()
+            if tol == "--":
+                tol= 0.000001
+            else:
+                tol=float(tol)
+                
+            res = bolt_ic.brandt(xloc,yloc,p_xloc,p_yloc,p_angle,tol)
             
             self.IC = res[1]
             self.Cu = res[2]
@@ -306,6 +321,7 @@ class main_window:
             self.ic_y_gui.set("{0:.3f}".format(self.IC[1]))
             self.cu_gui.set("{0:.3f}".format(self.Cu))
             self.solution_gui.set(self.detailed_out[12][1])
+            self.cu_maybe_gui.set("{0:.3f}".format(self.detailed_out[15][1]))
             
             self.hasrun=1
             self.draw_bolts()
@@ -431,7 +447,7 @@ class main_window:
             sol.grid(row=5, column=0,columnspan=2, sticky=tk.W)
             self.detailed_results_gui.append(sol)
             
-            res_string = "Sum Rx: {0}\nSum Ry: {1}\nSum Mi: {2}\n\nFxx = Px-Rx = {3}\nFyy = Py-Ry = {4}".format(self.detailed_out[13][1],self.detailed_out[13][3],self.detailed_out[13][5],self.detailed_out[10][1],self.detailed_out[10][3])
+            res_string = "Sum Rx: {0}\nSum Ry: {1}\nSum Mi: {2}\n\nFxx = Px-Rx = {3}\nFyy = Py-Ry = {4}\nF = {5}\n\nFprev={6}\nCuprev={7}".format(self.detailed_out[13][1],self.detailed_out[13][3],self.detailed_out[13][5],self.detailed_out[10][1],self.detailed_out[10][3],self.detailed_out[10][5],self.detailed_out[16][0],self.detailed_out[16][2])
             f_delta = tk.Label(self.detailed_res_frame, text=res_string, justify=tk.LEFT, font=self.helv)
             f_delta.grid(row=6, column=0,columnspan=3, sticky=tk.W)
             self.detailed_results_gui.append(f_delta)
