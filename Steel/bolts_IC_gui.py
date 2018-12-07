@@ -199,6 +199,11 @@ class main_window:
         tk.Label(self.data_frame, text="Tolerance Overide: \nDefualt:0.000001\n-- = no overide", font=self.helv).grid(row=14, column=0, sticky=tk.E)
         tk.Entry(self.data_frame, textvariable=self.tol_overide_gui, width=10).grid(row=14, column=1)
         
+        self.tol_achieved_gui = tk.StringVar()
+        self.tol_achieved_gui.set("--")
+        tk.Label(self.data_frame, text="Tolerance reached:", font=self.helv).grid(row=15, column=0, sticky=tk.E)
+        tk.Entry(self.data_frame, textvariable=self.tol_achieved_gui, width=10).grid(row=15, column=1)
+        
         self.data_frame.pack(fill=tk.BOTH,expand=1, padx=5, pady=5)
         
         # Call function to display license dialog on app start
@@ -322,6 +327,7 @@ class main_window:
             self.cu_gui.set("{0:.3f}".format(self.Cu))
             self.solution_gui.set(self.detailed_out[12][1])
             self.cu_maybe_gui.set("{0:.3f}".format(self.detailed_out[15][1]))
+            self.tol_achieved_gui.set(min(self.detailed_out[17][0]))
             
             self.hasrun=1
             self.draw_bolts()
