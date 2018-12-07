@@ -180,7 +180,7 @@ def brandt(xloc, yloc, P_xloc, P_yloc, P_angle, tol=0.000001):
     iterations = 0
     f_track = [F]
     cu_track = [Cu]
-    while count<100000:
+    while count<200:
 
         IC_new = [IC_new[0]+ax_new,IC_new[1]+ay_new]
         Mp_new = (-1*Px*(P_yloc-IC_new[1]))+(Py*(P_xloc-IC_new[0]))
@@ -202,7 +202,7 @@ def brandt(xloc, yloc, P_xloc, P_yloc, P_angle, tol=0.000001):
              
         if F <= tol:
             iterations = count
-            count = 100000          
+            count = 200          
             solution = 'yes'
         else:   
             iterations = count
@@ -241,6 +241,6 @@ def brandt(xloc, yloc, P_xloc, P_yloc, P_angle, tol=0.000001):
 #P_angle = 15
 #
 #brandt = brandt(x_b, y_b, P_xloc, P_yloc, P_angle) 
-#
+
 #Cu = brandt[2]
         

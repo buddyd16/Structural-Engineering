@@ -100,6 +100,17 @@ class main_window:
         self.detailed_res_frame = tk.Frame(self.detail_tab, bd=2, relief='sunken', padx=1,pady=1)
         self.detailed_res_frame.pack(fill=tk.BOTH,expand=1, padx=5, pady=5)
         
+        #Convergance Graph
+        self.converge_graph_tab = ttk.Frame(self.nb_graph)
+        self.nb_graph.add(self.converge_graph_tab, text='Convergance Graph')
+        
+        self.g_converge_frame = tk.Frame(self.converge_graph_tab, bd=2, relief='sunken', padx=1,pady=1)
+        self.g_converge_frame.pack(fill=tk.BOTH,expand=1, padx=5, pady=5)
+        
+        self.g_converge_canvas = tk.Canvas(self.g_converge_frame, width=50, height=50, bd=2, relief='sunken', background="black")
+        self.g_converge_canvas.bind("<Configure>", self.draw_converge)
+        self.g_converge_canvas.pack(side = tk.LEFT, anchor='c', padx= 1, pady= 1, fill=tk.BOTH, expand=1)
+        
         #Data/calc Frame tabs
         #Load location Angle and add bolts
         self.basic_input = ttk.Frame(self.nb_data)
@@ -332,6 +343,7 @@ class main_window:
             self.hasrun=1
             self.draw_bolts()
             self.fill_details()
+            self.draw_converge()
             
     def draw_bolts(self,*event):
         self.g_plan_canvas.delete("all")
@@ -481,7 +493,71 @@ class main_window:
                     self.detailed_results_gui.append(to_gui)
                     i+=1
                 y+=1
+
+    def draw_converge(self, *events):
+        self.g_converge_canvas.delete("all")
+        w = self.g_converge_canvas.winfo_width()
+        h = self.g_converge_canvas.winfo_height()
+        
+        if self.hasrun == 0:
+            pass
+        else:
             
+            vals = self.detailed_out[17][0]
+            
+            norm_vals = [float(i)/max(vals) for i in vals]
+            
+            count = len(vals)
+            
+            max_dim_for_scale = count
+                        
+            initial = 80
+            
+            sf_x = (w - (2*initial)) / max_dim_for_scale
+                
+            #x - axis:
+            x0 = initial
+            y0 = h - initial
+            x1 = w - initial
+            y1 = h - initial
+            self.g_converge_canvas.create_line(x0,y0,x1,y1, fill='green', width=1)
+            
+            #y - axis
+            x0 = initial
+            y0 = h - initial
+            x1 = initial
+            y1 = initial
+            self.g_converge_canvas.create_line(x0,y0,x1,y1, fill='green', width=1)
+            
+            
+            x = 0
+            for i in range(len(norm_vals)):
+                x0 = (((x) * sf_x) + initial)
+                y0 = h - initial
+                x1 = x0
+                y1 = h - (initial-5)
+                self.g_converge_canvas.create_line(x0,y0,x1,y1, fill='green', width=1)
+                x+=1
+            
+            x = 0
+            for y in range(len(norm_vals)):
+                if y+1 > len(norm_vals):
+                    pass
+                else:                    
+                    x0 = (((x) * sf_x) + initial)
+                    y0 = (h-initial) - (norm_vals[y] * (h - (2*initial)))
+                    x1 = (((x+1) * sf_x) + initial)
+                    y1 = (h-initial) - (norm_vals[y+1] * (h - (2*initial)))
+                    
+                    
+                    if y0<=y1:
+                        color = "blue"
+                    else:
+                        color = "red"
+                        
+                    self.g_converge_canvas.create_line(x0,y0,x1,y1, fill=color, width=1)
+                    
+                    x+=1
         
 def main():
     root = tk.Tk()
