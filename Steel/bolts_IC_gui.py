@@ -541,7 +541,7 @@ class main_window:
             
             x = 0
             for y in range(len(norm_vals)):
-                if y+1 > len(norm_vals):
+                if y+1 > len(norm_vals)-1:
                     pass
                 else:                    
                     x0 = (((x) * sf_x) + initial)
