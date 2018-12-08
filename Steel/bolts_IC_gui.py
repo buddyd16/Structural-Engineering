@@ -609,7 +609,7 @@ class main_window:
             
             vals = self.detailed_out[17][1]
             
-            norm_vals = [float(i)/max(vals) for i in vals]
+            norm_vals = [(float(i)-min(vals))/(max(vals)-min(vals)) for i in vals]
             
             count = len(vals)
             
@@ -618,6 +618,7 @@ class main_window:
             initial = 80
             
             sf_x = (w - (2*initial)) / max_dim_for_scale
+            sf_y = (h - (2*initial))
                 
             #x - axis:
             x0 = initial
@@ -644,9 +645,9 @@ class main_window:
 
             #min val label + line
             x0 = initial
-            y0 = (h-initial) - (min(norm_vals) * (h - (2*initial)))
+            y0 = (h-initial) - (min(norm_vals) * sf_y)
             x1 = x0 - 5
-            y1 = (h-initial) - (min(norm_vals) * (h - (2*initial)))
+            y1 = (h-initial) - (min(norm_vals) * sf_y)
             self.g_c_stab_canvas.create_line(x0,y0,x1,y1, fill='green', width=1)
             self.g_c_stab_canvas.create_text(x1-35,y0, text='{0:.4f}'.format(min(vals)), fill='green')
             
@@ -665,11 +666,10 @@ class main_window:
                     pass
                 else:                    
                     x0 = (((x) * sf_x) + initial)
-                    y0 = (h-initial) - (norm_vals[y] * (h - (2*initial)))
+                    y0 = (h-initial) - (norm_vals[y] * sf_y)
                     x1 = (((x+1) * sf_x) + initial)
-                    y1 = (h-initial) - (norm_vals[y+1] * (h - (2*initial)))
-                    
-                    
+                    y1 = (h-initial) - (norm_vals[y+1] * sf_y)
+                                       
                     if y0<=y1:
                         color = "blue"
                     else:
