@@ -110,6 +110,18 @@ class main_window:
         self.g_converge_canvas = tk.Canvas(self.g_converge_frame, width=50, height=50, bd=2, relief='sunken', background="black")
         self.g_converge_canvas.bind("<Configure>", self.draw_converge)
         self.g_converge_canvas.pack(side = tk.LEFT, anchor='c', padx= 1, pady= 1, fill=tk.BOTH, expand=1)
+
+        #C stability Graph
+        self.c_stab_graph_tab = ttk.Frame(self.nb_graph)
+        self.nb_graph.add(self.c_stab_graph_tab, text='C Stability Graph')
+        
+        self.g_c_stab_frame = tk.Frame(self.c_stab_graph_tab, bd=2, relief='sunken', padx=1,pady=1)
+
+        self.g_c_stab_frame.pack(fill=tk.BOTH,expand=1, padx=5, pady=5)
+        
+        self.g_c_stab_canvas = tk.Canvas(self.g_c_stab_frame, width=50, height=50, bd=2, relief='sunken', background="black")
+        self.g_c_stab_canvas.bind("<Configure>", self.draw_c_stability)
+        self.g_c_stab_canvas.pack(side = tk.LEFT, anchor='c', padx= 1, pady= 1, fill=tk.BOTH, expand=1)
         
         #Data/calc Frame tabs
         #Load location Angle and add bolts
@@ -344,6 +356,7 @@ class main_window:
             self.draw_bolts()
             self.fill_details()
             self.draw_converge()
+            self.draw_c_stability()
             
     def draw_bolts(self,*event):
         self.g_plan_canvas.delete("all")
@@ -529,7 +542,33 @@ class main_window:
             y1 = initial
             self.g_converge_canvas.create_line(x0,y0,x1,y1, fill='green', width=1)
             
-            
+            #max val label + line
+            x0 = initial
+            y0 = initial
+            x1 = x0 - 5
+            y1 = initial
+            self.g_converge_canvas.create_line(x0,y0,x1,y1, fill='green', width=1)
+
+            if max(vals)<0.01:
+                string = "{:.3E}".format(max(vals))
+            else:
+                string = '{0:.3f}'.format(max(vals))
+
+            self.g_converge_canvas.create_text(x1-35,initial, text=string, fill='green')
+
+            #min val label + line
+            x0 = initial
+            y0 = (h-initial) - (min(norm_vals) * (h - (2*initial)))
+            x1 = x0 - 5
+            y1 = (h-initial) - (min(norm_vals) * (h - (2*initial)))
+            self.g_converge_canvas.create_line(x0,y0,x1,y1, fill='green', width=1)
+
+            if min(vals)<0.01:
+                string = "{:.3E}".format(min(vals))
+            else:
+                string = '{0:.3f}'.format(min(vals))
+            self.g_converge_canvas.create_text(x1-35,y0, text=string, fill='green')
+           
             x = 0
             for i in range(len(norm_vals)):
                 x0 = (((x) * sf_x) + initial)
@@ -556,6 +595,87 @@ class main_window:
                         color = "red"
                         
                     self.g_converge_canvas.create_line(x0,y0,x1,y1, fill=color, width=1)
+                    
+                    x+=1
+
+    def draw_c_stability(self, *events):
+        self.g_c_stab_canvas.delete("all")
+        w = self.g_c_stab_canvas.winfo_width()
+        h = self.g_c_stab_canvas.winfo_height()
+        
+        if self.hasrun == 0:
+            pass
+        else:
+            
+            vals = self.detailed_out[17][1]
+            
+            norm_vals = [float(i)/max(vals) for i in vals]
+            
+            count = len(vals)
+            
+            max_dim_for_scale = count
+                        
+            initial = 80
+            
+            sf_x = (w - (2*initial)) / max_dim_for_scale
+                
+            #x - axis:
+            x0 = initial
+            y0 = h - initial
+            x1 = w - initial
+            y1 = h - initial
+            self.g_c_stab_canvas.create_line(x0,y0,x1,y1, fill='green', width=1)
+            
+
+            #y - axis
+            x0 = initial
+            y0 = h - initial
+            x1 = initial
+            y1 = initial
+            self.g_c_stab_canvas.create_line(x0,y0,x1,y1, fill='green', width=1)
+            
+            #max val label + line
+            x0 = initial
+            y0 = initial
+            x1 = x0 - 5
+            y1 = initial
+            self.g_c_stab_canvas.create_line(x0,y0,x1,y1, fill='green', width=1)
+            self.g_c_stab_canvas.create_text(x1-35,initial, text='{0:.4f}'.format(max(vals)), fill='green')
+
+            #min val label + line
+            x0 = initial
+            y0 = (h-initial) - (min(norm_vals) * (h - (2*initial)))
+            x1 = x0 - 5
+            y1 = (h-initial) - (min(norm_vals) * (h - (2*initial)))
+            self.g_c_stab_canvas.create_line(x0,y0,x1,y1, fill='green', width=1)
+            self.g_c_stab_canvas.create_text(x1-35,y0, text='{0:.4f}'.format(min(vals)), fill='green')
+            
+            x = 0
+            for i in range(len(norm_vals)):
+                x0 = (((x) * sf_x) + initial)
+                y0 = h - initial
+                x1 = x0
+                y1 = h - (initial-5)
+                self.g_c_stab_canvas.create_line(x0,y0,x1,y1, fill='green', width=1)
+                x+=1
+            
+            x = 0
+            for y in range(len(norm_vals)):
+                if y+1 > len(norm_vals)-1:
+                    pass
+                else:                    
+                    x0 = (((x) * sf_x) + initial)
+                    y0 = (h-initial) - (norm_vals[y] * (h - (2*initial)))
+                    x1 = (((x+1) * sf_x) + initial)
+                    y1 = (h-initial) - (norm_vals[y+1] * (h - (2*initial)))
+                    
+                    
+                    if y0<=y1:
+                        color = "blue"
+                    else:
+                        color = "red"
+                        
+                    self.g_c_stab_canvas.create_line(x0,y0,x1,y1, fill=color, width=1)
                     
                     x+=1
         
