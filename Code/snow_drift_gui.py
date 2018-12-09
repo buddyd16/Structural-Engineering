@@ -21,6 +21,7 @@ import tkMessageBox
 import ttk
 import tkFont
 import tkFileDialog
+import snow_drift_by_polygons as snow_drift
 
 class main_window:
 
@@ -29,6 +30,9 @@ class main_window:
         self.master = master
         self.inputs = []
         self.calc_balance = 0
+        self.segment_list = []
+        self.segment_list_gui = []
+        self.drift_run = 0
         
         # Font Set
         self.f_size = 8
@@ -89,7 +93,7 @@ class main_window:
         self.g_plan_frame.pack(fill=tk.BOTH,expand=1, padx=5, pady=5)
 
         self.g_plan_canvas = tk.Canvas(self.g_plan_frame, width=50, height=50, bd=2, relief='sunken', background="gray60")
-        #self.g_plan_canvas.bind("<Configure>", self.draw_plan)
+        self.g_plan_canvas.bind("<Configure>", self.draw_drift)
         self.g_plan_canvas.pack(side = tk.LEFT, anchor='c', padx= 1, pady= 1, fill=tk.BOTH, expand=1)
 
         #Geometry - Elevation/Section
@@ -118,7 +122,7 @@ class main_window:
         self.pg_entry = tk.Entry(self.snow_data_frame, textvariable=self.pg_psf_gui, width=10)
         self.pg_entry.grid(row=0, column=1)
 
-        # Ce - ground snow load
+        # Ce - exposure factor
         tk.Label(self.snow_data_frame, text="Ce :", font=self.helv).grid(row=1, column=0, sticky=tk.E)
         self.ce_gui = tk.StringVar()
         self.inputs.append(self.ce_gui)
@@ -126,7 +130,7 @@ class main_window:
         self.ce_entry = tk.Entry(self.snow_data_frame, textvariable=self.ce_gui, width=10)
         self.ce_entry.grid(row=1, column=1)
 
-        # Ct - ground snow load
+        # Ct - thermal factor
         tk.Label(self.snow_data_frame, text="Ct :", font=self.helv).grid(row=2, column=0, sticky=tk.E)
         self.ct_gui = tk.StringVar()
         self.inputs.append(self.ct_gui)
@@ -134,7 +138,7 @@ class main_window:
         self.ct_entry = tk.Entry(self.snow_data_frame, textvariable=self.ct_gui, width=10)
         self.ct_entry.grid(row=2, column=1)
 
-        # Cs - ground snow load
+        # Cs - slope factor
         tk.Label(self.snow_data_frame, text="Cs :", font=self.helv).grid(row=3, column=0, sticky=tk.E)
         self.cs_gui = tk.StringVar()
         self.inputs.append(self.cs_gui)
@@ -235,18 +239,40 @@ class main_window:
         tk.Label(self.segment_data_frame, text="Note: base program assumption is exterior segments form a closed polygon\nclose off free edges with an Hc = 0.001 ft.", font=self.helv).grid(row=8, column=0,columnspan=3, sticky=tk.E)
 
         # Button to Add Segment
-
-        # Button to Change Segment
-
+        self.b_add_segment = tk.Button(self.segment_data_frame,text="Add Segment", command=self.add_segment, font=self.helv, width=15, height=h, bg=color)
+        self.b_add_segment.grid(row=9, column=0)
+        
         # Button to Romove Segment
-
+        self.b_remove_segment = tk.Button(self.segment_data_frame,text="Remove Last", command=self.remove_segment, font=self.helv, width=15, height=h, bg=color)
+        self.b_remove_segment.grid(row=9, column=1)
+        
         # List box of segments
         # GUI segment list is different from used segment list
         # used segment list will be determined at run time and 
         # will pull the most current GUI segment list to perform
         # calculations and GUI Canvas drawing
+        self.segment_list_frame = tk.Frame(self.segment_data_frame, padx=1,pady=1)
+        self.segment_list_frame.grid(row=10, column=0,columnspan=3)
+        
+        self.segment_listbox = tk.Listbox(self.segment_list_frame,width=75, height=20, font=self.helv)
+        self.segment_listbox.pack(side=tk.LEFT, fill=tk.Y)
+        
+        self.segment_listbox_scroll = tk.Scrollbar(self.segment_list_frame, orient="vertical")
+        self.segment_listbox_scroll.config(command=self.segment_listbox.yview)
+        self.segment_listbox_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        self.segment_listbox.config(yscrollcommand = self.segment_listbox_scroll.set)
+        
+        # Button to Run Drift All
+        self.b_run = tk.Button(self.segment_data_frame,text="Calc Drifts", command=self.run_drift_all, font=self.helv, width=15, height=h, bg=color)
 
+        self.b_run.grid(row=11, column=0)
 
+        # Button to export DXF
+        self.b_run = tk.Button(self.segment_data_frame,text="Export DXF", command=self.exp_dxf, font=self.helv, width=15, height=h, bg=color)
+        self.b_run.grid(row=11, column=1)
+
+        self.draw_drift()
         # Call function to display license dialog on app start
         self.license_display()
     
@@ -292,7 +318,124 @@ class main_window:
         self.hb_ft_gui.config(text='{0:.3f}'.format(self.hb_ft))
         
         self.calc_balance = 1
+    
+    def add_segment(self, *event):
+        self.drift_run = 0
+        x0 = float(self.segment_start_x_ft.get())
+        y0 = float(self.segment_start_y_ft.get())
+        x1 = float(self.segment_end_x_ft.get())
+        y1 = float(self.segment_end_y_ft.get())
+        
+        location = self.segment_location.get()
+        
+        hc_ft = float(self.segment_hc_ft.get())
 
+        uid = len(self.segment_list)
+        
+        start = [x0,y0]
+        end = [x1,y1]
+        
+        text = 'Segment: i[{0:.2f},{1:.2f}] j[{2:.2f},{3:.2f}],{4},height: {5:.2f}ft'.format(x0,y0,x1,y1,location,hc_ft)
+        
+        self.segment_list_gui.append(text)
+        self.segment_list.append(snow_drift.Line([x0,y0],[x1,y1],hc_ft,uid,location))
+        
+        self.fill_gui_segment_list()
+        self.draw_drift()
+        
+    def remove_segment(self, *event):
+        self.drift_run = 0
+        del self.segment_list_gui[-1]
+        del self.segment_list[-1]
+
+        self.fill_gui_segment_list()
+        self.draw_drift()
+    
+    def fill_gui_segment_list(self,*event):
+        self.segment_listbox.delete(0,tk.END)
+        
+        for item in self.segment_list_gui:
+            self.segment_listbox.insert(tk.END,item)
+            
+
+    def draw_drift(self, *event):
+        self.g_plan_canvas.delete("all")
+        w = self.g_plan_canvas.winfo_width()
+        h = self.g_plan_canvas.winfo_height()
+        
+        # x y arrows
+        coord_start = 10
+        self.g_plan_canvas.create_line(coord_start,h-coord_start,coord_start+50,h-coord_start, fill='green', width=1, arrow=tk.LAST)
+        self.g_plan_canvas.create_text(coord_start+50,h-(coord_start+8), text='x', fill='green')
+        self.g_plan_canvas.create_line(coord_start,h-coord_start,coord_start,h-(coord_start+50), fill='green', width=1, arrow=tk.LAST)
+        self.g_plan_canvas.create_text(coord_start+8,h-(coord_start+50), text='y', fill='green')
+        
+        if len(self.segment_list) == 0:
+            pass
+        else:
+            min_x = min(min([line.start[0] for line in self.segment_list]), min([line.end[0] for line in self.segment_list]))
+            min_y = min(min([line.start[1] for line in self.segment_list]), min([line.end[1] for line in self.segment_list]))
+            
+            max_x = max(max([line.start[0] for line in self.segment_list]), max([line.end[0] for line in self.segment_list])) - min_x
+            max_y = max(max([line.start[1] for line in self.segment_list]), max([line.end[1] for line in self.segment_list])) - min_y
+            
+            max_dim_for_scale = max(max_x, max_y)
+           
+            initial = 50
+
+            if max_x == 0:
+                sf_x = (w - (2*initial))
+            else:
+                sf_x = (w - (2*initial)) / max_dim_for_scale
+            
+            if max_y == 0:
+                sf_y = (h - (2*initial))
+            else:
+                sf_y = (h - (2*initial)) / max_dim_for_scale
+
+            
+            for line in self.segment_list:
+                x0 = ((line.start[0] - min_x) * sf_x) + initial
+                y0 = h - (((line.start[1] - min_y) * sf_y) + initial)
+                x1 = ((line.end[0] - min_x) * sf_x) + initial
+                y1 = h - (((line.end[1] - min_y) * sf_y) + initial)
+                
+                if line.location == 'e':
+                    color = 'blue'
+                else:
+                    color = 'red'
+
+                self.g_plan_canvas.create_line(x0,y0,x1,y1, fill=color, width=2)
+
+                if self.drift_run == 0:
+                    pass
+                else:
+                    k=0
+                    prev_label = ''
+                    for point in line.internal_points_x:
+                        x2 = ((line.internal_points_x[k] - min_x) * sf_x) + initial
+                        y2 = h - (((line.internal_points_y[k] - min_y) * sf_y) + initial)
+                        x3 = ((line.drift_line_x[k] - min_x) * sf_x) + initial
+                        y3 = h - (((line.drift_line_y[k] - min_y) * sf_y) + initial)
+                        self.g_plan_canvas.create_line(x2,y2,x3,y3, fill='green', width=2)
+
+                        k+=1
+                
+
+    def run_drift_all(self, *event):
+        if len(self.segment_list) <3:
+            pass
+        else:
+            snow_drift.drift_all(self.segment_list, self.snow_density_pcf, self.pg_psf,25, 0)
+            self.drift_run = 1
+            self.draw_drift()
+               
+    def exp_dxf(self, *event):
+        if self.drift_run == 0:
+            pass
+        else:
+            snow_drift.export_dxf('test.dxf', self.segment_list) 
+      
 def main():
     root = tk.Tk()
     root.title("Snow Drift by Polygons - Alpha")
