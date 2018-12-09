@@ -66,24 +66,27 @@ def ic_brandt(IC, xloc, yloc, Mp):
         
     i=0
     for i in range(num_bolts):    
-        fxtemp = -1*(yIC[i]*ri[i])/di[i]
-        fx.append(fxtemp)
-        
-    i=0
-    for i in range(num_bolts):     
-        fytemp = (xIC[i]*ri[i])/di[i]
-        fy.append(fytemp)
-        
-    i=0
-    for i in range(num_bolts):    
         momenttemp = ri[i]*di[i]
         moment.append(momenttemp)
     
     Mi = sum(moment)
     Rult = -1*Mp/Mi
+
+    i=0
+    for i in range(num_bolts):    
+        fxtemp = -1*(yIC[i]*ri[i])/di[i]
+        fxtemp = fxtemp * Rult
+        fx.append(fxtemp)
+        
+    i=0
+
+    for i in range(num_bolts):     
+        fytemp = (xIC[i]*ri[i])/di[i]
+        fytemp = fytemp * Rult
+        fy.append(fytemp)
     
-    Rx = sum(fx) * Rult
-    Ry = sum(fy) * Rult
+    Rx = sum(fx) 
+    Ry = sum(fy)
     
     
     table = [["Bolt x to IC",xIC],["Bolt y to IC", yIC],["di", di],["deltai", deltai],["ri", ri],["Mi", moment],["Fxi", fx],["Fyi", fy]]
@@ -180,7 +183,7 @@ def brandt(xloc, yloc, P_xloc, P_yloc, P_angle, tol=0.000001):
     iterations = 0
     f_track = [F]
     cu_track = [Cu]
-    while count<200:
+    while count<500:
 
         IC_new = [IC_new[0]+ax_new,IC_new[1]+ay_new]
         Mp_new = (-1*Px*(P_yloc-IC_new[1]))+(Py*(P_xloc-IC_new[0]))
@@ -202,7 +205,7 @@ def brandt(xloc, yloc, P_xloc, P_yloc, P_angle, tol=0.000001):
              
         if F <= tol:
             iterations = count
-            count = 200          
+            count = 500          
             solution = 'yes'
         else:   
             iterations = count
