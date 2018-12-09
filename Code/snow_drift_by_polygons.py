@@ -609,7 +609,7 @@ def export_dxf(path, lines):
         prev_label = ''
         for point in line.internal_points_x:
             label = '{0:.2f} psf - w = {1:.2f} ft'.format(line.drift_pd[k], line.drift_w[k])
-            if k+1 > len(line.drift_w)-1:
+            if k+1 > len(line.drift_w)-1 or k+1 > len(line.drift_pd)-1:
                 next_label = ''
             else:
                 next_label = '{0:.2f} psf - w = {1:.2f} ft'.format(line.drift_pd[k+1], line.drift_w[k+1])
