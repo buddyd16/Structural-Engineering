@@ -183,7 +183,7 @@ def brandt(xloc, yloc, P_xloc, P_yloc, P_angle, tol=0.000001):
     iterations = 0
     f_track = [F]
     cu_track = [Cu]
-    while count<500:
+    while count<1000:
 
         IC_new = [IC_new[0]+ax_new,IC_new[1]+ay_new]
         Mp_new = (-1*Px*(P_yloc-IC_new[1]))+(Py*(P_xloc-IC_new[0]))
@@ -200,12 +200,12 @@ def brandt(xloc, yloc, P_xloc, P_yloc, P_angle, tol=0.000001):
         
         cu_track.append(Cu)
         
-        ax_new = (-1*fyy*J)/(n*Mo)
-        ay_new = (fxx*J) / (n*Mo)
+        ax_new = ((-1*fyy*J)/(n*Mo))/10.0
+        ay_new = ((fxx*J) / (n*Mo))/10.0
              
         if F <= tol:
             iterations = count
-            count = 500          
+            count = 1000          
             solution = 'yes'
         else:   
             iterations = count
@@ -232,6 +232,7 @@ def brandt(xloc, yloc, P_xloc, P_yloc, P_angle, tol=0.000001):
     detailed_output.append(["Predicted Cu", Cu_predict])
     detailed_output.append([F_old,F,Cu_old,Cu])
     detailed_output.append([f_track,cu_track])
+    detailed_output.append([ax_new,ay_new])
     
     
     return detailed_output, IC_new, Cu

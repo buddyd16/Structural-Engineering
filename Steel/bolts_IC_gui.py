@@ -466,7 +466,7 @@ class main_window:
             p_unit.grid(row=3, column=0, sticky=tk.W)
             self.detailed_results_gui.append(p_unit)
             
-            px = tk.Label(self.detailed_res_frame, text="Px,unit: {0:.3f}".format(self.detailed_out[3][1]), font=self.helv)
+            px = tk.Label(self.detailed_res_frame, text="Px,unit: {0:.3f}\nMo = {1}".format(self.detailed_out[3][1],self.detailed_out[4][1]), font=self.helv)
             px.grid(row=4, column=0, sticky=tk.W)
             self.detailed_results_gui.append(px)
             
@@ -478,7 +478,7 @@ class main_window:
             sol.grid(row=5, column=0,columnspan=2, sticky=tk.W)
             self.detailed_results_gui.append(sol)
             
-            res_string = "Sum Rx: {0}\nSum Ry: {1}\nSum Mi: {2}\n\nFxx = Px-Rx = {3}\nFyy = Py-Ry = {4}\nF = {5}\n\nFprev={6}\nCuprev={7}".format(self.detailed_out[13][1],self.detailed_out[13][3],self.detailed_out[13][5],self.detailed_out[10][1],self.detailed_out[10][3],self.detailed_out[10][5],self.detailed_out[16][0],self.detailed_out[16][2])
+            res_string = "Sum Rx: {0}\nSum Ry: {1}\nSum Mi: {2}\n\nFxx = Px-Rx = {3}\nFyy = Py-Ry = {4}\nF = {5}\nMp = {8}\n\nFprev={6}\nCuprev={7}\nax = {9}\nay = {10}".format(self.detailed_out[13][1],self.detailed_out[13][3],self.detailed_out[13][5],self.detailed_out[10][1],self.detailed_out[10][3],self.detailed_out[10][5],self.detailed_out[16][0],self.detailed_out[16][2],self.detailed_out[14][3],self.detailed_out[18][0],self.detailed_out[18][1])
             f_delta = tk.Label(self.detailed_res_frame, text=res_string, justify=tk.LEFT, font=self.helv)
             f_delta.grid(row=6, column=0,columnspan=3, sticky=tk.W)
             self.detailed_results_gui.append(f_delta)
