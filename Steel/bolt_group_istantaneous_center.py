@@ -99,6 +99,10 @@ def ic_brandt(IC, xloc, yloc, Mp):
     i=0
     for i in range(num_bolts):
         ditemp = m.sqrt((xIC[i]*xIC[i])+(yIC[i]*yIC[i]))
+        if ditemp == 0:
+            ditemp = 0.00000001
+        else:
+            pass
         di.append(ditemp)
     
     dmax = max(di)
