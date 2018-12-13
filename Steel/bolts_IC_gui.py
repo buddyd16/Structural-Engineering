@@ -37,6 +37,7 @@ class main_window:
         self.bolt_count = 0
         self.hasrun=0
         self.detailed_results_gui = []
+        self.aisc_result_labels = []
         
         # Font Set
         self.f_size = 8
@@ -229,6 +230,59 @@ class main_window:
         
         self.data_frame.pack(fill=tk.BOTH,expand=1, padx=5, pady=5)
         
+        #AISC Table Verification
+        self.aisc_verify_input = ttk.Frame(self.nb_data)
+        self.nb_data.add(self.aisc_verify_input, text='AISC Table 7.7-7.14 Verification')
+        self.aisc_verify_frame = tk.Frame(self.aisc_verify_input, bd=2, relief='sunken', padx=1,pady=1)
+        
+        # To match AISC table need to know:
+        # Number of Columns of Bolts
+        # Number of Rows of Bolts
+        # Spacing of Columns, in.
+        # Spacing of Rows, in.
+        # Load Angle from Vertical, degrees
+        # x eccentricity from bolt group centroid to load
+        # y eccentricity = 0
+        
+        self.aisc_ex = [2,3,4,5,6,7,8,9,10,12,14,16,18,20,24,28,32,36]
+        
+        self.aisc_numCols = tk.StringVar()
+        self.aisc_numCols.set("1")
+        tk.Label(self.aisc_verify_frame, text="Number of Columns:", font=self.helv).grid(row=0, column=0, sticky=tk.E)
+        tk.Entry(self.aisc_verify_frame,textvariable=self.aisc_numCols, width=10).grid(row=0, column=1)
+        
+        self.aisc_numRows = tk.StringVar()
+        self.aisc_numRows.set("2")
+        tk.Label(self.aisc_verify_frame, text="Number of Rows:", font=self.helv).grid(row=0, column=2, sticky=tk.E)
+        tk.Entry(self.aisc_verify_frame,textvariable=self.aisc_numRows, width=10).grid(row=0, column=3)
+        
+        self.aisc_colspacing = tk.StringVar()
+        self.aisc_colspacing.set("2")
+        tk.Label(self.aisc_verify_frame, text="Column Spacing (in):", font=self.helv).grid(row=1, column=0, sticky=tk.E)
+        tk.Entry(self.aisc_verify_frame,textvariable=self.aisc_colspacing, width=10).grid(row=1, column=1)
+        
+        self.aisc_rowspacing = tk.StringVar()
+        self.aisc_rowspacing.set("3")
+        tk.Label(self.aisc_verify_frame, text="Row Spacing (in):", font=self.helv).grid(row=1, column=2, sticky=tk.E)
+        tk.Entry(self.aisc_verify_frame,textvariable=self.aisc_rowspacing, width=10).grid(row=1, column=3)
+        
+        self.aisc_loadangle = tk.StringVar()
+        self.aisc_loadangle.set("0")
+        tk.Label(self.aisc_verify_frame, text="Load Angle from Vertical (degrees):", font=self.helv).grid(row=2, column=0, columnspan=2, sticky=tk.E)
+        tk.Entry(self.aisc_verify_frame,textvariable=self.aisc_loadangle, width=10).grid(row=2, column=2)
+        
+        tk.Label(self.aisc_verify_frame, text="ex (in):", font=self.helv).grid(row=3, column=0, sticky=tk.E)
+        
+        i=4
+        for ex in self.aisc_ex:
+            tk.Label(self.aisc_verify_frame, text='{0}'.format(ex), font=self.helv).grid(row=i, column=0, sticky=tk.E)
+            i+=1
+        
+        # Button run AISC check
+        self.b_run_aisc = tk.Button(self.aisc_verify_frame,text="Calc AISC Table", command=self.run_aisc, font=self.helv, width=15, height=h, bg=color)
+        self.b_run_aisc.grid(row=i+1, column=0)
+        
+        self.aisc_verify_frame.pack(fill=tk.BOTH,expand=1, padx=5, pady=5)
         # Call function to display license dialog on app start
         self.license_display()
     
@@ -446,6 +500,8 @@ class main_window:
     def fill_details(self,*event):
         for element in self.detailed_results_gui:
             element.destroy()
+        
+        del self.detailed_results_gui[:]
         
         if self.hasrun == 0:
             pass
@@ -678,6 +734,46 @@ class main_window:
                     self.g_c_stab_canvas.create_line(x0,y0,x1,y1, fill=color, width=1)
                     
                     x+=1
+                    
+    def run_aisc(self, *events):
+        for element in self.aisc_result_labels:
+            element.destroy()
+        
+        del self.aisc_result_labels[:]
+        
+        cols = int(self.aisc_numCols.get())
+        rows = int(self.aisc_numRows.get())
+        colspacing = float(self.aisc_colspacing.get())
+        rowspacing = float(self.aisc_rowspacing.get())
+        angle_input = float(self.aisc_loadangle.get())
+        angle_use = 90 - angle_input
+        
+        if cols == 0  or rows == 0:
+            pass
+        else:
+        
+            x,y = bolt_ic.build_bolt_group(cols, rows, colspacing, rowspacing)
+            
+            cg = bolt_ic.bolt_group_center(x,y)
+            
+            i=4
+            for ex in self.aisc_ex:
+                
+                p_xloc = cg[0]+ex
+                p_yloc = cg[1]
+                p_angle = angle_use
+                tol = 0.00001
+                res = bolt_ic.brandt(x,y,p_xloc,p_yloc,p_angle,tol)
+                
+                c_string = '{0:.2f}'.format(res[2])
+                label = tk.Label(self.aisc_verify_frame, text=c_string, font=self.helv)
+                label.grid(row=i, column=1)
+                self.aisc_result_labels.append(label)
+                
+                i+=1
+                
+                
+        
         
 def main():
     root = tk.Tk()

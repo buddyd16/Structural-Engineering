@@ -22,6 +22,55 @@ Created on Tue Dec 04 11:50:08 2018
 from __future__ import division
 import math as m
 
+def build_bolt_group(numCols, numRows, Colspacing, Rowspacing):
+    # Given a number of rows and columns
+    # return the x and y coordinate lists
+    # starting with the first bolt at (0,0)
+    
+    xloc = [0]
+    yloc = [0]
+    
+    i=0
+    y=0
+    for i in range(numCols):
+        if i == 0:
+            y=0
+            for y in range(numRows-1):
+                xloc.append(xloc[-1])
+                yloc.append(yloc[-1]+Rowspacing)
+        else:
+            x = xloc[-1] + Colspacing
+            xloc.append(x)
+            yloc.append(0)
+            y=0
+            for y in range(numRows-1):
+                xloc.append(x)
+                yloc.append(yloc[-1]+Rowspacing)
+    return xloc, yloc
+    
+def bolt_group_center(xloc, yloc):
+    #Bolt Group Centroid
+    if len(xloc)<3:
+        anchor_x_bar = (xloc[0]+xloc[1])/2.00
+        anchor_y_bar = (yloc[0]+yloc[1])/2.00
+    
+    else:
+        j=0
+        x_tot=0
+        y_tot=0
+        
+        for i in xloc:
+            x_tot = x_tot+xloc[j]
+            y_tot = y_tot+yloc[j]    
+            j+=1
+        
+        anchor_x_bar = x_tot/len(xloc)
+        anchor_y_bar = y_tot/len(yloc)
+     
+    cg_anchors = [anchor_x_bar, anchor_y_bar]
+    
+    return cg_anchors
+    
 def ic_brandt(IC, xloc, yloc, Mp):
     num_bolts = len(xloc)
     
@@ -237,6 +286,7 @@ def brandt(xloc, yloc, P_xloc, P_yloc, P_angle, tol=0.000001):
     
     return detailed_output, IC_new, Cu
 
+
 # Brandt's Method Testing Zone
 #x_b = [-1.5,-1.5,-1.5,-1.5,1.5,1.5,1.5,1.5]
 #y_b = [-4.5,-1.5,1.5,4.5,4.5,1.5,-1.5,-4.5]
@@ -247,4 +297,5 @@ def brandt(xloc, yloc, P_xloc, P_yloc, P_angle, tol=0.000001):
 #brandt = brandt(x_b, y_b, P_xloc, P_yloc, P_angle) 
 
 #Cu = brandt[2]
-        
+
+#x,y = build_bolt_group(4,4,3,3)    
