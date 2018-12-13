@@ -38,6 +38,7 @@ class main_window:
         self.hasrun=0
         self.detailed_results_gui = []
         self.aisc_result_labels = []
+        self.aisc_has_run = 0
         
         # Font Set
         self.f_size = 8
@@ -315,6 +316,8 @@ class main_window:
         
         for element in self.bolt_gui_elements:
             element.destroy()
+            
+        del self.bolt_gui_elements[:]
             
         self.bolt_x_gui.append(tk.StringVar())
         self.bolt_y_gui.append(tk.StringVar())
@@ -736,6 +739,7 @@ class main_window:
                     x+=1
                     
     def run_aisc(self, *events):
+        self.aisc_has_run = 0
         for element in self.aisc_result_labels:
             element.destroy()
         
@@ -772,8 +776,48 @@ class main_window:
                 
                 i+=1
                 
-                
+            self.aisc_has_run = 1
+            self.send_aisc_geometry(x,y)
+    
+    def send_aisc_geometry(self,xloc,yloc, *events):
+        if self.aisc_has_run == 0:
+            pass
         
+        else:
+            self.hasrun=0
+            for element in self.bolt_gui_elements:
+                element.destroy()
+            
+            del self.bolt_gui_elements[:]
+            del self.bolt_x_gui[:]
+            del self.bolt_y_gui[:]
+            
+            self.bolt_count = len(xloc)
+            
+            for i in range(len(xloc)):
+            
+                self.bolt_x_gui.append(tk.StringVar())
+                self.bolt_y_gui.append(tk.StringVar())
+                
+                x = xloc[i]
+                y = yloc[i]
+                
+                self.bolt_x_gui[-1].set(x)
+                self.bolt_y_gui[-1].set(y)
+                
+            for i in range(self.bolt_count):
+                c = tk.Label(self.bolt_canvas_frame, text="Bolt {0}".format(i), font=self.helv)
+                c.grid(row=i, column=0, sticky=tk.W)
+                a = tk.Entry(self.bolt_canvas_frame, textvariable=self.bolt_x_gui[i], width=10)
+                a.grid(row=i, column=1)
+                b = tk.Entry(self.bolt_canvas_frame, textvariable=self.bolt_y_gui[i], width=10)
+                b.grid(row=i, column=2)
+                
+                self.bolt_gui_elements.append(c)
+                self.bolt_gui_elements.append(a)
+                self.bolt_gui_elements.append(b)
+                
+            self.draw_bolts()
         
 def main():
     root = tk.Tk()
