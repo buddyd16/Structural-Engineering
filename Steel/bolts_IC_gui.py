@@ -508,6 +508,23 @@ class main_window:
             x1 = (((ic_x - min_x) * sf_x) + initial)+5
             y1 = h-(((ic_y - min_y)*sf_y)+initial)-5
             self.g_plan_canvas.create_oval(x0,y0,x1,y1, fill='red', width=1)
+            
+            #CG
+            if self.hasrun == 0:
+                cg = [0,0]
+            else:
+                cg = self.detailed_out[1][1]
+            x0 = (((cg[0] - min_x) * sf_x) + initial)-5
+            y0 = h-(((cg[1] - min_y)*sf_y)+initial)
+            x1 = (((cg[0] - min_x) * sf_x) + initial)+5
+            y1 = h-(((cg[1] - min_y)*sf_y)+initial)
+            self.g_plan_canvas.create_line(x0,y0,x1,y1, fill='green', width=1)
+            
+            x0 = (((cg[0] - min_x) * sf_x) + initial)
+            y0 = h-(((cg[1] - min_y)*sf_y)+initial)-5
+            x1 = (((cg[0] - min_x) * sf_x) + initial)
+            y1 = h-(((cg[1] - min_y)*sf_y)+initial)+5
+            self.g_plan_canvas.create_line(x0,y0,x1,y1, fill='green', width=1)
 
     def fill_details(self,*event):
         self.results_text_box.delete(1.0,tk.END)
@@ -516,7 +533,9 @@ class main_window:
         else:
             string = "Number of Bolts: {0}".format(self.detailed_out[0])
             
-            string = string + "\nBolt Group Centroid: ({0:.3f},{1:.3f})".format(self.detailed_out[1][1][0],self.detailed_out[1][1][1])
+            cg = self.detailed_out[1][1]
+            
+            string = string + "\nBolt Group Centroid: ({0:.3f},{1:.3f})".format(cg[0],cg[1])
             
             string = string + "\nBolt Group J: {0:.3f}".format(self.detailed_out[2][1])
             
@@ -530,7 +549,11 @@ class main_window:
             
             ex = abs(self.detailed_out[1][1][0] - p_xloc)
             ey = abs(self.detailed_out[1][1][1] - p_yloc)
-            e = m.sqrt((ex*ex)+(ey*ey))
+            
+            px_2 = (m.cos(m.radians(p_angle))*3)+ p_xloc
+            py_2 = (m.sin(m.radians(p_angle))*3) + p_yloc
+            
+            e = abs(((py_2 - p_yloc)*cg[0]) - ((px_2-p_xloc)*cg[1]) + (px_2*p_yloc) - (py_2*p_xloc)) / m.sqrt(((py_2-p_yloc)*(py_2-p_yloc)) + ((px_2 - p_xloc)*(px_2 - p_xloc)))
             
             string = string + "\n\nLoad Location: ({0:.3f},{1:.3f})\nLoad Angle:{2:.3f}\nex = {3:.3f}\ney = {4:.3f}\ne = {5:.3f}".format(p_xloc,p_yloc,p_angle,ex,ey,e)
             
