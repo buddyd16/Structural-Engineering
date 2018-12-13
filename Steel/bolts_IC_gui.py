@@ -230,7 +230,7 @@ class main_window:
         
         self.tol_overide_gui = tk.StringVar()
         self.tol_overide_gui.set("--")
-        tk.Label(self.data_frame, text="Tolerance Overide: \nDefualt:0.000001\n-- = no overide", font=self.helv).grid(row=14, column=0, sticky=tk.E)
+        tk.Label(self.data_frame, text="Tolerance Overide: \nDefualt: 1E-6\n-- = no overide", font=self.helv).grid(row=14, column=0, sticky=tk.E)
         tk.Entry(self.data_frame, textvariable=self.tol_overide_gui, width=10).grid(row=14, column=1)
         
         self.tol_achieved_gui = tk.StringVar()
