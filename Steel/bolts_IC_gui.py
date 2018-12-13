@@ -36,7 +36,7 @@ class main_window:
         self.yloc = []
         self.bolt_count = 0
         self.hasrun=0
-        self.detailed_results_gui = []
+        #self.detailed_results_gui = []
         self.aisc_result_labels = []
         self.aisc_has_run = 0
         
@@ -45,6 +45,7 @@ class main_window:
         self.helv = tkFont.Font(family=' Courier New',size=self.f_size, weight='bold')
         self.helv_norm = tkFont.Font(family=' Courier New',size=self.f_size)
         self.helv_res = tkFont.Font(family=' Courier New',size=self.f_size, weight='bold', underline = True)
+        self.mono_f = tkFont.Font(family='Consolas',size=self.f_size)
         
         # Menubar
         self.menubar = tk.Menu(self.master)
@@ -100,6 +101,14 @@ class main_window:
         self.nb_graph.add(self.detail_tab, text='Detailed Results')
         
         self.detailed_res_frame = tk.Frame(self.detail_tab, bd=2, relief='sunken', padx=1,pady=1)
+        self.results_text_box = tk.Text(self.detailed_res_frame, bg= "grey90", font= self.mono_f, wrap=tk.WORD)
+        self.results_text_box.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        
+        self.res_txt_scroll = tk.Scrollbar(self.detailed_res_frame, command=self.results_text_box.yview)
+        self.res_txt_scroll.pack(side=tk.LEFT, fill=tk.Y)
+        
+        self.results_text_box['yscrollcommand'] = self.res_txt_scroll.set
+        
         self.detailed_res_frame.pack(fill=tk.BOTH,expand=1, padx=5, pady=5)
         
         #Convergance Graph
@@ -501,70 +510,44 @@ class main_window:
             self.g_plan_canvas.create_oval(x0,y0,x1,y1, fill='red', width=1)
 
     def fill_details(self,*event):
-        for element in self.detailed_results_gui:
-            element.destroy()
-        
-        del self.detailed_results_gui[:]
-        
+        self.results_text_box.delete(1.0,tk.END)
         if self.hasrun == 0:
             pass
         else:
-            b = tk.Label(self.detailed_res_frame, text="Number of Bolts: {0}".format(self.detailed_out[0]), font=self.helv)
-            b.grid(row=0, column=0, columnspan=2, sticky=tk.W)
-            self.detailed_results_gui.append(b)
+            string = "Number of Bolts: {0}".format(self.detailed_out[0])
             
-            cg = tk.Label(self.detailed_res_frame, text="Bolt Group Centroid: ({0:.3f},{1:.3f})".format(self.detailed_out[1][1][0],self.detailed_out[1][1][1]), font=self.helv)
-            cg.grid(row=1, column=0, columnspan=2, sticky=tk.W)
-            self.detailed_results_gui.append(cg)
+            string = string + "\nBolt Group Centroid: ({0:.3f},{1:.3f})".format(self.detailed_out[1][1][0],self.detailed_out[1][1][1])
             
-            j = tk.Label(self.detailed_res_frame, text="Bolt Group J: {0:.3f}".format(self.detailed_out[2][1]), font=self.helv)
-            j.grid(row=2, column=0, columnspan=2, sticky=tk.W)
-            self.detailed_results_gui.append(j)
+            string = string + "\nBolt Group J: {0:.3f}".format(self.detailed_out[2][1])
             
-            p_unit = tk.Label(self.detailed_res_frame, text="Unit Forces:", font=self.helv)
-            p_unit.grid(row=3, column=0, sticky=tk.W)
-            self.detailed_results_gui.append(p_unit)
+            string = string + "\n\nUnit Forces:"
             
-            px = tk.Label(self.detailed_res_frame, text="Px,unit: {0:.3f}\nMo = {1}".format(self.detailed_out[3][1],self.detailed_out[4][1]), font=self.helv)
-            px.grid(row=4, column=0, sticky=tk.W)
-            self.detailed_results_gui.append(px)
+            string = string + "\nPx,unit: {0:.3f}\nPy,unit: {1:.3f}\nMo = {2:.3f}".format(self.detailed_out[3][1],self.detailed_out[3][2], self.detailed_out[4][1])
             
-            py = tk.Label(self.detailed_res_frame, text="Py,unit: {0:.3f}".format(self.detailed_out[3][2]), font=self.helv)
-            py.grid(row=4, column=1, sticky=tk.W)
-            self.detailed_results_gui.append(py)
+            p_xloc = float(self.load_x_gui.get())
+            p_yloc = float(self.load_y_gui.get())
+            p_angle = float(self.load_angle_gui.get())
             
-            sol = tk.Label(self.detailed_res_frame, text="{0} {1}\n{2} {3}".format(self.detailed_out[12][0],self.detailed_out[12][1],self.detailed_out[12][2],self.detailed_out[12][3]), justify=tk.LEFT, font=self.helv)
-            sol.grid(row=5, column=0,columnspan=2, sticky=tk.W)
-            self.detailed_results_gui.append(sol)
+            ex = abs(self.detailed_out[1][1][0] - p_xloc)
+            ey = abs(self.detailed_out[1][1][1] - p_yloc)
+            e = m.sqrt((ex*ex)+(ey*ey))
             
-            res_string = "Sum Rx: {0}\nSum Ry: {1}\nSum Mi: {2}\n\nFxx = Px-Rx = {3}\nFyy = Py-Ry = {4}\nF = {5}\nMp = {8}\n\nFprev={6}\nCuprev={7}\nax = {9}\nay = {10}".format(self.detailed_out[13][1],self.detailed_out[13][3],self.detailed_out[13][5],self.detailed_out[10][1],self.detailed_out[10][3],self.detailed_out[10][5],self.detailed_out[16][0],self.detailed_out[16][2],self.detailed_out[14][3],self.detailed_out[18][0],self.detailed_out[18][1])
-            f_delta = tk.Label(self.detailed_res_frame, text=res_string, justify=tk.LEFT, font=self.helv)
-            f_delta.grid(row=6, column=0,columnspan=3, sticky=tk.W)
-            self.detailed_results_gui.append(f_delta)
+            string = string + "\n\nLoad Location: ({0:.3f},{1:.3f})\nLoad Angle:{2:.3f}\nex = {3:.3f}\ney = {4:.3f}\ne = {5:.3f}".format(p_xloc,p_yloc,p_angle,ex,ey,e)
             
-            labels = ["Bolt","x to IC","y to IC","di","deltai","R/Rult","Mi","Fxi","Fyi"]
-            y = 0
+            string = string + "\n\n{0} {1}\n{2} {3}\n".format(self.detailed_out[12][0],self.detailed_out[12][1],self.detailed_out[12][2],self.detailed_out[12][3])
             
-            for label in labels:
-                to_gui = tk.Label(self.detailed_res_frame, text=label, font=self.helv, width = 10)
-                to_gui.grid(row=7, column=y)
-                self.detailed_results_gui.append(to_gui)
-                y+=1
+            string = string + "\nSum Rx: {0}\nSum Ry: {1}\nSum Mi: {2}\n\nFxx = Px-Rx = {3}\nFyy = Py-Ry = {4}\nF = {5}\nMp = {8}\n\nFprev = {6}\nCuprev = {7}\nax = {9}\nay = {10}".format(self.detailed_out[13][1],self.detailed_out[13][3],self.detailed_out[13][5],self.detailed_out[10][1],self.detailed_out[10][3],self.detailed_out[10][5],self.detailed_out[16][0],self.detailed_out[16][2],self.detailed_out[14][3],self.detailed_out[18][0],self.detailed_out[18][1])
+            
+            string = string + "\n\n|{0:.^11}|{1:.^11}|{2:.^11}|{3:.^11}|{4:.^11}|{5:.^11}|{6:.^11}|{7:.^11}|{8:.^11}|\n".format("Bolt","x to IC","y to IC","di","deltai","R/Rult","Mi","Fxi","Fyi")
             
             for i in range(self.detailed_out[0]):
-                to_gui = tk.Label(self.detailed_res_frame, text="{0}".format(i+1), font=self.helv, width = 10)
-                to_gui.grid(row=8+i, column=0)
-                self.detailed_results_gui.append(to_gui)
+                string = string + "|{0:_^11}".format(i+1)
                 
-            y = 1
-            for res in self.detailed_out[13][7]:
-                i=0
-                for out in res[1]:
-                    to_gui = tk.Label(self.detailed_res_frame, text="{0:.4f}".format(out), font=self.helv, width = 10)
-                    to_gui.grid(row=8+i, column=y)
-                    self.detailed_results_gui.append(to_gui)
-                    i+=1
-                y+=1
+                for res in self.detailed_out[13][7]:
+                        string = string + "|{0:_^ 11.3f}".format(res[1][i])
+                        
+                string = string + "|\n"
+            self.results_text_box.insert(tk.END, string)
 
     def draw_converge(self, *events):
         self.g_converge_canvas.delete("all")
@@ -823,7 +806,7 @@ def main():
     root = tk.Tk()
     root.title("Bolt Group Coefficient - Alpha")
     main_window(root)
-    root.minsize(1024,768)
+    root.minsize(1324,768)
     root.mainloop()
 
 if __name__ == '__main__':
