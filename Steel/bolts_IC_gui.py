@@ -65,8 +65,8 @@ class main_window:
         self.base_frame = tk.Frame(master, bd=2, relief='sunken', padx=1,pady=1)
         self.base_frame.pack(side=tk.BOTTOM, padx= 1, pady= 1, fill=tk.X)
         #Base Frame Items
-        w=20
-        h=2
+        w=18
+        h=1
         color='cornflower blue'
         self.b_quit = tk.Button(self.base_frame,text="Quit", command=self.quit_app, font=self.helv, width=w, height=h, bg='red3')
         self.b_quit.pack(side=tk.RIGHT)
@@ -226,18 +226,18 @@ class main_window:
         
         self.cu_maybe_gui = tk.StringVar()
         self.cu_maybe_gui.set("--")
-        tk.Label(self.data_frame, text="Predicted Cu: ", font=self.helv).grid(row=13, column=0, sticky=tk.E)
-        tk.Entry(self.data_frame, textvariable=self.cu_maybe_gui, width=10).grid(row=13, column=1)
+        tk.Label(self.data_frame, text="Predicted Cu: ", font=self.helv).grid(row=11, column=3, sticky=tk.E)
+        tk.Entry(self.data_frame, textvariable=self.cu_maybe_gui, width=10).grid(row=11, column=4)
         
         self.tol_overide_gui = tk.StringVar()
         self.tol_overide_gui.set("--")
-        tk.Label(self.data_frame, text="Tolerance Overide: \nDefualt: 1E-6\n-- = no overide", font=self.helv).grid(row=14, column=0, sticky=tk.E)
-        tk.Entry(self.data_frame, textvariable=self.tol_overide_gui, width=10).grid(row=14, column=1)
+        tk.Label(self.data_frame, text="Tolerance Overide: \nDefualt: 1E-6\n-- = no overide", font=self.helv).grid(row=9, column=3, sticky=tk.E)
+        tk.Entry(self.data_frame, textvariable=self.tol_overide_gui, width=10).grid(row=9, column=4)
         
         self.tol_achieved_gui = tk.StringVar()
         self.tol_achieved_gui.set("--")
-        tk.Label(self.data_frame, text="Tolerance reached:", font=self.helv).grid(row=15, column=0, sticky=tk.E)
-        tk.Entry(self.data_frame, textvariable=self.tol_achieved_gui, width=10).grid(row=15, column=1)
+        tk.Label(self.data_frame, text="Tolerance reached:", font=self.helv).grid(row=10, column=3, sticky=tk.E)
+        tk.Entry(self.data_frame, textvariable=self.tol_achieved_gui, width=10).grid(row=10, column=4)
         
         self.data_frame.pack(fill=tk.BOTH,expand=1, padx=5, pady=5)
         
@@ -832,7 +832,7 @@ def main():
     root = tk.Tk()
     root.title("Bolt Group Coefficient - Alpha")
     main_window(root)
-    root.minsize(1324,768)
+    root.minsize(1150,600)
     root.mainloop()
 
 if __name__ == '__main__':
