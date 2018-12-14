@@ -342,7 +342,7 @@ def drift_all(lines, snow_density_pcf, pg_psf,number_of_points=10, logging=1, to
     points_x = []
     points_y = []
     
-    dist = 10
+    dist = 3000
     
     for line in lines:
         if logging == 1:
@@ -417,7 +417,11 @@ def drift_all(lines, snow_density_pcf, pg_psf,number_of_points=10, logging=1, to
                         y_ok = min(a0y,a1y)-tolerance <= point_y <= max(a0y,a1y)+tolerance
     
                         #check point vector same as perp line
-                        point_vector = vector_direction(b0x,b0y,point_x,point_y)
+                        #point_vector = vector_direction(b0x,b0y,point_x,point_y)
+                        
+                        #check point within perp line start, end vertices
+                        x_perp_ok = min(b0x,b1x)-tolerance <= point_x <= max(b0x,b1x)+tolerance
+                        y_perp_ok = min(b0y,b1y)-tolerance <= point_y <= max(b0y,b1y)+tolerance
     
                         if logging == 1:
                             calc_log = calc_log + 3*indent + 'x = {0}\n'.format(point_x)
@@ -430,7 +434,7 @@ def drift_all(lines, snow_density_pcf, pg_psf,number_of_points=10, logging=1, to
                         else:
                             pass
     
-                        if x_ok == True and y_ok == True and (perp_line_vector-tolerance) <= point_vector <= (perp_line_vector+tolerance):
+                        if x_ok == True and y_ok == True and x_perp_ok == True and y_perp_ok == True:
                             valid_point +=1
     
                             intersect_points.append(intersect_point)

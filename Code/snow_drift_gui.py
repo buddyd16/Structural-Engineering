@@ -225,7 +225,7 @@ class main_window:
         self.segment_add_menu.config(font=self.helv)
         self.segment_add_menu.grid(row=4, column=1, padx= 2, sticky=tk.W)
         tk.Label(self.segment_data_frame, text="e = exterior -- segments must be defined counter clockwise", font=self.helv).grid(row=5, column=0, columnspan=3, sticky=tk.W)
-        tk.Label(self.segment_data_frame, text="i = interior -- segments must be defined clockwise", font=self.helv).grid(row=6, column=0, columnspan=3, sticky=tk.W)        
+        tk.Label(self.segment_data_frame, text="i = interior -- segments must be defined counter clockwise", font=self.helv).grid(row=6, column=0, columnspan=3, sticky=tk.W)        
         
         #Segment Height - min of 3" or 0.25 ft
         tk.Label(self.segment_data_frame, text="Hc (ft): ", font=self.helv).grid(row=7, column=0, sticky=tk.E)
