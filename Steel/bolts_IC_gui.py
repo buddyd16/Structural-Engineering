@@ -189,12 +189,13 @@ class main_window:
         self.b_remove_bolt.grid(row=6, column=1)
         
         self.bolt_frame = tk.Frame(self.data_frame)
-        self.bolt_input_canvas = tk.Canvas(self.bolt_frame, background="gray")
+        self.bolt_input_canvas = tk.Canvas(self.bolt_frame, background="gray", width=50, height=200)
         self.bolt_canvas_frame = tk.Frame(self.bolt_input_canvas)
         self.scrollforcanvas = tk.Scrollbar(self.bolt_frame, orient="vertical", command=self.bolt_input_canvas.yview)
         self.scrollforcanvas.pack(side=tk.RIGHT, fill="y")
         self.bolt_input_canvas.pack(side=tk.LEFT, fill="both", expand=True)
-        self.bolt_input_canvas.create_window((3,6), window=self.bolt_canvas_frame, anchor="nw", tags="self.bolt_canvas_frame")
+        self.bolt_input_canvas.create_window(0,0, window=self.bolt_canvas_frame, anchor="nw", tags="self.bolt_canvas_frame")
+        self.bolt_input_canvas.configure(yscrollcommand=self.scrollforcanvas.set)
         self.bolt_frame.grid(row=7, column=0, columnspan=3, sticky=tk.NSEW)
         
         self.bolt_canvas_frame.bind("<Configure>", self.onFrameConfigure)
@@ -350,6 +351,7 @@ class main_window:
             self.bolt_gui_elements.append(b)
             
         self.draw_bolts()
+        self.onFrameConfigure()
         
     def remove_bolt(self, *event):
         self.hasrun=0
@@ -377,6 +379,7 @@ class main_window:
                 self.bolt_gui_elements.append(b)
             
             self.draw_bolts()
+            self.onFrameConfigure()
             
     def onFrameConfigure(self, *event):
         '''Reset the scroll region to encompass the inner frame'''
