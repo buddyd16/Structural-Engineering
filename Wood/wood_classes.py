@@ -19,7 +19,6 @@ Created on Fri Feb 16 09:37:43 2018
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from __future__ import division
 #import matplotlib.pyplot as plt
 
 class wood_stud_wall:
@@ -628,9 +627,9 @@ wall = wood_stud_wall(1.5,5.5,18,16,"No.2",875,150,1150,1400000,510000,200,19,90
 fc_prime = wall.fc_prime_calc(1.0)
 cp = wall.cp
 
-print '---Warnings--\n'
-print wall.warning
-print wall.assumptions
+print ('---Warnings--\n')
+print (wall.warning)
+print (wall.assumptions)
 
 fig, ax1 = plt.subplots()
 ax1.minorticks_on()

@@ -81,5 +81,5 @@ analysis_3mm_time = end_t - start_t
 results_3mm = test_3mm.res()
 
 
-print 'Analysis: {0}'.format(analysis_time)
-print 'Analysis - 3mm: {0}'.format(analysis_3mm_time)
+print ('Analysis: {0}'.format(analysis_time))
+print ('Analysis - 3mm: {0}'.format(analysis_3mm_time))

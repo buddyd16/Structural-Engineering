@@ -21,11 +21,10 @@ Created on Thu Jul 26 17:43:52 2018
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from __future__ import division
 import math
-import Tkinter as tk
-import ttk
-import tkFont
+import tkinter as tk
+import tkinter.ttk as ttk
+import tkinter.font as tkFont 
 import welds_elastic_method as wem
 
 class Master_window:

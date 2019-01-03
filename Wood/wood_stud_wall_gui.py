@@ -14,17 +14,17 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import Tkinter as tk
-import tkMessageBox
-import ttk
-import tkFont
+import tkinter as tk
+import tkinter.messagebox as tkMessageBox
+import tkinter.ttk as ttk
+import tkinter.font as tkFont 
 import wood_classes as wood
 import matplotlib
 matplotlib.use('TKAgg')
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
-import tkFileDialog
+import tkinter.filedialog as tkFileDialog
 import os
 import math
 

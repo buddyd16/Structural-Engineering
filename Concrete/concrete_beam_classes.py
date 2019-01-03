@@ -12,7 +12,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from __future__ import division
 import math
 
 class reinforcement:
@@ -212,8 +211,8 @@ class rect_beam:
             concrete_moment_component_inlbs = concrete_compression_force_lbs * concrete_moment_arm_in
             nominal_moment_inlbs = concrete_moment_component_inlbs + steel_moment_component_inlbs
 
-            #print phi,concrete_moment_component_inlbs,steel_moment_component_inlbs,concrete_moment_arm_in
-            #print concrete_compression_force_lbs, steel_tension_force_layer_lbs
+            #print (phi,concrete_moment_component_inlbs,steel_moment_component_inlbs,concrete_moment_arm_in)
+            #print (concrete_compression_force_lbs, steel_tension_force_layer_lbs)
 
             return phi,nominal_moment_inlbs,phi*nominal_moment_inlbs
 
@@ -273,7 +272,7 @@ class rect_beam:
             else:
                 a = c
             loop+=1
-        #print na
+        #print (na)
 
         i_crack_in4 = (self.b_in*na**3)/3
         for i in range(len(bars_as_array)):
@@ -515,8 +514,8 @@ class t_beam:
             else:
                 a = c
             loop+=1
-            print tension_c
-            print pna
+            print (tension_c)
+            print (pna)
         return pna
 
     def moment_capacity_inlbs(self,bars_as_array,bars_d_array,bars_cg,c_in,fy_psi,Es_psi):
@@ -769,12 +768,12 @@ class t_beam:
 # flexural_top_bars_per_layer = [3]
 
 
-# print bm.max_bars_layer(flexural_bottom_bars[0], cover_in, shear_bar, aggregate_size_in)
-# print bm.min_bars_bottom_layer(flexural_bottom_bars[0], cover_in, shear_bar, flexural_bars.fy_psi)
+# print (bm.max_bars_layer(flexural_bottom_bars[0], cover_in, shear_bar, aggregate_size_in))
+# print (bm.min_bars_bottom_layer(flexural_bottom_bars[0], cover_in, shear_bar, flexural_bars.fy_psi))
 # bars_as,bars_d,tension_bars_cg = bm.flexural_bottom_bars_automatic_by_layers(flexural_bottom_bars,flexural_bottom_bars_per_layer,cover_in,shear_bar)
 # top_bars_as,top_bars_d = bm.flexural_top_bars_automatic_by_layers(flexural_top_bars,flexural_top_bars_per_layer,cover_in,shear_bar)
-# print bars_as,bars_d,tension_bars_cg
-# print top_bars_as, top_bars_d
+# print (bars_as,bars_d,tension_bars_cg)
+# print (top_bars_as, top_bars_d)
 # flexural_bars_as = bars_as + top_bars_as
 # flexural_bars_d = bars_d + top_bars_d
 # total_as = sum(flexural_bars_as)
@@ -785,9 +784,9 @@ class t_beam:
 # flexural_bars_cg = total_as_d/total_as
 # minas = bm.as_min(tension_bars_cg,flexural_bars.fy_psi)
 # c_in =  bm.find_pna(flexural_bars_as,flexural_bars_d,flexural_bars_cg,flexural_bars.fy_psi,flexural_bars.Es_psi)
-# print c_in
-# print bm.strain_compatibility_steel(flexural_bars_as,flexural_bars_d,c_in,flexural_bars.fy_psi,flexural_bars.Es_psi)
-# print bm.moment_capacity_inlbs(flexural_bars_as,flexural_bars_d,flexural_bars_cg,c_in,flexural_bars.fy_psi,flexural_bars.Es_psi)
-# print bm.concrete_shear_capacity_lbs(tension_bars_cg)
-# print bm.cracked_moment_of_inertia_in4(flexural_bars_as,flexural_bars_d,flexural_bars.Es_psi)
-# print bm.Ig_in4
+# print (c_in)
+# print (bm.strain_compatibility_steel(flexural_bars_as,flexural_bars_d,c_in,flexural_bars.fy_psi,flexural_bars.Es_psi))
+# print (bm.moment_capacity_inlbs(flexural_bars_as,flexural_bars_d,flexural_bars_cg,c_in,flexural_bars.fy_psi,flexural_bars.Es_psi))
+# print (bm.concrete_shear_capacity_lbs(tension_bars_cg))
+# print (bm.cracked_moment_of_inertia_in4(flexural_bars_as,flexural_bars_d,flexural_bars.Es_psi))
+# print (bm.Ig_in4)

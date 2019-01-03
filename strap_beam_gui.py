@@ -19,17 +19,16 @@ Created on Wed May 30 23:36:44 2018
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from __future__ import division
 import math as m
 import Analysis.pin_pin_beam_equations_classes as ppbeam
 import Concrete.concrete_beam_classes as concbeam
 from numpy import zeros
 import numpy as np
-import Tkinter as tk
-import tkMessageBox
-import ttk
-import tkFont
-import tkFileDialog
+import tkinter as tk
+import tkinter.messagebox as tkMessageBox
+import tkinter.ttk as ttk
+import tkinter.font as tkFont 
+import tkinter.filedialog as tkFileDialog
 
 class main_window:
 

@@ -14,10 +14,9 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from __future__ import division
-import Tkinter as tk
-import ttk
-import tkFont
+import tkinter as tk
+import tkinter.ttk as ttk
+import tkinter.font as tkFont 
 import pin_pin_beam_equations_classes as ppbeam
 from numpy import zeros
 import numpy as np
@@ -25,7 +24,7 @@ import scipy.integrate as sci_int
 import math
 import os
 import webbrowser
-import tkMessageBox
+import tkinter.messagebox as tkMessageBox
 # import matplotlib.pyplot as plt
 
 class Master_window:

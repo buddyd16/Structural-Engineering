@@ -74,8 +74,8 @@ combined = np.dot(basic_factors, loads)
 
 max_ind = np.unravel_index(np.argmax(combined), combined.shape)
 
-print basic_combos[max_ind[0]]
-print xs[max_ind[1]]
+print (basic_combos[max_ind[0]])
+print (xs[max_ind[1]])
 
 max_flat = np.max(combined, axis=0).reshape(501,1)
 min_flat = np.min(combined, axis=0).reshape(501,1)
