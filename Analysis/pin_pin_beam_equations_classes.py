@@ -91,7 +91,16 @@ class pl:
 
         self.x_graph=[arrow_minus,self.a,arrow_plus,self.a,self.a]
         self.y_graph=[arrow_height,0,arrow_height,0,self.p]
-
+    
+    def fef(self):
+        # Fixed End Forces
+        RL = ((self.p*self.b*self.b) / (self.L*self.L*self.L))*((3*self.a)+self.b)
+        RR = ((self.p*self.a*self.a) / (self.L*self.L*self.L))*(self.a+(3*self.b))
+        ML = -1*(self.p*self.a*self.b*self.b) / (self.L*self.L)
+        MR = (self.p*self.a*self.a*self.b) / (self.L*self.L)
+        
+        return [RL,ML,RR,MR]
+        
     def v(self,x):
         iters = len(x)
         v=zeros(iters)
@@ -228,7 +237,15 @@ class point_moment:
                 self.x_graph.append(x)
                 self.y_graph.append(y)
 
-
+    def fef(self):
+        # Fixed End Forces
+        RL = ((-6.0*self.ma*self.a) / (self.L*self.L*self.L)) * (self.L-self.a)
+        RR = -1.0*RR
+        ML = ((-1.0*self.ma) / (self.L*self.L))*((self.L*self.L)-(4*self.L*self.a)+(3*self.a*self.a))
+        MR = -1.0*(self.ma / (self.L*self.L))*((3*self.a*self.a)-(2*self.a*self.L))
+        
+        return [RL,ML,RR,MR]
+        
     def v(self,x):
         iters = len(x)
         v=zeros(iters)
