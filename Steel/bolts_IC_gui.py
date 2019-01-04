@@ -677,7 +677,10 @@ class main_window:
             
             vals = self.detailed_out[17][1]
             
-            norm_vals = [(float(i)-min(vals))/(max(vals)-min(vals)) for i in vals]
+            if max(vals)-min(vals) == 0:
+                norm_vals = [(float(i))/(max(vals)) for i in vals]
+            else:
+                norm_vals = [(float(i)-min(vals))/(max(vals)-min(vals)) for i in vals]
             
             count = len(vals)
             
