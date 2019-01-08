@@ -240,7 +240,7 @@ class point_moment:
     def fef(self):
         # Fixed End Forces
         RL = ((-6.0*self.ma*self.a) / (self.L*self.L*self.L)) * (self.L-self.a)
-        RR = -1.0*RR
+        RR = -1.0*RL
         ML = ((-1.0*self.ma) / (self.L*self.L))*((self.L*self.L)-(4*self.L*self.a)+(3*self.a*self.a))
         MR = -1.0*(self.ma / (self.L*self.L))*((3*self.a*self.a)-(2*self.a*self.L))
         
@@ -467,6 +467,26 @@ class udl:
             eid = ((-1 * self.rr * x ** 3) / 6) + ((self.c3 * x ** 2) / 2) + (self.c6 * x) + self.c9
         return eid
 
+    def fef(self):
+        eis0 = self.eisx(0)
+        eisL = self.eisx(self.L)
+        
+        s = np.array([[-1.0*eis0],[-1.0*eisL]])
+        
+        ems = np.array([[-1.0*self.L/3.0 , self.L/6.0],[self.L/6.0 , -1.0*self.L/3.0]])
+        
+        fem = np.linalg.solve(ems,s)
+        
+        mo = point_moment(fem[0],0,self.L)
+        ml = point_moment(fem[1],self.L,self.L)
+        
+        RL = self.rl+mo.rl+ml.rl
+        RR = self.rr+mo.rr+ml.rr
+        ML = fem[0][0]
+        MR = fem[1][0]
+        
+        return [RL,ML,RR,MR]
+        
 class trap:
     def __init__(self, w1, w2, a, b, L):
 
@@ -615,6 +635,26 @@ class trap:
             eid = ((-1 * self.rr * x ** 3) / 6) + ((self.c3 * x ** 2) / 2) + (self.c6 * x) + self.c9
         return eid
 
+    def fef(self):
+        eis0 = self.eisx(0)
+        eisL = self.eisx(self.L)
+        
+        s = np.array([[-1.0*eis0],[-1.0*eisL]])
+        
+        ems = np.array([[-1.0*self.L/3.0 , self.L/6.0],[self.L/6.0 , -1.0*self.L/3.0]])
+        
+        fem = np.linalg.solve(ems,s)
+        
+        mo = point_moment(fem[0],0,self.L)
+        ml = point_moment(fem[1],self.L,self.L)
+        
+        RL = self.rl+mo.rl+ml.rl
+        RR = self.rr+mo.rr+ml.rr
+        ML = fem[0][0]
+        MR = fem[1][0]
+        
+        return [RL,ML,RR,MR]
+        
 class cant_right_nl:
     def __init__(self, slope):
         self.slope = slope
