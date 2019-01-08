@@ -477,8 +477,8 @@ class udl:
         
         fem = np.linalg.solve(ems,s)
         
-        mo = point_moment(fem[0],0,self.L)
-        ml = point_moment(fem[1],self.L,self.L)
+        mo = point_moment(fem[0][0],0,self.L)
+        ml = point_moment(fem[1][0],self.L,self.L)
         
         RL = self.rl+mo.rl+ml.rl
         RR = self.rr+mo.rr+ml.rr
@@ -645,8 +645,8 @@ class trap:
         
         fem = np.linalg.solve(ems,s)
         
-        mo = point_moment(fem[0],0,self.L)
-        ml = point_moment(fem[1],self.L,self.L)
+        mo = point_moment(fem[0][0],0,self.L)
+        ml = point_moment(fem[1][0],self.L,self.L)
         
         RL = self.rl+mo.rl+ml.rl
         RR = self.rr+mo.rr+ml.rr
