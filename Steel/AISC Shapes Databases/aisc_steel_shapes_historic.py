@@ -19,9 +19,9 @@ Created on Thu Apr 27 14:28:17 2017
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import Tkinter as tk
-import tkFont
-import tkMessageBox
+import tkinter as tk
+import tkinter.font as tkFont 
+import tkinter.messagebox as tkMessageBox
 
 class Master_window:
 

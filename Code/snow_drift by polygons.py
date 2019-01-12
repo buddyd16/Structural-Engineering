@@ -18,7 +18,6 @@ Created on Thu May 10 16:08:02 2018
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from __future__ import division
 import math
 import numpy as np
 import matplotlib.pyplot as plt
@@ -646,16 +645,16 @@ a_calc_log_line, a_perp_lines_line, a_intersect_points_line, a_points_x_line, a_
 calc_log, perp_lines, intersect_points, points_x, points_y = drift_all(lines,snow_density_pcf,pg_psf,25,1)
 
 s_x, s_y, mx, my = lines_transformation_to_origin(lines)
-print s_x
-print s_y
-print mx
-print my
+print (s_x)
+print (s_y)
+print (mx)
+print (my)
 
 test1, test2, segment, segment_point = line_closest_to_point_and_point_on_line([35.5,9.4],lines)
-print test1
-print test2
-print segment
-print segment_point
+print (test1)
+print (test2)
+print (segment)
+print (segment_point)
 
 colors = ['r','b','g','c','m','y','k','r','b','g','c','m','y','k','r','b','g','c','m','y','k','r','b','g','c','m','y','k','r','b','g','c','m','y','k','r','b','g','c','m','y','k','r','b','g','c','m','y','k']
 i=0

@@ -14,16 +14,15 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from __future__ import division
 import matplotlib
 matplotlib.use('TKAgg')
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
-import Tkinter as tk
+import tkinter as tk
 import os
 import math
-import tkMessageBox
+import tkinter.messagebox as tkMessageBox
 
 def path_exists(path):
     res_folder_exist = os.path.isdir(path)
@@ -345,40 +344,40 @@ class Main_window:
         i=0
         for i in range(0,num_vertices):
             i_x =i_x + (vertices_y[i]**2+vertices_y[i]*vertices_y[i+1]+vertices_y[i+1]**2)*(vertices_x[i]*vertices_y[i+1]-vertices_x[i+1]*vertices_y[i])
-            print str(i_x)
+            print (str(i_x))
         i_x = i_x/12
         i_x = i_x
             
         i=0
         for i in range(0,num_vertices):
             i_y = i_y + (vertices_x[i]**2+vertices_x[i]*vertices_x[i+1]+vertices_x[i+1]**2)*(vertices_x[i]*vertices_y[i+1]-vertices_x[i+1]*vertices_y[i])
-            print str(i_y)
+            print (str(i_y))
         i_y = i_y/12
         i_y = i_y
             
         i=0
         for i in range(0,num_vertices):
             i_xy = i_xy + (vertices_x[i]*vertices_y[i+1]+2*vertices_x[i]*vertices_y[i]+2*vertices_x[i+1]*vertices_y[i+1]+vertices_x[i+1]*vertices_y[i])*(vertices_x[i]*vertices_y[i+1]-vertices_x[i+1]*vertices_y[i])
-            print str(i_xy)
+            print (str(i_xy))
         i_xy = i_xy/24
         i_xy = i_xy
         
         i=0
         for i in range(0,num_vertices):
             area = area + (vertices_x[i]*vertices_y[i+1]-vertices_x[i+1]*vertices_y[i])
-            print str(area)
+            print (str(area))
         area = area/2
         
         i=0
         for i in range(0,num_vertices):
             x_bar = x_bar + (vertices_x[i]+vertices_x[i+1])*(vertices_x[i]*vertices_y[i+1]-vertices_x[i+1]*vertices_y[i])
-            print str(x_bar)
+            print (str(x_bar))
         x_bar = x_bar / (6*area)
         
         i=0
         for i in range(0,num_vertices):
             y_bar = y_bar + (vertices_y[i]+vertices_y[i+1])*(vertices_x[i]*vertices_y[i+1]-vertices_x[i+1]*vertices_y[i])
-            print str(y_bar)
+            print (str(y_bar))
         y_bar = y_bar/(6*area)
         
         i_x_bar = i_x - area*y_bar**2

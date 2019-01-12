@@ -19,9 +19,9 @@ Created on Wed Apr 26 14:50:25 2017
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-import Tkinter as tk
-import tkFont
-import tkMessageBox
+import tkinter as tk
+import tkinter.font as tkFont 
+import tkinter.messagebox as tkMessageBox
 
 class Master_window:
 

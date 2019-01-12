@@ -18,13 +18,12 @@ Created on Fri May 04 14:06:27 2018
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from __future__ import division
 import math
 import aisc_database_class
-import Tkinter as tk
-import ttk
-import tkFont
-import tkMessageBox
+import tkinter as tk
+import tkinter.ttk as ttk
+import tkinter.font as tkFont 
+import tkinter.messagebox as tkMessageBox
 
 class Master_window:
 

@@ -1,14 +1,13 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-from __future__ import division
 import matplotlib
 matplotlib.use('TKAgg')
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 from matplotlib.figure import Figure
-import Tkinter as tk
-from Tkinter import PhotoImage
-import tkFileDialog
-import tkFont
+import tkinter as tk
+from tkinter import PhotoImage
+import tkinter.filedialog as tkFileDialog
+import tkinter.font as tkFont 
 import numpy as np
 from numpy.linalg import inv
 from numpy import unravel_index
@@ -18,7 +17,7 @@ import matplotlib.pyplot as plt
 import os
 import itertools
 import math
-import tkMessageBox
+import tkinter.messagebox as tkMessageBox
 import time
 
 def load_pattern(num_spans):
@@ -730,7 +729,7 @@ class Results_window():
         
         self.per_span_res_frame = tk.Frame(self.frame_selection,relief='sunken')
         stations = Main_window.stations
-        print stations
+        print (stations)
         self.span_res_scale = tk.Scale(self.per_span_res_frame, from_=0, to=stations, orient=tk.HORIZONTAL, label = "Location in Span:", length = 300, command=self.span_res_run)
         self.span_res_scale.pack(side=tk.TOP, padx=5, pady=5)
         self.span_res_b_plus = tk.Button(self.per_span_res_frame,text='+', command = self.set_span_res_plus)
@@ -2412,7 +2411,7 @@ class Main_window:
                     wind_y.append(holder)
                     Main_window.load_exist[10]=1
                 else:
-                    print 'no load kind'
+                    print ('no load kind')
             else:
                 pass
 
@@ -2509,7 +2508,7 @@ class Main_window:
             Main_window.total_deflection_goal.append(span/240)
             
         startt = time.time()
-        print 'Perform analysis for all load types defined....'
+        print ('Perform analysis for all load types defined....')
         for i in range(0,11):
             if i in range(5,9):
                 if len(loads[i][1][0]) == 0:
@@ -2539,14 +2538,14 @@ class Main_window:
         Main_window.xs,Main_window.displace_initial_results[0],Main_window.displace_initial_results[1],Main_window.displace_initial_results[2],Main_window.displace_initial_results[3], Main_window.displace_initial_results[4], Main_window.displace_initial_results[5] = three_moment_method(beam_spans, beam_momentofinertia, cant, [[0.00,0.00,0.00,0.00,'POINT',0,0]], E, iters, displace_initial)
         
         endt = time.time()
-        print '**Analysis Complete** in {0:.4f} sec'.format(endt-startt)
+        print ('**Analysis Complete** in {0:.4f} sec'.format(endt-startt))
         
         Main_window.load_results = loads
         Main_window.bm = np.zeros((iters+1,N))
         # # ['D', 'Ex', 'Ey', 'F', 'H', 'L', 'Lr', 'R', 'S', 'Wx', 'Wy']
         # # data structure for each non patterned load type [['D'],[loads],[shears],[moments],[slopes],[deflections],[Support Reactions],[Moments at supports]]
 
-        print 'Factoring Loads and Generating Graphs...'
+        print ('Factoring Loads and Generating Graphs...')
 
         fi = float(self.fi_lrfd.get())
         fy = float(self.fy_lrfd.get())
@@ -2618,7 +2617,7 @@ class Main_window:
 
 
         #Factor and combine loads and Print Results to text File
-        print 'LRFD Combinations...'
+        print ('LRFD Combinations...')
         Main_window.lrfd_v = []
         Main_window.lrfd_m = []
         Main_window.lrfd_r = []
@@ -2696,7 +2695,7 @@ class Main_window:
             Main_window.lrfd_m_support_env_min.append(np.minimum.reduce(m_pattern))
             Main_window.lrfd_m_support_env_max.append(np.maximum.reduce(m_pattern))
 
-        print 'ASD/BASIC Combinations...'
+        print ('ASD/BASIC Combinations...')
         Main_window.basic_v = []
         Main_window.basic_m = []
         Main_window.basic_s = []
@@ -2799,7 +2798,7 @@ class Main_window:
             Main_window.basic_r_env_min.append(np.minimum.reduce(r_pattern))
             Main_window.basic_m_support_env_min.append(np.minimum.reduce(m_pattern))
         
-        print 'Enveloping Results...'
+        print ('Enveloping Results...')
 
         Main_window.lrfd_Rmax_print = np.maximum.reduce(Main_window.lrfd_r_env_max)
         Main_window.lrfd_Rmin_print = np.minimum.reduce(Main_window.lrfd_r_env_min)
@@ -2825,7 +2824,7 @@ class Main_window:
         Main_window.asd_d_min_diag = np.minimum.reduce(Main_window.basic_d_env_min)
         
         #Create CSV file of LRFD Envelope Results
-        print 'Writing CSV Files...'
+        print ('Writing CSV Files...')
         file = open(os.path.join(path,bmlabel+'_04_LRFD_Envelope_Results.csv'),'w')
         file.write('LRFD Envelope Results\n')
         file.write('Spans:,'+str(N))
@@ -2869,7 +2868,7 @@ class Main_window:
         
         cad_points = iters
         #Create DXF of Envelope Results
-        print 'Creating DXF of Results ...'
+        print ('Creating DXF of Results ...')
         file = open(os.path.join(path,bmlabel+'_02_Envelope_Results.dxf'),'w')
         file.write('  0\nSECTION\n  2\nENTITIES\n')
         file.write('  0\nPOLYLINE\n  8\nspans\n 66\n1\n 10\n0.0\n 20\n0.0\n 30\n0.0\n 70\n8\n')
@@ -3349,7 +3348,7 @@ class Main_window:
         file.write('  0\nENDSEC\n  0\nEOF')
         file.close()
         
-        print 'Done!'
+        print ('Done!')
         self.brun.configure(bg='green')
         self.bresults.configure(state="normal", bg='green')
         self.menu.entryconfig(4, state="normal")

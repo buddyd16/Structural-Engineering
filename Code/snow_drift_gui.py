@@ -14,13 +14,12 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from __future__ import division
 import math as m
-import Tkinter as tk
-import tkMessageBox
-import ttk
-import tkFont
-import tkFileDialog
+import tkinter as tk
+import tkinter.messagebox as tkMessageBox
+import tkinter.ttk as ttk
+import tkinter.font as tkFont 
+import tkinter.filedialog as tkFileDialog
 import snow_drift_by_polygons as snow_drift
 
 class main_window:
