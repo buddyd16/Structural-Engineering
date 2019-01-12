@@ -18,6 +18,54 @@ from numpy import zeros
 import numpy as np
 import math
 
+def PieceFunctionString(piece_set):
+        '''
+        # Returns the general piecwise function in the form of a string
+        # INPUT: List
+        # List makup:
+        # list1 is the polynomial coeficients of order [c0,c1x,c2x^2,...,cnx^n]
+        # where the list values will only by the cn's*
+        # list 2 will be the range over which the function piece applies
+        # 0 <= a would be [0,a] **note it will be assumed the the eqality is <= not <
+        # rerturned lists will be [[[list11],[list21]],....,[[list1n],[list2n]]
+        # where n is the total number of functions to capture the range from 
+        # 0 to the full span, L of the beam
+        '''
+        
+        output = ''
+        
+        for func in piece_set:
+            i=0
+            
+            if all(c == 0 for c in func[0]):
+                line = '0'
+                print 'yup'
+            else:
+                line = '' 
+                for c in func[0]:
+                    if c == 0:
+                        pass
+                    elif i == 0:
+                        line = line + '{0:0.4f}'.format(c)
+                    elif i == 1:
+                        if line == '':
+                            line = line + '{0:0.4f}*x'.format(c)
+                        elif c < 0:
+                            line = line + '-{0:0.4f}*x'.format(abs(c))
+                        else:
+                            line = line + '+{0:0.4f}*x'.format(c)
+                    else:
+                        if line == '':
+                            line = line + '{0:0.4f}*x^{1}'.format(c,i)
+                        elif c < 0:
+                            line = line + '-{0:0.4f}*x^{1}'.format(abs(c),i)
+                        else:
+                            line = line + '+{0:0.4f}*x^{1}'.format(c,i)
+                    i+=1
+                    
+            output = output + '{0:0.4f} < x <= {1:0.4f}:\n'.format(func[1][0],func[1][1]) + line + '\n'
+        return output
+
 class no_load:
     def __init__(self):
         self.p = 0
@@ -92,6 +140,39 @@ class pl:
         self.x_graph=[arrow_minus,self.a,arrow_plus,self.a,self.a]
         self.y_graph=[arrow_height,0,arrow_height,0,self.p]
     
+    def piece_functions(self):
+        '''
+        Returns the general piecwise function in the form of two lists
+        # list1 is the polynomial coeficients of order [c0,c1x,c2x^2,...,cnx^n]
+        # where the list values will only by the cn's*
+        # list 2 will be the range over which the function piece applies
+        # 0 <= a would be [0,a] **note it will be assumed the the eqality is <= not <
+        # rerturned lists will be [[[list11],[list21]],....,[[list1n],[list2n]]
+        # where n is the total number of functions to capture the range from 
+        # 0 to the full span, L of the beam
+        '''
+        
+        if self.a == 0 or self.a == self.L:
+            v = [[[0],[0,self.L]]]
+            m = [[[0],[0,self.L]]]
+            eis = [[[0],[0,self.L]]]
+            eid = [[[0],[0,self.L]]]
+        else:
+            v = [[[self.rl],[0,self.a]],[[-1*self.rr],[self.a,self.L]]]
+            
+            m = [[[0,self.rl],[0,self.a]],[[(self.rr * self.L),(-1 * self.rr)],[self.a,self.L]]]
+            
+            eis = [[[self.c1,0,self.rl/2.0],[0,self.a]],[[self.c2,(self.rr * self.L),-1.0*self.rr/2.0],[self.a,self.L]]]
+            
+            eid = [[[0,self.c1,0,self.rl/6.0],[0,self.a]],[[self.c4, self.c2, self.rr*self.L*0.5,-1*self.rr/6.0],[self.a,self.L]]]
+        
+        vs = PieceFunctionString(v)
+        ms = PieceFunctionString(m)
+        eiss = PieceFunctionString(eis)
+        eids = PieceFunctionString(eid)
+        
+        return [v,m,eis,eid],[vs,ms,eiss,eids]
+        
     def fef(self):
         # Fixed End Forces
         RL = ((self.p*self.b*self.b) / (self.L*self.L*self.L))*((3*self.a)+self.b)
@@ -236,7 +317,39 @@ class point_moment:
                 y = 0+(r*math.sin(math.radians(a)))
                 self.x_graph.append(x)
                 self.y_graph.append(y)
-
+                
+    def piece_functions(self):
+        '''
+        Returns the general piecwise function in the form of two lists
+        # list1 is the polynomial coeficients of order [c0,c1x,c2x^2,...,cnx^n]
+        # where the list values will only by the cn's*
+        # list 2 will be the range over which the function piece applies
+        # 0 <= a would be [0,a] **note it will be assumed the the eqality is <= not <
+        # rerturned lists will be [[[list11],[list21]],....,[[list1n],[list2n]]
+        # where n is the total number of functions to capture the range from 
+        # 0 to the full span, L of the beam
+        '''
+        
+        v = [[[self.rl],[0,self.L]]]
+        
+        if self.a == 0:
+            m = [[[self.ma,self.rl],[0,self.L]]]
+        elif self.a == self.L:
+            m = [[[0,self.rl],[0,self.L]]]
+        else:
+            m = [[[0,self.rl],[0,self.a]],[[self.ma,self.rl],[self.a,self.L]]]
+        
+        eis = [[[self.c1,0,0.5*self.rl],[0,self.a]],[[self.c2,self.ma,0.5*self.rl],[self.a,self.L]]]
+        
+        eid = [[[self.c3, self.c1,0,((1/6.0)*self.rl)],[0,self.a]],[[self.c4,self.c2,0.5*self.ma,(1/6.0)*self.rl],[self.a,self.L]]]
+        
+        vs = PieceFunctionString(v)
+        ms = PieceFunctionString(m)
+        eiss = PieceFunctionString(eis)
+        eids = PieceFunctionString(eid)
+        
+        return [v,m,eis,eid],[vs,ms,eiss,eids]
+        
     def fef(self):
         # Fixed End Forces
         RL = ((-6.0*self.ma*self.a) / (self.L*self.L*self.L)) * (self.L-self.a)
@@ -374,7 +487,34 @@ class udl:
 
         self.x_graph=[arrow_minus_start,self.a,arrow_plus_start,self.a,self.a,self.b,self.b,arrow_minus_end,self.b,arrow_plus_end]
         self.y_graph=[arrow_height,0,arrow_height,0,self.w1,self.w1,0,arrow_height,0,arrow_height]
-
+        
+    def piece_functions(self):
+        '''
+        Returns the general piecwise function in the form of two lists
+        # list1 is the polynomial coeficients of order [c0,c1x,c2x^2,...,cnx^n]
+        # where the list values will only by the cn's*
+        # list 2 will be the range over which the function piece applies
+        # 0 <= a would be [0,a] **note it will be assumed the the eqality is <= not <
+        # rerturned lists will be [[[list11],[list21]],....,[[list1n],[list2n]]
+        # where n is the total number of functions to capture the range from 
+        # 0 to the full span, L of the beam
+        '''
+        
+        v = [[[self.rl],[0,self.a]],[[(self.rl+self.w1*self.a),-1.0*self.w1],[self.a,self.b]],[[-1*self.rr],[self.b,self.L]]]
+        
+        m = [[[self.c1,self.rl],[0,self.a]],[[self.c2,self.rl+(self.w1*self.a),-0.5*self.w1],[self.a,self.b]],[[self.c3,-1.0*self.rr],[self.b,self.L]]]
+        
+        eis = [[[self.c4,self.c1,0.5*self.rl],[0,self.a]],[[self.c5,self.c2,0.5*(self.rl+(self.w1*self.a)),(-1/6.0)*self.w1],[self.a,self.b]],[[self.c6,self.c3,-0.5*self.rr],[self.b,self.L]]]
+        
+        eid = [[[self.c7,self.c4,0.5*self.c1,1/6.0*self.rl],[0,self.a]],[[self.c8, self.c5, 0.5*self.c2,(1/6.0)*(self.rl+(self.w1*self.a)),-1.0*(self.w1 / 24.0)],[self.a,self.b]],[[self.c9,self.c6,0.5*self.c3,((-1.0 * self.rr) / 6.0)],[self.b,self.L]]]
+        
+        vs = PieceFunctionString(v)
+        ms = PieceFunctionString(m)
+        eiss = PieceFunctionString(eis)
+        eids = PieceFunctionString(eid)
+        
+        return [v,m,eis,eid],[vs,ms,eiss,eids]
+        
     def v(self,x):
         iters = len(x)
         v=zeros(iters)
@@ -542,7 +682,34 @@ class trap:
 
         self.x_graph=[arrow_minus_start,self.a,arrow_plus_start,self.a,self.a,self.b,self.b,arrow_minus_end,self.b,arrow_plus_end]
         self.y_graph=[arrow_height,0,arrow_height,0,self.w1,self.w2,0,arrow_height2,0,arrow_height2]
-
+        
+    def piece_functions(self):
+        '''
+        Returns the general piecwise function in the form of two lists
+        # list1 is the polynomial coeficients of order [c0,c1x,c2x^2,...,cnx^n]
+        # where the list values will only by the cn's*
+        # list 2 will be the range over which the function piece applies
+        # 0 <= a would be [0,a] **note it will be assumed the the eqality is <= not <
+        # rerturned lists will be [[[list11],[list21]],....,[[list1n],[list2n]]
+        # where n is the total number of functions to capture the range from 
+        # 0 to the full span, L of the beam
+        '''
+        
+        v = [[[self.rl],[0,self.a]],[[self.rl- ((((self.s * self.a) - (2 * self.w1)) * self.a) / 2),-1.0*((self.w1 - (self.s * self.a))),-1.0*(self.s/ 2)],[self.a,self.b]],[[-1.0*self.rr],[self.b,self.L]]]
+        
+        m = [[[self.c1,self.rl],[0,self.a]],[[self.c2,self.rl - ((((self.s * self.a) - (2 * self.w1)) * self.a) / 2.0),-1.0*((self.w1 - (self.s * self.a)) / 2.0),-1.0*((self.s) / 6.0)],[self.a,self.b]],[[self.c3,-1.0*self.rr],[self.b,self.L]]]
+        
+        eis = [[[self.c4,self.c1,(self.rl / 2.0)],[0,self.a]],[[self.c5,self.c2,(self.rl/ 2.0) - ((((self.s * self.a) - (2 * self.w1)) * self.a) / 4.0), -1.0*((self.w1 - (self.s * self.a)) / 6.0),-1.0*(self.s / 24.0)],[self.a,self.b]],[[self.c6,self.c3,((-1.0* self.rr) / 2)],[self.b,self.L]]]
+        
+        eid =  [[[self.c7,self.c4,(self.c1 / 2.0),(self.rl/ 6.0)],[0,self.a]],[[self.c8,self.c5,self.c2 / 2.0,(self.rl / 6.0) - ((((self.s * self.a) - (2 * self.w1)) * self.a) / 12.0), -1.0*((self.w1 - (self.s * self.a)) / 24),-1.0*(self.s / 120.0)],[self.a,self.b]],[[self.c9,self.c6,(self.c3 / 2.0),((-1.0 * self.rr) / 6.0)],[self.b,self.L]]]
+        
+        vs = PieceFunctionString(v)
+        ms = PieceFunctionString(m)
+        eiss = PieceFunctionString(eis)
+        eids = PieceFunctionString(eid)
+        
+        return [v,m,eis,eid],[vs,ms,eiss,eids]
+        
     def v(self,x):
         iters = len(x)
         v=zeros(iters)
