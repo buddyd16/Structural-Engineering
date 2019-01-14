@@ -39,7 +39,6 @@ def PieceFunctionString(piece_set):
             
             if all(c == 0 for c in func[0]):
                 line = '0'
-                print 'yup'
             else:
                 line = '' 
                 for c in func[0]:
@@ -65,7 +64,24 @@ def PieceFunctionString(piece_set):
                     
             output = output + '{0:0.4f} < x <= {1:0.4f}:\n'.format(func[1][0],func[1][1]) + line + '\n'
         return output
-
+def poly_eval(c_list,x):
+    
+    i = 0
+    res=0
+    if all(c == 0 for c in c_list):
+        pass
+    else:
+        for c in c_list:
+            if c == 0:
+                res = 0
+            elif i == 0:
+                res = res+c
+            else:
+                res = res + c*math.pow(x,i)
+            i+=1
+            
+    return res
+        
 class no_load:
     def __init__(self):
         self.p = 0
@@ -2571,3 +2587,138 @@ def single_span_solve_fixed_ends_and_redundant_interiors(delta, reaction_points,
 
     return R, reactions_as_loads
 
+def center_span_piecewise_function(loads):
+    '''
+    Build the full piecewise fucntion set for a single span
+    Input: lists of loads as defined above
+    output: lists of piecewise functions and list of piecewise functions as text strings
+    
+    It is assumed all loads have the same span length defined
+    '''
+    
+    # Gather load start and end locations these define how the fucntions will be split
+    ab = []
+    ab.append(loads[0].L)
+    for load in loads:
+        if load.kind == "Point" or load.kind == "Moment":
+            ab.append(load.a)
+        else:
+            ab.append(load.a)
+            ab.append(load.b)
+    ab = list(set(ab))
+    ab.sort()
+    
+    v_out = []
+    m_out = []
+    eis_out = []
+    eid_out = []
+    
+    count=0
+    for i in ab:
+        if count == 0:
+            piece_range = [0,i]
+        else:
+            piece_range = [ab[count-1],i]
+        
+        if piece_range == [0,0]:
+            pass
+        else:
+            v = []
+            m = []
+            eis = []
+            eid = []
+            for load in loads:
+                func, func_strings = load.piece_functions()
+                
+                #Shear
+                for piece in func[0]:
+                    if piece[1][0] < piece_range[1] and piece[1][1] >= piece_range[1]:
+                            eq_len_delta = len(piece[0]) - len(v) # difference in number of coefficients
+                            print eq_len_delta
+                            if eq_len_delta > 0:
+                                v.extend([0]*eq_len_delta)
+                            elif eq_len_delta<0:
+                                piece[0].extend([0]*abs(eq_len_delta))
+                            else:
+                                pass
+                                
+                            v = [sum(x) for x in zip(piece[0],v)]
+                    else:
+                        pass
+                #Moment
+                for piece in func[1]:
+                    if piece[1][0] < piece_range[1] and piece[1][1] >= piece_range[1]:
+                            eq_len_delta = len(piece[0]) - len(m) # difference in number of coefficients
+                            print eq_len_delta
+                            if eq_len_delta > 0:
+                                m.extend([0]*eq_len_delta)
+                            elif eq_len_delta<0:
+                                piece[0].extend([0]*abs(eq_len_delta))
+                            else:
+                                pass
+                                
+                            m = [sum(x) for x in zip(piece[0],m)]
+                    else:
+                        pass
+                #EIS
+                for piece in func[2]:
+                    if piece[1][0] < piece_range[1] and piece[1][1] >= piece_range[1]:
+                            eq_len_delta = len(piece[0]) - len(eis) # difference in number of coefficients
+                            print eq_len_delta
+                            if eq_len_delta > 0:
+                                eis.extend([0]*eq_len_delta)
+                            elif eq_len_delta<0:
+                                piece[0].extend([0]*abs(eq_len_delta))
+                            else:
+                                pass
+                                
+                            eis = [sum(x) for x in zip(piece[0],eis)]
+                    else:
+                        pass
+                #EID
+                for piece in func[3]:
+                    if piece[1][0] < piece_range[1] and piece[1][1] >= piece_range[1]:
+                            eq_len_delta = len(piece[0]) - len(eid) # difference in number of coefficients
+                            print eq_len_delta
+                            if eq_len_delta > 0:
+                                eid.extend([0]*eq_len_delta)
+                            elif eq_len_delta<0:
+                                piece[0].extend([0]*abs(eq_len_delta))
+                            else:
+                                pass
+                                
+                            eid = [sum(x) for x in zip(piece[0],eid)]
+                    else:
+                        pass
+            v_out.append([v,piece_range])
+            m_out.append([m,piece_range])
+            eis_out.append([eis,piece_range])
+            eid_out.append([eid,piece_range])
+        count +=1
+    
+    vs = PieceFunctionString(v_out)
+    ms = PieceFunctionString(m_out)
+    eiss = PieceFunctionString(eis_out)
+    eids = PieceFunctionString(eid_out)
+    
+    return [v_out, m_out, eis_out, eid_out],[vs, ms, eiss, eids]
+    
+def eval_beam_piece_function(piece_function,x):
+    '''
+    Given the peicewise beam functions and a location evaluate the results
+    '''
+    
+    res = []
+    
+    for func in piece_function:
+        for line in func:
+            if line[1][0] < x <= line[1][1]:
+                res.append(poly_eval(line[0],x))
+            else:
+                pass
+    
+    return res
+    
+    
+
+    
