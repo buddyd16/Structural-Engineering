@@ -2745,6 +2745,7 @@ def points_of_zero_shear(shear_piece_function):
                 # if signs are the the same a/b will result in a positive value
                 coeff = line[0][::-1]
                 c = np.roots(coeff)
+                c = c.real[abs(c.imag)<1e-5]
                 for root in c:
                     if line[1][0] < root <= line[1][1]:
                         zero_loc.append(root)
