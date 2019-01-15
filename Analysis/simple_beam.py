@@ -26,6 +26,7 @@ import math
 import os
 import webbrowser
 import tkMessageBox
+
 # import matplotlib.pyplot as plt
 
 class Master_window:
@@ -282,7 +283,7 @@ class Master_window:
         
         self.loads_scroll_frame = tk.Frame(self.pg2_frame, bd=2, relief='sunken', padx=4,pady=4)
         self.loads_scrollbar = tk.Scrollbar(self.loads_scroll_frame, orient="vertical")
-        self.loads_canvas = tk.Canvas(self.loads_scroll_frame, bd=1, scrollregion=(0,0,200,200))
+        self.loads_canvas = tk.Canvas(self.loads_scroll_frame, bd=1, scrollregion=(0,0,100,100))
         
         self.loads_frame = tk.Frame(self.loads_canvas, bd=2, relief='sunken', padx=4,pady=4)
         
@@ -401,7 +402,26 @@ class Master_window:
         self.res_r_frame.pack(anchor='c', padx= 1, pady= 1, fill=tk.BOTH, expand=1)
 
         self.pg3_frame.pack(anchor='c', padx= 1, pady= 1, fill=tk.BOTH, expand=1)
-      
+        
+        #Tab 4 - Piecewise Beam Functions
+        self.page4 = ttk.Frame(self.nb)
+        self.nb.add(self.page4, text='Piecewise Beam Functions')
+
+        self.pg4_frame = tk.Frame(self.page4, bd=2, relief='sunken', padx=1,pady=1)
+        
+        self.pfunc_frame = tk.Frame(self.pg4_frame, bd=2, relief='sunken', padx=1,pady=1)
+        self.pfunc_text_box = tk.Text(self.pfunc_frame, bg= "grey90", font= helv, wrap=tk.WORD)
+        self.pfunc_text_box.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        
+        self.pfunc_scroll = tk.Scrollbar(self.pfunc_frame, command=self.pfunc_text_box.yview)
+        self.pfunc_scroll.pack(side=tk.LEFT, fill=tk.Y)
+        
+        self.pfunc_text_box['yscrollcommand'] = self.pfunc_scroll.set
+        
+        self.pfunc_frame.pack(fill=tk.BOTH,expand=1, padx=5, pady=5)
+        
+        self.pg4_frame.pack(anchor='c', padx= 1, pady= 1, fill=tk.BOTH, expand=1)
+        
         #self.b_export_pdf = tk.Button(self.base_frame,text="Export PDF", command=self.export_pdf, font=helv)
         #self.b_export_pdf.pack(side=tk.RIGHT)
         self.b_export_html = tk.Button(self.base_frame,text="Export HTML", command=self.write_html_results, font=helv)
@@ -1204,7 +1224,11 @@ class Master_window:
                 else:
                     pass
                 i+=1
-
+            
+            #save station to global variables for other processes
+            self.xsl_local = xsl
+            self.xsc_local = xsc
+            self.xsr_local = xsr
             #convert x coordinates to global
             self.xsl = xsl
             self.xsc = xsc + xsl[-1]
@@ -1212,7 +1236,12 @@ class Master_window:
             
             self.has_run = 1
             self.bm_canvas_draw()
-
+            
+            if len(self.loads_center) == 0:
+                pass
+            else:
+                self.piece_function_gen()
+                
     def runx(self, *event):
         x = float(self.resx_var.get())
         
@@ -1375,6 +1404,15 @@ class Master_window:
             
             return v,m,s,d
     
+    def analysisx_type(self, x, res=1,*event):
+        v,m,s,d = self.analysisx(x)
+        a = [v,m,s,d]
+
+        out = a[res]
+
+        return -1*out[1]
+        
+        
     def update(self, *event):
         
         ll = float(self.left_cant_ft.get())
@@ -1962,7 +2000,7 @@ class Master_window:
         file.write('<div style="width:75%;">\n<canvas id="slope"></canvas>\n</div>\n')
         file.write('<div style="width:75%;">\n<canvas id="deflection"></canvas>\n</div>\n')
         file.write("<script>\nvar scatterShear = {\ndatasets: [{\n")
-        file.write("label: 'Shear',\nshowLine: true,\nlineTension: 0,\ndata: [\n")
+        file.write("label: 'Shear',\nshowLine: true,\nlineTension: 0,\nborderColor: 'rgb(54, 162, 235)',\nbackgroundColor: 'rgba(54, 162, 235,0.2)',\npointRadius: 3,\npointBackgroundColor:'rgb(255,0,0)',\ndata: [\n")
         
         #Shear
         i=0
@@ -1990,7 +2028,7 @@ class Master_window:
         file.write(text)
         file.write('}]};')
         file.write("\nvar scatterMoment = {\ndatasets: [{\n")
-        file.write("label: 'Moment',\nshowLine: true,\nlineTension: 0,\ndata: [\n")
+        file.write("label: 'Moment',\nshowLine: true,\nlineTension: 0,\nborderColor: 'rgb(54, 162, 235)',\nbackgroundColor: 'rgba(54, 162, 235,0.2)',\npointRadius: 3,\npointBackgroundColor:'rgb(255,0,0)',\ndata: [\n")
         
         #moment
         i=0
@@ -2018,7 +2056,7 @@ class Master_window:
         file.write(text)
         file.write('}]};')
         file.write("\nvar scatterSlope = {\ndatasets: [{\n")
-        file.write("label: 'Slope',\nshowLine: true,\nlineTension: 0,\ndata: [\n")
+        file.write("label: 'Slope',\nshowLine: true,\nlineTension: 0,\nborderColor: 'rgb(54, 162, 235)',\nbackgroundColor: 'rgba(54, 162, 235,0.2)',\npointRadius: 3,\npointBackgroundColor:'rgb(255,0,0)',\ndata: [\n")
         
         #slope
         i=0
@@ -2046,7 +2084,7 @@ class Master_window:
         file.write(text)
         file.write('}]};')
         file.write("\nvar scatterDeflection = {\ndatasets: [{\n")
-        file.write("label: 'Deflection',\nshowLine: true,\nlineTension: 0,\ndata: [\n")
+        file.write("label: 'Deflection',\nshowLine: true,\nlineTension: 0,\nborderColor: 'rgb(54, 162, 235)',\nbackgroundColor: 'rgba(54, 162, 235,0.2)',\npointRadius: 3,\npointBackgroundColor:'rgb(255,0,0)',\ndata: [\n")
         
         #deflection
         i=0
@@ -2124,7 +2162,40 @@ class Master_window:
         file.close()
         
         webbrowser.open('file://'+ os.path.realpath('simple_beam.html'))
-       
+    
+    def piece_function_gen(self, *event):
+        eq, eqs = ppbeam.center_span_piecewise_function(self.loads_center)
+        
+        zero_shear_loc = ppbeam.points_of_zero_shear(eq[0])
+
+        zero_slope_loc = ppbeam.points_of_zero_shear(eq[2])
+        
+        self.pfunc_text_box.delete(1.0,tk.END)
+        
+        string = 'Shear:\nPoints of 0 Shear:'
+        
+        for x in zero_shear_loc:
+            string = string + ' {0:.4f} ft '.format(x)
+        
+        string = string + '\n'
+        string = string + eqs[0]
+        
+        string = string + '\nMoment:\n'
+        string = string + eqs[1]
+        
+        string = string + '\nEI*Slope:\nPoints of 0 Slope:'
+        
+        for x in zero_slope_loc:
+            string = string + ' {0:.4f} ft '.format(x)
+        
+        string = string + '\n'
+        string = string + eqs[2]
+        
+        string = string + '\n(EI/12)*Deflection:\n'
+        string = string + eqs[3]
+        
+        self.pfunc_text_box.insert(tk.END, string)
+        
 def main():
     root = tk.Tk()
     root.title("Simple Beam")
