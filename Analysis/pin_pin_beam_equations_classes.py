@@ -64,6 +64,7 @@ def PieceFunctionString(piece_set):
                     
             output = output + '{0:0.4f} < x <= {1:0.4f}:\n'.format(func[1][0],func[1][1]) + line + '\n'
         return output
+        
 def poly_eval(c_list,x):
     
     i = 0
@@ -72,12 +73,7 @@ def poly_eval(c_list,x):
         pass
     else:
         for c in c_list:
-            if c == 0:
-                res = 0
-            elif i == 0:
-                res = res+c
-            else:
-                res = res + c*math.pow(x,i)
+            res = res + c*math.pow(x,i)
             i+=1
             
     return res
@@ -2706,6 +2702,8 @@ def center_span_piecewise_function(loads):
 def eval_beam_piece_function(piece_function,x):
     '''
     Given the peicewise beam functions and a location evaluate the results
+    
+    return a list of [V,M,EIS,EID]
     '''
     
     res = []
@@ -2719,6 +2717,57 @@ def eval_beam_piece_function(piece_function,x):
     
     return res
     
+def points_of_zero_shear(shear_piece_function):
+    '''
+    Given the piecewise shear function for the beam return a list
+    of the location of zero shear or where shear jumps from + to - ie 
+    at point loads
+    '''
     
+    zero_loc = []
+    i=0
+    for line in shear_piece_function:
+        print i
+        if len(line[0]) == 1:
+            pass # If function is a value then there is no chance for a sign change
+        
+        else:
+            a = poly_eval(line[0], line[1][0]) # value at start of bounds
+            b = poly_eval(line[0], line[1][1]) # value at end of bounds
+            
+            print line[0]
+            print a,b
+            
+            if a==0:
+                zero_loc.append(line[1][0])
+                
+            elif b==0:
+                zero_loc.append(line[1][1])
+                
+            else:
+                # if signs are the the same a/b will result in a positive value
+                coeff = line[0][::-1]
+                c = np.roots(coeff)
+                print c
+                for root in c:
+                    if line[1][0] < root <= line[1][1]:
+                        zero_loc.append(root)
+                    else:
+                        pass
+            
+            if i==0:
+                pass
+            else:
+                d = poly_eval(shear_piece_function[i-1][0], line[1][0]) # value at end of previous bounds
+                
+                if a/d < 0:
+                    zero_loc.append(line[1][0])
+                else:
+                    pass
+        print zero_loc
+        i+=1
+    
+    return zero_loc
+        
 
     

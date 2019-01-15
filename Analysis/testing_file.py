@@ -25,6 +25,7 @@ import matplotlib.pyplot as plt
 import datetime
 
 import three_moment_method_e as tmm
+import numpy as np
 
 L = 10.0 #ft
 
@@ -47,17 +48,26 @@ point_moment = ppbeam.point_moment(1,2,L)
 
 ff_pm = point_moment.fef()
 
-L1 = ppbeam.trap(1,0,0,10,10)
-L2 = ppbeam.udl(1,1,8,10)
-L3 = ppbeam.pl(1,3,10)
-L4 = ppbeam.point_moment(1,5,10)
+L1 = ppbeam.trap(0,1,0,2,10)
+L2 = ppbeam.udl(1,2,8,10)
+L3 = ppbeam.trap(1,0,8,10,10)
+L4 = ppbeam.pl(-5.8564,5,10)
 
 loads = [L1,L2,L3,L4]
 
 eq, eqs = ppbeam.center_span_piecewise_function(loads)
 
-res = ppbeam.eval_beam_piece_function(eq,9)
+res = ppbeam.eval_beam_piece_function(eq,6)
 
+basic = ppbeam.udl(1,0,10,10).piece_functions()
+factored = ppbeam.udl(10,0,10,10).piece_functions()
+
+zero_shear_loc = ppbeam.points_of_zero_shear(eq[0])
+
+zero_slope_loc = ppbeam.points_of_zero_shear(eq[2])
+
+test_list = eq[0][3][0][::-1]
+test_root = np.roots(test_list)
 ##Left Cantilever Loads
 ##loads = [ppbeam.cant_left_point(1,0,l,0),
 ##            ppbeam.cant_left_point_moment(1,(l*0.5),l,0),
