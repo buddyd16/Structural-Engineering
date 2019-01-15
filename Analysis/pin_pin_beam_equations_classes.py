@@ -2630,7 +2630,7 @@ def center_span_piecewise_function(loads):
                 for piece in func[0]:
                     if piece[1][0] < piece_range[1] and piece[1][1] >= piece_range[1]:
                             eq_len_delta = len(piece[0]) - len(v) # difference in number of coefficients
-                            print eq_len_delta
+                            
                             if eq_len_delta > 0:
                                 v.extend([0]*eq_len_delta)
                             elif eq_len_delta<0:
@@ -2645,7 +2645,7 @@ def center_span_piecewise_function(loads):
                 for piece in func[1]:
                     if piece[1][0] < piece_range[1] and piece[1][1] >= piece_range[1]:
                             eq_len_delta = len(piece[0]) - len(m) # difference in number of coefficients
-                            print eq_len_delta
+                            
                             if eq_len_delta > 0:
                                 m.extend([0]*eq_len_delta)
                             elif eq_len_delta<0:
@@ -2660,7 +2660,7 @@ def center_span_piecewise_function(loads):
                 for piece in func[2]:
                     if piece[1][0] < piece_range[1] and piece[1][1] >= piece_range[1]:
                             eq_len_delta = len(piece[0]) - len(eis) # difference in number of coefficients
-                            print eq_len_delta
+                            
                             if eq_len_delta > 0:
                                 eis.extend([0]*eq_len_delta)
                             elif eq_len_delta<0:
@@ -2675,7 +2675,7 @@ def center_span_piecewise_function(loads):
                 for piece in func[3]:
                     if piece[1][0] < piece_range[1] and piece[1][1] >= piece_range[1]:
                             eq_len_delta = len(piece[0]) - len(eid) # difference in number of coefficients
-                            print eq_len_delta
+                            
                             if eq_len_delta > 0:
                                 eid.extend([0]*eq_len_delta)
                             elif eq_len_delta<0:
@@ -2727,7 +2727,7 @@ def points_of_zero_shear(shear_piece_function):
     zero_loc = []
     i=0
     for line in shear_piece_function:
-        print i
+        
         if len(line[0]) == 1 and i==0:
             pass # If function is a value then there is no chance for a sign change
         

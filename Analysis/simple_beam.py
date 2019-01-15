@@ -405,7 +405,7 @@ class Master_window:
         
         #Tab 4 - Piecewise Beam Functions
         self.page4 = ttk.Frame(self.nb)
-        self.nb.add(self.page4, text='Piecewise Beam Functions')
+        self.nb.add(self.page4, text='Center Span - Piecewise Beam Functions')
 
         self.pg4_frame = tk.Frame(self.page4, bd=2, relief='sunken', padx=1,pady=1)
         
@@ -1237,7 +1237,21 @@ class Master_window:
             self.has_run = 1
             self.bm_canvas_draw()
             
-            if len(self.loads_center) == 0:
+            self.loads_piece = []
+            self.loads_piece.extend(self.loads_center)
+            
+            if self.ll == 0:
+                pass
+            else:
+                self.loads_piece.append(ppbeam.point_moment(momentl[-1],0,xsc[-1]))
+            
+            if self.lr == 0:
+                pass
+            else:
+                self.loads_piece.append(ppbeam.point_moment(-1*momentr[0],xsc[-1],xsc[-1]))
+           
+                    
+            if len(self.loads_piece) == 0:
                 pass
             else:
                 self.piece_function_gen()
@@ -2164,9 +2178,11 @@ class Master_window:
         webbrowser.open('file://'+ os.path.realpath('simple_beam.html'))
     
     def piece_function_gen(self, *event):
-        eq, eqs = ppbeam.center_span_piecewise_function(self.loads_center)
+        eq, eqs = ppbeam.center_span_piecewise_function(self.loads_piece)
         
         zero_shear_loc = ppbeam.points_of_zero_shear(eq[0])
+        
+        zero_moment_loc = ppbeam.points_of_zero_shear(eq[1])
 
         zero_slope_loc = ppbeam.points_of_zero_shear(eq[2])
         
@@ -2180,7 +2196,12 @@ class Master_window:
         string = string + '\n'
         string = string + eqs[0]
         
-        string = string + '\nMoment:\n'
+        string = string + '\nMoment:\nPoints of 0 Moment:'
+        
+        for x in zero_moment_loc:
+            string = string + ' {0:.4f} ft '.format(x)
+        
+        string = string + '\n'
         string = string + eqs[1]
         
         string = string + '\nEI*Slope:\nPoints of 0 Slope:'
