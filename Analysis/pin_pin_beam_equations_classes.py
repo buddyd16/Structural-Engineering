@@ -2728,15 +2728,12 @@ def points_of_zero_shear(shear_piece_function):
     i=0
     for line in shear_piece_function:
         print i
-        if len(line[0]) == 1:
+        if len(line[0]) == 1 and i==0:
             pass # If function is a value then there is no chance for a sign change
         
         else:
-            a = poly_eval(line[0], line[1][0]) # value at start of bounds
-            b = poly_eval(line[0], line[1][1]) # value at end of bounds
-            
-            print line[0]
-            print a,b
+            a = poly_eval(line[0], line[1][0]+0.0001) # value at start of bounds
+            b = poly_eval(line[0], line[1][1]-0.0001) # value at end of bounds
             
             if a==0:
                 zero_loc.append(line[1][0])
@@ -2748,7 +2745,6 @@ def points_of_zero_shear(shear_piece_function):
                 # if signs are the the same a/b will result in a positive value
                 coeff = line[0][::-1]
                 c = np.roots(coeff)
-                print c
                 for root in c:
                     if line[1][0] < root <= line[1][1]:
                         zero_loc.append(root)
@@ -2758,13 +2754,12 @@ def points_of_zero_shear(shear_piece_function):
             if i==0:
                 pass
             else:
-                d = poly_eval(shear_piece_function[i-1][0], line[1][0]) # value at end of previous bounds
+                d = poly_eval(shear_piece_function[i-1][0], line[1][0]-0.0001) # value at end of previous bounds
                 
                 if a/d < 0:
                     zero_loc.append(line[1][0])
                 else:
                     pass
-        print zero_loc
         i+=1
     
     return zero_loc
