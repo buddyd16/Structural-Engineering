@@ -86,6 +86,39 @@ class no_load:
         
         self.kind = 'NL'
         
+    def piece_functions(self):
+        '''
+        Returns the general piecwise function in the form of two lists
+        # list1 is the polynomial coeficients of order [c0,c1x,c2x^2,...,cnx^n]
+        # where the list values will only by the cn's*
+        # list 2 will be the range over which the function piece applies
+        # 0 <= a would be [0,a] **note it will be assumed the the eqality is <= not <
+        # rerturned lists will be [[[list11],[list21]],....,[[list1n],[list2n]]
+        # where n is the total number of functions to capture the range from 
+        # 0 to the full span, L of the beam
+        '''
+        
+        v = [[[0],[0,self.L]]]
+        m = [[[0],[0,self.L]]]
+        eis = [[[0],[0,self.L]]]
+        eid = [[[0],[0,self.L]]]
+
+        vs = PieceFunctionString(v)
+        ms = PieceFunctionString(m)
+        eiss = PieceFunctionString(eis)
+        eids = PieceFunctionString(eid)
+        
+        return [v,m,eis,eid],[vs,ms,eiss,eids]
+        
+    def fef(self):
+        # Fixed End Forces
+        RL = 0
+        RR = 0
+        ML = 0
+        MR = 0
+        
+        return [RL,ML,RR,MR]
+        
     def v(self,x):
         iters = len(x)
         v=zeros(iters)
@@ -842,7 +875,43 @@ class cant_right_nl:
         self.ml = 0
         
         self.kind = 'NL'
+        
+    def piece_functions(self):
+        '''
+        Returns the general piecwise function in the form of two lists
+        # list1 is the polynomial coeficients of order [c0,c1x,c2x^2,...,cnx^n]
+        # where the list values will only by the cn's*
+        # list 2 will be the range over which the function piece applies
+        # 0 <= a would be [0,a] **note it will be assumed the the eqality is <= not <
+        # rerturned lists will be [[[list11],[list21]],....,[[list1n],[list2n]]
+        # where n is the total number of functions to capture the range from 
+        # 0 to the full span, L of the beam
+        '''
+        
+        v = [[[0],[0,self.L]]]
+        
+        m = [[[0],[0,self.L]]]
 
+        eis = [[[self.slope],[0,self.L]]]
+        
+        eid = [[[0, self.slope],[0,self.L]]]
+        
+        vs = PieceFunctionString(v)
+        ms = PieceFunctionString(m)
+        eiss = PieceFunctionString(eis)
+        eids = PieceFunctionString(eid)
+        
+        return [v,m,eis,eid],[vs,ms,eiss,eids]
+        
+    def fef(self):
+        # Fixed End Forces
+        RL = 0
+        RR = 0
+        ML = 0
+        MR = 0
+        
+        return [RL,ML,RR,MR]
+        
     def v(self,x):
         iters = len(x)
         v=zeros(iters)
@@ -930,7 +999,49 @@ class cant_right_point:
 
         self.x_graph=[arrow_minus,self.a,arrow_plus,self.a,self.a]
         self.y_graph=[arrow_height,0,arrow_height,0,self.p]
-
+        
+    def piece_functions(self):
+        '''
+        Returns the general piecwise function in the form of two lists
+        # list1 is the polynomial coeficients of order [c0,c1x,c2x^2,...,cnx^n]
+        # where the list values will only by the cn's*
+        # list 2 will be the range over which the function piece applies
+        # 0 <= a would be [0,a] **note it will be assumed the the eqality is <= not <
+        # rerturned lists will be [[[list11],[list21]],....,[[list1n],[list2n]]
+        # where n is the total number of functions to capture the range from 
+        # 0 to the full span, L of the beam
+        '''
+        
+        if self.a == 0:
+            v = [[[0],[0,self.L]]]
+            m = [[[0],[0,self.L]]]
+            eis = [[[0],[0,self.L]]]
+            eid = [[[0],[0,self.L]]]
+        else:
+            v = [[[self.p],[0,self.a]],[[0],[self.a,self.L]]]
+            
+            m = [[[self.ml,self.rl],[0,self.a]],[[0],[self.a,self.L]]]
+            
+            eis = [[[self.c1,self.ml,0.5*self.rl],[0,self.a]],[[self.c3],[self.a,self.L]]]
+            
+            eid = [[[self.c2,self.c1,0.5*self.ml,(1.0/6.0)*self.rl],[0,self.a]],[[self.c4, self.c3],[self.a,self.L]]]
+        
+        vs = PieceFunctionString(v)
+        ms = PieceFunctionString(m)
+        eiss = PieceFunctionString(eis)
+        eids = PieceFunctionString(eid)
+        
+        return [v,m,eis,eid],[vs,ms,eiss,eids]
+        
+    def fef(self):
+        # Fixed End Forces
+        RL = self.rl
+        RR = 0
+        ML = self.ml
+        MR = 0
+        
+        return [RL,ML,RR,MR]
+        
     def v(self,x):
         iters = len(x)
         v=zeros(iters)
@@ -1073,7 +1184,43 @@ class cant_right_point_moment:
                 y = 0+(r*math.sin(math.radians(a)))
                 self.x_graph.append(x)
                 self.y_graph.append(y)
-
+                
+    def piece_functions(self):
+        '''
+        Returns the general piecwise function in the form of two lists
+        # list1 is the polynomial coeficients of order [c0,c1x,c2x^2,...,cnx^n]
+        # where the list values will only by the cn's*
+        # list 2 will be the range over which the function piece applies
+        # 0 <= a would be [0,a] **note it will be assumed the the eqality is <= not <
+        # rerturned lists will be [[[list11],[list21]],....,[[list1n],[list2n]]
+        # where n is the total number of functions to capture the range from 
+        # 0 to the full span, L of the beam
+        '''
+        
+        v = [[[0],[0,self.L]]]
+        
+        m = [[[self.ml],[0,self.a]],[[0],[self.a,self.L]]]
+        
+        eis = [[[self.c1,self.ml],[0,self.a]],[[self.c3],[self.a,self.L]]]
+        
+        eid = [[[self.c2, self.c1,0.5*self.ml],[0,self.a]],[[self.c4,self.c3],[self.a,self.L]]]
+        
+        vs = PieceFunctionString(v)
+        ms = PieceFunctionString(m)
+        eiss = PieceFunctionString(eis)
+        eids = PieceFunctionString(eid)
+        
+        return [v,m,eis,eid],[vs,ms,eiss,eids]
+        
+    def fef(self):
+        # Fixed End Forces
+        RL = self.rl
+        RR = 0
+        ML = self.ml
+        MR = 0
+        
+        return [RL,ML,RR,MR]
+        
     def v(self,x):
         iters = len(x)
         v=zeros(iters)
@@ -1456,7 +1603,43 @@ class cant_left_nl:
 
         self.rr = 0
         self.mr = 0
+        
+    def piece_functions(self):
+        '''
+        Returns the general piecwise function in the form of two lists
+        # list1 is the polynomial coeficients of order [c0,c1x,c2x^2,...,cnx^n]
+        # where the list values will only by the cn's*
+        # list 2 will be the range over which the function piece applies
+        # 0 <= a would be [0,a] **note it will be assumed the the eqality is <= not <
+        # rerturned lists will be [[[list11],[list21]],....,[[list1n],[list2n]]
+        # where n is the total number of functions to capture the range from 
+        # 0 to the full span, L of the beam
+        '''
+        
+        v = [[[0],[0,self.L]]]
+        
+        m = [[[0],[0,self.L]]]
 
+        eis = [[[self.c1],[0,self.L]]]
+        
+        eid = [[[self.c2, self.c1],[0,self.L]]]
+        
+        vs = PieceFunctionString(v)
+        ms = PieceFunctionString(m)
+        eiss = PieceFunctionString(eis)
+        eids = PieceFunctionString(eid)
+        
+        return [v,m,eis,eid],[vs,ms,eiss,eids]
+        
+    def fef(self):
+        # Fixed End Forces
+        RL = 0
+        RR = 0
+        ML = 0
+        MR = 0
+        
+        return [RL,ML,RR,MR]
+        
     def v(self,x):
         iters = len(x)
         v=zeros(iters)
@@ -1543,7 +1726,44 @@ class cant_left_point:
 
         self.x_graph=[arrow_minus,self.a,arrow_plus,self.a,self.a]
         self.y_graph=[arrow_height,0,arrow_height,0,self.p]
+        
+    def piece_functions(self):
+        '''
+        Returns the general piecwise function in the form of two lists
+        # list1 is the polynomial coeficients of order [c0,c1x,c2x^2,...,cnx^n]
+        # where the list values will only by the cn's*
+        # list 2 will be the range over which the function piece applies
+        # 0 <= a would be [0,a] **note it will be assumed the the eqality is <= not <
+        # rerturned lists will be [[[list11],[list21]],....,[[list1n],[list2n]]
+        # where n is the total number of functions to capture the range from 
+        # 0 to the full span, L of the beam
+        '''
+        
 
+        v = [[[0],[0,self.a]],[[-1.0*self.p],[self.a,self.L]]]
+        
+        m = [[[0],[0,self.a]],[[self.p*self.a,-1.0*self.p],[self.a,self.L]]]
+        
+        eis = [[[self.c1],[0,self.a]],[[-0.5*self.a*self.a*self.p+self.c3,self.a*self.p, -0.5*self.p],[self.a,self.L]]]
+        
+        eid = [[[self.c2,self.c1],[0,self.a]],[[self.c4+((self.a*self.a*self.a*self.p)*(1/6.0)), self.c3-(0.5*self.a*self.a*self.p),0.5*self.a*self.p,(-1/6.0)*self.p],[self.a,self.L]]]
+        
+        vs = PieceFunctionString(v)
+        ms = PieceFunctionString(m)
+        eiss = PieceFunctionString(eis)
+        eids = PieceFunctionString(eid)
+        
+        return [v,m,eis,eid],[vs,ms,eiss,eids]
+        
+    def fef(self):
+        # Fixed End Forces
+        RL = 0
+        RR = self.rr
+        ML = 0
+        MR = self.mr
+        
+        return [RL,ML,RR,MR]
+        
     def v(self,x):
         iters = len(x)
         v=zeros(iters)
@@ -1680,7 +1900,43 @@ class cant_left_point_moment:
                 y = 0+(r*math.sin(math.radians(a)))
                 self.x_graph.append(x)
                 self.y_graph.append(y)
-
+                
+    def piece_functions(self):
+        '''
+        Returns the general piecwise function in the form of two lists
+        # list1 is the polynomial coeficients of order [c0,c1x,c2x^2,...,cnx^n]
+        # where the list values will only by the cn's*
+        # list 2 will be the range over which the function piece applies
+        # 0 <= a would be [0,a] **note it will be assumed the the eqality is <= not <
+        # rerturned lists will be [[[list11],[list21]],....,[[list1n],[list2n]]
+        # where n is the total number of functions to capture the range from 
+        # 0 to the full span, L of the beam
+        '''
+        
+        v = [[[0],[0,self.L]]]
+        
+        m = [[[0],[0,self.a]],[[self.ma],[self.a,self.L]]]
+        
+        eis = [[[self.c1],[0,self.a]],[[self.c3,self.ma],[self.a,self.L]]]
+        
+        eid = [[[self.c2, self.c1],[0,self.a]],[[self.c4,self.c3,0.5*self.ma],[self.a,self.L]]]
+        
+        vs = PieceFunctionString(v)
+        ms = PieceFunctionString(m)
+        eiss = PieceFunctionString(eis)
+        eids = PieceFunctionString(eid)
+        
+        return [v,m,eis,eid],[vs,ms,eiss,eids]
+        
+    def fef(self):
+        # Fixed End Forces
+        RL = 0
+        RR = self.rr
+        ML = 0
+        MR = self.mr
+        
+        return [RL,ML,RR,MR]
+        
     def v(self,x):
         iters = len(x)
         v=zeros(iters)
@@ -2598,6 +2854,8 @@ def center_span_piecewise_function(loads):
     for load in loads:
         if load.kind == "Point" or load.kind == "Moment":
             ab.append(load.a)
+        elif load.kind == "NL":
+            pass
         else:
             ab.append(load.a)
             ab.append(load.b)
