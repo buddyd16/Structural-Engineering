@@ -2101,6 +2101,7 @@ class Master_window:
         
         extension = filename.split('.')[-1]
         
+        del self.loads_gui_select_var[:]
         
         if filename is None:
             return
