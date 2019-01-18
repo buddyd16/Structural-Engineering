@@ -26,14 +26,15 @@ import math
 import os
 import webbrowser
 import tkMessageBox
-
-# import matplotlib.pyplot as plt
+import tkFileDialog
 
 class Master_window:
 
     def __init__(self, master):
         
         self.master = master
+        
+        self.inputs = []
         
         self.loads_scale = [0.0001]
         self.load_last_add = []
@@ -65,6 +66,9 @@ class Master_window:
         self.menu = tk.Menu(self.menubar, tearoff=0)
         self.menu_props = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label = "File", menu=self.menu)
+        self.menu.add_command(label="Save", command=self.save_inputs)
+        self.menu.add_command(label="Open", command=self.open_existing)
+        self.menu.add_separator()
         self.menu.add_command(label="Quit", command=self.quit_app)
         try:
             self.master.config(menu=self.menubar)
@@ -129,9 +133,12 @@ class Master_window:
         tk.Label(self.bm_info_frame, text="Center Span (ft):", font=helv).grid(row=2,column=1, sticky = tk.E)
         tk.Label(self.bm_info_frame, text="Right Cantilever (ft):", font=helv).grid(row=3,column=1, sticky = tk.E)
         
-        self.left_cant_ft = tk.StringVar() 
+        self.left_cant_ft = tk.StringVar()
+        self.inputs.append(self.left_cant_ft)
         self.span_ft = tk.StringVar()
+        self.inputs.append(self.span_ft)
         self.right_cant_ft = tk.StringVar()
+        self.inputs.append(self.right_cant_ft)
         
         self.left_cant_ft.set(0.0)
         self.span_ft.set(10.0)
@@ -147,8 +154,10 @@ class Master_window:
         tk.Label(self.bm_info_frame, text="E (ksi):", font=helv).grid(row=4,column=1, sticky = tk.E)
         tk.Label(self.bm_info_frame, text="I (in^4):", font=helv).grid(row=5,column=1, sticky = tk.E)
         
-        self.E_ksi = tk.StringVar() 
+        self.E_ksi = tk.StringVar()
+        self.inputs.append(self.E_ksi)
         self.I_in4 = tk.StringVar()
+        self.inputs.append(self.I_in4)
         
         self.E_ksi.set(29000)
         self.I_in4.set(30.8)
@@ -157,6 +166,7 @@ class Master_window:
         self.E_entry.grid(row=4,column=2, sticky = tk.W)
         self.I_entry = tk.Entry(self.bm_info_frame, textvariable=self.I_in4, width=10)
         self.I_entry.grid(row=5,column=2, sticky = tk.W)
+        
         
         tk.Label(self.bm_info_frame, text="Stations:", font=helv).grid(row=6,column=1, sticky = tk.E)
         self.stations = tk.Spinbox(self.bm_info_frame, values=(4, 10, 20, 25, 50, 100, 200, 500, 1000), command=self.run)
@@ -200,15 +210,18 @@ class Master_window:
         self.res_calc_multi_frame = tk.Frame(self.pg1_frame, bd=2, relief='sunken', padx=4 ,pady=1)
         
         self.fixed_left = tk.IntVar()
+        self.inputs.append(self.fixed_left)
         self.fixed_left_check = tk.Checkbutton(self.res_calc_multi_frame , text=' : Fixed Left', variable=self.fixed_left, font=helv)
         self.fixed_left_check.grid(row=0, column=0, sticky = tk.W)
         
         self.fixed_right = tk.IntVar()
+        self.inputs.append(self.fixed_right)
         self.fixed_right_check = tk.Checkbutton(self.res_calc_multi_frame , text=' : Fixed Right', variable=self.fixed_right, font=helv)
         self.fixed_right_check.grid(row=0, column=2, sticky = tk.W)
         
         tk.Label(self.res_calc_multi_frame, text = 'Support Locations (ft):\nex. 10,20,30,...,Xi', font=helv).grid(row=1, column=0, columnspan= 3)
         self.internal_supports = tk.StringVar()
+        self.inputs.append(self.internal_supports)
         tk.Entry(self.res_calc_multi_frame, textvariable = self.internal_supports, width=40).grid(row=2, column=0, columnspan= 3)
         
         self.b_solve_multi = tk.Button(self.res_calc_multi_frame, text='Solve Fixed End and Interior Reactions', command = self.multi_solve, font=helv)
@@ -1426,7 +1439,6 @@ class Master_window:
 
         return -1*out[1]
         
-        
     def update(self, *event):
         
         ll = float(self.left_cant_ft.get())
@@ -1562,167 +1574,6 @@ class Master_window:
         
         self.moment_area_label.configure(text=res_string)
                     
-    # def export_pdf(self, *event):
-        # fig = plt.figure(figsize=(11,17),dpi=600)
-        
-        # axb_l = plt.subplot2grid((8, 1), (0, 0))
-        # axb_p = plt.subplot2grid((8, 1), (1, 0))
-        # axb_m = plt.subplot2grid((8, 1), (2, 0))
-
-        # axr = plt.subplot2grid((8, 1), (3, 0))
-        # axv = plt.subplot2grid((8, 1), (4, 0))
-        # axm = plt.subplot2grid((8, 1), (5, 0))
-        # axs = plt.subplot2grid((8, 1), (6, 0))
-        # axd = plt.subplot2grid((8, 1), (7, 0))
-
-        # for load in self.loads_left:
-            # if len(load.x_graph) > 11:
-                # axb_m.plot(load.x_graph,load.y_graph)
-            # elif len(load.x_graph) > 6:
-                # axb_l.plot(load.x_graph,load.y_graph)
-            # else:
-                # axb_p.plot(load.x_graph,load.y_graph)
-                
-        # for load in self.loads_center:
-            # if len(load.x_graph) > 11:
-                # axb_m.plot(load.x_graph+self.xsl[-1],load.y_graph)
-            # elif len(load.x_graph) > 6:
-                # axb_l.plot(load.x_graph+self.xsl[-1],load.y_graph)
-            # else:
-                # axb_p.plot(load.x_graph+self.xsl[-1],load.y_graph)
-                
-        # for load in self.loads_right:
-            # if len(load.x_graph) > 11:
-                # axb_m.plot(load.x_graph+self.xsc[-1],load.y_graph)
-            # elif len(load.x_graph) > 6:
-                # axb_l.plot(load.x_graph+self.xsc[-1],load.y_graph)
-            # else:
-                # axb_p.plot(load.x_graph+self.xsc[-1],load.y_graph)
-                
-        # axb_l.plot([0,0,0],[0.5,0,-0.5], alpha=0)
-        # axb_l.plot(self.xsl,[0]*len(self.xsl))
-        # axb_l.plot(self.xsc,[0]*len(self.xsc))
-        # axb_l.plot(self.xsr,[0]*len(self.xsr))
-        
-        # axb_m.plot([0,0,0],[0.5,0,-0.5], alpha=0)
-        # axb_m.plot(self.xsl,[0]*len(self.xsl))
-        # axb_m.plot(self.xsc,[0]*len(self.xsc))
-        # axb_m.plot(self.xsr,[0]*len(self.xsr))
-        
-        # axb_p.plot([0,0,0],[0.5,0,-0.5], alpha=0)
-        # axb_p.plot(self.xsl,[0]*len(self.xsl))
-        # axb_p.plot(self.xsc,[0]*len(self.xsc))
-        # axb_p.plot(self.xsr,[0]*len(self.xsr))
-        
-        # #support symbols
-        # x0 = self.ll
-        # x2 = self.ll+self.lc
-        # axb_l.plot([x0,x0-0.25,x0+0.25,x0],[0,-0.25,-0.25,0], color='k')
-        # axb_l.plot([x2,x2-0.25,x2+0.25,x2],[0,-0.25,-0.25,0], color='k')
-        # axb_l.minorticks_on()
-        # axb_l.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
-        # axb_l.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
-        
-        # axb_m.plot([x0,x0-0.25,x0+0.25,x0],[0,-0.25,-0.25,0], color='k')
-        # axb_m.plot([x2,x2-0.25,x2+0.25,x2],[0,-0.25,-0.25,0], color='k')
-        # axb_m.minorticks_on()
-        # axb_m.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
-        # axb_m.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
-        
-        # axb_p.plot([x0,x0-0.25,x0+0.25,x0],[0,-0.25,-0.25,0], color='k')
-        # axb_p.plot([x2,x2-0.25,x2+0.25,x2],[0,-0.25,-0.25,0], color='k')
-        # axb_p.minorticks_on()
-        # axb_p.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
-        # axb_p.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
-        
-        # axb_l.set_ylabel('Applied Loads\n(klf)')
-        # axb_m.set_ylabel('Applied Moments\n(ft-kips)')
-        # axb_p.set_ylabel('Applied Point Loads\n(kips)')
-        # axb_l.set_xlabel('L (ft)')
-        # axb_m.set_xlabel('L (ft)')
-        # axb_p.set_xlabel('L (ft)')
-
-        # axr.plot(self.rlx,self.rly)
-        # axr.annotate('RL = {0:.3f} kips'.format(self.reaction_left), xy=(self.ll,min(self.rly)))
-        # axr.plot(self.rrx,self.rry)
-        # axr.annotate('RR = {0:.3f} kips'.format(self.reaction_right), xy=(self.ll+self.lc,min(self.rry)), ha="right")
-        # axr.plot([0,0,0],[0.5,0,-0.5], alpha=0)
-        # axr.plot(self.xsl,[0]*len(self.xsl))
-        # axr.plot(self.xsc,[0]*len(self.xsc))
-        # axr.plot(self.xsr,[0]*len(self.xsr))
-        # axr.minorticks_on()
-        # axr.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
-        # axr.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
-        # axr.set_ylabel('Reaction (kips)')
-        # axr.set_xlabel('L (ft)')
-
-        # axv.plot(self.xsl,self.shearl)
-        # axv.plot(self.xsc,self.shearc)
-        # axv.plot(self.xsr,self.shearr)
-        # axv.plot(self.xsl,[0]*len(self.xsl))
-        # axv.plot(self.xsc,[0]*len(self.xsc))
-        # axv.plot(self.xsr,[0]*len(self.xsr))
-        # axv.fill_between(self.xsl,self.shearl,[0]*len(self.xsl), facecolor='blue', alpha=0.2)
-        # axv.fill_between(self.xsc,self.shearc,[0]*len(self.xsc), facecolor='blue', alpha=0.2)
-        # axv.fill_between(self.xsr,self.shearr,[0]*len(self.xsr), facecolor='blue', alpha=0.2)
-        # axv.minorticks_on()
-        # axv.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
-        # axv.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
-        # axv.set_ylabel('V (kips)')
-        # axv.set_xlabel('L (ft)')
-
-        # axm.plot(self.xsl,self.momentl)
-        # axm.plot(self.xsc,self.momentc)
-        # axm.plot(self.xsr,self.momentr)
-        # axm.plot(self.xsl,[0]*len(self.xsl))
-        # axm.plot(self.xsc,[0]*len(self.xsc))
-        # axm.plot(self.xsr,[0]*len(self.xsr))
-        # axm.fill_between(self.xsl,self.momentl,[0]*len(self.xsl), facecolor='red', alpha=0.2)
-        # axm.fill_between(self.xsc,self.momentc,[0]*len(self.xsc), facecolor='red', alpha=0.2)
-        # axm.fill_between(self.xsr,self.momentr,[0]*len(self.xsr), facecolor='red', alpha=0.2)
-        # axm.minorticks_on()
-        # axm.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
-        # axm.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
-        # axm.set_ylabel('M (ft-kips)')
-        # axm.set_xlabel('L (ft)')
-
-        # axs.plot(self.xsl,self.slopel)
-        # axs.plot(self.xsc,self.slopec)
-        # axs.plot(self.xsr,self.sloper)
-        # axs.plot(self.xsl,[0]*len(self.xsl))
-        # axs.plot(self.xsc,[0]*len(self.xsc))
-        # axs.plot(self.xsr,[0]*len(self.xsr))
-        # axs.fill_between(self.xsl,self.slopel,[0]*len(self.xsl), facecolor='green', alpha=0.2)
-        # axs.fill_between(self.xsc,self.slopec,[0]*len(self.xsc), facecolor='green', alpha=0.2)
-        # axs.fill_between(self.xsr,self.sloper,[0]*len(self.xsr), facecolor='green', alpha=0.2)
-        # axs.minorticks_on()
-        # axs.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
-        # axs.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
-        # axs.set_ylabel('S (rad)')
-        # axs.set_xlabel('L (ft)')
-
-        # axd.plot(self.xsl,self.deltal)
-        # axd.plot(self.xsc,self.deltac)
-        # axd.plot(self.xsr,self.deltar)
-        # axd.plot(self.xsl,[0]*len(self.xsl))
-        # axd.plot(self.xsc,[0]*len(self.xsc))
-        # axd.plot(self.xsr,[0]*len(self.xsr))
-        # axd.fill_between(self.xsl,self.deltal,[0]*len(self.xsl), facecolor='yellow', alpha=0.2)
-        # axd.fill_between(self.xsc,self.deltac,[0]*len(self.xsc), facecolor='yellow', alpha=0.2)
-        # axd.fill_between(self.xsr,self.deltar,[0]*len(self.xsr), facecolor='yellow', alpha=0.2)
-        # axd.minorticks_on()
-        # axd.grid(b=True, which='major', color='k', linestyle='-', alpha=0.3)
-        # axd.grid(b=True, which='minor', color='g', linestyle='-', alpha=0.1)
-        # axd.set_ylabel('D (in)')
-        # axd.set_xlabel('L (ft)')
-
-        # plt.tight_layout()
-        # #plt.subplots_adjust(left=0.125, bottom=0.1, right=0.9, top=0.9, wspace=0.2, hspace=0.4)
-
-        # fig.savefig('simple_beam.pdf', dpi=600)
-        # plt.close('all')
-        # self.write_html_results()
-
     def multi_solve(self, *args):
         l_ft = float(self.span_ft.get())
         
@@ -2216,6 +2067,77 @@ class Master_window:
         string = string + eqs[3]
         
         self.pfunc_text_box.insert(tk.END, string)
+        
+        color = "pale green"
+        self.pfunc_text_box.tag_configure("odd", background=color)
+        self.pfunc_text_box.tag_configure("even", background="#ffffff")
+        
+        lastline = self.pfunc_text_box.index("end-1c").split(".")[0]
+        tag = "odd"
+        for i in range(1, int(lastline)):
+            self.pfunc_text_box.tag_add(tag, "%s.0" % i, "%s.0" % (i+1))
+            tag = "even" if tag == "odd" else "odd"
+            
+    def save_inputs(self, *args):
+        
+        out_file = tkFileDialog.asksaveasfile(mode='w', defaultextension=".simpbm")
+        
+        if out_file is None:
+            return
+        
+        for data in self.inputs:
+            text = '{0}\n'.format(data.get())
+            out_file.write(text)
+        
+        out_file.write('*Loads*\n')
+        for load in self.loads_gui_select_var:
+            text = '{0},{1},{2},{3},{4},{5},{6}\n'.format(load[0].get(),load[1].get(),load[2].get(),load[3].get(),load[4].get(),load[5].get(),load[6].get())
+            out_file.write(text)
+        out_file.close()
+    
+    def open_existing(self, *args):
+    
+        filename = tkFileDialog.askopenfilename()
+        
+        extension = filename.split('.')[-1]
+        
+        
+        if filename is None:
+            return
+        elif extension not in ['simpbm']:
+            tkMessageBox.showerror("ERROR!!","Selected File not a .simpbm file")
+            return
+        else:
+            calc_file = open(filename,'r')
+            calc_data = calc_file.readlines()
+            calc_file.close()
+            
+            i=0
+            load_section = 0
+            for line in calc_data:
+                value = line.rstrip('\n')
+                if value == '*Loads*':
+                    load_section = 1
+                elif load_section == 0:
+                    self.inputs[i].set(value)
+                else:
+                    load = value.split(',')
+                    
+                    self.loads_gui_select_var.append([tk.IntVar(), tk.StringVar(), tk.StringVar(), tk.StringVar(), tk.StringVar(), tk.StringVar(), tk.StringVar()])
+        
+                    n = len(self.loads_gui_select_var)
+                    self.loads_gui_select_var[n-1][0].set(load[0])
+                    self.loads_gui_select_var[n-1][1].set(load[1])
+                    self.loads_gui_select_var[n-1][2].set(load[2])
+                    self.loads_gui_select_var[n-1][3].set(load[3])
+                    self.loads_gui_select_var[n-1][4].set(load[4])
+                    self.loads_gui_select_var[n-1][5].set(load[5])
+                    self.loads_gui_select_var[n-1][6].set(load[6])
+                    
+                i+=1
+                
+            self.build_loads_gui()
+            self.build_loads()
         
 def main():
     root = tk.Tk()
