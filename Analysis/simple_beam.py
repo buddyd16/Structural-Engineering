@@ -972,7 +972,10 @@ class Master_window:
                 load_left = self.loads_left
             
             if len(self.loads_center) == 0:
-                load_center = [ppbeam.pl(0,0,self.lc)]
+                if self.lc == 0:
+                    load_center = [ppbeam.no_load()]
+                else:
+                    load_center = [ppbeam.pl(0,0,self.lc)]
             else:
                 load_center = self.loads_center
             
@@ -1258,12 +1261,18 @@ class Master_window:
             if self.ll == 0:
                 pass
             else:
-                self.loads_piece.append(ppbeam.point_moment(momentl[-1],0,xsc[-1]))
+                if self.lc == 0:
+                    pass
+                else:
+                    self.loads_piece.append(ppbeam.point_moment(momentl[-1],0,xsc[-1]))
             
             if self.lr == 0:
                 pass
             else:
-                self.loads_piece.append(ppbeam.point_moment(-1*momentr[0],xsc[-1],xsc[-1]))
+                if self.lc == 0:
+                    pass
+                else:
+                    self.loads_piece.append(ppbeam.point_moment(-1*momentr[0],xsc[-1],xsc[-1]))
            
                     
             if len(self.loads_piece) == 0:
@@ -1370,7 +1379,10 @@ class Master_window:
                 load_left = self.loads_left
             
             if len(self.loads_center) == 0:
-                load_center = [ppbeam.pl(0,0,self.lc)]
+                if self.lc == 0:
+                    load_center = [ppbeam.no_load()]
+                else:
+                    load_center = [ppbeam.pl(0,0,self.lc)]
             else:
                 load_center = self.loads_center
             
