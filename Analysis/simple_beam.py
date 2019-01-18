@@ -169,8 +169,10 @@ class Master_window:
         
         
         tk.Label(self.bm_info_frame, text="Stations:", font=helv).grid(row=6,column=1, sticky = tk.E)
-        self.stations = tk.Spinbox(self.bm_info_frame, values=(4, 10, 20, 25, 50, 100, 200, 500, 1000), command=self.run)
-        self.stations.grid(row=6, column=2)
+        self.stations = tk.StringVar()
+        self.inputs.append(self.stations)
+        self.stations_sb= tk.Spinbox(self.bm_info_frame, values=(4, 10, 20, 25, 50, 100, 200, 500, 1000), textvariable=self.stations, command=self.run)
+        self.stations_sb.grid(row=6, column=2)
 
         
         self.b_run = tk.Button(self.bm_info_frame,text = "Update", command = self.update, font=helv)
