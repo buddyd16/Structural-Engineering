@@ -3015,7 +3015,7 @@ def points_of_zero_shear(shear_piece_function):
             else:
                 d = poly_eval(shear_piece_function[i-1][0], line[1][0]-0.0001) # value at end of previous bounds
                 
-                if d = 0:
+                if d == 0:
                     pass
                 elif a/d < 0:
                     zero_loc.append(line[1][0])
