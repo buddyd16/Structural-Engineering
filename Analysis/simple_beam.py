@@ -1867,6 +1867,16 @@ class Master_window:
         file.write('<title>Simple Beam Diagrams</title>\n')
         file.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>\n')
         file.write('<style>\n')
+        file.write('.column {\n')
+        file.write('  float: left;\n')
+        file.write('  width: 50%;\n')
+        file.write('}\n')
+        file.write('/* Clear floats after the columns */\n')
+        file.write('.row:after {\n')
+        file.write('  content: "";\n')
+        file.write('  display: table;\n')
+        file.write('  clear: both;\n')
+        file.write('}\n')
         file.write('canvas{\n')
         file.write('-moz-user-select: none;\n')
         file.write('-webkit-user-select: none;\n')
@@ -1874,12 +1884,47 @@ class Master_window:
         file.write('}\n')
         file.write('</style>\n')
         file.write('</head>\n\n<body>\n')
-        file.write('<div style="width:75%;">\n<canvas id="shear"></canvas>\n</div>\n')
-        file.write('<div style="width:75%;">\n<canvas id="moment"></canvas>\n</div>\n')
-        file.write('<div style="width:75%;">\n<canvas id="slope"></canvas>\n</div>\n')
-        file.write('<div style="width:75%;">\n<canvas id="deflection"></canvas>\n</div>\n')
+        file.write('<div class="row">\n')
+        file.write('<div class="column">\n')
+        file.write('<table>\n')
+        ins = ['Left Cant. (ft):','Center Span (ft):','Right Cant. (ft):','E (ksi):','I (in^4):','Stations:','Fixed Left:','Fixed Right:','Interior Supports(ft):']
+        i=0
+        for x in self.inputs:
+            file.write('<tr>\n')
+            file.write('<td>{0}</td>\n'.format(ins[i]))
+            file.write('<td>{0}</td>\n'.format(x.get()))
+            file.write('</tr>')
+            i+=1
+        file.write('</table>')
+        file.write('</div>\n')
+        file.write('<div class="column">\n')
+        file.write('<table>\n')
+        file.write('<tr>\n<td>Reaction Left (kips):</td>\n<td>{0:.4f}</td>\n</tr>\n'.format(self.reaction_left))
+        file.write('<tr>\n<td>Reaction Right (kips):</td>\n<td>{0:.4f}</td>\n</tr>\n'.format(self.reaction_right))
+        file.write('<tr>\n<td><u>Max/Min Moments (ft-kips):</u></td>\n</tr>\n')
+        for x in self.zero_shear_loc:
+            v,m,s,d = self.analysisx(x)
+            file.write('<tr>\n<td>@{0:.4f} ft</td>\n<td>{1:.4f}</td>\n</tr>\n'.format(x,m[1]))
+        file.write('<tr>\n<td><u>Max/Min Deflections (in):</u></td>\n</tr>\n')
+        E = float(self.E_ksi.get()) * 144        #144 is conversion from ksi to ksf - 12^2
+        I = float(self.I_in4.get()) / 12.0**4    #covert from in^4 to ft^4
+
+        for x in self.zero_slope_loc:
+            v,m,s,d = self.analysisx(x)
+            file.write('<tr>\n<td>@{0:.4f} ft</td>\n<td>{1:.4f}</td>\n</tr>\n'.format(x,(d[1]/(E*I))*12))
+        file.write('</table>\n')
+        file.write('</div>\n')
+        file.write('</div>\n')
+        file.write('<div class="row">')
+        file.write('<div class="column">\n<canvas id="shear"></canvas>\n</div>\n')
+        file.write('<div class="column">\n<canvas id="moment"></canvas>\n</div>\n')
+        file.write('</div>')
+        file.write('<div class="row">')
+        file.write('<div class="column">\n<canvas id="slope"></canvas>\n</div>\n')
+        file.write('<div class="column">\n<canvas id="deflection"></canvas>\n</div>\n')
+        file.write('</div>')
         file.write("<script>\nvar scatterShear = {\ndatasets: [{\n")
-        file.write("label: 'Shear',\nshowLine: true,\nlineTension: 0,\nborderColor: 'rgb(54, 162, 235)',\nbackgroundColor: 'rgba(54, 162, 235,0.2)',\npointRadius: 3,\npointBackgroundColor:'rgb(255,0,0)',\ndata: [\n")
+        file.write("label: 'Shear',\nshowLine: true,\nlineTension: 0,\nborderColor: 'rgb(255, 0, 0)',\nbackgroundColor: 'rgba(255, 0, 0,0.2)',\npointRadius: 3,\npointBackgroundColor:'rgb(255,0,0)',\ndata: [\n")
         
         #Shear
         i=0
@@ -1907,7 +1952,7 @@ class Master_window:
         file.write(text)
         file.write('}]};')
         file.write("\nvar scatterMoment = {\ndatasets: [{\n")
-        file.write("label: 'Moment',\nshowLine: true,\nlineTension: 0,\nborderColor: 'rgb(54, 162, 235)',\nbackgroundColor: 'rgba(54, 162, 235,0.2)',\npointRadius: 3,\npointBackgroundColor:'rgb(255,0,0)',\ndata: [\n")
+        file.write("label: 'Moment',\nshowLine: true,\nlineTension: 0,\nborderColor: 'rgb(0, 255, 0)',\nbackgroundColor: 'rgba(0, 255, 0,0.2)',\npointRadius: 3,\npointBackgroundColor:'rgb(0,255,0)',\ndata: [\n")
         
         #moment
         i=0
@@ -1935,7 +1980,7 @@ class Master_window:
         file.write(text)
         file.write('}]};')
         file.write("\nvar scatterSlope = {\ndatasets: [{\n")
-        file.write("label: 'Slope',\nshowLine: true,\nlineTension: 0,\nborderColor: 'rgb(54, 162, 235)',\nbackgroundColor: 'rgba(54, 162, 235,0.2)',\npointRadius: 3,\npointBackgroundColor:'rgb(255,0,0)',\ndata: [\n")
+        file.write("label: 'Slope',\nshowLine: true,\nlineTension: 0,\nborderColor: 'rgb(0, 0, 255)',\nbackgroundColor: 'rgba(0, 0, 255,0.2)',\npointRadius: 3,\npointBackgroundColor:'rgb(0,0,255)',\ndata: [\n")
         
         #slope
         i=0
@@ -1963,7 +2008,7 @@ class Master_window:
         file.write(text)
         file.write('}]};')
         file.write("\nvar scatterDeflection = {\ndatasets: [{\n")
-        file.write("label: 'Deflection',\nshowLine: true,\nlineTension: 0,\nborderColor: 'rgb(54, 162, 235)',\nbackgroundColor: 'rgba(54, 162, 235,0.2)',\npointRadius: 3,\npointBackgroundColor:'rgb(255,0,0)',\ndata: [\n")
+        file.write("label: 'Deflection',\nshowLine: true,\nlineTension: 0,\nborderColor: 'rgb(211, 211, 211)',\nbackgroundColor: 'rgba(211, 211, 211,0.2)',\npointRadius: 3,\npointBackgroundColor:'rgb(211,211,211)',\ndata: [\n")
         
         #deflection
         i=0
@@ -2045,17 +2090,17 @@ class Master_window:
     def piece_function_gen(self, *event):
         eq, eqs = ppbeam.center_span_piecewise_function(self.loads_piece)
         
-        zero_shear_loc = ppbeam.points_of_zero_shear(eq[0])
+        self.zero_shear_loc = ppbeam.points_of_zero_shear(eq[0])
         
-        zero_moment_loc = ppbeam.points_of_zero_shear(eq[1])
+        self.zero_moment_loc = ppbeam.points_of_zero_shear(eq[1])
 
-        zero_slope_loc = ppbeam.points_of_zero_shear(eq[2])
+        self.zero_slope_loc = ppbeam.points_of_zero_shear(eq[2])
         
         self.pfunc_text_box.delete(1.0,tk.END)
         
         string = 'Shear:\nPoints of 0 Shear:'
         
-        for x in zero_shear_loc:
+        for x in self.zero_shear_loc:
             string = string + ' {0:.4f} ft '.format(x)
         
         string = string + '\n'
@@ -2063,7 +2108,7 @@ class Master_window:
         
         string = string + '\nMoment:\nPoints of 0 Moment:'
         
-        for x in zero_moment_loc:
+        for x in self.zero_moment_loc:
             string = string + ' {0:.4f} ft '.format(x)
         
         string = string + '\n'
@@ -2071,7 +2116,7 @@ class Master_window:
         
         string = string + '\nEI*Slope:\nPoints of 0 Slope:'
         
-        for x in zero_slope_loc:
+        for x in self.zero_slope_loc:
             string = string + ' {0:.4f} ft '.format(x)
         
         string = string + '\n'
@@ -2123,7 +2168,7 @@ class Master_window:
             tkMessageBox.showerror("ERROR!!","Selected File not a .simpbm file")
             return
         else:
-            calc_file = open(filename,'r')
+            calc_file = open(filename,'rU')
             calc_data = calc_file.readlines()
             calc_file.close()
             
