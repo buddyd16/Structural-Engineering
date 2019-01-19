@@ -1901,11 +1901,11 @@ class Master_window:
         file.write('<table>\n')
         file.write('<tr>\n<td>Reaction Left (kips):</td>\n<td>{0:.4f}</td>\n</tr>\n'.format(self.reaction_left))
         file.write('<tr>\n<td>Reaction Right (kips):</td>\n<td>{0:.4f}</td>\n</tr>\n'.format(self.reaction_right))
-        file.write('<tr>\n<td><u>Max/Min Moments (ft-kips):</u></td>\n</tr>\n')
+        file.write('<tr>\n<td><u>Center Span Max/Min Moments (ft-kips):</u></td>\n</tr>\n')
         for x in self.zero_shear_loc:
             v,m,s,d = self.analysisx(x)
             file.write('<tr>\n<td>@{0:.4f} ft</td>\n<td>{1:.4f}</td>\n</tr>\n'.format(x,m[1]))
-        file.write('<tr>\n<td><u>Max/Min Deflections (in):</u></td>\n</tr>\n')
+        file.write('<tr>\n<td><u>Center Span Max/Min Deflections (in):</u></td>\n</tr>\n')
         E = float(self.E_ksi.get()) * 144        #144 is conversion from ksi to ksf - 12^2
         I = float(self.I_in4.get()) / 12.0**4    #covert from in^4 to ft^4
 
