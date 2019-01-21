@@ -1882,6 +1882,29 @@ class Master_window:
         file.write('-webkit-user-select: none;\n')
         file.write('-ms-user-select: none;\n')
         file.write('}\n')
+        file.write('''table {
+                    font-family: Arial, Helvetica, sans-serif;
+                    border-collapse: collapse;
+                    width: 4.9in;
+                    font-size: 12px;
+                    }
+
+            td,  th {
+                    border: 1px solid #ddd;
+                    text-align: center;
+                    padding: 2px;
+                    }
+
+             tr:nth-child(even){background-color: #f2f2f2}
+
+             tr:hover {background-color: #ddd;}
+
+             th {
+                 padding-top: 2px;
+                 padding-bottom: 2px;
+                 background-color: #4CAF50;
+                 color: white;
+                 }\n''')
         file.write('</style>\n')
         file.write('</head>\n\n<body>\n')
         file.write('<div class="row">\n')
@@ -1893,25 +1916,43 @@ class Master_window:
             file.write('<tr>\n')
             file.write('<td>{0}</td>\n'.format(ins[i]))
             file.write('<td>{0}</td>\n'.format(x.get()))
-            file.write('</tr>')
+            file.write('</tr>\n')
             i+=1
-        file.write('</table>')
+        file.write('</table>\n<br>\n')
+        file.write('<table>\n')
+        file.write('<tr>\n<th>P,M, or W1 (kips/ft-kips/klf)</th>\n<th>W2 (klf)</th>\n<th>a (ft)</th>\n<th>b (ft)</th>\n<th>Location</th>\n<th>Load Type</th>\n</tr>\n')
+        
+        for load in self.loads_gui_select_var:
+            if load[0].get() == 1:
+                file.write('<tr>\n')
+                file.write('<td>{0}</td>\n'.format(load[1].get()))
+                file.write('<td>{0}</td>\n'.format(load[2].get()))
+                file.write('<td>{0}</td>\n'.format(load[3].get()))
+                file.write('<td>{0}</td>\n'.format(load[4].get()))
+                file.write('<td>{0}</td>\n'.format(load[5].get()))
+                file.write('<td>{0}</td>\n'.format(load[6].get()))
+                file.write('</tr>\n')
+                
+        file.write('</table>\n')
         file.write('</div>\n')
         file.write('<div class="column">\n')
         file.write('<table>\n')
         file.write('<tr>\n<td>Reaction Left (kips):</td>\n<td>{0:.4f}</td>\n</tr>\n'.format(self.reaction_left))
         file.write('<tr>\n<td>Reaction Right (kips):</td>\n<td>{0:.4f}</td>\n</tr>\n'.format(self.reaction_right))
-        file.write('<tr>\n<td><u>Center Span Max/Min Moments (ft-kips):</u></td>\n</tr>\n')
-        for x in self.zero_shear_loc:
-            v,m,s,d = self.analysisx(x)
-            file.write('<tr>\n<td>@{0:.4f} ft</td>\n<td>{1:.4f}</td>\n</tr>\n'.format(x,m[1]))
-        file.write('<tr>\n<td><u>Center Span Max/Min Deflections (in):</u></td>\n</tr>\n')
-        E = float(self.E_ksi.get()) * 144        #144 is conversion from ksi to ksf - 12^2
-        I = float(self.I_in4.get()) / 12.0**4    #covert from in^4 to ft^4
+        if self.lc == 0:
+            pass
+        else:
+            file.write('<tr>\n<td><u>Center Span Max/Min Moments (ft-kips):</u></td>\n</tr>\n')
+            for x in self.zero_shear_loc:
+                v,m,s,d = self.analysisx(x)
+                file.write('<tr>\n<td>@{0:.4f} ft</td>\n<td>{1:.4f}</td>\n</tr>\n'.format(x,m[1]))
+            file.write('<tr>\n<td><u>Center Span Max/Min Deflections (in):</u></td>\n</tr>\n')
+            E = float(self.E_ksi.get()) * 144        #144 is conversion from ksi to ksf - 12^2
+            I = float(self.I_in4.get()) / 12.0**4    #covert from in^4 to ft^4
 
-        for x in self.zero_slope_loc:
-            v,m,s,d = self.analysisx(x)
-            file.write('<tr>\n<td>@{0:.4f} ft</td>\n<td>{1:.4f}</td>\n</tr>\n'.format(x,(d[1]/(E*I))*12))
+            for x in self.zero_slope_loc:
+                v,m,s,d = self.analysisx(x)
+                file.write('<tr>\n<td>@{0:.4f} ft</td>\n<td>{1:.4f}</td>\n</tr>\n'.format(x,(d[1]/(E*I))*12))
         file.write('</table>\n')
         file.write('</div>\n')
         file.write('</div>\n')
