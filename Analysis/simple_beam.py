@@ -1879,6 +1879,8 @@ class Master_window:
         file.write('  display: table;\n')
         file.write('  clear: both;\n')
         file.write('}\n')
+        file.write('.bround {\n')
+        file.write('  float: left;\n  padding: 5px;\n  border: 2px solid lightgray;\n  border-radius: 5px;\n  margin-top: 5px;\n  background-color: rgba(242, 242, 242, 0.6);\n}\n')
         file.write('canvas{\n')
         file.write('-moz-user-select: none;\n')
         file.write('-webkit-user-select: none;\n')
@@ -1911,7 +1913,7 @@ class Master_window:
         file.write('</head>\n\n<body>\n')
         file.write('<div class="row">\n')
         file.write('<div class="column left">\n')
-        file.write('<table>\n')
+        file.write('<div class="bround">\n<br>\n<table>\n')
         ins = ['Left Cant. (ft):','Center Span (ft):','Right Cant. (ft):','E (ksi):','I (in^4):','Stations:','Fixed Left:','Fixed Right:','Interior Supports(ft):']
         i=0
         file.write('<tr>\n')
@@ -1963,22 +1965,22 @@ class Master_window:
                 v,m,s,d = self.analysisx(x)
                 file.write('<tr>\n<td>@{0:.4f} ft</td>\n<td>{1:.4f}</td>\n</tr>\n'.format(x,(d[1]/(E*I))*12))
         
-        file.write('</table>\n<br>\n')
+        file.write('</table>\n<br>\n</div>\n<br>\n')
         # Equations
         if self.lc == 0:
             pass
         else:
-            file.write('{0}<br>\n'.format(ppbeam.PieceFunctionStringHTMLTable(self.piece_eq_center[0],'Shear (kips):')))
+            file.write('<div class="bround">\n<h3>Center Span Piecewise Functions</h3>\n<br>\n{0}<br>\n'.format(ppbeam.PieceFunctionStringHTMLTable(self.piece_eq_center[0],'Shear (kips):')))
             file.write('{0}<br>\n'.format(ppbeam.PieceFunctionStringHTMLTable(self.piece_eq_center[1],'Moment (kip-ft):')))
             file.write('{0}<br>\n'.format(ppbeam.PieceFunctionStringHTMLTable(self.piece_eq_center[2],'EI*Slope (rads): [convert EI from inch to ft first]')))
-            file.write('{0}<br>\n'.format(ppbeam.PieceFunctionStringHTMLTable(self.piece_eq_center[3],'(EI/12)*Deflection (in):[convert EI from inch to ft first]')))
+            file.write('{0}<br>\n</div>\n'.format(ppbeam.PieceFunctionStringHTMLTable(self.piece_eq_center[3],'(EI/12)*Deflection (in):[convert EI from inch to ft first]')))
             
         file.write('</div>\n')
         file.write('<div class="column right">\n')
-        file.write('<canvas id="shear"></canvas>\n')
+        file.write('<div class="bround">\n<canvas id="shear"></canvas>\n')
         file.write('<canvas id="moment"></canvas>\n')
         file.write('<canvas id="slope"></canvas>\n')
-        file.write('<canvas id="deflection"></canvas>\n')
+        file.write('<canvas id="deflection"></canvas>\n</div>\n')
         file.write('</div>\n')
         file.write('</div>\n')
 

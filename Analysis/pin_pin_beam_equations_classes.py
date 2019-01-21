@@ -109,7 +109,7 @@ def PieceFunctionStringHTMLTable(piece_set,heading_str):
                         line = line + '+{0:0.4f}*x<sup>{1}</sup>'.format(c,i)
                 i+=1
                 
-        output = output + '<tr>\n<td>{0:0.4f} < x <= {1:0.4f}:</td>\n</tr>\n<tr>\n<td>{2}</td>\n</tr>\n'.format(func[1][0],func[1][1],line)
+        output = output + '<tr>\n<td><u>{0:0.4f} < x <= {1:0.4f}:</u></td>\n</tr>\n<tr>\n<td><b>{2}</b></td>\n</tr>\n'.format(func[1][0],func[1][1],line)
     output = output + '</table>\n'
     return output
         
