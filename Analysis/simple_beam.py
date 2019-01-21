@@ -1964,6 +1964,18 @@ class Master_window:
         file.write('<div class="column">\n<canvas id="slope"></canvas>\n</div>\n')
         file.write('<div class="column">\n<canvas id="deflection"></canvas>\n</div>\n')
         file.write('</div>')
+        # Equations
+        if self.lc == 0:
+            pass
+        else:
+            file.write('<div class="row">')
+            file.write('<div class="column">\n{0}</div>\n'.format(ppbeam.PieceFunctionStringHTMLTable(self.piece_eq_center[0],'Shear (kips):')))
+            file.write('<div class="column">\n{0}</div>\n'.format(ppbeam.PieceFunctionStringHTMLTable(self.piece_eq_center[1],'Moment (kip-ft):')))
+            file.write('</div>')
+            file.write('<div class="row">')
+            file.write('<div class="column">\n{0}</div>\n'.format(ppbeam.PieceFunctionStringHTMLTable(self.piece_eq_center[2],'EI*Slope (rads): [convert EI from inch to ft first]')))
+            file.write('<div class="column">\n{0}</div>\n'.format(ppbeam.PieceFunctionStringHTMLTable(self.piece_eq_center[3],'(EI/12)*Deflection (in):[convert EI from inch to ft first]')))
+            file.write('</div>')
         file.write("<script>\nvar scatterShear = {\ndatasets: [{\n")
         file.write("label: 'Shear',\nshowLine: true,\nlineTension: 0,\nborderColor: 'rgb(255, 0, 0)',\nbackgroundColor: 'rgba(255, 0, 0,0.2)',\npointRadius: 3,\npointBackgroundColor:'rgb(255,0,0)',\ndata: [\n")
         
@@ -2177,6 +2189,8 @@ class Master_window:
         for i in range(1, int(lastline)):
             self.pfunc_text_box.tag_add(tag, "%s.0" % i, "%s.0" % (i+1))
             tag = "even" if tag == "odd" else "odd"
+        
+        self.piece_eq_center = eq
             
     def save_inputs(self, *args):
         

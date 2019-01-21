@@ -64,6 +64,54 @@ def PieceFunctionString(piece_set):
                     
             output = output + '{0:0.4f} < x <= {1:0.4f}:\n'.format(func[1][0],func[1][1]) + line + '\n'
         return output
+
+def PieceFunctionStringHTMLTable(piece_set,heading_str):
+    '''
+    # Returns the general piecwise function in the form of a string
+    # INPUT: List
+    # List makup:
+    # list1 is the polynomial coeficients of order [c0,c1x,c2x^2,...,cnx^n]
+    # where the list values will only by the cn's*
+    # list 2 will be the range over which the function piece applies
+    # 0 <= a would be [0,a] **note it will be assumed the the eqality is <= not <
+    # rerturned lists will be [[[list11],[list21]],....,[[list1n],[list2n]]
+    # where n is the total number of functions to capture the range from 
+    # 0 to the full span, L of the beam
+    '''
+    
+    output = '<table>\n<tr>\n<th>{0}</th>\n</tr>\n'.format(heading_str)
+    
+    for func in piece_set:
+        i=0
+        
+        if all(c == 0 for c in func[0]):
+            line = '0'
+        else:
+            line = '' 
+            for c in func[0]:
+                if c == 0:
+                    pass
+                elif i == 0:
+                    line = line + '{0:0.4f}'.format(c)
+                elif i == 1:
+                    if line == '':
+                        line = line + '{0:0.4f}*x'.format(c)
+                    elif c < 0:
+                        line = line + '-{0:0.4f}*x'.format(abs(c))
+                    else:
+                        line = line + '+{0:0.4f}*x'.format(c)
+                else:
+                    if line == '':
+                        line = line + '{0:0.4f}*x<sup>{1}</sup>'.format(c,i)
+                    elif c < 0:
+                        line = line + '-{0:0.4f}*x<sup>{1}</sup>'.format(abs(c),i)
+                    else:
+                        line = line + '+{0:0.4f}*x<sup>{1}</sup>'.format(c,i)
+                i+=1
+                
+        output = output + '<tr>\n<td>{0:0.4f} < x <= {1:0.4f}:</td>\n</tr>\n<tr>\n<td>{2}</td>\n</tr>\n'.format(func[1][0],func[1][1],line)
+    output = output + '</table>\n'
+    return output
         
 def poly_eval(c_list,x):
     
