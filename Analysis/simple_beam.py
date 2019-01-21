@@ -1868,8 +1868,10 @@ class Master_window:
         file.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>\n')
         file.write('<style>\n')
         file.write('.column {\n')
-        file.write('  float: left;\n')
-        file.write('  width: 50%;\n')
+        file.write('  float: left;\n  padding: 10px;\n}\n')
+        file.write('.left{\n  width: 30%;\n')
+        file.write('}\n')
+        file.write('.right{\n  width: 60%;\n')
         file.write('}\n')
         file.write('/* Clear floats after the columns */\n')
         file.write('.row:after {\n')
@@ -1908,10 +1910,13 @@ class Master_window:
         file.write('</style>\n')
         file.write('</head>\n\n<body>\n')
         file.write('<div class="row">\n')
-        file.write('<div class="column">\n')
+        file.write('<div class="column left">\n')
         file.write('<table>\n')
         ins = ['Left Cant. (ft):','Center Span (ft):','Right Cant. (ft):','E (ksi):','I (in^4):','Stations:','Fixed Left:','Fixed Right:','Interior Supports(ft):']
         i=0
+        file.write('<tr>\n')
+        file.write('<th colspan="2">Inputs:</th>\n')
+        file.write('</tr>\n')
         for x in self.inputs:
             file.write('<tr>\n')
             file.write('<td>{0}</td>\n'.format(ins[i]))
@@ -1920,6 +1925,9 @@ class Master_window:
             i+=1
         file.write('</table>\n<br>\n')
         file.write('<table>\n')
+        file.write('<tr>\n')
+        file.write('<th colspan="6">Applied Loads: (includes interior reactions)</th>\n')
+        file.write('</tr>\n')
         file.write('<tr>\n<th>P,M, or W1 (kips/ft-kips/klf)</th>\n<th>W2 (klf)</th>\n<th>a (ft)</th>\n<th>b (ft)</th>\n<th>Location</th>\n<th>Load Type</th>\n</tr>\n')
         
         for load in self.loads_gui_select_var:
@@ -1933,49 +1941,47 @@ class Master_window:
                 file.write('<td>{0}</td>\n'.format(load[6].get()))
                 file.write('</tr>\n')
                 
-        file.write('</table>\n')
-        file.write('</div>\n')
-        file.write('<div class="column">\n')
+        file.write('</table>\n<br>\n')
         file.write('<table>\n')
+        file.write('<tr>\n')
+        file.write('<th colspan="2">Results:</th>\n')
+        file.write('</tr>\n')
         file.write('<tr>\n<td>Reaction Left (kips):</td>\n<td>{0:.4f}</td>\n</tr>\n'.format(self.reaction_left))
         file.write('<tr>\n<td>Reaction Right (kips):</td>\n<td>{0:.4f}</td>\n</tr>\n'.format(self.reaction_right))
         if self.lc == 0:
             pass
         else:
-            file.write('<tr>\n<td><u>Center Span Max/Min Moments (ft-kips):</u></td>\n</tr>\n')
+            file.write('<tr>\n<td colspan="2"><u>Center Span Max/Min Moments (ft-kips):</u></td>\n</tr>\n')
             for x in self.zero_shear_loc:
                 v,m,s,d = self.analysisx(x)
                 file.write('<tr>\n<td>@{0:.4f} ft</td>\n<td>{1:.4f}</td>\n</tr>\n'.format(x,m[1]))
-            file.write('<tr>\n<td><u>Center Span Max/Min Deflections (in):</u></td>\n</tr>\n')
+            file.write('<tr>\n<td colspan="2"><u>Center Span Max/Min Deflections (in):</u></td>\n</tr>\n')
             E = float(self.E_ksi.get()) * 144        #144 is conversion from ksi to ksf - 12^2
             I = float(self.I_in4.get()) / 12.0**4    #covert from in^4 to ft^4
 
             for x in self.zero_slope_loc:
                 v,m,s,d = self.analysisx(x)
                 file.write('<tr>\n<td>@{0:.4f} ft</td>\n<td>{1:.4f}</td>\n</tr>\n'.format(x,(d[1]/(E*I))*12))
-        file.write('</table>\n')
-        file.write('</div>\n')
-        file.write('</div>\n')
-        file.write('<div class="row">')
-        file.write('<div class="column">\n<canvas id="shear"></canvas>\n</div>\n')
-        file.write('<div class="column">\n<canvas id="moment"></canvas>\n</div>\n')
-        file.write('</div>')
-        file.write('<div class="row">')
-        file.write('<div class="column">\n<canvas id="slope"></canvas>\n</div>\n')
-        file.write('<div class="column">\n<canvas id="deflection"></canvas>\n</div>\n')
-        file.write('</div>')
+        
+        file.write('</table>\n<br>\n')
         # Equations
         if self.lc == 0:
             pass
         else:
-            file.write('<div class="row">')
-            file.write('<div class="column">\n{0}</div>\n'.format(ppbeam.PieceFunctionStringHTMLTable(self.piece_eq_center[0],'Shear (kips):')))
-            file.write('<div class="column">\n{0}</div>\n'.format(ppbeam.PieceFunctionStringHTMLTable(self.piece_eq_center[1],'Moment (kip-ft):')))
-            file.write('</div>')
-            file.write('<div class="row">')
-            file.write('<div class="column">\n{0}</div>\n'.format(ppbeam.PieceFunctionStringHTMLTable(self.piece_eq_center[2],'EI*Slope (rads): [convert EI from inch to ft first]')))
-            file.write('<div class="column">\n{0}</div>\n'.format(ppbeam.PieceFunctionStringHTMLTable(self.piece_eq_center[3],'(EI/12)*Deflection (in):[convert EI from inch to ft first]')))
-            file.write('</div>')
+            file.write('{0}<br>\n'.format(ppbeam.PieceFunctionStringHTMLTable(self.piece_eq_center[0],'Shear (kips):')))
+            file.write('{0}<br>\n'.format(ppbeam.PieceFunctionStringHTMLTable(self.piece_eq_center[1],'Moment (kip-ft):')))
+            file.write('{0}<br>\n'.format(ppbeam.PieceFunctionStringHTMLTable(self.piece_eq_center[2],'EI*Slope (rads): [convert EI from inch to ft first]')))
+            file.write('{0}<br>\n'.format(ppbeam.PieceFunctionStringHTMLTable(self.piece_eq_center[3],'(EI/12)*Deflection (in):[convert EI from inch to ft first]')))
+            
+        file.write('</div>\n')
+        file.write('<div class="column right">\n')
+        file.write('<canvas id="shear"></canvas>\n')
+        file.write('<canvas id="moment"></canvas>\n')
+        file.write('<canvas id="slope"></canvas>\n')
+        file.write('<canvas id="deflection"></canvas>\n')
+        file.write('</div>\n')
+        file.write('</div>\n')
+
         file.write("<script>\nvar scatterShear = {\ndatasets: [{\n")
         file.write("label: 'Shear',\nshowLine: true,\nlineTension: 0,\nborderColor: 'rgb(255, 0, 0)',\nbackgroundColor: 'rgba(255, 0, 0,0.2)',\npointRadius: 3,\npointBackgroundColor:'rgb(255,0,0)',\ndata: [\n")
         
