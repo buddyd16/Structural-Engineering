@@ -1880,7 +1880,7 @@ class Master_window:
         file.write('  clear: both;\n')
         file.write('}\n')
         file.write('.bround {\n')
-        file.write('  float: left;\n  padding: 5px;\n  border: 2px solid lightgray;\n  border-radius: 5px;\n  margin-top: 5px;\n  background-color: rgba(242, 242, 242, 0.6);\n}\n')
+        file.write('  float: left;\n  padding: 5px;\n  border: 2px solid #FDFEFE;\n  border-radius: 5px;\n  margin-top: 5px;\n  background-color: rgba(229, 231, 233, 0.6);\n}\n')
         file.write('canvas{\n')
         file.write('-moz-user-select: none;\n')
         file.write('-webkit-user-select: none;\n')
@@ -1894,20 +1894,20 @@ class Master_window:
                     }
 
             td,  th {
-                    border: 1px solid #ddd;
+                    border: 1px solid #BDC3C7;
                     text-align: center;
                     padding: 2px;
                     }
 
-             tr:nth-child(even){background-color: #f2f2f2}
+             tr:nth-child(even){background-color: #E5E7E9}
 
-             tr:hover {background-color: #ddd;}
+             tr:hover {background-color: #BDC3C7;}
 
              th {
                  padding-top: 2px;
                  padding-bottom: 2px;
-                 background-color: #4CAF50;
-                 color: white;
+                 background-color: #D5D8DC;
+                 color: #353535;
                  }\n''')
         file.write('</style>\n')
         file.write('</head>\n\n<body>\n')
