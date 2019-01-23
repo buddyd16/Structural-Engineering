@@ -1867,26 +1867,11 @@ class Master_window:
         file.write('<title>Simple Beam Diagrams</title>\n')
         file.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>\n')
         file.write('<style>\n')
-        file.write('body {\n  background-color: rgb(89, 89, 89);\n}\n')
-        file.write('.column {\n')
-        file.write('  float: left;\n  padding: 10px;\n}\n')
-        file.write('.left{\n  width: 30%;\n')
-        file.write('}\n')
-        file.write('.right{\n  width: 60%;\n')
-        file.write('}\n')
-        file.write('/* Clear floats after the columns */\n')
-        file.write('.row:after {\n')
-        file.write('  content: "";\n')
-        file.write('  display: table;\n')
-        file.write('  clear: both;\n')
-        file.write('}\n')
-        file.write('.bround {\n')
-        file.write('  float: left;\n  padding: 5px;\n  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.2), 0 2px 8px 0 rgba(0, 0, 0, 0.19);\n  border: 2px solid #FDFEFE;\n  border-radius: 5px;\n  margin-top: 10px;\n  background-color: rgba(254, 254, 254, 0.9);\n}\n')
-        file.write('canvas{\n')
-        file.write('-moz-user-select: none;\n')
-        file.write('-webkit-user-select: none;\n')
-        file.write('-ms-user-select: none;\n')
-        file.write('}\n')
+        file.write('body {\n  background-color: rgb(245, 245, 245);\n}\n')
+        file.write('canvas{\n  width: 500px;\n')
+        file.write('  -moz-user-select: none;\n')
+        file.write('  -webkit-user-select: none;\n')
+        file.write('  -ms-user-select: none;\n}\n')
         file.write('''table {
                     font-family: Arial, Helvetica, sans-serif;
                     border-collapse: collapse;
@@ -1894,27 +1879,26 @@ class Master_window:
                     font-size: 12px;
                     }
 
-            td,  th {
-                    border: 1px solid #BDC3C7;
-                    text-align: center;
-                    padding: 2px;
-                    }
+                    td,  th {
+                            border: 1px solid #BDC3C7;
+                            text-align: center;
+                            padding: 2px;
+                            }
 
-             tr:nth-child(even){background-color: #E5E7E9}
+                     tr:nth-child(even){background-color: #E5E7E9}
 
-             tr:hover {background-color: #BDC3C7;}
+                     tr:hover {background-color: #BDC3C7;}
 
-             th {
-                 padding-top: 2px;
-                 padding-bottom: 2px;
-                 background-color: #D5D8DC;
-                 color: #353535;
+                     th {
+                         padding-top: 2px;
+                         padding-bottom: 2px;
+                         background-color: #D5D8DC;
+                         color: #353535;
                  }\n''')
         file.write('</style>\n')
         file.write('</head>\n\n<body>\n')
-        file.write('<div class="row">\n')
-        file.write('<div class="column left">\n')
-        file.write('<div class="bround">\n<br>\n<table>\n')
+        file.write('<div>\n')
+        file.write('<br>\n<table>\n')
         ins = ['Left Cant. (ft):','Center Span (ft):','Right Cant. (ft):','E (ksi):','I (in^4):','Stations:','Fixed Left:','Fixed Right:','Interior Supports(ft):']
         i=0
         file.write('<tr>\n')
@@ -1971,18 +1955,15 @@ class Master_window:
         if self.lc == 0:
             pass
         else:
-            file.write('<div class="bround">\n<h3>Center Span Piecewise Functions</h3>\n<br>\n{0}<br>\n'.format(ppbeam.PieceFunctionStringHTMLTable(self.piece_eq_center[0],'Shear (kips):')))
+            file.write('<h3>Center Span Piecewise Functions</h3>\n<br>\n{0}<br>\n'.format(ppbeam.PieceFunctionStringHTMLTable(self.piece_eq_center[0],'Shear (kips):')))
             file.write('{0}<br>\n'.format(ppbeam.PieceFunctionStringHTMLTable(self.piece_eq_center[1],'Moment (kip-ft):')))
             file.write('{0}<br>\n'.format(ppbeam.PieceFunctionStringHTMLTable(self.piece_eq_center[2],'EI*Slope (rads): [convert EI from inch to ft first]')))
-            file.write('{0}<br>\n</div>\n'.format(ppbeam.PieceFunctionStringHTMLTable(self.piece_eq_center[3],'(EI/12)*Deflection (in):[convert EI from inch to ft first]')))
+            file.write('{0}<br>\n'.format(ppbeam.PieceFunctionStringHTMLTable(self.piece_eq_center[3],'(EI/12)*Deflection (in):[convert EI from inch to ft first]')))
             
-        file.write('</div>\n')
-        file.write('<div class="column right">\n')
-        file.write('<div class="bround">\n<canvas id="shear"></canvas>\n')
+        file.write('<canvas id="shear"></canvas>\n')
         file.write('<canvas id="moment"></canvas>\n')
         file.write('<canvas id="slope"></canvas>\n')
-        file.write('<canvas id="deflection"></canvas>\n</div>\n')
-        file.write('</div>\n')
+        file.write('<canvas id="deflection"></canvas>\n')
         file.write('</div>\n')
 
         file.write("<script>\nvar scatterShear = {\ndatasets: [{\n")
