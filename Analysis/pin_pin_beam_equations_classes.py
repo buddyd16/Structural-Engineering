@@ -3071,6 +3071,8 @@ def points_of_zero_shear(shear_piece_function):
                     pass
         i+=1
     
+    zero_loc = sorted(set(zero_loc))
+    
     return zero_loc
         
 

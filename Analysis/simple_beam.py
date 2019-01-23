@@ -1867,6 +1867,7 @@ class Master_window:
         file.write('<title>Simple Beam Diagrams</title>\n')
         file.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>\n')
         file.write('<style>\n')
+        file.write('body {\n  background-color: rgb(89, 89, 89);\n}\n')
         file.write('.column {\n')
         file.write('  float: left;\n  padding: 10px;\n}\n')
         file.write('.left{\n  width: 30%;\n')
@@ -1880,7 +1881,7 @@ class Master_window:
         file.write('  clear: both;\n')
         file.write('}\n')
         file.write('.bround {\n')
-        file.write('  float: left;\n  padding: 5px;\n  border: 2px solid #FDFEFE;\n  border-radius: 5px;\n  margin-top: 5px;\n  background-color: rgba(229, 231, 233, 0.6);\n}\n')
+        file.write('  float: left;\n  padding: 5px;\n  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.2), 0 2px 8px 0 rgba(0, 0, 0, 0.19);\n  border: 2px solid #FDFEFE;\n  border-radius: 5px;\n  margin-top: 10px;\n  background-color: rgba(254, 254, 254, 0.9);\n}\n')
         file.write('canvas{\n')
         file.write('-moz-user-select: none;\n')
         file.write('-webkit-user-select: none;\n')
@@ -2069,7 +2070,7 @@ class Master_window:
         file.write(text)
         file.write('}]};')
         file.write("\nvar scatterDeflection = {\ndatasets: [{\n")
-        file.write("label: 'Deflection',\nshowLine: true,\nlineTension: 0,\nborderColor: 'rgb(211, 211, 211)',\nbackgroundColor: 'rgba(211, 211, 211,0.2)',\npointRadius: 3,\npointBackgroundColor:'rgb(211,211,211)',\ndata: [\n")
+        file.write("label: 'Deflection',\nshowLine: true,\nlineTension: 0,\nborderColor: 'rgb(51, 51, 51)',\nbackgroundColor: 'rgba(115, 115, 115,0.2)',\npointRadius: 3,\npointBackgroundColor:'rgb(89,89,89)',\ndata: [\n")
         
         #deflection
         i=0
