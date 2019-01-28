@@ -239,6 +239,9 @@ class Master_window:
         self.species_entry = tk.Entry(self.ref_stud_properties_frame, textvariable=self.species, width=50, font=helv)
         self.species_entry.grid(row=8,column=2,columnspan=3)
         
+        self.is_syp = tk.IntVar()
+        tk.Checkbutton(self.ref_stud_properties_frame, text=': Southern Pine (y/n)', variable=self.is_syp, font=helv).grid(row=8, column=5)
+        
         self.ref_stud_properties_frame.pack(fill=tk.X, padx=2, pady=2)
         
         self.enviro_treatment_frame = tk.LabelFrame(self.input_frame, text="Enviroment and Treatment : ", bd=2, relief='sunken', padx=2, pady=2, font=helv)
@@ -812,7 +815,7 @@ class Master_window:
             self.e_in = 0
             e_string =''
         
-        self.wall = wood.wood_stud_wall(b,d,height,spacing,grade,fb,fv,fc,E,Emin,fc_perp,moisture,temp,incise,num_pl, cfrt, self.com_lat_brace_yn.get(), float(self.blocking_ft.get()), self.no_sheathing_yn.get())
+        self.wall = wood.wood_stud_wall(b,d,height,spacing,grade,fb,fv,fc,E,Emin,fc_perp,moisture,temp,incise,num_pl, cfrt, self.com_lat_brace_yn.get(), float(self.blocking_ft.get()), self.no_sheathing_yn.get(),self.is_syp.get())
         
             
         pressure_psf = float(self.pressure.get())
@@ -2022,7 +2025,7 @@ def main():
     root = tk.Tk()
     root.title("Wood Stud Wall - 2-4x Studs - North American Species (Not Southern Pine) - V0.9 BETA")
     Master_window(root)
-    root.minsize(1024,600)
+    root.minsize(1024,700)
     root.mainloop()
 
 if __name__ == '__main__':

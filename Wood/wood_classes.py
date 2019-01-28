@@ -23,7 +23,7 @@ from __future__ import division
 #import matplotlib.pyplot as plt
 
 class wood_stud_wall:
-    def __init__(self,b_in=1.5,d_in=3.5,height_ft=10, spacing_in=12, grade="No.2", fb_psi=875, fv_psi= 150, fc_psi=1150, E_psi=1400000, Emin_psi=510000, fc_perp_pl_psi=565, moisture_percent = 19, temp = 90, incised = 0,  num_plates = 0, c_frt=[1,1,1,1,1,1], compression_face=1, blocking_ft=0, no_sheathing=0):
+    def __init__(self,b_in=1.5,d_in=3.5,height_ft=10, spacing_in=12, grade="No.2", fb_psi=875, fv_psi= 150, fc_psi=1150, E_psi=1400000, Emin_psi=510000, fc_perp_pl_psi=565, moisture_percent = 19, temp = 90, incised = 0,  num_plates = 0, c_frt=[1,1,1,1,1,1], compression_face=1, blocking_ft=0, no_sheathing=0, is_syp=0):
         self.b_in = b_in
         self.d_in = d_in
         
@@ -70,91 +70,96 @@ class wood_stud_wall:
         #Size Factor, Cf
         #NDS 2005 section 4.3.6 and Table 4A
         #NOTE ASSUMES STUDS ARE VISUALLY GRADED DIMENSION LUMBER 2"-4" AND NOT SOUTHERN PINE AND NORTH AMERICAN SPECIES
-        self.assumptions = self.assumptions + 'Size Factor_Cf - Wall Studs are visually graded dimensional lumber 2" to 4" North American Species and not Southern Pine\n'
-        if grade == "Stud":
-            #Per NDS 2005 Table 4A for stud grade depth >8" use No.3 size factors
-            if self.d_in>11.25:
-                self.cf_fc = 0.9
-                if self.b_in>2.5:
+        if is_syp == 0:
+            self.assumptions = self.assumptions + 'Size Factor_Cf - Wall Studs are visually graded dimensional lumber 2" to 4" North American Species and not Southern Pine\n'
+            if grade == "Stud":
+                #Per NDS 2005 Table 4A for stud grade depth >8" use No.3 size factors
+                if self.d_in>11.25:
+                    self.cf_fc = 0.9
+                    if self.b_in>2.5:
+                        self.cf_fb = 1.0
+                    else:
+                        self.cf_fb = 0.9
+                elif self.d_in>9.25:
+                    self.cf_fc = 1.0
+                    if self.b_in>2.5:
+                        self.cf_fb = 1.1
+                    else:
+                        self.cf_fb = 1.0
+                elif self.d_in>7.25:
+                    self.cf_fc = 1.0
+                    if self.b_in>2.5:
+                        self.cf_fb = 1.2
+                    else:
+                        self.cf_fb = 1.1
+                elif self.d_in>5.5:
+                    self.cf_fc = 1.05
+                    if self.b_in>2.5:
+                        self.cf_fb = 1.3
+                    else:
+                        self.cf_fb = 1.2
+                elif self.d_in > 3.5:
                     self.cf_fb = 1.0
+                    self.cf_fc = 1.0
                 else:
-                    self.cf_fb = 0.9
-            elif self.d_in>9.25:
-                self.cf_fc = 1.0
-                if self.b_in>2.5:
+                    self.cf_fc = 1.05
                     self.cf_fb = 1.1
-                else:
+            elif grade == "Construction":
+                self.cf_fb = 1.0
+                self.cf_fc = 1.0
+            elif grade == "Utility":
+                if self.d_in > 2.5:
                     self.cf_fb = 1.0
-            elif self.d_in>7.25:
-                self.cf_fc = 1.0
-                if self.b_in>2.5:
-                    self.cf_fb = 1.2
+                    self.cf_fc = 1.0
                 else:
-                    self.cf_fb = 1.1
-            elif self.d_in>5.5:
-                self.cf_fc = 1.05
-                if self.b_in>2.5:
+                    self.cf_fc = 0.6
+                    if self.b_in>2.5:
+                        self.cf_fb = 1.0
+                    else:
+                        self.cf_fb = 0.4
+            else:
+                if self.d_in>11.25:
+                    self.cf_fc = 0.9
+                    if self.b_in>2.5:
+                        self.cf_fb = 1.0
+                    else:
+                        self.cf_fb = 0.9
+                elif self.d_in>9.25:
+                    self.cf_fc = 1.0
+                    if self.b_in>2.5:
+                        self.cf_fb = 1.1
+                    else:
+                        self.cf_fb = 1.0
+                elif self.d_in>7.25:
+                    self.cf_fc = 1.0
+                    if self.b_in>2.5:
+                        self.cf_fb = 1.2
+                    else:
+                        self.cf_fb = 1.1
+                elif self.d_in>5.5:
+                    self.cf_fc = 1.05
+                    if self.b_in>2.5:
+                        self.cf_fb = 1.3
+                    else:
+                        self.cf_fb = 1.2
+                elif self.d_in>4.5:
+                    self.cf_fc = 1.1
                     self.cf_fb = 1.3
+                elif self.d_in>3.5:
+                    self.cf_fc = 1.1
+                    self.cf_fb = 1.4
                 else:
-                    self.cf_fb = 1.2
-            elif self.d_in > 3.5:
-                self.cf_fb = 1.0
-                self.cf_fc = 1.0
-            else:
-                self.cf_fc = 1.05
-                self.cf_fb = 1.1
-        elif grade == "Construction":
-            self.cf_fb = 1.0
-            self.cf_fc = 1.0
-        elif grade == "Utility":
-            if self.d_in > 2.5:
-                self.cf_fb = 1.0
-                self.cf_fc = 1.0
-            else:
-                self.cf_fc = 0.6
-                if self.b_in>2.5:
-                    self.cf_fb = 1.0
-                else:
-                    self.cf_fb = 0.4
+                    self.cf_fc = 1.15
+                    self.cf_fb = 1.5
         else:
-            if self.d_in>11.25:
-                self.cf_fc = 0.9
-                if self.b_in>2.5:
-                    self.cf_fb = 1.0
-                else:
-                    self.cf_fb = 0.9
-            elif self.d_in>9.25:
-                self.cf_fc = 1.0
-                if self.b_in>2.5:
-                    self.cf_fb = 1.1
-                else:
-                    self.cf_fb = 1.0
-            elif self.d_in>7.25:
-                self.cf_fc = 1.0
-                if self.b_in>2.5:
-                    self.cf_fb = 1.2
-                else:
-                    self.cf_fb = 1.1
-            elif self.d_in>5.5:
-                self.cf_fc = 1.05
-                if self.b_in>2.5:
-                    self.cf_fb = 1.3
-                else:
-                    self.cf_fb = 1.2
-            elif self.d_in>4.5:
-                self.cf_fc = 1.1
-                self.cf_fb = 1.3
-            elif self.d_in>3.5:
-                self.cf_fc = 1.1
-                self.cf_fb = 1.4
-            else:
-                self.cf_fc = 1.15
-                self.cf_fb = 1.5
-                
+            self.assumptions = self.assumptions + 'Size Factor_Cf - Wall Studs are Southern Pine and stud is less than 4" thick and 12" wide. Cf = 1.0\n'
+            self.cf_fc = 1.0
+            self.cf_fb = 1.0
+            
         #Wet Service Factor, Cm
         #NDS 2005 section 4.3.3 and Table 4A
         #NOTE ASSUMES STUDS ARE VISUALLY GRADED DIMENSION LUMBER 2"-4" AND NOT SOUTHERN PINE AND NORTH AMERICAN SPECIES
-        self.assumptions = self.assumptions + 'Wet Service Factor_Cm - Wall Studs are visually graded dimensional lumber 2" to 4" North American Species and not Southern Pine\n'
+        self.assumptions = self.assumptions + 'Wet Service Factor_Cm - Wall Studs are visually graded dimensional lumber 2" to 4" North American Species or Southern Pine\n'
         if moisture_percent > 19:
             self.cm_fc_perp = 0.67
             self.cm_E = 0.9
