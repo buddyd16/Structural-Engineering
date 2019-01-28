@@ -357,7 +357,12 @@ class Master_window:
         self.text_results_frame = tk.LabelFrame(self.results_frame, text="Calculation Results: ", bd=2, relief='sunken', padx=2, pady=2, font=helv)
 
         self.results_text_box = tk.Text(self.text_results_frame, height = 10, width = 10, bg= "grey90", font= tkFont.Font(family='Helvetica',size=8, weight='normal'), wrap=tk.WORD)
-        self.results_text_box.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+        self.results_text_box.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        
+        self.restxt_scroll = tk.Scrollbar(self.text_results_frame, command=self.results_text_box.yview)
+        self.restxt_scroll.pack(side=tk.LEFT, fill=tk.Y)
+        
+        self.results_text_box['yscrollcommand'] = self.restxt_scroll.set
 
         self.text_results_frame.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
         self.b_output_res= tk.Button(self.results_frame,text="Export Results", command=self.write_text_results_to_file, font=helv, state = tk.DISABLED)
