@@ -76,7 +76,7 @@ class Beam:
         self.j = j_node
         self.E = E
         self.I = I
-        self.Load_List = Loads_List
+        self.Load_List = [load for load in Loads_List]
         self.Length = j_node.x - i_node.x
         
         self.mi = [0]
@@ -165,6 +165,10 @@ class Beam:
             rr += load.rr
         
         return [rl,rr]
+    
+    def reset_fem(self):
+        self.mi = [0]
+        self.mj = [0]
         
 
 class Column_Up:
@@ -207,6 +211,10 @@ class Column_Up:
             self.K = (3/4.0)*(self.E*self.I / self.Length)
             self.dfj = 1
             self.coi = 0.5
+            
+    def reset_fem(self):
+         self.mi = [0]
+         self.mj = [0]       
 
 class Column_Down:
     def __init__(self, j_node, height, E, I, support='fix'):
@@ -248,14 +256,117 @@ class Column_Down:
             self.K = (3/4.0)*(self.E*self.I / self.Length)
             self.dfi = 1
             self.coj = 0.5
-            
+        
+    def reset_fem(self):
+        self.mi = [0]
+        self.mj = [0]
+
+def beams_all_same(nodes, E, I, load):
+    beams = []
+    spans = len(nodes)-1
+    
+    loads = []
+    loads.extend(load)
+
+    for i in range(spans):
+        beams.append(Beam(nodes[i],nodes[i+1],E,I,loads))
+    
+    return beams
+
+def col_up_same(nodes, E, I,height,support):
+    columns = []
+    
+    for node in nodes:
+        columns.append(Column_Up(node,height,E,I,support))
+    
+    return columns
+
+def col_dwn_same(nodes, E, I, height, support):
+    columns = []
+    
+    for node in nodes:
+        columns.append(Column_Down(node,height,E,I,support))
+    
+    return columns
+
+def moment_distribution_cycle(nodes, beams, columns):
+    # Moment Distribution Cycle - left to right
+    for node in nodes:
+        
+        node.sum_node_moments(beams, columns)
+        
+        for beam in beams:
+            if beam.i == node:
+                beam.mi.append(node.m_balance*beam.dfi)
+                beam.mj.append(beam.mi[-1]*0.5)
+                
+            elif beam.j == node:
+                beam.mj.append(node.m_balance*beam.dfi)
+                beam.mi.append(beam.mj[-1]*0.5)
+            else:
+                pass
+    
+        for column in columns:
+            if column.i == node:
+                column.mi.append(node.m_balance*column.dfi)
+                if column.fix == 1:
+                    column.mj.append(column.mi[-1]*0.5)
+                else:
+                    pass
+                
+            elif column.j == node:
+                column.mj.append(node.m_balance*column.dfj)
+                if column.fix == 1:
+                    column.mi.append(column.mj[-1]*0.5)
+                else:
+                    pass
+            else:
+                pass
+    
+    # Moment Distribution Cycle - right to left  
+    nodes_rev = nodes[::-1]
+    for node in nodes_rev:
+        node.sum_node_moments(beams, columns)
+        
+        m_bal = node.m_balance
+        
+        for beam in beams:
+            if beam.i == node:
+                beam.mi.append(m_bal*beam.dfi)
+                beam.mj.append(beam.mi[-1]*0.5)
+                
+            elif beam.j == node:
+                beam.mj.append(m_bal*beam.dfi)
+                beam.mi.append(beam.mj[-1]*0.5)
+                    
+            else:
+                pass
+    
+        for column in columns:
+            if column.i == node:
+                column.mi.append(m_bal*column.dfi)
+                if column.fix == 1:
+                    column.mj.append(column.mi[-1]*0.5)
+                else:
+                    pass
+                
+            elif column.j == node:
+                column.mj.append(m_bal*column.dfj)
+                if column.fix == 1:
+                    column.mi.append(column.mj[-1]*0.5)
+                else:
+                    pass
+            else:
+                pass
+        
+    return 0
+    
 a = node(0)  
 b = node(10)
 c = node(20)
 d = node(30)
 
 nodes = [a,b,c,d]
-#nodes = [a,b,c]
 
 A_in2 = 12*24.0
 E_ksi = 4286.83
@@ -264,17 +375,16 @@ I_in4 = 13824
 E_ksf = E_ksi*144.0 # k/in^2 * 144 in^2 / 1 ft^2 = 144 k/ft^2
 I_ft4 = I_in4 * (1 / 20736.0) # in^4 * 1 ft^4 / 12^4 in^4 = ft^4
 
-beams = [Beam(a,b,E_ksf,I_ft4,[[1,0,0,10,'UDL']]),Beam(b,c,E_ksf,I_ft4,[[1,0,0,10,'UDL']]),Beam(c,d,E_ksf,I_ft4,[[1,0,0,10,'UDL']])]
+bm_load = [[1,0,0,10,'UDL']]
 
-columns_down = [Column_Down(a,10,E_ksf,I_ft4),Column_Down(b,10,E_ksf,I_ft4),Column_Down(c,10,E_ksf,I_ft4),Column_Down(d,10,E_ksf,I_ft4)]
+beams = beams_all_same(nodes, E_ksf, I_ft4, bm_load)
 
-columns_up = [Column_Up(a,10,E_ksf,I_ft4),Column_Up(b,10,E_ksf,I_ft4),Column_Up(c,10,E_ksf,I_ft4),Column_Up(d,10,E_ksf,I_ft4)]
+support = 'fix' 
+col_height = 10
 
-#beams = [Beam(a,b,E_ksf,I_ft4,[[1,0,0,10,'UDL']]),Beam(b,c,E_ksf,I_ft4,[[1,0,0,10,'UDL']])]
-#
-#columns_down = [Column_Down(a,10,E_ksf,I_ft4),Column_Down(b,10,E_ksf,I_ft4),Column_Down(c,10,E_ksf,I_ft4)]
-#
-#columns_up = [Column_Up(a,10,E_ksf,I_ft4),Column_Up(b,10,E_ksf,I_ft4),Column_Up(c,10,E_ksf,I_ft4)]
+columns_down = col_dwn_same(nodes, E_ksf, I_ft4, col_height, support)
+
+columns_up = col_up_same(nodes, E_ksf, I_ft4, col_height, support)
 
 columns=[]
 columns.extend(columns_down)
@@ -324,74 +434,7 @@ for beam in beams:
     bmfef.extend([beam.mi[0],beam.mj[0]])
 
 # Moment Distribution Pass 1 - left to right
-for node in nodes:
-    
-    node.sum_node_moments(beams, columns)
-    
-    for beam in beams:
-        if beam.i == node:
-            beam.mi.append(node.m_balance*beam.dfi)
-            beam.mj.append(beam.mi[-1]*0.5)
-            
-        elif beam.j == node:
-            beam.mj.append(node.m_balance*beam.dfi)
-            beam.mi.append(beam.mj[-1]*0.5)
-        else:
-            pass
-
-    for column in columns:
-        if column.i == node:
-            column.mi.append(node.m_balance*column.dfi)
-            if column.fix == 1:
-                column.mj.append(column.mi[-1]*0.5)
-            else:
-                pass
-            
-        elif column.j == node:
-            column.mj.append(node.m_balance*column.dfj)
-            if column.fix == 1:
-                column.mi.append(column.mj[-1]*0.5)
-            else:
-                pass
-        else:
-            pass
-
-# Moment Distribution Pass 1 - right to left
-
-nodes_rev = nodes[::-1]
-for node in nodes_rev:
-    node.sum_node_moments(beams, columns)
-    
-    m_bal = node.m_balance
-    
-    for beam in beams:
-        if beam.i == node:
-            beam.mi.append(m_bal*beam.dfi)
-            beam.mj.append(beam.mi[-1]*0.5)
-            
-        elif beam.j == node:
-            beam.mj.append(m_bal*beam.dfi)
-            beam.mi.append(beam.mj[-1]*0.5)
-                
-        else:
-            pass
-
-    for column in columns:
-        if column.i == node:
-            column.mi.append(m_bal*column.dfi)
-            if column.fix == 1:
-                column.mj.append(column.mi[-1]*0.5)
-            else:
-                pass
-            
-        elif column.j == node:
-            column.mj.append(m_bal*column.dfj)
-            if column.fix == 1:
-                column.mi.append(column.mj[-1]*0.5)
-            else:
-                pass
-        else:
-            pass            
+moment_distribution_cycle(nodes, beams, columns)        
 
 # Moment Distrubution multiple passes
 
@@ -399,76 +442,8 @@ count = 0
 n = 50
 
 while count < n:
-    for node in nodes:
-        node.sum_node_moments(beams, columns)
-        
-        m_bal = node.m_balance
-        
-        for beam in beams:
-            if beam.i == node:
-                beam.mi.append(m_bal*beam.dfi)
-                beam.mj.append(beam.mi[-1]*0.5)
-                
-            elif beam.j == node:
-                beam.mj.append(m_bal*beam.dfi)
-                beam.mi.append(beam.mj[-1]*0.5)
-            
-            else:
-                pass
-    
-        for column in columns:
-            if column.i == node:
-                column.mi.append(m_bal*column.dfi)
-                if column.fix == 1:
-                    column.mj.append(column.mi[-1]*0.5)
-                else:
-                    pass
-                
-            elif column.j == node:
-                column.mj.append(m_bal*column.dfj)
-                if column.fix == 1:
-                    column.mi.append(column.mj[-1]*0.5)
-                else:
-                    pass
-            else:
-                pass              
-    
-    # Moment Distribution Pass n - right to left
-    for node in nodes_rev:
-        node.sum_node_moments(beams, columns)
-        
-        m_bal = node.m_balance
-        
-        for beam in beams:
-            if beam.i == node:
-                beam.mi.append(m_bal*beam.dfi)
-                beam.mj.append(beam.mi[-1]*0.5)
-                
-            elif beam.j == node:
-                beam.mj.append(m_bal*beam.dfi)
-                beam.mi.append(beam.mj[-1]*0.5)
-                    
-            else:
-                pass
-    
-        for column in columns:
-            if column.i == node:
-                column.mi.append(m_bal*column.dfi)
-                if column.fix == 1:
-                    column.mj.append(column.mi[-1]*0.5)
-                else:
-                    pass
-                
-            elif column.j == node:
-                column.mj.append(m_bal*column.dfj)
-                if column.fix == 1:
-                    column.mi.append(column.mj[-1]*0.5)
-                else:
-                    pass
-            else:
-                pass 
+    moment_distribution_cycle(nodes, beams, columns)
 
-    
     count +=1
     
 n_m_unbalance = [node.m_unbalance for node in nodes ]
@@ -480,17 +455,15 @@ Final_colmi = [sum(col.mi) for col in columns]
 Final_colmj = [sum(col.mj) for col in columns]
 
 # Add final Moments to Beams and Get individual Beam End Reactions
-node_r = []
-for node in nodes:
-    r = 0
-    for beam in beams:
-        if beam.i == node:
-            r += beam.reactions()[0]
-        elif beam.j == node:
-            r += beam.reactions()[1]
-        else:
-            pass
-    node_r.append(r)
+node_r = [0]*len(nodes)
+i=0
+for beam in beams:
+    r = beam.reactions()
+    
+    node_r[i] = node_r[i] + r[0]
+    node_r[i+1] = node_r[i+1] + r[1]
+    
+    i+=1
     
 # Determine column shortening for reactions - PL/AE
 node_delta = []
@@ -503,208 +476,89 @@ for column in columns_down:
     i+=1
 
 # Create New Beam Set with the column shortening as loads
-delta_beams = [Beam(a,b,E_ksf,I_ft4,[[node_delta[0]/12.0,node_delta[1]/12.0,0,10,'END_DELTA']]),Beam(b,c,E_ksf,I_ft4,[[node_delta[1]/12.0,node_delta[2]/12.0,0,10,'END_DELTA']]),Beam(c,d,E_ksf,I_ft4,[[node_delta[2]/12.0,node_delta[3]/12.0,0,10,'END_DELTA']])]
+delta_load = []
+i=0
+for beam in beams:
+    delta_load.append([node_delta[i]/12.0,node_delta[i+1]/12.0,0,10,'END_DELTA'])
+    i+=1
 
-delta_columns_down = [Column_Down(a,10,E_ksf,I_ft4),Column_Down(b,10,E_ksf,I_ft4),Column_Down(c,10,E_ksf,I_ft4),Column_Down(d,10,E_ksf,I_ft4)]
+# reset beam end moments
+for beam in beams:
+    beam.reset_fem()
+    
+# reset column end moments
+for column in columns:
+    column.reset_fem()
 
-delta_columns_up = [Column_Up(a,10,E_ksf,I_ft4),Column_Up(b,10,E_ksf,I_ft4),Column_Up(c,10,E_ksf,I_ft4),Column_Up(d,10,E_ksf,I_ft4)]
-
-delta_columns = []
-delta_columns.extend(delta_columns_down)
-delta_columns.extend(delta_columns_up)
-# Repeat Moment Distribution 
-# Beam Distribution Factors at each Node
-delta_bmdfs = []
-for beam in delta_beams:
-    for node in nodes:
-        if node == beam.i:
-            beam.dfi = beam.K / node.K
-            
-            delta_bmdfs.append(beam.dfi)
-            
-        elif node == beam.j:
-            beam.dfj = beam.K / node.K
-            delta_bmdfs.append(beam.dfj)
-        else:
-            pass
-
-# Column Distribution Factors at each Node
-delta_coldfs = []
-for column in delta_columns:
-    for node in nodes:
-        if node == column.i:
-            column.dfi = column.K / node.K
-            delta_coldfs.append(column.dfi)
-            delta_coldfs.append(column.dfj)
-            
-        elif node == column.j:
-            column.dfj = column.K / node.K
-            delta_coldfs.append(column.dfi)
-            delta_coldfs.append(column.dfj)
-                       
-        else:
-            pass
-        
+# add end delta loads to beams
+i=0
+for beam in beams:
+    beam.Load_List.append(delta_load[i])
+    i+=1
+    
 # Beam Fixed End Forces
 delta_bmfef = []
-for beam in delta_beams:
+for beam in beams:
     beam.applied_loads()
     beam.fef()
     delta_bmfef.extend([beam.mi[0],beam.mj[0]])
 
 # Moment Distribution Pass 1 - left to right
-for node in nodes:
-    
-    node.sum_node_moments(delta_beams, delta_columns)
-    
-    for beam in delta_beams:
-        if beam.i == node:
-            beam.mi.append(node.m_balance*beam.dfi)
-            beam.mj.append(beam.mi[-1]*0.5)
-            
-        elif beam.j == node:
-            beam.mj.append(node.m_balance*beam.dfi)
-            beam.mi.append(beam.mj[-1]*0.5)
-        else:
-            pass
-
-    for column in delta_columns:
-        if column.i == node:
-            column.mi.append(node.m_balance*column.dfi)
-            if column.fix == 1:
-                column.mj.append(column.mi[-1]*0.5)
-            else:
-                pass
-            
-        elif column.j == node:
-            column.mj.append(node.m_balance*column.dfj)
-            if column.fix == 1:
-                column.mi.append(column.mj[-1]*0.5)
-            else:
-                pass
-        else:
-            pass
-
-# Moment Distribution Pass 1 - right to left
-
-nodes_rev = nodes[::-1]
-for node in nodes_rev:
-    node.sum_node_moments(delta_beams, delta_columns)
-    
-    m_bal = node.m_balance
-    
-    for beam in delta_beams:
-        if beam.i == node:
-            beam.mi.append(m_bal*beam.dfi)
-            beam.mj.append(beam.mi[-1]*0.5)
-            
-        elif beam.j == node:
-            beam.mj.append(m_bal*beam.dfi)
-            beam.mi.append(beam.mj[-1]*0.5)
-                
-        else:
-            pass
-
-    for column in delta_columns:
-        if column.i == node:
-            column.mi.append(m_bal*column.dfi)
-            if column.fix == 1:
-                column.mj.append(column.mi[-1]*0.5)
-            else:
-                pass
-            
-        elif column.j == node:
-            column.mj.append(m_bal*column.dfj)
-            if column.fix == 1:
-                column.mi.append(column.mj[-1]*0.5)
-            else:
-                pass
-        else:
-            pass            
+moment_distribution_cycle(nodes, beams, columns)          
 
 # Moment Distrubution multiple passes
 
 count = 0
-n = 50
 
 while count < n:
-    for node in nodes:
-        node.sum_node_moments(delta_beams, delta_columns)
-        
-        m_bal = node.m_balance
-        
-        for beam in delta_beams:
-            if beam.i == node:
-                beam.mi.append(m_bal*beam.dfi)
-                beam.mj.append(beam.mi[-1]*0.5)
-                
-            elif beam.j == node:
-                beam.mj.append(m_bal*beam.dfi)
-                beam.mi.append(beam.mj[-1]*0.5)
-            
-            else:
-                pass
-    
-        for column in delta_columns:
-            if column.i == node:
-                column.mi.append(m_bal*column.dfi)
-                if column.fix == 1:
-                    column.mj.append(column.mi[-1]*0.5)
-                else:
-                    pass
-                
-            elif column.j == node:
-                column.mj.append(m_bal*column.dfj)
-                if column.fix == 1:
-                    column.mi.append(column.mj[-1]*0.5)
-                else:
-                    pass
-            else:
-                pass              
-    
-    # Moment Distribution Pass n - right to left
-    for node in nodes_rev:
-        node.sum_node_moments(delta_beams, delta_columns)
-        
-        m_bal = node.m_balance
-        
-        for beam in delta_beams:
-            if beam.i == node:
-                beam.mi.append(m_bal*beam.dfi)
-                beam.mj.append(beam.mi[-1]*0.5)
-                
-            elif beam.j == node:
-                beam.mj.append(m_bal*beam.dfi)
-                beam.mi.append(beam.mj[-1]*0.5)
-                    
-            else:
-                pass
-    
-        for column in delta_columns:
-            if column.i == node:
-                column.mi.append(m_bal*column.dfi)
-                if column.fix == 1:
-                    column.mj.append(column.mi[-1]*0.5)
-                else:
-                    pass
-                
-            elif column.j == node:
-                column.mj.append(m_bal*column.dfj)
-                if column.fix == 1:
-                    column.mi.append(column.mj[-1]*0.5)
-                else:
-                    pass
-            else:
-                pass 
-
-    
+    moment_distribution_cycle(nodes, beams, columns) 
+  
     count +=1
     
-Final_bmi_delta = [sum(bm.mi) for bm in delta_beams]
-Final_bmj_delta = [sum(bm.mj) for bm in delta_beams]
+Final_bmi_delta = [sum(bm.mi) for bm in beams]
+Final_bmj_delta = [sum(bm.mj) for bm in beams]
 
-Final_colmi_delta = [sum(col.mi) for col in delta_columns]
-Final_colmj_delta = [sum(col.mj) for col in delta_columns]
+Final_colmi_delta = [sum(col.mi) for col in columns]
+Final_colmj_delta = [sum(col.mj) for col in columns]
+   
+# Add final Moments to Beams and Get individual Beam End Reactions
+delta_node_r = [0]*len(nodes)
+i=0
+for beam in beams:
+    r = beam.reactions()
+    
+    delta_node_r[i] = delta_node_r[i] + r[0]
+    delta_node_r[i+1] = delta_node_r[i+1] + r[1]
+    
+    i+=1
+    
+# Determine column shortening for reactions - PL/AE
+delta_node_delta = []
+i = 0
+for column in columns_down:
+    p = delta_node_r[i]
+    
+    delta_node_delta.append((-1.0*p*column.Length*12.0) / (A_in2 * E_ksi))
+    
+    i+=1   
 
-full_bmi = [x+y for x,y in zip(Final_bmi,Final_bmi_delta)]
-            
+# Add final Moments to Beams and Get individual Beam End Reactions
+delta_node_r = [0]*len(nodes)
+i=0
+for beam in beams:
+    r = beam.reactions()
+    
+    delta_node_r[i] = delta_node_r[i] + r[0]
+    delta_node_r[i+1] = delta_node_r[i+1] + r[1]
+    
+    i+=1
+    
+# Determine column shortening for reactions - PL/AE
+delta_node_delta = []
+i = 0
+for column in columns_down:
+    p = delta_node_r[i]
+    print p
+    
+    delta_node_delta.append((-1.0*p*column.Length*12.0) / (A_in2 * E_ksi))
+    i+=1
