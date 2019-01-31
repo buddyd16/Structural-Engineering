@@ -288,7 +288,7 @@ class Column_Up:
             
     def reset_fem(self):
          self.mi = [0]
-         self.mj = [0]       
+         self.mj = [0]
 
 class Column_Down:
     def __init__(self, j_node, height, E, I, support='fix'):
@@ -439,8 +439,12 @@ a = node(0)
 b = node(10)
 c = node(20)
 d = node(30)
+e = node(40)
+f = node(50)
+g = node(60)
 
-nodes = [a,b,c,d]
+
+nodes = [a,b,c,d,e,f,g]
 
 A_in2 = 12*24.0
 A_ft2 = A_in2/144.0
@@ -456,7 +460,7 @@ bm_load = [[1,0,0,10,'UDL']]
 beams = beams_all_same(nodes, E_ksf, I_ft4, bm_load)
 
 support = 'fix'
-support_dwn = 'fix'
+support_dwn = 'pin'
 col_height = 10
 
 columns_down = col_dwn_same(nodes, E_ksf, I_ft4, col_height, support_dwn)
@@ -619,6 +623,7 @@ for beam in beams:
     delta_func.append(beam.equations_delta)
 
 # Beam Max/Min Moments and EIDeltas
+# and Beam charting values
 moments = []
 EIdeltas = []
 beam_charts = []
