@@ -923,7 +923,7 @@ class end_delta:
         self.deltai = delta_i
         self.deltaj = delta_j
         self.L = L
-        
+        print delta_i
         self.slope = (delta_j - delta_i)/self.L
         
         self.kind = 'END_DELTA'
@@ -973,7 +973,7 @@ class end_delta:
         iters = len(x)
         eid=zeros(iters)
         for i in range(0,iters):
-            eid[i] = self.deltai - self.slope*x[i]
+            eid[i] = self.slope*x[i] + self.deltai
         return eid
 
     def vx(self,x):
@@ -989,7 +989,7 @@ class end_delta:
         return eisx
 
     def eidx(self,x):
-        eid = self.deltai - self.slope*x
+        eid = self.slope*x + self.deltai
         return eid
     
     def fef(self):
@@ -2999,7 +2999,7 @@ def center_span_piecewise_function(loads):
     for load in loads:
         if load.kind == "Point" or load.kind == "Moment":
             ab.append(load.a)
-        elif load.kind == "NL":
+        elif load.kind == "NL" or load.kind == "END_DELTA":
             pass
         else:
             ab.append(load.a)
@@ -3113,6 +3113,7 @@ def eval_beam_piece_function(piece_function,x):
     
     for func in piece_function:
         for line in func:
+            
             if line[1][0] < x <= line[1][1]:
                 res.append(poly_eval(line[0],x))
             else:

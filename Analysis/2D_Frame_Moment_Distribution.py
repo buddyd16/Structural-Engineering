@@ -95,6 +95,8 @@ class Beam:
         
         self.chart_stations.append(self.Length)
         
+        self.loads_built = 0
+        
     def applied_loads(self):
         
         self.Loads = []
@@ -169,8 +171,57 @@ class Beam:
     def reset_fem(self):
         self.mi = [0]
         self.mj = [0]
+    
+    def build_load_function(self):
         
+        self.loads_nodelta = [load for load in self.Loads if load.kind != "END_DELTA"]
+        self.loads_delta = [load for load in self.Loads if load.kind == "END_DELTA"]
+        
+        self.equations, self.equation_strings = ppbeam.center_span_piecewise_function(self.loads_nodelta)
+        
+        self.equations_delta, self.equations_strings_delta = ppbeam.center_span_piecewise_function(self.loads_delta)
+        
+        # points of inflection
+        self.zero_shear_loc = ppbeam.points_of_zero_shear(self.equations[0])
+        
+        self.zero_moment_loc = ppbeam.points_of_zero_shear(self.equations[1])
 
+        self.zero_slope_loc = ppbeam.points_of_zero_shear(self.equations[2])
+        
+        # add points of inflection to the charting stations
+        self.chart_stations.extend(self.zero_shear_loc)
+        self.chart_stations.extend(self.zero_moment_loc)
+        self.chart_stations.extend(self.zero_slope_loc)
+        self.chart_stations = list(set(self.chart_stations))       
+        self.chart_stations.sort()
+        
+        self.loads_built = 1
+    
+    def max_min_moment(self):
+        
+        if self.loads_built == 1:
+            m_out = []
+            for x in self.zero_shear_loc:
+                m_res = ppbeam.eval_beam_piece_function(self.equations,x)
+                
+                m_out.append([x,m_res[1]])
+            
+            return m_out
+        else:
+            return [[0,0]]
+        
+    def max_min_eidelta(self):
+        if self.loads_built == 1:
+            eid_out = []
+            for x in self.zero_slope_loc:
+                eid_res = ppbeam.eval_beam_piece_function(self.equations,x)
+                
+                eid_out.append([x,eid_res[3]])
+            
+            return eid_out        
+        else:
+            return [[0,0]]
+            
 class Column_Up:
     def __init__(self, i_node, height, E, I, support='fix'):
         '''
@@ -208,7 +259,7 @@ class Column_Up:
             self.dfj = 0
             self.coi = 0
         else:
-            self.K = (3/4.0)*(self.E*self.I / self.Length)
+            self.K = (0.75)*(self.E*self.I / self.Length)
             self.dfj = 1
             self.coi = 0.5
             
@@ -253,7 +304,7 @@ class Column_Down:
             self.dfi = 0
             self.coj = 0
         else:
-            self.K = (3/4.0)*(self.E*self.I / self.Length)
+            self.K = (0.75)*(self.E*self.I / self.Length)
             self.dfi = 1
             self.coj = 0.5
         
@@ -369,6 +420,8 @@ d = node(30)
 nodes = [a,b,c,d]
 
 A_in2 = 12*24.0
+A_ft2 = A_in2/144.0
+
 E_ksi = 4286.83
 I_in4 = 13824
 
@@ -379,10 +432,11 @@ bm_load = [[1,0,0,10,'UDL']]
 
 beams = beams_all_same(nodes, E_ksf, I_ft4, bm_load)
 
-support = 'fix' 
+support = 'fix'
+support_dwn = 'fix'
 col_height = 10
 
-columns_down = col_dwn_same(nodes, E_ksf, I_ft4, col_height, support)
+columns_down = col_dwn_same(nodes, E_ksf, I_ft4, col_height, support_dwn)
 
 columns_up = col_up_same(nodes, E_ksf, I_ft4, col_height, support)
 
@@ -439,7 +493,7 @@ moment_distribution_cycle(nodes, beams, columns)
 # Moment Distrubution multiple passes
 
 count = 0
-n = 50
+n = 100
 
 while count < n:
     moment_distribution_cycle(nodes, beams, columns)
@@ -471,7 +525,7 @@ i = 0
 for column in columns_down:
     p = node_r[i]
     
-    node_delta.append((-1.0*p*column.Length*12.0) / (A_in2 * E_ksi))
+    node_delta.append((-1.0*p*column.Length) / (A_ft2 * E_ksf))
     
     i+=1
 
@@ -479,7 +533,8 @@ for column in columns_down:
 delta_load = []
 i=0
 for beam in beams:
-    delta_load.append([node_delta[i]/12.0,node_delta[i+1]/12.0,0,10,'END_DELTA'])
+    delta_load.append([node_delta[i],node_delta[i+1],0,10,'END_DELTA'])
+
     i+=1
 
 # reset beam end moments
@@ -530,35 +585,20 @@ for beam in beams:
     delta_node_r[i] = delta_node_r[i] + r[0]
     delta_node_r[i+1] = delta_node_r[i+1] + r[1]
     
-    i+=1
+    i+=1 
     
-# Determine column shortening for reactions - PL/AE
-delta_node_delta = []
-i = 0
-for column in columns_down:
-    p = delta_node_r[i]
-    
-    delta_node_delta.append((-1.0*p*column.Length*12.0) / (A_in2 * E_ksi))
-    
-    i+=1   
-
-# Add final Moments to Beams and Get individual Beam End Reactions
-delta_node_r = [0]*len(nodes)
-i=0
+# Build Beam Load Functions
+funcs = []
+delta_func = []
 for beam in beams:
-    r = beam.reactions()
-    
-    delta_node_r[i] = delta_node_r[i] + r[0]
-    delta_node_r[i+1] = delta_node_r[i+1] + r[1]
-    
-    i+=1
-    
-# Determine column shortening for reactions - PL/AE
-delta_node_delta = []
-i = 0
-for column in columns_down:
-    p = delta_node_r[i]
-    print p
-    
-    delta_node_delta.append((-1.0*p*column.Length*12.0) / (A_in2 * E_ksi))
-    i+=1
+    beam.build_load_function()
+    funcs.append(beam.equation_strings)
+    delta_func.append(beam.equations_delta)
+
+# Beam Max/Min Moments and EIDeltas
+moments = []
+EIdeltas = []
+
+for beam in beams:
+    moments.append(beam.max_min_moment())
+    EIdeltas.append(beam.max_min_eidelta())
