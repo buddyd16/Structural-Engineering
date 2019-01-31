@@ -221,6 +221,29 @@ class Beam:
             return eid_out        
         else:
             return [[0,0]]
+    
+    def station_values(self):
+        v = []
+        m = []
+        eis = []
+        eid = []
+        end_delta_d = []
+        if self.loads_built == 1:
+            
+            for x in self.chart_stations:
+                res = ppbeam.eval_beam_piece_function(self.equations,x)
+  
+                res_d = ppbeam.eval_beam_piece_function(self.equations_delta,x)
+
+                
+                end_delta_d.append(res_d[3])
+                v.append(res[0])
+                m.append(res[1])
+                eis.append(res[2])
+                eid.append(res[3])
+        
+            return [self.chart_stations, v, m, eis, eid],end_delta_d
+                
             
 class Column_Up:
     def __init__(self, i_node, height, E, I, support='fix'):
@@ -598,7 +621,9 @@ for beam in beams:
 # Beam Max/Min Moments and EIDeltas
 moments = []
 EIdeltas = []
-
+beam_charts = []
 for beam in beams:
     moments.append(beam.max_min_moment())
     EIdeltas.append(beam.max_min_eidelta())
+    beam_charts.append(beam.station_values())
+    

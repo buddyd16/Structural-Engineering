@@ -923,7 +923,7 @@ class end_delta:
         self.deltai = delta_i
         self.deltaj = delta_j
         self.L = L
-        print delta_i
+        
         self.slope = (delta_j - delta_i)/self.L
         
         self.kind = 'END_DELTA'
@@ -3114,7 +3114,7 @@ def eval_beam_piece_function(piece_function,x):
     for func in piece_function:
         for line in func:
             
-            if line[1][0] < x <= line[1][1]:
+            if line[1][0] <= x <= line[1][1]:
                 res.append(poly_eval(line[0],x))
             else:
                 pass
