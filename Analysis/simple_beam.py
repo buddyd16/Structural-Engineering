@@ -973,7 +973,7 @@ class Master_window:
             
             if len(self.loads_center) == 0:
                 if self.lc == 0:
-                    load_center = [ppbeam.no_load()]
+                    load_center = [ppbeam.no_load(self.lc)]
                 else:
                     load_center = [ppbeam.pl(0,0,self.lc)]
             else:
@@ -1380,7 +1380,7 @@ class Master_window:
             
             if len(self.loads_center) == 0:
                 if self.lc == 0:
-                    load_center = [ppbeam.no_load()]
+                    load_center = [ppbeam.no_load(self.lc)]
                 else:
                     load_center = [ppbeam.pl(0,0,self.lc)]
             else:
@@ -1960,10 +1960,10 @@ class Master_window:
             file.write('{0}<br>\n'.format(ppbeam.PieceFunctionStringHTMLTable(self.piece_eq_center[2],'EI*Slope (rads): [convert EI from inch to ft first]')))
             file.write('{0}<br>\n'.format(ppbeam.PieceFunctionStringHTMLTable(self.piece_eq_center[3],'(EI/12)*Deflection (in):[convert EI from inch to ft first]')))
             
-        file.write('<canvas id="shear"></canvas>\n')
+        file.write('<div style="width: 8in;">\n<canvas id="shear"></canvas>\n')
         file.write('<canvas id="moment"></canvas>\n')
         file.write('<canvas id="slope"></canvas>\n')
-        file.write('<canvas id="deflection"></canvas>\n')
+        file.write('<canvas id="deflection"></canvas>\n</div>\n')
         file.write('</div>\n')
 
         file.write("<script>\nvar scatterShear = {\ndatasets: [{\n")

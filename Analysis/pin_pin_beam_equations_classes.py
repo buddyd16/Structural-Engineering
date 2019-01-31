@@ -97,16 +97,16 @@ def PieceFunctionStringHTMLTable(piece_set,heading_str):
                     if line == '':
                         line = line + '{0:0.4f}*x'.format(c)
                     elif c < 0:
-                        line = line + '-{0:0.4f}*x'.format(abs(c))
+                        line = line + ' - {0:0.4f}*x'.format(abs(c))
                     else:
-                        line = line + '+{0:0.4f}*x'.format(c)
+                        line = line + ' + {0:0.4f}*x'.format(c)
                 else:
                     if line == '':
                         line = line + '{0:0.4f}*x<sup>{1}</sup>'.format(c,i)
                     elif c < 0:
-                        line = line + '-{0:0.4f}*x<sup>{1}</sup>'.format(abs(c),i)
+                        line = line + ' - {0:0.4f}*x<sup>{1}</sup>'.format(abs(c),i)
                     else:
-                        line = line + '+{0:0.4f}*x<sup>{1}</sup>'.format(c,i)
+                        line = line + ' + {0:0.4f}*x<sup>{1}</sup>'.format(c,i)
                 i+=1
                 
         output = output + '<tr>\n<td><u>{0:0.4f} < x <= {1:0.4f}:</u></td>\n</tr>\n<tr>\n<td><b>{2}</b></td>\n</tr>\n'.format(func[1][0],func[1][1],line)
@@ -127,10 +127,11 @@ def poly_eval(c_list,x):
     return res
         
 class no_load:
-    def __init__(self):
+    def __init__(self, L):
         self.p = 0
         self.rl = 0
         self.rr = 0
+        self.L = L
         
         self.kind = 'NL'
         
@@ -202,7 +203,7 @@ class no_load:
     def eidx(self,x):
         eid = 0
         return eid
-
+        
 class pl:
     def __init__(self, p, a, L):
 
@@ -915,6 +916,102 @@ class trap:
         
         return [RL,ML,RR,MR]
         
+class end_delta:
+    def __init__(self, delta_i, delta_j, L):
+        self.rl = 0
+        self.rr = 0
+        self.deltai = delta_i
+        self.deltaj = delta_j
+        self.L = L
+        
+        self.slope = (delta_j - delta_i)/self.L
+        
+        self.kind = 'END_DELTA'
+        
+    def piece_functions(self):
+        '''
+        Returns the general piecwise function in the form of two lists
+        # list1 is the polynomial coeficients of order [c0,c1x,c2x^2,...,cnx^n]
+        # where the list values will only by the cn's*
+        # list 2 will be the range over which the function piece applies
+        # 0 <= a would be [0,a] **note it will be assumed the the eqality is <= not <
+        # rerturned lists will be [[[list11],[list21]],....,[[list1n],[list2n]]
+        # where n is the total number of functions to capture the range from 
+        # 0 to the full span, L of the beam
+        '''
+        
+        v = [[[0],[0,self.L]]]
+        m = [[[0],[0,self.L]]]
+        eis = [[[self.slope],[0,self.L]]]
+        eid = [[[self.deltai,self.slope],[0,self.L]]]
+
+        vs = PieceFunctionString(v)
+        ms = PieceFunctionString(m)
+        eiss = PieceFunctionString(eis)
+        eids = PieceFunctionString(eid)
+        
+        return [v,m,eis,eid],[vs,ms,eiss,eids]
+        
+    def v(self,x):
+        iters = len(x)
+        v=zeros(iters)
+        return v
+
+    def m(self,x):
+        iters = len(x)
+        m=zeros(iters)
+        return m
+
+    def eis(self,x):
+        iters = len(x)
+        eis=zeros(iters)
+        for i in range(0,iters):
+            eis[i] = self.slope
+        return eis
+
+    def eid(self,x):
+        iters = len(x)
+        eid=zeros(iters)
+        for i in range(0,iters):
+            eid[i] = self.deltai - self.slope*x[i]
+        return eid
+
+    def vx(self,x):
+        v = 0
+        return v
+
+    def mx(self,x):
+        m = 0
+        return m
+
+    def eisx(self,x):
+        eisx = self.slope
+        return eisx
+
+    def eidx(self,x):
+        eid = self.deltai - self.slope*x
+        return eid
+    
+    def fef(self):
+        eis0 = self.eisx(0)
+        eisL = self.eisx(self.L)
+        
+        s = np.array([[-1.0*eis0],[-1.0*eisL]])
+        
+        ems = np.array([[-1.0*self.L/3.0 , self.L/6.0],[self.L/6.0 , -1.0*self.L/3.0]])
+        
+        fem = np.linalg.solve(ems,s)
+        
+        mo = point_moment(fem[0][0],0,self.L)
+        ml = point_moment(fem[1][0],self.L,self.L)
+        
+        RL = self.rl+mo.rl+ml.rl
+        RR = self.rr+mo.rr+ml.rr
+        ML = fem[0][0]
+        MR = fem[1][0]
+        
+        return [RL,ML,RR,MR]
+        
 class cant_right_nl:
     def __init__(self, slope):
         self.slope = slope
@@ -1030,7 +1127,7 @@ class cant_right_point:
 
         # 0 length backspan indicates fixed-free beam initialize slope to 0
         if Lb == 0:
-            self.backspan = no_load()
+            self.backspan = no_load(0)
             self.c1 = 0
         else:
             self.backspan = point_moment(-1.0*self.ml,self.Lb,self.Lb)
@@ -1190,7 +1287,7 @@ class cant_right_point_moment:
 
         # 0 length backspan indicates fixed-free beam initialize slope to 0
         if Lb == 0:
-            self.backspan = no_load()
+            self.backspan = no_load(0)
             self.c1 = 0
         else:
             self.backspan = point_moment(-1.0*self.ml,self.Lb,self.Lb)
@@ -1373,7 +1470,7 @@ class cant_right_udl:
 
         # 0 length backspan indicates fixed-free beam initialize slope to 0
         if Lb == 0:
-            self.backspan = no_load()
+            self.backspan = no_load(0)
             self.c1 = 0
         else:
             self.backspan = point_moment(-1.0*self.ml,self.Lb,self.Lb)
@@ -1525,7 +1622,7 @@ class cant_right_trap:
 
         # 0 length backspan indicates fixed-free beam initialize slope to 0
         if Lb == 0:
-            self.backspan = no_load()
+            self.backspan = no_load(0)
             self.c1 = 0
         else:
             self.backspan = point_moment(-1.0*self.ml,self.Lb,self.Lb)
@@ -1757,7 +1854,7 @@ class cant_left_point:
 
         # 0 length backspan indicates fixed-free beam initialize slope to 0
         if self.Lb == 0:
-            self.backspan = no_load()
+            self.backspan = no_load(0)
             self.c3 = 0 + (0.5*self.p * (self.L-self.a)**2)
         else:
             self.backspan = point_moment(self.mr,0,self.Lb)
@@ -1906,7 +2003,7 @@ class cant_left_point_moment:
 
         # 0 length backspan indicates fixed-free beam initialize slope to 0
         if Lb == 0:
-            self.backspan = no_load()
+            self.backspan = no_load(0)
             self.c3 = 0 - (self.ma*self.L)
         else:
             self.backspan = point_moment(self.mr,0,Lb)
@@ -2089,7 +2186,7 @@ class cant_left_udl:
 
         # 0 length backspan indicates fixed-free beam initialize slope to 0
         if Lb == 0:
-            self.backspan = no_load()
+            self.backspan = no_load(0)
             self.c5 = 0 + (0.5 * self.w_tot * (self.L - (self.a + (0.5*self.c)))**2)
         else:
             self.backspan = point_moment(self.mr,0,Lb)
@@ -2240,7 +2337,7 @@ class cant_left_trap:
 
         # 0 length backspan indicates fixed-free beam initialize slope to 0
         if Lb == 0:
-            self.backspan = no_load()
+            self.backspan = no_load(0)
             self.c6 = 0 + (0.5*self.w*(self.L-self.cc)**2)
         else:
             self.backspan = point_moment(self.mr,0,Lb)
