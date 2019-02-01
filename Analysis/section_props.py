@@ -25,7 +25,7 @@ import math
 
 class Section:
     
-    def __init__(self, x, y, solid=True):
+    def __init__(self, x, y, solid=True, n=1):
         '''
         A section defined by (x,y) vertices
         
@@ -45,6 +45,8 @@ class Section:
         
         If solid = 1 then the coordinates will be ordered so the signed area
         is positive
+        
+        n = property multiplier
         '''
         
         # check if a closed polygon is formed from the coordinates
@@ -64,6 +66,7 @@ class Section:
         # for a solid shape. If not reverse the coordinate order
         
         self.area = sum([(x[i]*y[i+1])-(x[i+1]*y[i]) for i in range(len(x[:-1]))])/2.0
+        self.area = self.area*n
         
         if self.area < 0 and solid == True:
             x.reverse()
@@ -94,11 +97,16 @@ class Section:
             # properties about the global x and y axis
             
             self.cx = sum([(x[i]+x[i+1])*((x[i]*y[i+1])-(x[i+1]*y[i])) for i in range(len(x[:-1]))])/(6*self.area)
+            self.cx = self.cx*n
             self.cy = sum([(y[i]+y[i+1])*((x[i]*y[i+1])-(x[i+1]*y[i])) for i in range(len(x[:-1]))])/(6*self.area)
+            self.cy = self.cy*n
             
             self.Ix = sum([((y[i]*y[i])+(y[i]*y[i+1])+(y[i+1]*y[i+1]))*((x[i]*y[i+1])-(x[i+1]*y[i])) for i in range(len(x[:-1]))])/(12.0)
+            self.Ix = self.Ix*n
             self.Iy = sum([((x[i]*x[i])+(x[i]*x[i+1])+(x[i+1]*x[i+1]))*((x[i]*y[i+1])-(x[i+1]*y[i])) for i in range(len(x[:-1]))])/(12.0)
+            self.Iy = self.Iy*n
             self.Ixy = sum([((x[i]*y[i+1])+(2*x[i]*y[i])+(2*x[i+1]*y[i+1])+(x[i+1]*y[i]))*(x[i]*y[i+1]-x[i+1]*y[i]) for i in range(len(x[:-1]))])/(24.0)
+            self.Ixy = self.Ixy*n
             self.Jz = self.Ix + self.Iy
             self.sx_top = self.Ix / abs(max(y) - self.cy)
             self.sx_bottom = self.Ix / abs(min(y) - self.cy)
@@ -139,10 +147,10 @@ class Section:
             self.Ivv = temp - temp2*math.cos(two_theta) + self.Ixxyy*math.sin(two_theta)
             self.Iuuvv = temp2*math.sin(two_theta) + self.Ixxyy*math.cos(two_theta)
             
-            if self.Iuu == I1:
+            if I1-0.000001 <= self.Iuu <= I1+0.000001:
                 self.theta1 = math.degrees(two_theta/2.0)
                 self.theta2 = self.theta1 + 90.0
-            elif self.Iuu == I2:
+            elif I2-0.000001 <= self.Iuu <= I2+0.000001:
                 self.theta2 = math.degrees(two_theta/2.0)
                 self.theta1 = self.theta2 - 90.0           
         
@@ -217,8 +225,10 @@ def composite_shape_properties(sections):
     return the composite section properties
     
     Limitation: any specified voids must be entirely enclosed inside solid sections
-    '''
     
+    given a list of modifiers n
+    '''
+       
     # determine the global centroid location and total composite area
     # cx = sum A*dx / sum A
     # cy = sum A*dy / sum A
@@ -298,10 +308,10 @@ def composite_shape_properties(sections):
     output.append(Iuv)
     output_strings.append('Iuv')
     
-    if Iu == I1:
+    if I1-0.000001 <= Iu <= I1+0.000001:
         theta1 = math.degrees(two_theta/2.0)
         theta2 = theta1 + 90.0
-    elif Iu == I2:
+    elif I2-0.000001 <= Iu <= I2+0.000001:
         theta2 = math.degrees(two_theta/2.0)
         theta1 = theta2 - 90.0
     
@@ -344,4 +354,18 @@ def circle_coordinates(x,y,r,start,end):
         y_out.append(y0+y)
     
     return [x_out,y_out]
-            
+
+x1 = [0,300,300,0,0]
+y1 = [0,0,150,150,0]
+
+x2 = [300,310,310,300,300]
+y2 = [37.5,37.5,112.5,112.5,37.5]
+
+n = [1,20]
+
+shape1 = Section(x1,y1,True, n[0])
+shape2 = Section(x2,y2,True, n[1])
+
+shapes = [shape1,shape2]
+
+out, out_s = composite_shape_properties(shapes)
