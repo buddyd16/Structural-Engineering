@@ -752,11 +752,11 @@ for chart in beam_charts:
     ax3.plot(chart[0][0], s, 'g-')
     ax3.plot(chart[0][0], [0]*len(chart[0][0]), 'k-')
     ax3.set_title('Slope - Rad')
-    ax3.ticklabel_format(axis='x',style='sci',scilimits=(1,3))
+    ax3.ticklabel_format(axis='y',style='sci',scilimits=(1,3))
     ax4.plot(chart[0][0], delta, 'c-')
     ax4.plot(chart[0][0], [0]*len(chart[0][0]), 'k-')
     ax4.set_title('Deflection - in')
-    ax4.ticklabel_format(axis='x',style='sci',scilimits=(1,3))
+    ax4.ticklabel_format(axis='y',style='sci',scilimits=(1,3))
     
     f.suptitle('Beam {0}'.format(i))
     
