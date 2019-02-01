@@ -21,6 +21,8 @@ Created on Wed Jan 30 14:32:29 2019
 
 from __future__ import division
 import pin_pin_beam_equations_classes as ppbeam
+import matplotlib.pyplot as plt
+
 
 class node:
     def __init__(self, x):
@@ -287,9 +289,52 @@ class Column_Up:
             self.coi = 0.5
             
     def reset_fem(self):
-         self.mi = [0]
-         self.mj = [0]
+        self.mi = [0]
+        self.mj = [0]
 
+    def build_load_function(self):
+        Mi = sum(self.mi)
+        Mj = sum(self.mj)
+        
+        L1 = ppbeam.point_moment(Mi,0,self.Length)
+        L2 = ppbeam.point_moment(Mj,self.Length,self.Length)
+        
+        self.equations, self.equation_strings = ppbeam.center_span_piecewise_function([L1,L2])
+        
+        # points of inflection
+        self.zero_shear_loc = ppbeam.points_of_zero_shear(self.equations[0])
+        
+        self.zero_moment_loc = ppbeam.points_of_zero_shear(self.equations[1])
+
+        self.zero_slope_loc = ppbeam.points_of_zero_shear(self.equations[2])
+        
+        # add points of inflection to the charting stations
+        self.chart_stations.extend(self.zero_shear_loc)
+        self.chart_stations.extend(self.zero_moment_loc)
+        self.chart_stations.extend(self.zero_slope_loc)
+        self.chart_stations = list(set(self.chart_stations))       
+        self.chart_stations.sort()
+        
+        self.loads_built = 1
+    
+    def station_values(self):
+        v = []
+        m = []
+        eis = []
+        eid = []
+
+        if self.loads_built == 1:
+            
+            for x in self.chart_stations:
+                res = ppbeam.eval_beam_piece_function(self.equations,x)
+                
+                v.append(res[0])
+                m.append(res[1])
+                eis.append(res[2])
+                eid.append(res[3])
+        
+            return [self.chart_stations, v, m, eis, eid]
+        
 class Column_Down:
     def __init__(self, j_node, height, E, I, support='fix'):
         '''
@@ -334,7 +379,50 @@ class Column_Down:
     def reset_fem(self):
         self.mi = [0]
         self.mj = [0]
+        
+    def build_load_function(self):
+        Mi = sum(self.mi)
+        Mj = sum(self.mj)
+        
+        L1 = ppbeam.point_moment(Mi,0,self.Length)
+        L2 = ppbeam.point_moment(Mj,self.Length,self.Length)
+        
+        self.equations, self.equation_strings = ppbeam.center_span_piecewise_function([L1,L2])
+        
+        # points of inflection
+        self.zero_shear_loc = ppbeam.points_of_zero_shear(self.equations[0])
+        
+        self.zero_moment_loc = ppbeam.points_of_zero_shear(self.equations[1])
 
+        self.zero_slope_loc = ppbeam.points_of_zero_shear(self.equations[2])
+        
+        # add points of inflection to the charting stations
+        self.chart_stations.extend(self.zero_shear_loc)
+        self.chart_stations.extend(self.zero_moment_loc)
+        self.chart_stations.extend(self.zero_slope_loc)
+        self.chart_stations = list(set(self.chart_stations))       
+        self.chart_stations.sort()
+        
+        self.loads_built = 1
+    
+    def station_values(self):
+        v = []
+        m = []
+        eis = []
+        eid = []
+
+        if self.loads_built == 1:
+            
+            for x in self.chart_stations:
+                res = ppbeam.eval_beam_piece_function(self.equations,x)
+                
+                v.append(res[0])
+                m.append(res[1])
+                eis.append(res[2])
+                eid.append(res[3])
+        
+            return [self.chart_stations, v, m, eis, eid]
+            
 def beams_all_same(nodes, E, I, load):
     beams = []
     spans = len(nodes)-1
@@ -432,19 +520,18 @@ def moment_distribution_cycle(nodes, beams, columns):
                     pass
             else:
                 pass
-        
-    return 0
+    check = all(abs(node.m_balance) < 1e-10 for node in nodes)
+    
+    return check
     
 a = node(0)  
 b = node(10)
 c = node(20)
 d = node(30)
-e = node(40)
-f = node(50)
-g = node(60)
 
 
-nodes = [a,b,c,d,e,f,g]
+
+nodes = [a,b,c,d]
 
 A_in2 = 12*24.0
 A_ft2 = A_in2/144.0
@@ -460,7 +547,7 @@ bm_load = [[1,0,0,10,'UDL']]
 beams = beams_all_same(nodes, E_ksf, I_ft4, bm_load)
 
 support = 'fix'
-support_dwn = 'pin'
+support_dwn = 'fix'
 col_height = 10
 
 columns_down = col_dwn_same(nodes, E_ksf, I_ft4, col_height, support_dwn)
@@ -521,12 +608,14 @@ moment_distribution_cycle(nodes, beams, columns)
 
 count = 0
 n = 100
-
-while count < n:
-    moment_distribution_cycle(nodes, beams, columns)
+test = False
+while test == False:
+    test = moment_distribution_cycle(nodes, beams, columns)
 
     count +=1
-    
+
+print count
+  
 n_m_unbalance = [node.m_unbalance for node in nodes ]
     
 Final_bmi = [sum(bm.mi) for bm in beams]
@@ -590,12 +679,14 @@ moment_distribution_cycle(nodes, beams, columns)
 
 # Moment Distrubution multiple passes
 
-count = 0
-
-while count < n:
-    moment_distribution_cycle(nodes, beams, columns) 
+count_delta = 0
+test_delta = False
+while test_delta == False:
+    test_delta = moment_distribution_cycle(nodes, beams, columns) 
   
-    count +=1
+    count_delta +=1
+    
+print count_delta
     
 Final_bmi_delta = [sum(bm.mi) for bm in beams]
 Final_bmj_delta = [sum(bm.mj) for bm in beams]
@@ -631,4 +722,79 @@ for beam in beams:
     moments.append(beam.max_min_moment())
     EIdeltas.append(beam.max_min_eidelta())
     beam_charts.append(beam.station_values())
+
+# Column Load Function - only loads on columns = end moments
+col_funcs = []
+for column in columns:
+    column.build_load_function()
+    col_funcs.append(column.equation_strings)
+    
+# Column - Charts
+column_charts = []
+for column in columns:
+    column_charts.append(column.station_values())
+    
+# Beam plots - will show one at a time
+i = 1
+for chart in beam_charts:
+    plt.close('all')
+    
+    delta = [((delt*12.0)/(E_ksf*I_ft4))+supdelt for delt,supdelt in zip(chart[0][4],chart[1])]
+    s = [sl/(E_ksf*I_ft4) for sl in chart[0][3]]
+    
+    f, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
+    ax1.plot(chart[0][0], chart[0][1], 'r-')
+    ax1.plot(chart[0][0], [0]*len(chart[0][0]), 'k-')
+    ax1.set_title('Shear - kips')
+    ax2.plot(chart[0][0], chart[0][2], 'b-')
+    ax2.plot(chart[0][0], [0]*len(chart[0][0]), 'k-')
+    ax2.set_title('Moment - ft-kips')
+    ax3.plot(chart[0][0], s, 'g-')
+    ax3.plot(chart[0][0], [0]*len(chart[0][0]), 'k-')
+    ax3.set_title('Slope - Rad')
+    ax3.ticklabel_format(axis='x',style='sci',scilimits=(1,3))
+    ax4.plot(chart[0][0], delta, 'c-')
+    ax4.plot(chart[0][0], [0]*len(chart[0][0]), 'k-')
+    ax4.set_title('Deflection - in')
+    ax4.ticklabel_format(axis='x',style='sci',scilimits=(1,3))
+    
+    f.suptitle('Beam {0}'.format(i))
+    
+    plt.tight_layout()
+    
+    plt.show()
+    
+    i+=1
+
+# Column plots - will show one at a time
+i = 1
+for chart in column_charts:
+    plt.close('all')
+    
+    delta = [((delt*12.0)/(E_ksf*I_ft4)) for delt in chart[4]]
+    s = [sl/(E_ksf*I_ft4) for sl in chart[3]]
+    
+    f, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
+    ax1.plot(chart[1], chart[0], 'r-')
+    ax1.plot([0]*len(chart[0]), chart[0],'k-')
+    ax1.set_title('Shear - kips')
+    ax2.plot(chart[2], chart[0], 'b-')
+    ax2.plot([0]*len(chart[0]), chart[0],'k-')
+    ax2.set_title('Moment - ft-kips')
+    ax3.plot(s, chart[0], 'g-')
+    ax3.plot([0]*len(chart[0]),chart[0], 'k-')
+    ax3.set_title('Slope - Rad')
+    ax3.ticklabel_format(axis='x',style='sci',scilimits=(1,3))
+    ax4.plot(delta, chart[0], 'c-')
+    ax4.plot([0]*len(chart[0]), chart[0], 'k-')
+    ax4.set_title('Deflection - in')
+    ax4.ticklabel_format(axis='x',style='sci',scilimits=(1,3))
+    
+    f.suptitle('Column {0}'.format(i))
+    
+    plt.tight_layout()
+    
+    plt.show()
+    
+    i+=1
     
