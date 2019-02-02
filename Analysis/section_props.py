@@ -21,7 +21,7 @@ Created on Fri Feb 01 11:11:46 2019
 
 from __future__ import division
 import math
-
+import matplotlib.pyplot as plt
 
 class Section:
     
@@ -74,13 +74,15 @@ class Section:
             self.warnings = self.warnings + '**User Verify** Coordinate order reversed to make signed area positive for a solid.\n'
             
             self.area = sum([(x[i]*y[i+1])-(x[i+1]*y[i]) for i in range(len(x[:-1]))])/2.0
-        
+            self.area = self.area*n
+            
         elif self.area > 0 and solid == False:
             x.reverse()
             y.reverse()
             self.warnings = self.warnings + '**User Verify** Coordinate order reversed to make signed area negative for a void.\n'
             
             self.area = sum([(x[i]*y[i+1])-(x[i+1]*y[i]) for i in range(len(x[:-1]))])/2.0
+            self.area = self.area*n
             
         elif self.area == 0:
             self.warnings = self.warnings + '**User Verify** Area = 0 - verify defined shape has no overlapping segments.\n'
@@ -88,34 +90,77 @@ class Section:
         else:
             pass
         
-        self.x = x
-        self.y = y
+        self.x = [i for i in x]
+        self.y = [j for j in y]
+        self.n = n
         
         if self.area == 0:
             pass
         else:
+            self.calc_props()
+            
+    def calc_props(self):
+            x = self.x
+            y = self.y
+            n = self.n
+            
+            self.output = []
+            self.output_strings = []
+            
+            self.area = sum([(x[i]*y[i+1])-(x[i+1]*y[i]) for i in range(len(x[:-1]))])/2.0
+            self.area = self.area*n
+            
+            self.output.append(self.area)
+            self.output_strings.append('Area')
+
             # properties about the global x and y axis
             
             self.cx = sum([(x[i]+x[i+1])*((x[i]*y[i+1])-(x[i+1]*y[i])) for i in range(len(x[:-1]))])/(6*self.area)
             self.cx = self.cx*n
+            self.output.append(self.cx)
+            self.output_strings.append('Cx')
             self.cy = sum([(y[i]+y[i+1])*((x[i]*y[i+1])-(x[i+1]*y[i])) for i in range(len(x[:-1]))])/(6*self.area)
             self.cy = self.cy*n
+            self.output.append(self.cy)
+            self.output_strings.append('Cy')
             
             self.Ix = sum([((y[i]*y[i])+(y[i]*y[i+1])+(y[i+1]*y[i+1]))*((x[i]*y[i+1])-(x[i+1]*y[i])) for i in range(len(x[:-1]))])/(12.0)
             self.Ix = self.Ix*n
+            self.output.append(self.Ix)
+            self.output_strings.append('Ix')
             self.Iy = sum([((x[i]*x[i])+(x[i]*x[i+1])+(x[i+1]*x[i+1]))*((x[i]*y[i+1])-(x[i+1]*y[i])) for i in range(len(x[:-1]))])/(12.0)
             self.Iy = self.Iy*n
+            self.output.append(self.Iy)
+            self.output_strings.append('Iy')
             self.Ixy = sum([((x[i]*y[i+1])+(2*x[i]*y[i])+(2*x[i+1]*y[i+1])+(x[i+1]*y[i]))*(x[i]*y[i+1]-x[i+1]*y[i]) for i in range(len(x[:-1]))])/(24.0)
             self.Ixy = self.Ixy*n
+            self.output.append(self.Ixy)
+            self.output_strings.append('Ixy')
             self.Jz = self.Ix + self.Iy
+            self.output.append(self.Jz)
+            self.output_strings.append('Jz')
             self.sx_top = self.Ix / abs(max(y) - self.cy)
+            self.output.append(self.sx_top)
+            self.output_strings.append('Sx,top')
             self.sx_bottom = self.Ix / abs(min(y) - self.cy)
+            self.output.append(self.sx_bottom)
+            self.output_strings.append('Sx,botom')
             self.sy_right = self.Iy / abs(max(x) - self.cx)
+            self.output.append(self.sy_right)
+            self.output_strings.append('Sy,right')
             self.sy_left = self.Iy / abs(min(x) - self.cx)
+            self.output.append(self.sy_left)
+            self.output_strings.append('Sy,left')
             
             self.rx = math.sqrt(self.Ix/self.area)
+            self.output.append(self.rx)
+            self.output_strings.append('rx')
             self.ry = math.sqrt(self.Iy/self.area)
+            self.output.append(self.ry)
+            self.output_strings.append('ry')
             self.rz = math.sqrt(self.Jz/self.area)
+            self.output.append(self.rz)
+            self.output_strings.append('rz')
             
             # properties about the cross section centroidal x and y axis
             # parallel axis theorem Ix = Ixx + A*d^2
@@ -123,37 +168,70 @@ class Section:
             # Ixx = Ix - A*d^2
             
             self.Ixx = self.Ix - (self.area*self.cy*self.cy)
+            self.output.append(self.Ixx)
+            self.output_strings.append('Ixx')
             self.Iyy = self.Iy - (self.area*self.cx*self.cx)
+            self.output.append(self.Iyy)
+            self.output_strings.append('Iyy')
             self.Ixxyy = self.Ixy - (self.area*self.cx*self.cy)
+            self.output.append(self.Ixxyy)
+            self.output_strings.append('Ixxyy')
             self.Jzz = self.Ixx + self.Iyy
+            self.output.append(self.Jzz)
+            self.output_strings.append('Jzz')
             self.sxx_top = self.Ixx / abs(max(y) - self.cy)
+            self.output.append(self.sxx_top)
+            self.output_strings.append('Sxx,top')
             self.sxx_bottom = self.Ixx / abs(min(y) - self.cy)
+            self.output.append(self.sxx_bottom)
+            self.output_strings.append('Sxx,bottom')
             self.syy_right = self.Iyy / abs(max(x) - self.cx)
+            self.output.append(self.syy_right)
+            self.output_strings.append('Syy,right')
             self.syy_left = self.Iyy / abs(min(x) - self.cx)
+            self.output.append(self.syy_left)
+            self.output_strings.append('Syy,left')
             
             self.rxx = math.sqrt(self.Ixx/self.area)
+            self.output.append(self.rxx)
+            self.output_strings.append('rxx')
             self.ryy = math.sqrt(self.Iyy/self.area)
+            self.output.append(self.ryy)
+            self.output_strings.append('ryy')
             self.rzz = math.sqrt(self.Jzz/self.area)
+            self.output.append(self.rzz)
+            self.output_strings.append('rzz')
             
             # Cross section principle Axis
             
-            two_theta = math.atan((-1.0*2.0*self.Ixxyy)/(self.Ixx - self.Iyy))
+            two_theta = math.atan((-1.0*2.0*self.Ixxyy)/(1E-16+(self.Ixx - self.Iyy)))
             temp = (self.Ixx+self.Iyy)/2.0
             temp2 = (self.Ixx-self.Iyy)/2.0
             I1 = temp + math.sqrt((temp2*temp2)+(self.Ixxyy*self.Ixxyy))
             I2 = temp - math.sqrt((temp2*temp2)+(self.Ixxyy*self.Ixxyy))
             
             self.Iuu = temp + temp2*math.cos(two_theta) - self.Ixxyy*math.sin(two_theta)
+            self.output.append(self.Iuu)
+            self.output_strings.append('Iuu')
             self.Ivv = temp - temp2*math.cos(two_theta) + self.Ixxyy*math.sin(two_theta)
+            self.output.append(self.Ivv)
+            self.output_strings.append('Ivv')
             self.Iuuvv = temp2*math.sin(two_theta) + self.Ixxyy*math.cos(two_theta)
+            self.output.append(self.Iuuvv)
+            self.output_strings.append('Iuuvv')
             
             if I1-0.000001 <= self.Iuu <= I1+0.000001:
                 self.theta1 = math.degrees(two_theta/2.0)
                 self.theta2 = self.theta1 + 90.0
             elif I2-0.000001 <= self.Iuu <= I2+0.000001:
                 self.theta2 = math.degrees(two_theta/2.0)
-                self.theta1 = self.theta2 - 90.0           
-        
+                self.theta1 = self.theta2 - 90.0
+            
+            self.output.append(self.theta1)
+            self.output_strings.append('Theta1,u')
+            self.output.append(self.theta2)
+            self.output_strings.append('Theta2,v')
+                
     def parallel_axis_theorem(self, x, y):
         '''
         given a new global x,y coordinate for a new
@@ -171,16 +249,39 @@ class Section:
             
             return [Ix,Iy,Ixy]
     
-    def transformed_vertices(self, angle):
+    def transformed_vertices(self, xo, yo, angle):
         '''
         given an angle in degrees
-        return the transformed values of the shape vertices
-        
+        and coordinate to translate about
+        return the transformed values of the shape vertices       
         '''
         theta = math.radians(angle)
         
-        x_t = [x*math.cos(theta)+y*math.sin(theta) for x,y in zip(self.x, self.y)]
-        y_t = [-1.0*x*math.sin(theta)+y*math.cos(theta) for x,y in zip(self.x, self.y)]
+        x_t = [(x-xo)*math.cos(theta)+(y-yo)*math.sin(theta) for x,y in zip(self.x, self.y)]
+        y_t = [-1.0*(x-xo)*math.sin(theta)+(y-yo)*math.cos(theta) for x,y in zip(self.x, self.y)]
+        
+        x_t = [i+xo for i in x_t]
+        y_t = [j+yo for j in y_t]
+        
+        self.x = x_t
+        self.y = y_t
+        
+        self.calc_props()
+        
+        return [x_t, y_t]
+    
+    def translate_vertices(self, xo, yo):
+        '''
+        give an x and y translation
+        shift the shape vertices by the x and y amount
+        '''
+        x_t = [x+xo for x in self.x]
+        y_t = [y+yo for y in self.y]
+        
+        self.x = x_t
+        self.y = y_t
+        
+        self.calc_props()
         
         return [x_t, y_t]
         
@@ -292,7 +393,7 @@ def composite_shape_properties(sections):
     
     # composite section principle Axis
     
-    two_theta = math.atan((-1.0*2.0*Ixy)/(Ix - Iy))
+    two_theta = math.atan((-1.0*2.0*Ixy)/(1E-16+(Ix - Iy)))
     temp = (Ix+Iy)/2.0
     temp2 = (Ix-Iy)/2.0
     I1 = temp + math.sqrt((temp2*temp2)+(Ixy*Ixy))
@@ -369,3 +470,20 @@ shape2 = Section(x2,y2,True, n[1])
 shapes = [shape1,shape2]
 
 out, out_s = composite_shape_properties(shapes)
+
+x3 = [0,10,10,0,0]
+y3 = [0,0,20,20,0]
+
+shape3 = Section(x3,y3,True,1)
+
+shape4 = Section(x3,y3,True,1)
+
+shape4.transformed_vertices(shape4.cx,shape4.cy,45)
+
+s3_props = ['{0} = {1}'.format(j,i) for i,j in zip(shape3.output,shape3.output_strings)]
+s4_props = ['{0} = {1}'.format(j,i) for i,j in zip(shape4.output,shape4.output_strings)]
+
+plt.plot(shape3.x,shape3.y,'r-')
+plt.plot(shape4.x,shape4.y,'b-')
+
+plt.show()
