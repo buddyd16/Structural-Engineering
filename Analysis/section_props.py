@@ -456,34 +456,135 @@ def circle_coordinates(x,y,r,start,end):
     
     return [x_out,y_out]
 
-x1 = [0,300,300,0,0]
-y1 = [0,0,150,150,0]
+def line_x_at_y(x1,y1,x2,y2,at_y):
+    '''
+    given two points and a y coordinate
+    return the corresponding x coordinate
+    '''
+    if x2 == x1:
+        x_out = x1
+    
+    else:
+        m = (y2-y1) / (x2-x1)
+        
+        # y = mx + b
+        # b = y - mx
+        b = y1 - (m*x1)
+        
+        # y = mx+b
+        # x = y-b / m
+        if m == 0:
+            x_out = 0
+        else:
+            x_out = (at_y - b) / m
+    
+    return x_out
 
-x2 = [300,310,310,300,300]
-y2 = [37.5,37.5,112.5,112.5,37.5]
+def split_shape_above_horizontal_line(shape, line_y, solid=True, n=1):
+    
+    '''
+    given a shape and horizontal line y value
+    return all the sub shapes above the line
+    
+    assumption:
+        shape has been translated so its centroid is at 0,0
+        shape has been rotated to align with the horizontal
+    '''
+    # new shapes above
+    sub_shapes = []
+    
+    # General tolerance
+    tol = 1E-16
+    
+    # get a list of all the coordinates above or on the line
+    index_above = [i for i,y in enumerate(shape.y) if y>=line_y-tol]
+    
+    # step thru the indexs that are above the cut line
+    # at the first index find the intersection of the cut line
+    # and the vertex at index-1 this will be point 1 of the new shape
+    # if a point has a y coordinte directly on the cut line end the current
+    # shape here and close it with the first point. check if the next point is
+    # also on the cut line if so start the next shape at the first point where
+    # the next subsequent point is above the line
+    
+    x = [] 
+    y = []
+    
+    print index_above
+    
+    for i,j in enumerate(index_above):
+        x2 = shape.x[j]
+        y2 = shape.y[j]
+        x1 = shape.x[j-1]
+        y1 = shape.y[j-1]
+        x4 = shape.x[j+1]
+        y4 = shape.y[j+1]
+            
+        if y2 == line_y or y2 == line_y-tol and y4>y2:
+            x.append(x2)
+            y.append(y2)
+     
+        elif x2 == x1 and i == 0:
+            x.append(x2)
+            y.append(line_y)
+            x.append(x2)
+            y.append(y2)
+            
+        elif y1 < y2 and i == 0:            
+            x3 = line_x_at_y(x1,y1,x2,y2,line_y)
+            x.append(x3)
+            y.append(line_y)
+            x.append(x2)
+            y.append(y2)
 
-n = [1,20]
+        elif y4 < line_y+tol:
+            x5 = line_x_at_y(x2,y2,x4,y4,line_y)
+            x.append(x2)
+            y.append(y2)
+            x.append(x5)
+            y.append(line_y)
+            x.append(x[-1])
+            y.append(y[-1])
+            
+            sub_shapes.append(Section(x,y,solid,n))
+            
+            # found a closed shape reset the x,y coord
+            # list to empty to start again
+            x = []
+            y = []
+        
+        else:
+            x.append(x2)
+            y.append(y2)
 
-shape1 = Section(x1,y1,True, n[0])
-shape2 = Section(x2,y2,True, n[1])
+    return sub_shapes
+       
+        
+    
+x1 = [0,60,60,120,120,60,60,0,0]
+y1 = [0,0,60,60,120,120,180,180,0]
 
-shapes = [shape1,shape2]
+x2 = [8,52,52,112,112,52,52,8,8]
+y2 = [8,8,68,68,112,112,172,172,8]    
 
-out, out_s = composite_shape_properties(shapes)
+shape1 = Section(x1,y1)
+shape2 = Section(x2,y2,False,1)
 
-x3 = [0,10,10,0,0]
-y3 = [0,0,20,20,0]
+shape1.transformed_vertices(shape1.cx,shape1.cy,-45)
+shape2.transformed_vertices(shape1.cx,shape1.cy,-45)
 
-shape3 = Section(x3,y3,True,1)
+line_y = 75
 
-shape4 = Section(x3,y3,True,1)
+cut1 = split_shape_above_horizontal_line(shape1, line_y)
+cut2 = split_shape_above_horizontal_line(shape2, line_y, False, 1)
+    
+plt.plot(shape1.x,shape1.y,'r-')
+plt.plot(shape2.x,shape2.y,'b-')
 
-shape4.transformed_vertices(shape4.cx,shape4.cy,45)
+for cut in cut1:
+    plt.plot(cut.x,cut.y,'c-')
 
-s3_props = ['{0} = {1}'.format(j,i) for i,j in zip(shape3.output,shape3.output_strings)]
-s4_props = ['{0} = {1}'.format(j,i) for i,j in zip(shape4.output,shape4.output_strings)]
-
-plt.plot(shape3.x,shape3.y,'r-')
-plt.plot(shape4.x,shape4.y,'b-')
+for cut in cut2:
+  plt.plot(cut.x,cut.y,'k-')  
 
 plt.show()
