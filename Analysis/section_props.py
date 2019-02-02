@@ -526,148 +526,191 @@ def split_shape_above_horizontal_line(shape, line_y, solid=True, n=1):
     '''
     # new shapes above
     sub_shapes = []
+    
+    if max(shape.y) < line_y:
+        pass
+    
+    elif min(shape.y) > line_y:
+        x = [i for i in shape.x]
+        y = [j for j in shape.y]
+        sub = Section(x,y,solid,n)
         
-    xy = [[x,y] for x,y in zip(shape.x,shape.y)]
-    
-    list_above = []
-    list_below = []
-    
-    i=0
-    for point in xy:
-        if i == len(xy)-1:
-            pass
-        else:
-            p1 = point
-            p2 = xy[i+1]
-            
-            p1_test = dist_btwn_point_and_plane(p1, line_y,'H')
-            p2_test = dist_btwn_point_and_plane(p2, line_y,'H')
-            
-            if p1_test=='over' and p2_test=='over':
-                list_above.append(p2)
-            
-            elif p1_test=='on' and p2_test=='over':
-                list_above.append(p2)
-                
-            elif p1_test=='under' and p2_test=='over':
-                x_int = line_x_at_y(p1[0],p1[1],p2[0],p2[1],line_y)
-                list_above.append([x_int,line_y])
-                list_above.append(p2)
-                list_below.append(p1)
-                list_below.append([x_int,line_y])
-                
-            elif p1_test=='over' and p2_test=='on':
-                list_above.append(p2)
-            
-            elif p1_test=='on' and p2_test=='on':
-                list_above.append(p2)
-                
-            elif p1_test=='under' and p2_test=='on':
-                list_above.append(p2)
-                list_below.append(p2)
-            
-            elif p1_test=='over' and p2_test=='under':
-                x_int = line_x_at_y(p1[0],p1[1],p2[0],p2[1],line_y)
-                list_above.append([x_int,line_y])
-                list_below.append([x_int,line_y])
-                list_below.append(p2)
-            
-            elif p1_test=='on' and p2_test=='under':
-                list_below.append(p1)
-                list_below.append(p2)
-            
-            elif p1_test=='uder' and p2_test=='under':
-                list_below.append(p2)
-        i+=1
+        sub_shapes.append(sub)        
+    else:    
+             
+        xy = [[x,y] for x,y in zip(shape.x,shape.y)]
         
-    xover = [p[0] for p in list_above]
-    yover = [p[1] for p in list_above]
-    
-    xunder = [p[0] for p in list_below]
-    yunder = [p[1] for p in list_below]
-    
-    plt.plot(xover,yover,'co')
-    #plt.plot(xunder, yunder,'ko')
-     
-    #print list_above
-
-    int_count = 0
-    xsub = []
-    ysub = []
-    xsub2 = []
-    ysub2 = []
-    if len(list_above) >=3:
-        if list_above[0][1] == list_above[1][1] and list_above[0][1]==line_y:
+        list_above = []
+        list_below = []
+        
+        i=0
+        for point in xy:
+            if i == len(xy)-1:
+                pass
+            else:
+                p1 = point
+                p2 = xy[i+1]
+                
+                p1_test = dist_btwn_point_and_plane(p1, line_y,'H')
+                p2_test = dist_btwn_point_and_plane(p2, line_y,'H')
+                
+                if p1_test=='over' and p2_test=='over':
+                    list_above.append(p2)
+                
+                elif p1_test=='on' and p2_test=='over':
+                    list_above.append(p2)
+                    
+                elif p1_test=='under' and p2_test=='over':
+                    x_int = line_x_at_y(p1[0],p1[1],p2[0],p2[1],line_y)
+                    list_above.append([x_int,line_y])
+                    list_above.append(p2)
+                    list_below.append(p1)
+                    list_below.append([x_int,line_y])
+                    
+                elif p1_test=='over' and p2_test=='on':
+                    list_above.append(p2)
+                
+                elif p1_test=='on' and p2_test=='on':
+                    list_above.append(p2)
+                    
+                elif p1_test=='under' and p2_test=='on':
+                    list_above.append(p2)
+                    list_below.append(p2)
+                
+                elif p1_test=='over' and p2_test=='under':
+                    x_int = line_x_at_y(p1[0],p1[1],p2[0],p2[1],line_y)
+                    list_above.append([x_int,line_y])
+                    list_below.append([x_int,line_y])
+                    list_below.append(p2)
+                
+                elif p1_test=='on' and p2_test=='under':
+                    list_below.append(p1)
+                    list_below.append(p2)
+                
+                elif p1_test=='uder' and p2_test=='under':
+                    list_below.append(p2)
+            i+=1
             
-            xsub = [p[0] for p in list_above]
-            ysub = [p[1] for p in list_above]
-            sub = Section(xsub,ysub,solid,n)
-            sub_shapes.append(sub)
-        else:
-            xsub = []
-            ysub = []
-            xsub2 = []
-            ysub2 = []
-            i=0
-            for point in list_above:
-                print int_count
-                if list_above[0][1]!=line_y and int_count<1:
-                    xsub2.append(point[0])
-                    ysub2.append(point[1])
-                
-                else:
-                    if int_count > 2:
-                        xsub2.append(point[0])
-                        ysub2.append(point[1])
-                    else:
-                        xsub.append(point[0])
-                        ysub.append(point[1])
-
-                
-                if point != list_above[-1]:
-                    next_point = list_above[i+1]
-                    next_point_check = next_point[1] == line_y and point[1] == line_y and next_point[0]> point[0]
-                    
-                else:
-                    next_point_check = False
-                
-                if point[1] == line_y:
-                    int_count +=1
-                
-                
-                if int_count == 2 and len(xsub)>2 and list_above[0][1]==line_y and next_point_check==False:
-                    sub = Section(xsub,ysub,solid,n)
-                    int_count = 0
-                    xsub = []
-                    ysub = []
-                    
-                    sub_shapes.append(sub)
-                
-                elif point == list_above[-1] and len(xsub)>2:  
-                    sub = Section(xsub,ysub,solid,n)
-                    int_count = 0
-                    xsub = []
-                    ysub = []
-                    
-                    sub_shapes.append(sub)
-                
-                i+=1
-                
-    if len(xsub2)>2:
-        print xsub2, ysub2
-        sub = Section(xsub2,ysub2,solid,n)
+        xover = [p[0] for p in list_above]
+        yover = [p[1] for p in list_above]
+        
+        xunder = [p[0] for p in list_below]
+        yunder = [p[1] for p in list_below]
+        
+        plt.plot(xover,yover,'co')
+        #plt.plot(xunder, yunder,'ko')
+        
+        print '----'
+        print list_above
+        print '++++'
+        
+        if solid==False:
+            list_above.reverse()
+    
         int_count = 0
         xsub = []
         ysub = []
+        xsub2 = []
+        ysub2 = []
         
-        sub_shapes.append(sub)      
+        if len(list_above) >=3:
+            if list_above[0][1] == list_above[1][1] and list_above[0][1]==line_y:
+                
+                xsub = [p[0] for p in list_above]
+                ysub = [p[1] for p in list_above]
+                sub = Section(xsub,ysub,solid,n)
+                sub_shapes.append(sub)
+                print 'shape-1'
+            
+            elif list_above[0][1] != line_y and len([1 for p in list_above if p[1]==line_y])>=2:
+                xsub = [p[0] for p in list_above]
+                ysub = [p[1] for p in list_above]
+                sub = Section(xsub,ysub,solid,n)
+                sub_shapes.append(sub)
+                print 'shape0'
+                
+            else:
+                xsub = []
+                ysub = []
+                xsub2 = []
+                ysub2 = []
+                i=0
+                for point in list_above:
+                    print int_count
+                    if list_above[0][1]!=line_y and int_count<1:
+                        xsub2.append(point[0])
+                        ysub2.append(point[1])
+                    
+                    else:
+                        if int_count > 2:
+                            xsub2.append(point[0])
+                            ysub2.append(point[1])
+                        else:
+                            xsub.append(point[0])
+                            ysub.append(point[1])
+    
+                    
+                    if point != list_above[-1]:
+                        next_point = list_above[i+1]
+                        prev_point = list_above[i-1]
+                        next_point_check = next_point[1] == line_y and point[1] == line_y and next_point[0]> point[0]
+                        prev_point_check = prev_point[1] == line_y and point[1] >= prev_point[1] and next_point[1] > point[1]
+                        if prev_point_check == True:
+                            int_count = 0
+                    else:
+                        next_point_check = False
+                        prev_point_check = False
+                    
+                    if point[1] == line_y:
+                        int_count +=1
+                    
+    
+                    
+                    print next_point_check
+                    print prev_point_check
+                    print point
+                    if int_count >= 2 and len(xsub)>2 and list_above[0][1]==line_y and next_point_check==False:
+                        sub = Section(xsub,ysub,solid,n)
+                        int_count = 0
+                        xsub = []
+                        ysub = []
+                        
+                        sub_shapes.append(sub)
+                        print 'shape1'
+                    
+                    elif point == list_above[-1] and len(xsub)>2:
+                        print xsub
+                        print ysub
+                        sub = Section(xsub,ysub,solid,n)
+                        int_count = 0
+                        xsub = []
+                        ysub = []
+                        
+                        sub_shapes.append(sub)
+                        print 'shape2'
+                    
+                    i+=1
+    
+        if len(xsub2)>2:
+            sub = Section(xsub2,ysub2,solid,n)
+            int_count = 0
+            xsub = []
+            ysub = []
+            
+            sub_shapes.append(sub)
+        
                     
     return sub_shapes       
        
-        
+# KootK
+x1 = [0,60,60,120,120,60,60,0,0]
+y1 = [0,0,60,60,120,120,180,180,0]
+
+x2 = [8,52,52,112,112,52,52,8,8]
+y2 = [8,8,68,68,112,112,172,172,8]       
 # zig zag    
-x1 = [0,30,30,25,20,15,10,5,0,0]
-y1 = [0,0,10,20,10,20,10,20,10,0]
+#x1 = [0,30,30,25,20,15,10,5,0,0]
+#y1 = [0,0,10,20,10,20,10,20,10,0]
 
 # L
 #x1 = [0,120,120,12,12,0,0]
@@ -681,28 +724,29 @@ y1 = [0,0,10,20,10,20,10,20,10,0]
 #x1 = [0,30,30,20,20,10,10,0,0]
 #y1 = [0,0,30,30,10,10,20,20,0]
 shape1 = Section(x1,y1)
-#shape2 = Section(x2,y2, False, 1)
+shape2 = Section(x2,y2, False, 1)
 
-shape1.transformed_vertices(shape1.cx,shape1.cy,-130)
-#shape2.transformed_vertices(shape1.cx,shape1.cy,45)
+angle = -135
+shape1.transformed_vertices(shape1.cx,shape1.cy,angle)
+shape2.transformed_vertices(shape1.cx,shape1.cy,angle)
 
 #shape1.translate_vertices(0,120)
 #shape2.translate_vertices(10,0)
 
-line_y = 5
+line_y = 140
 
 cut1 = split_shape_above_horizontal_line(shape1, line_y)
-#cut2 = split_shape_above_horizontal_line(shape2, line_y, False, 1)
+cut2 = split_shape_above_horizontal_line(shape2, line_y, False, 1)
 
 plt.plot(shape1.x,shape1.y,'r-')
-#plt.plot(shape2.x,shape2.y,'b-')
+plt.plot(shape2.x,shape2.y,'b-')
 
 plt.axhline(y=line_y, color='g', linestyle='--')
 
 for c1 in cut1:
     plt.plot(c1.x,c1.y,'c+-')
 
-#for c2 in cut2:
-#    plt.plot(c2.x,c2.y,'k-')
+for c2 in cut2:
+    plt.plot(c2.x,c2.y,'k-')
 
 plt.show()
