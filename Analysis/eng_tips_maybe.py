@@ -70,7 +70,7 @@ n = Es/Ec
 
 # Desired neutral axis rotation
 # positive = clockwise
-na_angle = -45
+na_angle = -80
 
 # tranform the sections and the bars so the NA
 # lies on the horiztonal about the centroid of major
@@ -93,7 +93,7 @@ c=0
 mna=0
 
 max_iter = 10000
-tol = 1e-3
+tol = 1e-12
 loop = 0
 
 while loop < max_iter:
@@ -125,18 +125,19 @@ while loop < max_iter:
     
     mconc = msolid + mvoid
     
-    ms_above = sum([(n-1)*i[0]*(i[1]-c) for i in as_yb_t if i[1]>=c])
+    ms_above = sum([(n-1)*i[0]*abs((i[1]-c)) for i in as_yb_t if i[1]>c])
     ms_below = sum([n*i[0]*abs((i[1]-c)) for i in as_yb_t if i[1]<c])
     
     mna = mconc + ms_above - ms_below
     
     if mna == 0 or abs((a-b)/2.0) <= tol:
         na_y = c
+        loop_count=loop
         loop = max_iter
-    elif mna > 1:
-        b = c
-    else:
+    elif mna < 1:
         a = c
+    else:
+        b = c
         
     loop+=1
   

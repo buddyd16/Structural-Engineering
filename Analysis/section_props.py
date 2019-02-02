@@ -689,9 +689,12 @@ def split_shape_above_horizontal_line(shape, line_y, solid=True, n=1):
 # KootK
 #x1 = [0,60,60,120,120,60,60,0,0]
 #y1 = [0,0,60,60,120,120,180,180,0]
-
-#x2 = [8,52,52,112,112,52,52,8,8]
-#y2 = [8,8,68,68,112,112,172,172,8]       
+#
+#x2 = [8,52,52,8,8]
+#y2 = [8,8,172,172,8]
+#
+#x3 = [60,112,112,60,60]
+#y3 = [68,68,112,112,68]       
 # zig zag    
 #x1 = [0,30,30,25,20,15,10,5,0,0]
 #y1 = [0,0,10,20,10,20,10,20,10,0]
@@ -709,21 +712,26 @@ def split_shape_above_horizontal_line(shape, line_y, solid=True, n=1):
 #y1 = [0,0,30,30,10,10,20,20,0]
 #shape1 = Section(x1,y1)
 #shape2 = Section(x2,y2, False, 1)
+#shape3 = Section(x3,y3, False, 1)
 
-#angle = -35
+#angle = 0
 #shape1.transformed_vertices(shape1.cx,shape1.cy,angle)
 #shape2.transformed_vertices(shape1.cx,shape1.cy,angle)
+#shape3.transformed_vertices(shape1.cx,shape1.cy,angle)
+
 
 #shape1.translate_vertices(0,120)
 #shape2.translate_vertices(10,0)
 
-#line_y = -5
+#line_y = 10
 
 #cut1 = split_shape_above_horizontal_line(shape1, line_y)
 #cut2 = split_shape_above_horizontal_line(shape2, line_y, False, 1)
-
+#cut3 = split_shape_above_horizontal_line(shape3, line_y, False, 1)
+    
 #plt.plot(shape1.x,shape1.y,'r-')
 #plt.plot(shape2.x,shape2.y,'b-')
+#plt.plot(shape3.x,shape3.y,'b-')
 
 #plt.axhline(y=line_y, color='g', linestyle='--')
 
@@ -732,5 +740,8 @@ def split_shape_above_horizontal_line(shape, line_y, solid=True, n=1):
 
 #for c2 in cut2:
 #    plt.plot(c2.x,c2.y,'k-')
+#
+#for c3 in cut3:
+#    plt.plot(c3.x,c3.y,'k-')
 
 #plt.show()
