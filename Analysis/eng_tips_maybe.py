@@ -66,7 +66,7 @@ n = Es/Ec
 
 # Desired neutral axis rotation
 # positive = clockwise
-na_angle = -25
+na_angle = 135
 
 # tranform the sections and the bars so the NA
 # lies on the horiztonal about the centroid of major
@@ -148,7 +148,7 @@ Icracked = sum(Isolid)+sum(Ivoid)+Ibars_above+Ibars_below
 # plot the section
 plt.plot(shape1.x,shape1.y,'r-')
 plt.plot(shape2.x,shape2.y,'b-')
-plt.plot(xb_t,yb_t,'ko')
+plt.plot(xb_t,yb_t,'ko', markersize=1)
 
 plt.axhline(y=na_y, color='g', linestyle='--')
 
@@ -158,7 +158,7 @@ for c1 in cut1:
 for c2 in cut2:
     plt.plot(c2.x,c2.y,'k-')
     
-plt.plot(shape1.cx,shape1.cy,'k+')
+plt.plot(shape1.cx,shape1.cy,'k+', markersize=10)
 
 note = 'Icracked = {0:.3f}\nNA,y= {1:.3f}'.format(Icracked,na_y)
 
