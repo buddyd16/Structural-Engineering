@@ -597,12 +597,8 @@ def split_shape_above_horizontal_line(shape, line_y, solid=True, n=1):
         xunder = [p[0] for p in list_below]
         yunder = [p[1] for p in list_below]
         
-        plt.plot(xover,yover,'co')
+        #plt.plot(xover,yover,'co')
         #plt.plot(xunder, yunder,'ko')
-        
-        print '----'
-        print list_above
-        print '++++'
         
         if solid==False:
             list_above.reverse()
@@ -620,14 +616,12 @@ def split_shape_above_horizontal_line(shape, line_y, solid=True, n=1):
                 ysub = [p[1] for p in list_above]
                 sub = Section(xsub,ysub,solid,n)
                 sub_shapes.append(sub)
-                print 'shape-1'
             
             elif list_above[0][1] != line_y and len([1 for p in list_above if p[1]==line_y])>=2:
                 xsub = [p[0] for p in list_above]
                 ysub = [p[1] for p in list_above]
                 sub = Section(xsub,ysub,solid,n)
                 sub_shapes.append(sub)
-                print 'shape0'
                 
             else:
                 xsub = []
@@ -636,7 +630,6 @@ def split_shape_above_horizontal_line(shape, line_y, solid=True, n=1):
                 ysub2 = []
                 i=0
                 for point in list_above:
-                    print int_count
                     if list_above[0][1]!=line_y and int_count<1:
                         xsub2.append(point[0])
                         ysub2.append(point[1])
@@ -664,11 +657,6 @@ def split_shape_above_horizontal_line(shape, line_y, solid=True, n=1):
                     if point[1] == line_y:
                         int_count +=1
                     
-    
-                    
-                    print next_point_check
-                    print prev_point_check
-                    print point
                     if int_count >= 2 and len(xsub)>2 and list_above[0][1]==line_y and next_point_check==False:
                         sub = Section(xsub,ysub,solid,n)
                         int_count = 0
@@ -676,18 +664,14 @@ def split_shape_above_horizontal_line(shape, line_y, solid=True, n=1):
                         ysub = []
                         
                         sub_shapes.append(sub)
-                        print 'shape1'
                     
                     elif point == list_above[-1] and len(xsub)>2:
-                        print xsub
-                        print ysub
                         sub = Section(xsub,ysub,solid,n)
                         int_count = 0
                         xsub = []
                         ysub = []
                         
                         sub_shapes.append(sub)
-                        print 'shape2'
                     
                     i+=1
     

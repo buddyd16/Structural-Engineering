@@ -41,7 +41,7 @@ def coord_trans(x,y, xo, yo, angle):
     y_t = [j+yo for j in y_t]
     
     
-    return [x_t, y_t]
+    return x_t, y_t
 
 # KootK
 x1 = [0,60,60,120,120,60,60,0,0]
@@ -54,9 +54,9 @@ shape1 = secprop.Section(x1,y1)
 shape2 = secprop.Section(x2,y2, False, 1)
 
 # Bar coordinates and As's
-xb = []
-yb = []
-ab = []
+xb = [4,17,30,43,56,56,56,56,56,69,82,95,108,116,116,116,116,103,90,77,64,56,56,56,56,43,30,17,4,4,4,4,4,4,4,4,4,4,4,4,4,4]
+yb = [4,4,4,4,4,17,30,43,56,64,64,64,64,77,90,103,116,116,116,116,116,129,142,155,168,176,176,176,176,163,150,137,124,111,98,85,72,59,46,33,20,7]
+ab = [0.31]*len(xb)
 
 # Es and Ec -- consistent units -- 
 Es = 29000000 #psi
@@ -66,7 +66,7 @@ n = Es/Ec
 
 # Desired neutral axis rotation
 # positive = clockwise
-na_angle = -45
+na_angle = -25
 
 # tranform the sections and the bars so the NA
 # lies on the horiztonal about the centroid of major
@@ -75,18 +75,94 @@ na_angle = -45
 shape1.transformed_vertices(shape1.cx,shape1.cy,na_angle)
 shape2.transformed_vertices(shape1.cx,shape1.cy,na_angle)
 
+xb_t, yb_t = coord_trans(xb,yb,shape1.cx,shape1.cy,na_angle)
+
+as_yb_t = [[ast,j] for ast,j in zip(ab,yb_t)]
+
+# using the bisection method step the NA
+# down until Marea above = Marea below
+
+a=max(shape1.y)
+b=min(shape1.y)
+c=0
+mna=0
+
+max_iter = 10000
+tol = 1e-3
+loop = 0
+
+while loop < max_iter:
+    c = (a+b)/2.0
+    
+    # conrete area above the cut line
+    cut1 = secprop.split_shape_above_horizontal_line(shape1, c)
+    asolid = []
+    dysolid = [] 
+    for sol_shape in cut1:
+        asolid.append(sol_shape.area)
+        dysolid.append(sol_shape.cy - c)
+    
+    msolid = sum([ac*d for ac,d in zip(asolid,dysolid)])
+    
+    # void area above the cut line
+    avoid = []
+    dyvoid = []
+    cut2 = secprop.split_shape_above_horizontal_line(shape2, c, False, 1)
+    for void_shape in cut2:
+        avoid.append(void_shape.area)
+        dyvoid.append(void_shape.cy - c)
+    mvoid = sum([av*d for av,d in zip(avoid,dyvoid)])
+    
+    mconc = msolid + mvoid
+    
+    ms_above = sum([(n-1)*i[0]*(i[1]-c) for i in as_yb_t if i[1]>=c])
+    ms_below = sum([n*i[0]*abs((i[1]-c)) for i in as_yb_t if i[1]<c])
+    
+    mna = mconc + ms_above - ms_below
+    
+    if mna == 0 or abs((a-b)/2.0) <= tol:
+        na_y = c
+        loop = max_iter
+    elif mna > 1:
+        b = c
+    else:
+        a = c
+        
+    loop+=1
+  
+Isolid = []
+for solid in cut1:
+    I = solid.parallel_axis_theorem(solid.cx,na_y)
+    Isolid.append(I[0])
+    
+Ivoid = []
+for void in cut2:
+    I = void.parallel_axis_theorem(void.cx,na_y)
+    Ivoid.append(I[0])
+
+Ibars_above = sum([(n-1)*i[0]*math.pow(i[1]-na_y,2) for i in as_yb_t if i[1]>=na_y])
+Ibars_below = sum([n*i[0]*math.pow(i[1]-na_y,2) for i in as_yb_t if i[1]<na_y])   
+
+Icracked = sum(Isolid)+sum(Ivoid)+Ibars_above+Ibars_below
+
 # plot the section
-na_y = 10
 plt.plot(shape1.x,shape1.y,'r-')
 plt.plot(shape2.x,shape2.y,'b-')
+plt.plot(xb_t,yb_t,'ko')
 
 plt.axhline(y=na_y, color='g', linestyle='--')
 
-#for c1 in cut1:
-    #plt.plot(c1.x,c1.y,'c+-')
+for c1 in cut1:
+    plt.plot(c1.x,c1.y,'c+-')
 
-#for c2 in cut2:
-#    plt.plot(c2.x,c2.y,'k-')
+for c2 in cut2:
+    plt.plot(c2.x,c2.y,'k-')
+    
+plt.plot(shape1.cx,shape1.cy,'k+')
+
+note = 'Icracked = {0:.3f}\nNA,y= {1:.3f}'.format(Icracked,na_y)
+
+plt.annotate(note, xy=(shape1.cx, shape1.cy))
 
 plt.show()
 
