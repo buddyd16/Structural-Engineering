@@ -47,11 +47,15 @@ def coord_trans(x,y, xo, yo, angle):
 x1 = [0,60,60,120,120,60,60,0,0]
 y1 = [0,0,60,60,120,120,180,180,0]
 
-x2 = [8,52,52,112,112,52,52,8,8]
-y2 = [8,8,68,68,112,112,172,172,8]
+x2 = [8,52,52,8,8]
+y2 = [8,8,172,172,8]
+
+x3 = [60,112,112,60,60]
+y3 = [68,68,112,112,68]
 
 shape1 = secprop.Section(x1,y1)
 shape2 = secprop.Section(x2,y2, False, 1)
+shape3 = secprop.Section(x3,y3, False, 1)
 
 # Bar coordinates and As's
 xb = [4,17,30,43,56,56,56,56,56,69,82,95,108,116,116,116,116,103,90,77,64,56,56,56,56,43,30,17,4,4,4,4,4,4,4,4,4,4,4,4,4,4]
@@ -66,7 +70,7 @@ n = Es/Ec
 
 # Desired neutral axis rotation
 # positive = clockwise
-na_angle = 135
+na_angle = -45
 
 # tranform the sections and the bars so the NA
 # lies on the horiztonal about the centroid of major
@@ -74,6 +78,7 @@ na_angle = 135
 
 shape1.transformed_vertices(shape1.cx,shape1.cy,na_angle)
 shape2.transformed_vertices(shape1.cx,shape1.cy,na_angle)
+shape3.transformed_vertices(shape1.cx,shape1.cy,na_angle)
 
 xb_t, yb_t = coord_trans(xb,yb,shape1.cx,shape1.cy,na_angle)
 
@@ -108,9 +113,14 @@ while loop < max_iter:
     avoid = []
     dyvoid = []
     cut2 = secprop.split_shape_above_horizontal_line(shape2, c, False, 1)
-    for void_shape in cut2:
-        avoid.append(void_shape.area)
-        dyvoid.append(void_shape.cy - c)
+    cut3 = secprop.split_shape_above_horizontal_line(shape3, c, False, 1)
+    for void1_shape in cut2:
+        avoid.append(void1_shape.area)
+        dyvoid.append(void1_shape.cy - c)
+    for void2_shape in cut3:
+        avoid.append(void2_shape.area)
+        dyvoid.append(void2_shape.cy - c) 
+        
     mvoid = sum([av*d for av,d in zip(avoid,dyvoid)])
     
     mconc = msolid + mvoid
@@ -140,6 +150,10 @@ for void in cut2:
     I = void.parallel_axis_theorem(void.cx,na_y)
     Ivoid.append(I[0])
 
+for void2 in cut3:
+    I = void2.parallel_axis_theorem(void2.cx,na_y)
+    Ivoid.append(I[0])    
+
 Ibars_above = sum([(n-1)*i[0]*math.pow(i[1]-na_y,2) for i in as_yb_t if i[1]>=na_y])
 Ibars_below = sum([n*i[0]*math.pow(i[1]-na_y,2) for i in as_yb_t if i[1]<na_y])   
 
@@ -148,6 +162,8 @@ Icracked = sum(Isolid)+sum(Ivoid)+Ibars_above+Ibars_below
 # plot the section
 plt.plot(shape1.x,shape1.y,'r-')
 plt.plot(shape2.x,shape2.y,'b-')
+plt.plot(shape3.x,shape3.y,'b-')
+
 plt.plot(xb_t,yb_t,'ko', markersize=1)
 
 plt.axhline(y=na_y, color='g', linestyle='--')
@@ -157,6 +173,9 @@ for c1 in cut1:
 
 for c2 in cut2:
     plt.plot(c2.x,c2.y,'k-')
+
+for c3 in cut3:
+    plt.plot(c3.x,c3.y,'k-')
     
 plt.plot(shape1.cx,shape1.cy,'k+', markersize=10)
 
