@@ -70,8 +70,8 @@ n = Es/Ec
 
 # Desired neutral axis rotation
 # positive = clockwise
-na_angle = 90
-na_y = 80
+na_angle = 35
+na_y = 75
 # tranform the sections and the bars so the NA
 # lies on the horiztonal about the centroid of major
 # solid shape
@@ -159,8 +159,9 @@ if na_y == 0:
 else:
     cut1 = secprop.split_shape_above_horizontal_line(shape1, na_y)
     cut2 = secprop.split_shape_above_horizontal_line(shape2, na_y, False, 1)
-    cut3 = secprop.split_shape_above_horizontal_line(shape2, na_y, False, 1)
-  
+    cut3 = secprop.split_shape_above_horizontal_line(shape3, na_y, False, 1)
+ 
+    
 Isolid = []
 for solid in cut1:
     I = solid.parallel_axis_theorem(solid.cx,na_y)
@@ -203,7 +204,7 @@ plt.plot(shape1.cx,shape1.cy,'k+', markersize=10)
 note = 'I,cr = {0:.3f}'.format(Icracked)
 note2 = 'PNA,y = {0:.3f}\nAt {1} deg.'.format(na_y, na_angle)
 
-plt.annotate(note, xy=(shape1.cx, shape1.cy))
+plt.annotate(note, xy=(0, 0))
 plt.annotate(note2, xy=(shape1.cx, na_y))
 
 plt.show()
