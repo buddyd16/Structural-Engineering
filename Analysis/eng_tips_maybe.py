@@ -70,8 +70,8 @@ n = Es/Ec
 
 # Desired neutral axis rotation
 # positive = clockwise
-na_angle = 35
-na_y = 75
+na_angle = -35
+na_y = 100
 # tranform the sections and the bars so the NA
 # lies on the horiztonal about the centroid of major
 # solid shape
@@ -205,7 +205,8 @@ note = 'I,cr = {0:.3f}'.format(Icracked)
 note2 = 'PNA,y = {0:.3f}\nAt {1} deg.'.format(na_y, na_angle)
 
 plt.annotate(note, xy=(0, 0))
-plt.annotate(note2, xy=(shape1.cx, na_y))
+plt.annotate(note2, xy=(0, na_y-20))
+plt.annotate('geo. cntr.', xy=(shape1.cx, shape1.cy))
 
 plt.show()
 
