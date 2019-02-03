@@ -64,14 +64,14 @@ ab = [0.31]*len(xb)
 
 # Es and Ec -- consistent units -- 
 Es = 29000000 #psi
-Ec = math.pow(150,1.5)*33*math.sqrt(5000) #psi
+Ec = math.pow(150,1.5)*33*math.sqrt(4500) #psi
 
 n = Es/Ec
 
 # Desired neutral axis rotation
 # positive = clockwise
-na_angle = -35
-
+na_angle = 90
+na_y = 80
 # tranform the sections and the bars so the NA
 # lies on the horiztonal about the centroid of major
 # solid shape
@@ -96,62 +96,70 @@ yb_t = [j+ytrans for j in yb_t]
 
 as_yb_t = [[ast,j] for ast,j in zip(ab,yb_t)]
 
-# using the bisection method step the NA
-# down until Marea above = Marea below
+# if na_y = 0 assumes you want the Icr for
+# the plastic neutral axis
 
-a=max(shape1.y)
-b=min(shape1.y)
-c=0
-mna=0
-
-max_iter = 10000
-tol = 1e-12
-loop = 0
-
-while loop < max_iter:
-    c = (a+b)/2.0
+if na_y == 0:
+    # using the bisection method step the NA
+    # down until Marea above = Marea below
     
-    # conrete area above the cut line
-    cut1 = secprop.split_shape_above_horizontal_line(shape1, c)
-    asolid = []
-    dysolid = [] 
-    for sol_shape in cut1:
-        asolid.append(sol_shape.area)
-        dysolid.append(sol_shape.cy - c)
+    a=max(shape1.y)
+    b=min(shape1.y)
+    c=0
+    mna=0
     
-    msolid = sum([ac*d for ac,d in zip(asolid,dysolid)])
+    max_iter = 10000
+    tol = 1e-12
+    loop = 0
     
-    # void area above the cut line
-    avoid = []
-    dyvoid = []
-    cut2 = secprop.split_shape_above_horizontal_line(shape2, c, False, 1)
-    cut3 = secprop.split_shape_above_horizontal_line(shape3, c, False, 1)
-    for void1_shape in cut2:
-        avoid.append(void1_shape.area)
-        dyvoid.append(void1_shape.cy - c)
-    for void2_shape in cut3:
-        avoid.append(void2_shape.area)
-        dyvoid.append(void2_shape.cy - c) 
+    while loop < max_iter:
+        c = (a+b)/2.0
         
-    mvoid = sum([av*d for av,d in zip(avoid,dyvoid)])
-    
-    mconc = msolid + mvoid
-    
-    ms_above = sum([(n-1)*i[0]*abs((i[1]-c)) for i in as_yb_t if i[1]>c])
-    ms_below = sum([n*i[0]*abs((i[1]-c)) for i in as_yb_t if i[1]<c])
-    
-    mna = mconc + ms_above - ms_below
-    
-    if mna == 0 or abs((a-b)/2.0) <= tol:
-        na_y = c
-        loop_count=loop
-        loop = max_iter
-    elif mna < 1:
-        a = c
-    else:
-        b = c
+        # conrete area above the cut line
+        cut1 = secprop.split_shape_above_horizontal_line(shape1, c)
+        asolid = []
+        dysolid = [] 
+        for sol_shape in cut1:
+            asolid.append(sol_shape.area)
+            dysolid.append(sol_shape.cy - c)
         
-    loop+=1
+        msolid = sum([ac*d for ac,d in zip(asolid,dysolid)])
+        
+        # void area above the cut line
+        avoid = []
+        dyvoid = []
+        cut2 = secprop.split_shape_above_horizontal_line(shape2, c, False, 1)
+        cut3 = secprop.split_shape_above_horizontal_line(shape3, c, False, 1)
+        for void1_shape in cut2:
+            avoid.append(void1_shape.area)
+            dyvoid.append(void1_shape.cy - c)
+        for void2_shape in cut3:
+            avoid.append(void2_shape.area)
+            dyvoid.append(void2_shape.cy - c) 
+            
+        mvoid = sum([av*d for av,d in zip(avoid,dyvoid)])
+        
+        mconc = msolid + mvoid
+        
+        ms_above = sum([(n-1)*i[0]*abs((i[1]-c)) for i in as_yb_t if i[1]>c])
+        ms_below = sum([n*i[0]*abs((i[1]-c)) for i in as_yb_t if i[1]<c])
+        
+        mna = mconc + ms_above - ms_below
+        
+        if mna == 0 or abs((a-b)/2.0) <= tol:
+            na_y = c
+            loop_count=loop
+            loop = max_iter
+        elif mna < 1:
+            a = c
+        else:
+            b = c
+            
+        loop+=1
+else:
+    cut1 = secprop.split_shape_above_horizontal_line(shape1, na_y)
+    cut2 = secprop.split_shape_above_horizontal_line(shape2, na_y, False, 1)
+    cut3 = secprop.split_shape_above_horizontal_line(shape2, na_y, False, 1)
   
 Isolid = []
 for solid in cut1:
