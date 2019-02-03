@@ -72,7 +72,7 @@ n = Es/Ec
 # positive = clockwise
 # set elevation = 0 to automate PNA elevation
 na_angle = 0
-na_y = 25
+na_y = 75
 
 # tranform the sections and the bars so the NA
 # lies on the horiztonal about the centroid of major
