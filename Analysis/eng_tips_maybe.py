@@ -201,14 +201,14 @@ for c2 in cut2:
 for c3 in cut3:
     plt.plot(c3.x,c3.y,'k-')
     
-plt.plot(shape1.cx,shape1.cy,'k+', markersize=10)
+plt.plot(shape1.cx,shape1.cy,'r+', markersize=10)
 
 note = 'I,cr = {0:.3f}'.format(Icracked)
 note2 = 'PNA,y = {0:.3f}\nAt {1} deg.'.format(na_y, na_angle)
 
 plt.annotate(note, xy=(0, 0))
-plt.annotate(note2, xy=(0, na_y-20))
-plt.annotate('geo. cntr.', xy=(shape1.cx-25, shape1.cy-10))
+plt.annotate(note2, xy=(0, na_y-20), color='green')
+plt.annotate('geo. cntr.', xy=(shape1.cx-25, shape1.cy-10), color='red')
 
 plt.show()
 
