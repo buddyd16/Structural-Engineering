@@ -68,10 +68,12 @@ Ec = math.pow(150,1.5)*33*math.sqrt(4500) #psi
 
 n = Es/Ec
 
-# Desired neutral axis rotation
+# Desired neutral axis rotation and elevation
 # positive = clockwise
+# set elevation = 0 to automate PNA elevation
 na_angle = -35
-na_y = 100
+na_y = 50
+
 # tranform the sections and the bars so the NA
 # lies on the horiztonal about the centroid of major
 # solid shape
@@ -206,7 +208,7 @@ note2 = 'PNA,y = {0:.3f}\nAt {1} deg.'.format(na_y, na_angle)
 
 plt.annotate(note, xy=(0, 0))
 plt.annotate(note2, xy=(0, na_y-20))
-plt.annotate('geo. cntr.', xy=(shape1.cx, shape1.cy))
+plt.annotate('geo. cntr.', xy=(shape1.cx-25, shape1.cy-10))
 
 plt.show()
 
