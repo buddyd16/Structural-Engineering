@@ -70,7 +70,7 @@ n = Es/Ec
 
 # Desired neutral axis rotation
 # positive = clockwise
-na_angle = -80
+na_angle = -35
 
 # tranform the sections and the bars so the NA
 # lies on the horiztonal about the centroid of major
@@ -81,6 +81,18 @@ shape2.transformed_vertices(shape1.cx,shape1.cy,na_angle)
 shape3.transformed_vertices(shape1.cx,shape1.cy,na_angle)
 
 xb_t, yb_t = coord_trans(xb,yb,shape1.cx,shape1.cy,na_angle)
+
+# translate everything to the +x,+y quadrant
+xtrans = -1.0*min(shape1.x)
+ytrans = -1.0*min(shape1.y)
+
+shape1.translate_vertices(xtrans,ytrans)
+shape2.translate_vertices(xtrans,ytrans)
+shape3.translate_vertices(xtrans,ytrans)
+
+#translate the bars
+xb_t = [i+xtrans for i in xb_t]
+yb_t = [j+ytrans for j in yb_t]
 
 as_yb_t = [[ast,j] for ast,j in zip(ab,yb_t)]
 
@@ -180,9 +192,11 @@ for c3 in cut3:
     
 plt.plot(shape1.cx,shape1.cy,'k+', markersize=10)
 
-note = 'Icracked = {0:.3f}\nNA,y= {1:.3f}'.format(Icracked,na_y)
+note = 'I,cr = {0:.3f}'.format(Icracked)
+note2 = 'PNA,y = {0:.3f}\nAt {1} deg.'.format(na_y, na_angle)
 
 plt.annotate(note, xy=(shape1.cx, shape1.cy))
+plt.annotate(note2, xy=(shape1.cx, na_y))
 
 plt.show()
 

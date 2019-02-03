@@ -710,11 +710,19 @@ def split_shape_above_horizontal_line(shape, line_y, solid=True, n=1):
 #U 
 #x1 = [0,30,30,20,20,10,10,0,0]
 #y1 = [0,0,30,30,10,10,20,20,0]
+
+#H
+#x1 = [0,10,10,40,40,50,50,40,40,10,10,0,0]
+#y1 = [0,0,10,10,0,0,30,30,20,20,30,30,0]
+
+#X
+#x1 = [0,10,15,20,30,20,30,20,15,10,0,10,0]
+#y1 = [0,0,15,0,0,18,30,30,21,30,30,18,0]
 #shape1 = Section(x1,y1)
 #shape2 = Section(x2,y2, False, 1)
 #shape3 = Section(x3,y3, False, 1)
 
-#angle = 0
+#angle = -130
 #shape1.transformed_vertices(shape1.cx,shape1.cy,angle)
 #shape2.transformed_vertices(shape1.cx,shape1.cy,angle)
 #shape3.transformed_vertices(shape1.cx,shape1.cy,angle)
