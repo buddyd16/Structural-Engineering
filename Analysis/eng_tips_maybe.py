@@ -71,8 +71,8 @@ n = Es/Ec
 # Desired neutral axis rotation and elevation
 # positive = clockwise
 # set elevation = 0 to automate PNA elevation
-na_angle = -35
-na_y = 50
+na_angle = 0
+na_y = 25
 
 # tranform the sections and the bars so the NA
 # lies on the horiztonal about the centroid of major
@@ -206,7 +206,10 @@ plt.plot(shape1.cx,shape1.cy,'r+', markersize=10)
 note = 'I,cr = {0:.3f}'.format(Icracked)
 note2 = 'PNA,y = {0:.3f}\nAt {1} deg.'.format(na_y, na_angle)
 
-plt.annotate(note, xy=(0, 0))
+if na_y < (max(shape1.y)-min(shape1.y))/2.0:
+    plt.annotate(note, xy=(0, max(shape1.y)-20))
+else:
+    plt.annotate(note, xy=(0, 0))   
 plt.annotate(note2, xy=(0, na_y-20), color='green')
 plt.annotate('geo. cntr.', xy=(shape1.cx-25, shape1.cy-10), color='red')
 
