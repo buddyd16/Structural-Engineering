@@ -131,7 +131,7 @@ class LoadType:
                 patterned = []
                 
                 for pattern in patterns:
-                    patterned.append(self.factor_loads(factors,1))
+                    patterned.append(self.factor_loads(factor,1))
                 factored_patterned.append(patterned)
         
         else:
@@ -160,5 +160,11 @@ Live = LoadType(True,0,'Live','LL')
 Live.add_single_load([1,0,0,10,10,10,'UDL'])
 Live.add_multi_loads([[1,0,5,10,10,10,'PL'],[1,0,0,10,10,10,'TRAP']])
 
-test_pattern = Live.multi_pattern_and_factor([1.6,1.5,1.2],[1,0,0,1,1])
+pattern = [1,0,0,1,1]
+lfD = [1.4,1.2,1.2]
+lfL = [0,1.6,0.5*1.6]
+test_pattern = Live.multi_pattern_and_factor(lfL,pattern)
+test_dead_pattern = Dead.multi_pattern_and_factor(lfD,pattern)
+
+
 
