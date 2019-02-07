@@ -128,7 +128,7 @@ class Section:
             self.output.append(self.cy)
             self.output_strings.append('Cy')
             self.output.append('---')
-            self.output_strings.append('Globa Axis:')           
+            self.output_strings.append('Global Axis:')           
             self.Ix = sum([((y[i]*y[i])+(y[i]*y[i+1])+(y[i+1]*y[i+1]))*((x[i]*y[i+1])-(x[i+1]*y[i])) for i in range(len(x[:-1]))])/(12.0)
             self.Ix = self.Ix*n
             self.output.append(self.Ix)
@@ -832,6 +832,8 @@ y1 = [0,0,6,6,0]
 
 shape1 = Section(x1,y1)
 
+g = 0.125
+n = 2
 y2 = [0,0,2,2,0]
 y3 = [2,2,4,4,2]
 y4 = [4,4,6,6,4]
@@ -842,15 +844,16 @@ props_solid = 'Solid 12x6 Pl:\n'
 for i,j in zip(shape1.output,shape1.output_strings):
     props_solid += '{1} = {0}\n'.format(i,j)
 
-i=0
+k = 0
 for shape in shapes:
-    props_solid += '--\nLayer {0} - {1} x {2} at elevation {3}:--\n'.format(i+1,shape.x[1],shape.y[2]-shape.y[1],shape.y[1])
+    props_solid += '--\nLayer {0} - {1} x {2} at elevation {3}:--\n'.format(k+1,shape.x[1],shape.y[2]-shape.y[1],shape.y[1])
     for i,j in zip(shape.output,shape.output_strings):
         props_solid += '{1} = {0}\n'.format(i,j)
+    k+=1
 
 out, out_string = composite_shape_properties(shapes)
 props_solid += '\n**Composite of the Plate Layers:**\n'
-for i,j in zip(shape1.output,shape1.output_strings):
+for i,j in zip(out,out_string):
     props_solid += '{1} = {0}\n'.format(i,j)
 
 
