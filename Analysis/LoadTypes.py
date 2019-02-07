@@ -45,6 +45,8 @@ class LoadType:
         self.off_pattern_factor = off_pattern_factor
         self.factored_loads = 0
         self.all_factored_loads = []
+        self.patterned_factored_loads = []
+        self.all_patterned_factored_loads = []
         
     def add_single_load(self,load=[0,0,0,10,10,10,'NL']):
         self.load_list.append(load)
@@ -76,12 +78,16 @@ class LoadType:
             w1 = load[0]
             w2 = load[1]
             
-            w1_factored = w1*load_factor
-            w2_factored = w2*load_factor
+            if w1 ==0 and w2==0:
+                pass
             
-            factored_loads.append([w1_factored,w2_factored]+load[2:])
+            else:
+                w1_factored = w1*load_factor
+                w2_factored = w2*load_factor
+                
+                factored_loads.append([w1_factored,w2_factored]+load[2:])
         
-        self.factored_loads = factored_loads
+                self.factored_loads = factored_loads
         
         return factored_loads
 
@@ -96,10 +102,63 @@ class LoadType:
         self.all_factored_loads= all_factored_loads
         
         return all_factored_loads
+    
+    def pattern_and_factor_loads(self,factor,patterns = [1,0,1,1,0,1]):
         
+        patterned_loads = []
+        del self.patterned_factored_loads[:]
+        
+        if self.pattern == False:
+            return []
+        
+        else:
+            
+            for pattern in patterns:
+                patterned_loads.append(self.factor_loads(factor,pattern))
+            
+            self.patterned_factored_loads = patterned_loads
+            
+            return patterned_loads
+    
+    def multi_pattern_and_factor(self,factors=[1,1],patterns = [1,0,1,1,0,1]):
+        
+        factored_patterned = []
+        
+        del self.all_patterned_factored_loads[:]
+        
+        if self.pattern == False:
+            for factor in factors:              
+                patterned = []
+                
+                for pattern in patterns:
+                    patterned.append(self.factor_loads(factors,1))
+                factored_patterned.append(patterned)
+        
+        else:
+            
+            for factor in factors:
+                patterned = []
+                
+                for pattern in patterns:
+                    patterned.append(self.factor_loads(factor,pattern))
+                
+                factored_patterned.append(patterned)
+                
+        self.all_patterned_factored_loads = factored_patterned
+        
+        return factored_patterned
+                
+            
 Dead = LoadType()
 
 Dead.add_single_load([1,0,0,10,10,10,'UDL'])
 Dead.add_multi_loads([[1,0,5,10,10,10,'PL'],[1,0,0,10,10,10,'TRAP']])
 
 test = Dead.multiple_factor_loads([1,1.4,1.2],1)
+
+Live = LoadType(True,0,'Live','LL')
+Live.add_single_load([1,0,0,10,10,10,'UDL'])
+Live.add_multi_loads([[1,0,5,10,10,10,'PL'],[1,0,0,10,10,10,'TRAP']])
+
+test_pattern = Live.multi_pattern_and_factor([1.6,1.5,1.2],[1,0,0,1,1])
+
