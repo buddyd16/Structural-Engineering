@@ -98,6 +98,10 @@ class Section:
             pass
         else:
             self.calc_props()
+
+    def change_n(self,n):
+            self.n = n
+            self.calc_props()
             
     def calc_props(self):
             x = self.x
@@ -123,7 +127,8 @@ class Section:
             self.cy = self.cy*n
             self.output.append(self.cy)
             self.output_strings.append('Cy')
-            
+            self.output.append('---')
+            self.output_strings.append('Globa Axis:')           
             self.Ix = sum([((y[i]*y[i])+(y[i]*y[i+1])+(y[i+1]*y[i+1]))*((x[i]*y[i+1])-(x[i+1]*y[i])) for i in range(len(x[:-1]))])/(12.0)
             self.Ix = self.Ix*n
             self.output.append(self.Ix)
@@ -166,7 +171,8 @@ class Section:
             # parallel axis theorem Ix = Ixx + A*d^2
             # therefore to go from the global axis to the local
             # Ixx = Ix - A*d^2
-            
+            self.output.append('--')
+            self.output_strings.append('Shape Centroidal Axis:')
             self.Ixx = self.Ix - (self.area*self.cy*self.cy)
             self.output.append(self.Ixx)
             self.output_strings.append('Ixx')
@@ -210,6 +216,8 @@ class Section:
             I1 = temp + math.sqrt((temp2*temp2)+(self.Ixxyy*self.Ixxyy))
             I2 = temp - math.sqrt((temp2*temp2)+(self.Ixxyy*self.Ixxyy))
             
+            self.output.append('--')
+            self.output_strings.append('Shape Principal Axis:')
             self.Iuu = temp + temp2*math.cos(two_theta) - self.Ixxyy*math.sin(two_theta)
             self.output.append(self.Iuu)
             self.output_strings.append('Iuu')
@@ -319,7 +327,6 @@ class Section:
             
             return [Iu,Iv,Iuv,Jw,ru,rv,rw,trans_coords]
         
-
 def composite_shape_properties(sections):
     '''
     give a list of sections defined using the Sections class above
@@ -357,6 +364,9 @@ def composite_shape_properties(sections):
     
     output.append(cy)
     output_strings.append('cy')
+    
+    output.append('--')
+    output_strings.append('Shape Centroidal Axis:')
     
     # determine moment of inertias about the centroid coordinates
     
@@ -398,6 +408,9 @@ def composite_shape_properties(sections):
     temp2 = (Ix-Iy)/2.0
     I1 = temp + math.sqrt((temp2*temp2)+(Ixy*Ixy))
     I2 = temp - math.sqrt((temp2*temp2)+(Ixy*Ixy))
+    
+    output.append('--')
+    output_strings.append('Shape Principal Axis:')
     
     Iu = temp + temp2*math.cos(two_theta) - Ixy*math.sin(two_theta)
     output.append(Iu)
@@ -521,7 +534,6 @@ def split_shape_above_horizontal_line(shape, line_y, solid=True, n=1):
     return all the sub shapes above the line
     
     assumption:
-        shape has been translated so its centroid is at 0,0
         shape has been rotated to align with the horizontal
     '''
     # new shapes above
@@ -769,3 +781,76 @@ def split_shape_above_horizontal_line(shape, line_y, solid=True, n=1):
 #    plt.plot(c3.x,c3.y,'k-')
 
 #plt.show()
+
+# rect conc beam 12x24 with (2)#5 bottom
+# shapes = []
+# fc = 5000
+# Ec = math.pow(150,1.5)*33*math.sqrt(fc)
+# Es = 29000000
+
+# n = Es/Ec
+
+# x = [0,12,12,0,0]
+# y = [0,0,24,24,0]
+
+# conc = Section(x,y)
+# shapes.append(conc)
+
+# print conc.Ixx
+
+# # first bar at x = 2.3125 and y = 2.3125 r=0.3125
+# r = 0.3125
+# fb = circle_coordinates(2.3125,2.3125,r,0,360)
+
+# # (n-1) 
+# bar1 = Section(fb[0],fb[1],True,n)
+# shapes.append(bar1)
+# bar1void = Section(fb[0],fb[1],False,1)
+# shapes.append(bar1void)
+
+# # Second bar at x = 9.6875 and y = 2.3125 r=0.3125
+# r = 0.3125
+# sb = circle_coordinates(9.6875,2.3125,r,0,360)
+
+# # (n-1) 
+# bar2 = Section(sb[0],sb[1],True,n)
+# shapes.append(bar2)
+# bar2void = Section(sb[0],sb[1],False,1)
+# shapes.append(bar2void)
+
+# data, data_string = composite_shape_properties(shapes)
+
+# print data[3]
+
+# for shape in shapes:
+    # plt.plot(shape.x,shape.y,'r-')
+
+# plt.show()
+    
+x1 = [0,12,12,0,0]
+y1 = [0,0,6,6,0]
+
+shape1 = Section(x1,y1)
+
+y2 = [0,0,2,2,0]
+y3 = [2,2,4,4,2]
+y4 = [4,4,6,6,4]
+
+shapes = [Section(x1,y2),Section(x1,y3),Section(x1,y4)]
+
+props_solid = 'Solid 12x6 Pl:\n'
+for i,j in zip(shape1.output,shape1.output_strings):
+    props_solid += '{1} = {0}\n'.format(i,j)
+
+i=0
+for shape in shapes:
+    props_solid += '--\nLayer {0} - {1} x {2} at elevation {3}:--\n'.format(i+1,shape.x[1],shape.y[2]-shape.y[1],shape.y[1])
+    for i,j in zip(shape.output,shape.output_strings):
+        props_solid += '{1} = {0}\n'.format(i,j)
+
+out, out_string = composite_shape_properties(shapes)
+props_solid += '\n**Composite of the Plate Layers:**\n'
+for i,j in zip(shape1.output,shape1.output_strings):
+    props_solid += '{1} = {0}\n'.format(i,j)
+
+
