@@ -102,18 +102,24 @@ def stress_strain_whitney(fprimec, ultimate_strain, strain):
     else:
         return [0.85*fprimec, beta1]
 
-def stress_strain_steel(fy, yield_strain, strain):
+def stress_strain_steel(fy, yield_strain, Es, strain):
     '''
     Linear stress strain definition that will return
     a linear value between 0 and +/- the yield strain
     or Fy is the strain is above or below the yield strain
     '''
-
-    if abs(strain) >= yield_strain:
-        return (strain/abs(strain)) * fy
-
+    if Es == 0:
+        if abs(strain) >= yield_strain:
+            return (strain/abs(strain)) * fy
+    
+        else:
+            return (strain*fy)/yield_strain       
     else:
-        return (strain*fy)/yield_strain
+        if abs(strain)*Es >= yield_strain*Es:
+            return (strain/abs(strain)) * fy
+    
+        else:
+            return (strain*Es)
 
 
 def strain_at_depth(eu,neutral_axis_depth,depth_of_interest):
@@ -227,6 +233,7 @@ h=24
 # and moment will be in in-lbs
 fc = 5000
 fy = 60000
+Es = 0
 eu = 0.003
 es = 0.002
 k = 0.85
@@ -235,7 +242,7 @@ k = 0.85
 # cover = 2" to each corner bar
 xb = [0+2,b-2,0+2,b-2]
 yb = [2,2,h-2,h-2]
-ab = [0.31]*len(xb)
+ab = [2.54/2.0]*len(xb)
 
 
 xc = b/2.0
@@ -262,16 +269,11 @@ aci_reduction = []
 e_checks = []
 
 #list neutral axis depths
-count = int((h+40)/1)
-nas = [(h+40)-(i*1) for i in range(0,count)]
+count = int((h+6)/0.288)
+nas = [(h+6)-(i*0.288) for i in range(0,count-1)]
 
-small_nums = [1-(i*0.05) for i in range(1,20)]
-nas.extend(small_nums)
+nas.extend([1e-10])
 
-#nas = [2,1.75,1.5]
-
-#nas = [12]
-#na = 1.649
 for na in nas:
     # determine the bar strains and stresses
     # since this is a unixial check only care
@@ -280,11 +282,11 @@ for na in nas:
     # so we need H-y
     b_depths = [h-j for j in yb]
     if na < h:
-        bstrains = [strain_at_depth(eu,na, j) for j in b_depths]
+        bstrains = [strain_at_depth(eu, na, j) for j in b_depths]
     else:
         bstrains = [eu]*len(b_depths)
 
-    bstresses = [stress_strain_steel(fy,es,i) for i in bstrains]
+    bstresses = [stress_strain_steel(fy, es, Es, i) for i in bstrains]
 
     b_strain_phi = min(bstrains)
     if b_strain_phi > -0.002:
@@ -307,6 +309,7 @@ for na in nas:
     bforce_collins = [i-(q*stress_strain_collins_et_all(fc,eu,j)) if i>0 else 0 for i,j,q in zip(bforce,bstrains,ab)]
     bforce_desayi = [i-(q*stress_strain_desayi_krishnan(fc,eu,k,j)) if i>0 else 0  for i,j,q in zip(bforce,bstrains,ab)]
     bforce_whitney = [i-(q*stress_strain_whitney(fc,eu,j)[0]) if i>0 else 0  for i,j,q in zip(bforce,bstrains,ab)]
+    #bforce_whitney = [0]*len(ab)
 
     # Bar Momments - using right hand rule tensile forces below
     # the point we are summing momments about should be positive
@@ -321,12 +324,12 @@ for na in nas:
 
     bnegmoment_collins = [i*j for i,j in zip(bforce_collins,bmomentarm_collins)]
     bnegmoment_desayi = [i*j for i,j in zip(bforce_desayi,bmomentarm_desayi)]
-    bnegmomomen_whitney = [i*j for i,j in zip(bforce_whitney,bmomentarm_whitney)]
+    bnegmoment_whitney = [i*j for i,j in zip(bforce_whitney,bmomentarm_whitney)]
 
     # Concrete force
     # lets get a list of 25 points between the NA
     # and the top of the beam
-    iter_points = 50
+    iter_points = 200
     if 0 < na < h:
         yce = [0+(na/iter_points*i) for i in range(0,iter_points+1)]
         yce.reverse()
@@ -403,24 +406,25 @@ for na in nas:
     whitneyy = h - whitneyy
     whitney_momentarm = whitneyy - yc
 
+    #Sum Forces
+    P_bars = sum(bforce)
+    p_bars_neg = [sum(bforce_collins),sum(bforce_desayi),sum(bforce_whitney)]
+    
+    Axial_collins = P_bars + C_collins - p_bars_neg[0]
+    Axial_desayi = P_bars + C_desayi - p_bars_neg[1]
+    
+    Axial_whitney = P_bars + C_whitney - p_bars_neg[2]
+    
     # Concrete Moments
     M_collins = C_collins*collins_momentarm
     M_desayi = C_desayi*desayi_momentarm
     M_whitney = C_whitney*whitney_momentarm
 
-    #Sum Forces
-    P_bars = sum(bforce)
-    p_bars_neg = [sum(bforce_collins),sum(bforce_desayi),sum(bforce_whitney)]
-
-    Axial_collins = P_bars + C_collins - p_bars_neg[0]
-    Axial_desayi = P_bars + C_desayi - p_bars_neg[1]
-    Axial_whitney = P_bars + C_whitney - p_bars_neg[2]
-
     m_bars_collins = sum(bmoment_collins)
     m_bars_desayi = sum(bmoment_desayi)
     m_bars_whitney = sum(bmoment_whitney)
 
-    m_bars_neg = [sum(bmoment_collins), sum(bmoment_desayi), sum(bmoment_whitney)]
+    m_bars_neg = [sum(bnegmoment_collins), sum(bnegmoment_desayi), sum(bnegmoment_whitney)]
 
     Mx_collins = m_bars_collins + M_collins - m_bars_neg[0]
     Mx_desayi = m_bars_desayi + M_desayi - m_bars_neg[1]
@@ -455,7 +459,7 @@ ax5.plot([i*j for i,j in zip(M_desayi_plot,aci_reduction)],[i*j for i,j in zip(P
 ax5.plot(M_whitney_plot,P_whitney_plot,'b--')
 ax5.plot([i*j for i,j in zip(M_whitney_plot,aci_reduction)],[i*j for i,j in zip(P_whitney_plot,aci_reduction)],'b-')
 ax5.plot([0,max(M_desayi_plot)],[0,0],'k-')
-string = 'Concrete P-Mx - 12x24 - fc = 5000 - (3)#5 T&B'
+string = 'Concrete P-Mx - 12x24 - fc = 5000 - (2)#8 T&B'
 ax5.set_title(string)
 
 
@@ -467,7 +471,7 @@ ax5.set_title(string)
 # matplotlib at the head of the file
 #----#
 x = [-0.004+(i*0.00005) for i in range(0,161)]
-y = [stress_strain_steel(60,0.002,i) for i in x]
+y = [stress_strain_steel(60000, 0.002, Es, i) for i in x]
 #
 y2 = [stress_strain_collins_et_all(4500,0.003,i) for i in x]
 y3 = [stress_strain_desayi_krishnan(4500,0.003,0.85,i) for i in x]
@@ -478,7 +482,7 @@ y4 = [stress_strain_whitney(4500,0.003,i)[0] for i in x]
 ax1.plot(x, y, 'c-')
 ax1.plot(x, [0]*len(x),'k-')
 ax1.set_title('Steel Stress-Strain')
-ax1.set_ylim([-70,70])
+ax1.set_ylim([-70000,70000])
 ax1.set_xlim([-0.005,0.005])
 ax2.plot(x, y2, 'r-')
 ax2.plot(x, [0]*len(x),'k-')
@@ -501,3 +505,5 @@ plt.tight_layout()
 
 plt.show()
 #----#
+
+print stress_strain_steel(60000,0.002,Es,0.001)
