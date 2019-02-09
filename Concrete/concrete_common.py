@@ -45,11 +45,6 @@ def stress_strain_desayi_krishnan(fprimec, ultimate_strain, k, strain):
 
         E = 2*fo / eo
 
-        if strain >= ultimate_strain:
-            strain = ultimate_strain
-        else:
-            pass
-
         f = (E*strain) / (1+math.pow(strain/eo,2))
 
         return f
@@ -69,11 +64,6 @@ def stress_strain_collins_et_all(fprimec, ultimate_strain, strain):
         Ec = (40000*math.sqrt(fprimec)) + 1000000 # for PSI units
 
         ecprime = (fprimec / Ec)*(n/(n-1))
-
-        if strain >= ultimate_strain:
-            strain = ultimate_strain
-        else:
-            pass
 
         e = strain/ecprime
 
@@ -244,6 +234,8 @@ xb = [0+2,b-2,0+2,b-2]
 yb = [2,2,h-2,h-2]
 ab = [2.54/2.0]*len(xb)
 
+acm = (b*h)-sum(ab)
+P_max = 0.8*0.65*((0.85*fc*acm)+(fy*sum(ab)))/1000.0
 
 xc = b/2.0
 yc = h/2.0
@@ -453,14 +445,17 @@ ax2 = plt.subplot2grid((4, 2), (1, 1))
 ax3 = plt.subplot2grid((4, 2), (2, 1))
 ax4 = plt.subplot2grid((4, 2), (3, 1))
 ax5.plot(M_collins_plot,P_collins_plot,'r--')
-ax5.plot([i*j for i,j in zip(M_collins_plot,aci_reduction)],[i*j for i,j in zip(P_collins_plot,aci_reduction)],'r-')
+ax5.plot([i*j for i,j in zip(M_collins_plot,aci_reduction)],[i*j if i<P_max else P_max*j for i,j in zip(P_collins_plot,aci_reduction)],'r-')
 ax5.plot(M_desayi_plot,P_desayi_plot,'g--')
-ax5.plot([i*j for i,j in zip(M_desayi_plot,aci_reduction)],[i*j for i,j in zip(P_desayi_plot,aci_reduction)],'g-')
+ax5.plot([i*j for i,j in zip(M_desayi_plot,aci_reduction)],[i*j if i<P_max else P_max*j for i,j in zip(P_desayi_plot,aci_reduction)],'g-')
 ax5.plot(M_whitney_plot,P_whitney_plot,'b--')
-ax5.plot([i*j for i,j in zip(M_whitney_plot,aci_reduction)],[i*j for i,j in zip(P_whitney_plot,aci_reduction)],'b-')
+ax5.plot([i*j for i,j in zip(M_whitney_plot,aci_reduction)],[i*j if i<P_max else P_max*j for i,j in zip(P_whitney_plot,aci_reduction)],'b-')
 ax5.plot([0,max(M_desayi_plot)],[0,0],'k-')
 string = 'Concrete P-Mx - 12x24 - fc = 5000 - (2)#8 T&B'
 ax5.set_title(string)
+ax5.minorticks_on()
+ax5.grid(b=True, which='major', color='k', linestyle='-', alpha=0.5)
+ax5.grid(b=True, which='minor', color='k', linestyle='-', alpha=0.2)
 
 
 #----- END UNI-AXIAL COLUMN EXAMPLE DIAGRAM -----#
