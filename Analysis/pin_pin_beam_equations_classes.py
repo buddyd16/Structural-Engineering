@@ -1477,10 +1477,8 @@ class cant_right_udl:
             self.c1 = self.backspan.eisx(self.Lb)
 
         self.c2 = 0
-
         self.c3 = self.c1
         self.c4 = self.c1*self.a + self.c2 - self.c3*a
-
         self.c5 = 0.5*self.w_tot*self.b**2 + self.ml*self.b - (1.0/6.0)*self.w1*(self.b-self.a)**3 + self.c3
         self.c6 = (1.0/6.0)*self.w_tot*self.b**3 + 0.5*self.ml*self.b**2 - (1.0/24.0)*self.w1*(self.b-self.a)**4 + self.c3*self.b + self.c4 - self.c5*self.b
 
@@ -1493,7 +1491,43 @@ class cant_right_udl:
 
         self.x_graph=[arrow_minus_start,self.a,arrow_plus_start,self.a,self.a,self.b,self.b,arrow_minus_end,self.b,arrow_plus_end]
         self.y_graph=[arrow_height,0,arrow_height,0,self.w1,self.w1,0,arrow_height,0,arrow_height]
-
+    
+    def piece_functions(self):
+        '''
+        Returns the general piecwise function in the form of two lists
+        # list1 is the polynomial coeficients of order [c0,c1x,c2x^2,...,cnx^n]
+        # where the list values will only by the cn's*
+        # list 2 will be the range over which the function piece applies
+        # 0 <= a would be [0,a] **note it will be assumed the the eqality is <= not <
+        # rerturned lists will be [[[list11],[list21]],....,[[list1n],[list2n]]
+        # where n is the total number of functions to capture the range from 
+        # 0 to the full span, L of the beam
+        '''
+        
+        v = [[[self.rl],[0,self.a]],[[self.rl+(self.w1*self.a),-self.w1],[self.a,self.b]],[[0],[self.b,self.L]]]
+        
+        #m = [[[self.ml],[0,self.a]],[[0],[self.a,self.L]]]
+        
+        #eis = [[[self.c1,self.ml],[0,self.a]],[[self.c3],[self.a,self.L]]]
+        
+        #eid = [[[self.c2, self.c1,0.5*self.ml],[0,self.a]],[[self.c4,self.c3],[self.a,self.L]]]
+        
+        vs = PieceFunctionString(v)
+        #ms = PieceFunctionString(m)
+        #eiss = PieceFunctionString(eis)
+        #eids = PieceFunctionString(eid)
+        
+        return [v,m,eis,eid],[vs,ms,eiss,eids]
+        
+    def fef(self):
+        # Fixed End Forces
+        RL = self.rl
+        RR = 0
+        ML = self.ml
+        MR = 0
+        
+        return [RL,ML,RR,MR]
+    
     def v(self,x):
         iters = len(x)
         v=zeros(iters)
@@ -3114,7 +3148,9 @@ def eval_beam_piece_function(piece_function,x):
     for func in piece_function:
         for line in func:
             
-            if line[1][0] <= x <= line[1][1]:
+            if line [1][0] == 0 and x ==0:
+                res.append(poly_eval(line[0],x))
+            if line[1][0] < x <= line[1][1]:
                 res.append(poly_eval(line[0],x))
             else:
                 pass

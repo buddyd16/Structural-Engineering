@@ -25,7 +25,7 @@ import matplotlib.pyplot as plt
 
 class Section:
     
-    def __init__(self, x, y, solid=True, n=1):
+    def __init__(self, x, y, solid=True, n=1, E=1, Fy=1):
         '''
         A section defined by (x,y) vertices
         
@@ -48,6 +48,9 @@ class Section:
         
         n = property multiplier
         '''
+        
+        self.E = E
+        self.Fy = Fy
         
         # check if a closed polygon is formed from the coordinates
         # if not add another x and y coordinate equal to the firts 
@@ -239,7 +242,29 @@ class Section:
             self.output_strings.append('Theta1,u')
             self.output.append(self.theta2)
             self.output_strings.append('Theta2,v')
-                
+
+    def calc_s_at_vertices(self):
+        sx = []
+        sy = []
+
+        for y in shape.y:
+            if y == 0:
+                y=0.00000000000001
+            else:
+                pass
+            
+            sx.append(self.Ixx / abs(y - self.cy))
+            
+        for x in shape.x:
+            if x == 0:
+                x=0.00000000000001
+            else:
+                pass
+            
+            sy.append(self.Iyy / abs(x - self.cx))
+        
+        return sx,sy
+            
     def parallel_axis_theorem(self, x, y):
         '''
         given a new global x,y coordinate for a new
@@ -697,7 +722,95 @@ def split_shape_above_horizontal_line(shape, line_y, solid=True, n=1):
         
                     
     return sub_shapes       
-       
+
+def stl_wf(d,bf,tf,tw,k):
+    '''
+    given the defining geometric
+    properties for a Wide Flange from
+    AISC 
+    
+    return a Shape with appropriate
+    coordinates
+    0,0 point will be the bottom left of the section
+    '''
+    
+    # Bottom flange
+    x = [0,bf,bf]
+    y = [0,0,tf]
+    
+    # points in bottom right radius angle range is 270,180
+    cr1x = (bf/2.0)+(tw/2.0)+(k-tf)
+    cr1y = k
+    
+    # draw circle for radius in clockwise order then reverse it
+    # for the first radius
+    r=k-tf
+    x_r1, y_r1 = circle_coordinates(cr1x,cr1y,r,180,270)
+    
+    x_r1.reverse()
+    y_r1.reverse()
+    
+    x.extend(x_r1)
+    y.extend(y_r1)
+
+    # points in top right radius angle range is 180,90
+    cr2x = cr1x
+    cr2y = d-k
+    
+    # draw circle for radius in clockwise order then reverse it
+    # for the first radius
+    x_r2, y_r2 = circle_coordinates(cr2x,cr2y,r,90,180)
+    
+    x_r2.reverse()
+    y_r2.reverse()
+    
+    x.extend(x_r2)
+    y.extend(y_r2)
+    
+    # top flange
+    x.extend([bf,bf,0,0])   
+    y.extend([d-tf,d,d,d-tf])
+
+    # points in top left radius angle range is 90,0
+    cr3x = (bf/2.0)-(tw/2.0)-(k-tf)
+    cr3y = d-k
+    
+    # draw circle for radius in clockwise order then reverse it
+    # for the first radius
+    x_r3, y_r3 = circle_coordinates(cr3x,cr3y,r,0,90)
+    
+    x_r3.reverse()
+    y_r3.reverse()
+    
+    x.extend(x_r3)
+    y.extend(y_r3)
+
+    # points in bottom left radius angle range is 360,270
+    cr4x = cr3x
+    cr4y = k
+    
+    # draw circle for radius in clockwise order then reverse it
+    # for the first radius
+    x_r4, y_r4 = circle_coordinates(cr4x,cr4y,r,270,360)
+    
+    x_r4.reverse()
+    y_r4.reverse()
+    
+    x.extend(x_r4)
+    y.extend(y_r4)
+    
+    # Last points to close the bottom flange
+    x.extend([0,0])
+    y.extend([tf,0])
+    
+    WF = Section(x,y)
+    
+    return WF
+    
+    
+
+    
+    
 # KootK
 #x1 = [0,60,60,120,120,60,60,0,0]
 #y1 = [0,0,60,60,120,120,180,180,0]
@@ -827,33 +940,47 @@ def split_shape_above_horizontal_line(shape, line_y, solid=True, n=1):
 
 # plt.show()
     
-x1 = [0,12,12,0,0]
-y1 = [0,0,6,6,0]
+#x1 = [0,12,12,0,0]
+#y1 = [0,0,6,6,0]
+#
+#shape1 = Section(x1,y1)
+#
+#g = 0.125/2
+#n = 2
+#y2 = [0,0,2-g,2-g,0]
+#y3 = [2-g,2-g,2+g,2+g,2-g]
+#y4 = [2+g,2+g,4-g,4-g,2+g]
+#y5 = [4-g,4-g,4+g,4+g,4-g]
+#y6 = [4+g,4+g,6,6,4+g]
+#
+#shapes = [Section(x1,y2),Section(x1,y3,True,n),Section(x1,y4),Section(x1,y5,True,n),Section(x1,y6)]
+#
+#props_solid = 'Solid 12x6 Pl:\n'
+#for i,j in zip(shape1.output,shape1.output_strings):
+#    props_solid += '{1} = {0}\n'.format(i,j)
+#
+#k = 0
+#for shape in shapes:
+#    props_solid += '--\nLayer {0} - {1} x {2} at elevation {3}:--\n'.format(k+1,shape.x[1],shape.y[2]-shape.y[1],shape.y[1])
+#    for i,j in zip(shape.output,shape.output_strings):
+#        props_solid += '{1} = {0}\n'.format(i,j)
+#    k+=1
+#
+#out, out_string = composite_shape_properties(shapes)
+#props_solid += '\n**Composite of the Plate Layers:**\n'
+#for i,j in zip(out,out_string):
+#    props_solid += '{1} = {0}\n'.format(i,j)
 
-shape1 = Section(x1,y1)
 
-g = 0.125
-n = 2
-y2 = [0,0,2,2,0]
-y3 = [2,2,4,4,2]
-y4 = [4,4,6,6,4]
-
-shapes = [Section(x1,y2),Section(x1,y3),Section(x1,y4)]
-
-props_solid = 'Solid 12x6 Pl:\n'
-for i,j in zip(shape1.output,shape1.output_strings):
+shape = stl_wf(4.16,4.06,0.345,0.28,0.595)
+props_solid = 'WF:\n'
+for i,j in zip(shape.output,shape.output_strings):
     props_solid += '{1} = {0}\n'.format(i,j)
+    
+plt.plot(shape.x,shape.y)
 
-k = 0
-for shape in shapes:
-    props_solid += '--\nLayer {0} - {1} x {2} at elevation {3}:--\n'.format(k+1,shape.x[1],shape.y[2]-shape.y[1],shape.y[1])
-    for i,j in zip(shape.output,shape.output_strings):
-        props_solid += '{1} = {0}\n'.format(i,j)
-    k+=1
+plt.show()
 
-out, out_string = composite_shape_properties(shapes)
-props_solid += '\n**Composite of the Plate Layers:**\n'
-for i,j in zip(out,out_string):
-    props_solid += '{1} = {0}\n'.format(i,j)
+
 
 

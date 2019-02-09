@@ -32,7 +32,7 @@ class LoadType:
         NOTE: unless a function notes otherwise everything expects to
         be a getting list in the form of:
             [w1,w2,a,b,L,'Load Type'] or
-            [w1,w2,a,b,L,L,'Load Type']
+            [w1,w2,a,b,L,L,'Load Type'] in the case of a load on a cantilever
             
             'Load Type' should always be the last item
             
@@ -120,7 +120,7 @@ class LoadType:
             
             return patterned_loads
     
-    def multi_pattern_and_factor(self,factors=[1,1],patterns = [1,0,1,1,0,1]):
+    def multi_pattern_and_factor(self,factors=[1,1],patterns = [1,0,1]):
         
         factored_patterned = []
         
@@ -150,13 +150,14 @@ class LoadType:
                 
             
 Dead = LoadType()
+Live = LoadType(True,0,'Live','LL')
 
 Dead.add_single_load([1,0,0,10,10,10,'UDL'])
 Dead.add_multi_loads([[1,0,5,10,10,10,'PL'],[1,0,0,10,10,10,'TRAP']])
 
 test = Dead.multiple_factor_loads([1,1.4,1.2],1)
 
-Live = LoadType(True,0,'Live','LL')
+
 Live.add_single_load([1,0,0,10,10,10,'UDL'])
 Live.add_multi_loads([[1,0,5,10,10,10,'PL'],[1,0,0,10,10,10,'TRAP']])
 
