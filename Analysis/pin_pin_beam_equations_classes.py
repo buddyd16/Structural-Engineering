@@ -1024,6 +1024,7 @@ class cant_right_nl:
         self.slope = slope
         self.L = L
         self.rl = 0
+        self.rr = 0
         self.ml = 0
 
         self.kind = 'NL'
@@ -1130,6 +1131,7 @@ class cant_right_point:
             self.error = 'Error a > l'
 
         self.rl = self.p
+        self.rr = 0
         self.ml = -1.0*self.p*self.a
 
         # 0 length backspan indicates fixed-free beam initialize slope to 0
@@ -1290,6 +1292,7 @@ class cant_right_point_moment:
             self.error = 'Error a > l'
 
         self.rl = 0
+        self.rr = 0
         self.ml = -1.0*self.ma
 
         # 0 length backspan indicates fixed-free beam initialize slope to 0
@@ -1473,6 +1476,7 @@ class cant_right_udl:
             pass
 
         self.rl = self.w_tot
+        self.rr = 0
         self.ml = -1.0*self.w_tot*(self.b-(self.c/2))
 
         # 0 length backspan indicates fixed-free beam initialize slope to 0
@@ -1692,6 +1696,7 @@ class cant_right_trap:
         self.d = self.a+(((self.w1+(2*self.w2))/(3*(self.w2+self.w1)))*self.c)
         self.s = (self.w1-self.w2)/self.c
         self.rl = self.w
+        self.rr = 0
         self.ml = -1*self.w*self.d
 
         # 0 length backspan indicates fixed-free beam initialize slope to 0
@@ -1909,6 +1914,7 @@ class cant_left_nl:
         self.kind = 'NL'
 
         self.rr = 0
+        self.rl = 0
         self.mr = 0
 
     def piece_functions(self):
@@ -2012,6 +2018,7 @@ class cant_left_point:
             self.error = 'Error a > l'
 
         self.rr = self.p
+        self.rl = 0
         self.mr = -1*self.p*(self.L-self.a)
 
         # 0 length backspan indicates fixed-free beam initialize slope to 0
@@ -2161,6 +2168,7 @@ class cant_left_point_moment:
             self.error = 'Error a > l'
 
         self.rr = 0
+        self.rl = 0
         self.mr = self.ma
 
         # 0 length backspan indicates fixed-free beam initialize slope to 0
@@ -2344,6 +2352,7 @@ class cant_left_udl:
             pass
 
         self.rr = self.w_tot
+        self.rl = 0
         self.mr = -1.0*self.w_tot*(self.L-(a+(self.c/2.0)))
 
         # 0 length backspan indicates fixed-free beam initialize slope to 0
@@ -2585,6 +2594,7 @@ class cant_left_trap:
         self.s = (self.w1-self.w2)/self.c
         self.cc = (((self.w1+(2*self.w2))/(3*(self.w2+self.w1)))*self.c) + self.a
         self.rr = self.w
+        self.rl=0
         self.mr = -1*self.rr*(self.L-self.cc)
 
         # 0 length backspan indicates fixed-free beam initialize slope to 0
