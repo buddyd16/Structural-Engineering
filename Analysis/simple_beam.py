@@ -997,11 +997,11 @@ class Master_window:
                 
                 slopel = slopel + load.eis(xsl)
                 slopec = slopec + load.backspan.eis(xsc)
-                sloper = sloper + ppbeam.cant_right_nl(load.backspan.eisx(self.lc)).eis(xsr)
+                sloper = sloper + ppbeam.cant_right_nl(load.backspan.eisx(self.lc),self.lr).eis(xsr)
                 
                 deltal = deltal + load.eid(xsl)
                 deltac = deltac + load.backspan.eid(xsc)
-                deltar = deltar + ppbeam.cant_right_nl(load.backspan.eisx(self.lc)).eid(xsr)
+                deltar = deltar + ppbeam.cant_right_nl(load.backspan.eisx(self.lc),self.lr).eid(xsr)
             
             for load in load_center:
                 reaction_left = reaction_left + load.rl
@@ -1013,11 +1013,11 @@ class Master_window:
                
                 slopel = slopel + ppbeam.cant_left_nl(load.eisx(0),self.ll).eis(xsl)
                 slopec = slopec + load.eis(xsc)
-                sloper = sloper + ppbeam.cant_right_nl(load.eisx(self.lc)).eis(xsr)
+                sloper = sloper + ppbeam.cant_right_nl(load.eisx(self.lc),self.lr).eis(xsr)
                 
                 deltal = deltal + ppbeam.cant_left_nl(load.eisx(0),self.ll).eid(xsl)
                 deltac = deltac + load.eid(xsc)
-                deltar = deltar + ppbeam.cant_right_nl(load.eisx(self.lc)).eid(xsr)
+                deltar = deltar + ppbeam.cant_right_nl(load.eisx(self.lc),self.lr).eid(xsr)
             
             for load in load_right:
                 reaction_left = reaction_left + load.backspan.rl
@@ -1402,11 +1402,11 @@ class Master_window:
                 
                 slopelx = slopelx + load.eisx(xsl)
                 slopecx = slopecx + load.backspan.eisx(xsc)
-                sloperx = sloperx + ppbeam.cant_right_nl(load.backspan.eisx(self.lc)).eisx(xsr)
+                sloperx = sloperx + ppbeam.cant_right_nl(load.backspan.eisx(self.lc),self.lr).eisx(xsr)
                 
                 deltalx = deltalx + load.eidx(xsl)
                 deltacx = deltacx + load.backspan.eidx(xsc)
-                deltarx = deltarx + ppbeam.cant_right_nl(load.backspan.eisx(self.lc)).eidx(xsr)
+                deltarx = deltarx + ppbeam.cant_right_nl(load.backspan.eisx(self.lc),self.lr).eidx(xsr)
             
             for load in load_center:
                 
@@ -1416,11 +1416,11 @@ class Master_window:
                
                 slopelx = slopelx + ppbeam.cant_left_nl(load.eisx(0),self.ll).eisx(xsl)
                 slopecx = slopecx + load.eisx(xsc)
-                sloperx = sloperx + ppbeam.cant_right_nl(load.eisx(self.lc)).eisx(xsr)
+                sloperx = sloperx + ppbeam.cant_right_nl(load.eisx(self.lc),self.lr).eisx(xsr)
                 
                 deltalx = deltalx + ppbeam.cant_left_nl(load.eisx(0),self.ll).eidx(xsl)
                 deltacx = deltacx + load.eidx(xsc)
-                deltarx = deltarx + ppbeam.cant_right_nl(load.eisx(self.lc)).eidx(xsr)
+                deltarx = deltarx + ppbeam.cant_right_nl(load.eisx(self.lc),self.lr).eidx(xsr)
             
             for load in load_right:
                 

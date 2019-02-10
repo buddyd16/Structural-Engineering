@@ -1020,9 +1020,9 @@ class end_delta:
         return [RL,ML,RR,MR]
 
 class cant_right_nl:
-    def __init__(self, slope):
+    def __init__(self, slope,L):
         self.slope = slope
-
+        self.L = L
         self.rl = 0
         self.ml = 0
 
@@ -1773,22 +1773,26 @@ class cant_right_trap:
                 # Range b to L
                 [[self.c6],[self.b,self.L]]
                 ])
-                
-        # ******* LEFT OFF HERE **********
-        # ****************
+
         eid = ([
                 # Range 0 to a
-                [[0],[0,self.a]],
+                [[self.c2,#x^0
+                self.c1,#x^1
+                0.5*self.ml,#x^2
+                ((1.0/6.0)*self.rl),#x^3
+                ],
+                [0,self.a]],
                 # Range a to b
-                [[0,#x^0
-                0,#x^1
-                0,#x^2
-                0,#x^3
-                0,#x^4
-                0],#x^5
+                [[self.c5,#x^0
+                self.c4,#x^1
+                0.5*self.c3,#x^2
+                ((1/12.0)*math.pow(self.a,2)*self.s)+
+                ((1/6.0)*self.a*self.w1) + ((1/6.0)*self.rl),#x^3
+                ((-1/24.0)*self.a*self.s) - ((1/24.0)*self.w1),#x^4
+                (1/120.0)*self.s],#x^5
                 [self.a,self.b]],
                 # Range b to L
-                [[0],[self.b,self.L]]
+                [[self.c7,self.c6],[self.b,self.L]]
                 ])
 
         vs = PieceFunctionString(v)
@@ -2366,6 +2370,96 @@ class cant_left_udl:
         self.x_graph=[arrow_minus_start,self.a,arrow_plus_start,self.a,self.a,self.b,self.b,arrow_minus_end,self.b,arrow_plus_end]
         self.y_graph=[arrow_height,0,arrow_height,0,self.w1,self.w1,0,arrow_height,0,arrow_height]
 
+    def piece_functions(self):
+        '''
+        Returns the general piecwise function in the form of two lists
+        # list1 is the polynomial coeficients of order [c0,c1x,c2x^2,...,cnx^n]
+        # where the list values will only by the cn's*
+        # list 2 will be the range over which the function piece applies
+        # 0 <= a would be [0,a] **note it will be assumed the the eqality is <= not <
+        # rerturned lists will be [[[list11],[list21]],....,[[list1n],[list2n]]
+        # where n is the total number of functions to capture the range from
+        # 0 to the full span, L of the beam
+        '''
+
+        v = ([
+            [[0],[0,self.a]],
+            [[self.w1*self.a,
+            -1.0*self.w1],
+            [self.a,self.b]],
+            [[-1.0*self.w_tot],[self.b,self.L]]
+            ])
+
+        m = ([
+            # Range 0 to a
+            [[0],[0,self.a]],
+            # Range a to b
+            [[-0.5*math.pow(self.a,2)*self.w1,
+            self.a*self.w1,
+            -0.5*self.w1],
+            [self.a,self.b]],
+            # Range b to L
+            [[self.a*self.w_tot + 0.5*self.c*self.w_tot,
+             -1.0*self.w_tot],
+             [self.b,self.L]]
+            ])
+
+        eis = ([
+                # Range 0 to a
+                [[self.c1],[0,self.a]],
+                # Range a to b
+                [[(1/6.0)*math.pow(self.a,3)*self.w1 + self.c3,#x^0
+                -0.5*math.pow(self.a,2)*self.w1,#x^1
+                0.5*self.a*self.w1,#x^2
+                (-1/6.0)*self.w1],#x^3
+                [self.a,self.b]],
+                # Range b to L
+                [[self.c5-(0.5*math.pow(self.a,2)*self.w_tot)-
+                (0.5*self.a*self.c*self.w_tot) - ((1/8.0)*math.pow(self.c,2)*self.w_tot),#x^0
+                (self.a*self.w_tot)+(0.5*self.c*self.w_tot),#x^1
+                -0.5*self.w_tot],#x^2
+                [self.b,self.L]]
+                ])
+
+        eid = ([
+                # Range 0 to a
+                [[self.c2,self.c1],[0,self.a]],
+                # Range a to b
+                [[self.c4-((1/24.0)*math.pow(self.a,4)*self.w1),#x^0
+                (1/6.0)*math.pow(self.a,3)*self.w1+self.c3,#x^1
+                -0.25*math.pow(self.a,2)*self.w1,#x^2
+                (1/6.0)*self.a*self.w1,#x^3
+                (-1/24.0)*self.w1],#x^4
+                [self.a,self.b]],
+                # Range b to L
+                [[((1/6.0)*math.pow(self.a,3)*self.w_tot)+
+                (0.25*math.pow(self.a,2)*self.c*self.w_tot)+
+                (0.125*self.a*math.pow(self.c,2)*self.w_tot)+
+                ((1/48.0)*math.pow(self.c,3)*self.w_tot)+self.c6,#x^0
+                (-0.5*math.pow(self.a,2)*self.w_tot)-
+                (0.5*self.a*self.c*self.w_tot)-
+                (0.125*math.pow(self.c,2)*self.w_tot)+self.c5,#x^1
+                (0.5*self.a*self.w_tot) + (0.25*self.c*self.w_tot),#x^2
+                (-1/6.0)*self.w_tot],#x^3
+                [self.b,self.L]]
+                ])
+
+        vs = PieceFunctionString(v)
+        ms = PieceFunctionString(m)
+        eiss = PieceFunctionString(eis)
+        eids = PieceFunctionString(eid)
+
+        return [v,m,eis,eid],[vs,ms,eiss,eids]
+
+    def fef(self):
+        # Fixed End Forces
+        RL = 0
+        RR = self.rr
+        ML = 0
+        MR = self.mr
+
+        return [RL,ML,RR,MR]
+
     def v(self,x):
         iters = len(x)
         v=zeros(iters)
@@ -2518,6 +2612,100 @@ class cant_left_trap:
 
         self.x_graph=[arrow_minus_start,self.a,arrow_plus_start,self.a,self.a,self.b,self.b,arrow_minus_end,self.b,arrow_plus_end]
         self.y_graph=[arrow_height,0,arrow_height,0,self.w1,self.w2,0,arrow_height2,0,arrow_height2]
+
+    def piece_functions(self):
+        '''
+        Returns the general piecwise function in the form of two lists
+        # list1 is the polynomial coeficients of order [c0,c1x,c2x^2,...,cnx^n]
+        # where the list values will only by the cn's*
+        # list 2 will be the range over which the function piece applies
+        # 0 <= a would be [0,a] **note it will be assumed the the eqality is <= not <
+        # rerturned lists will be [[[list11],[list21]],....,[[list1n],[list2n]]
+        # where n is the total number of functions to capture the range from
+        # 0 to the full span, L of the beam
+        '''
+
+        v = ([
+            [[0],
+            [0,self.a]],
+            [[(0.5*math.pow(self.a,2)*self.s)+(self.a*self.w1), #x^0
+            (-1.0*self.a*self.s) - self.w1,                     #x^1
+            0.5*self.s],                                        #x^2
+            [self.a,self.b]],
+            [[-1.0*self.rr],
+            [self.b,self.L]]
+            ])
+
+        m = ([
+            # Range 0 to a
+            [[0],
+            [0,self.a]],
+            # Range a to b
+            [[self.c3,                                          #x^0
+            (0.5*math.pow(self.a,2)*self.s)+(self.a*self.w1),   #x^1
+            (-0.5*self.a*self.s) - (0.5*self.w1),               #x^2
+            (1/6.0)*self.s],                                    #x^3
+            [self.a,self.b]],
+            # Range b to L
+            [[self.w*self.cc,   #x^0
+             -1.0*self.w],      #x^1
+             [self.b,self.L]]
+            ])
+
+        eis = ([
+                # Range 0 to a
+                [[self.c1],
+                [0,self.a]],
+                # Range a to b
+                [[self.c4,#x^0
+                self.c3,#x^1
+                (0.25*math.pow(self.a,2)*self.s)+(0.5*self.a*self.w1),#x^2
+                ((-1/6.0)*self.a*self.s)-((1/6.0)*self.w1),#x^3
+                (1/24.0)*self.s],#x^4
+                [self.a,self.b]],
+                # Range b to L
+                [[self.c6-(0.5*math.pow(self.cc,2)*self.w),#x^0
+                self.cc*self.w,#x^1
+                -0.5*self.w],#x^2
+                [self.b,self.L]]
+                ])
+
+        eid = ([
+                # Range 0 to a
+                [[self.c2,self.c1],
+                [0,self.a]],
+                # Range a to b
+                [[self.c5,#x^0
+                self.c4,#x^1
+                0.5*self.c3,#x^2
+                ((1/12.0)*math.pow(self.a,2)*self.s)+((1/6.0)*self.a*self.w1),#x^3
+                ((-1/24.0)*self.a*self.s)-((1/24.0)*self.w1),#x^4
+                (1/120.0)*self.s],#x^5
+
+                [self.a,self.b]],
+                # Range b to L
+                [[self.c7+((1/6.0)*math.pow(self.cc,3)*self.w),#x^0
+                self.c6-(0.5*math.pow(self.cc,2)*self.w),#x^1
+                0.5*self.cc*self.w,#x^2
+                (-1/6.0)*self.w],#x^3
+                [self.b,self.L]]
+                ])
+
+        vs = PieceFunctionString(v)
+        ms = PieceFunctionString(m)
+        eiss = PieceFunctionString(eis)
+        eids = PieceFunctionString(eid)
+
+        return [v,m,eis,eid],[vs,ms,eiss,eids]
+
+    def fef(self):
+        # Fixed End Forces
+        RL = 0
+        RR = self.rr
+        ML = 0
+        MR = self.mr
+
+        return [RL,ML,RR,MR]
 
     def v(self,x):
         iters = len(x)
