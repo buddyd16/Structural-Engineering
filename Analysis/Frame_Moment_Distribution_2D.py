@@ -228,9 +228,13 @@ class CantBeam:
             if load.kind == "SLOPE":
                 pass         
             else:
-                self.mi[0] += -1*load.fef()[1]
-                self.mj[0] += -1*load.fef()[3]
-    
+                if self.isleft == 1:
+                    self.mi[0] += -1*load.fef()[1]
+                    self.mj[0] += -1*load.fef()[3]
+                else:
+                    self.mi[0] += load.fef()[3]
+                    self.mj[0] += load.fef()[1]
+                    
     def reactions(self):
         
         rl = 0
@@ -864,10 +868,12 @@ I_ft4 = I_in4 * (1 / 20736.0) # in^4 * 1 ft^4 / 12^4 in^4 = ft^4
 bm_load = [[1,0,0,10,'UDL']]
 
 cant_left = CantBeam(n1,E_ksf,I_ft4,5,[[1,0,0,5,'UDL']],1)
+cant_right = CantBeam(n3,E_ksf,I_ft4,5,[[1,0,0,5,'UDL']],0)
 
 beams = beams_all_same(nodes, E_ksf, I_ft4, bm_load)
 
 beams.append(cant_left)
+beams.append(cant_right)
 
 cantilevers = [bm for bm in beams if bm.type=='cantilever']
 
