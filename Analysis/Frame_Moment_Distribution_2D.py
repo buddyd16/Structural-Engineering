@@ -71,6 +71,8 @@ class node:
         for beam in beams:
             r = beam.reactions()
             
+            print r
+            
             if self == beam.i:
                 node_reaction += r[0]
             
@@ -190,27 +192,27 @@ class CantBeam:
             
             #['Point','Moment','UDL','TRAP','SLOPE']
             if load_type == 'Point':
-                self.Loads.append(ppbeam.cant_left_point(w1,a,lc,0))
+                self.Loads.append(ppbeam.cant_right_point(w1,a,lc,0))
                 b = min(lc,a + 0.01)
                 c = max(0,a - 0.01)
                 self.extra_station.extend([c,a,b])
 
             elif load_type == 'Moment':
-                self.Loads.append(ppbeam.cant_left_point_moment(w1,a,lc,0))
+                self.Loads.append(ppbeam.cant_right_point_moment(w1,a,lc,0))
                 b = min(lc,a + 0.01)
                 c = max(0,a - 0.01)
                 self.extra_station.extend([c,a,b])
 
             elif load_type == 'UDL':
-                self.Loads.append(ppbeam.cant_left_udl(w1,a,b,lc,0))
+                self.Loads.append(ppbeam.cant_right_udl(w1,a,b,lc,0))
                 self.extra_station.extend([a,b])
                 
             elif load_type == 'TRAP':
-                self.Loads.append(ppbeam.cant_left_trap(w1,w2,a,b,lc,0))
+                self.Loads.append(ppbeam.cant_right_trap(w1,w2,a,b,lc,0))
                 self.extra_station.extend([a,b])
             
             elif load_type == 'SLOPE':
-                self.Loads.append(ppbeam.cant_left_nl(w1,lc))
+                self.Loads.append(ppbeam.cant_right_nl(w1,lc))
                 
             else:
                 pass
@@ -232,8 +234,8 @@ class CantBeam:
                     self.mi[0] += -1*load.fef()[1]
                     self.mj[0] += -1*load.fef()[3]
                 else:
-                    self.mi[0] += load.fef()[3]
-                    self.mj[0] += load.fef()[1]
+                    self.mi[0] += load.fef()[1]
+                    self.mj[0] += load.fef()[3]
                     
     def reactions(self):
         
@@ -1068,7 +1070,6 @@ if Consider_shortening == 1:
        
     # Add final Moments to Beams and Get individual Beam End Reactions
     delta_node_r = []
-    node_r = []
     for beam in beams:
         if beam.type=='span':
             beam.add_end_moments()
