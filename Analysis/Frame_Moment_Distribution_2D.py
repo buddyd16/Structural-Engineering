@@ -21,7 +21,7 @@ Created on Wed Jan 30 14:32:29 2019
 
 from __future__ import division
 import pin_pin_beam_equations_classes as ppbeam
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 
 class node:
@@ -70,8 +70,6 @@ class node:
         
         for beam in beams:
             r = beam.reactions()
-            
-            print r
             
             if self == beam.i:
                 node_reaction += r[0]
@@ -278,7 +276,7 @@ class CantBeam:
         m = []
         eis = []
         eid = []
-        
+        end_delta_d = [0]*len(self.chart_stations)
         if self.loads_built == 1:
             
             for x in self.chart_stations:
@@ -289,12 +287,12 @@ class CantBeam:
                 eis.append(res[2])
                 eid.append(res[3])
         
-            return [self.chart_stations, v, m, eis, eid]
+            return [self.chart_stations, v, m, eis, eid],end_delta_d
         
         else:
             zero_out = [0]*len(self.chart_stations)
             
-            return [self.chart_stations, zero_out, zero_out, zero_out, zero_out]        
+            return [self.chart_stations, zero_out, zero_out, zero_out, zero_out],end_delta_d        
         
 class Beam:    
     def __init__(self, i_node, j_node, E, I, Loads_List):
@@ -840,7 +838,183 @@ def moment_distribution_cycle(nodes, beams, columns, tolerance):
     
     return check
 
-tolerance = 1e-14
+def moment_distribution(nodes, beams, columns, shortening=0, tolerance=1e-14):
+    # Sum of EI/L for members at each Node
+    for node in nodes:
+        node.sum_node_k(beams,columns)
+    
+    # Beam Distribution Factors at each Node
+    bmdfs = []
+    for beam in beams:
+        for node in nodes:
+            if node == beam.i:
+                beam.dfi = beam.K / node.K
+                
+                bmdfs.append(beam.dfi)
+                
+            elif node == beam.j:
+                beam.dfj = beam.K / node.K
+                bmdfs.append(beam.dfj)
+            else:
+                pass
+    
+    # Column Distribution Factors at each Node
+    coldfs = []
+    for column in columns:
+        for node in nodes:
+            if node == column.i:
+                column.dfi = column.K / node.K
+                coldfs.append(column.dfi)
+                coldfs.append(column.dfj)
+                
+            elif node == column.j:
+                column.dfj = column.K / node.K
+                coldfs.append(column.dfi)
+                coldfs.append(column.dfj)
+                           
+            else:
+                pass
+            
+    # Beam Fixed End Forces
+    bmfef = []
+    for beam in beams:
+        beam.applied_loads()
+        beam.fef()
+        bmfef.extend([beam.mi[0],beam.mj[0]])
+    
+    # Moment Distribution Pass 1 - left to right
+    moment_distribution_cycle(nodes, beams, columns, tolerance)        
+    
+    # Moment Distrubution multiple passes
+    
+    count = 0
+    count_max = 100
+    n_previous = []
+    kick = 0
+    test = False
+    while test == False and count < count_max and kick<1:
+        test = moment_distribution_cycle(nodes, beams, columns, tolerance)
+        
+        if count <=1:
+            n_m_unbalance = [node.m_unbalance for node in nodes]
+            n_previous.append(n_m_unbalance)        
+        else:
+            n_m_unbalance = [node.m_unbalance for node in nodes]
+            
+            if n_m_unbalance == n_previous[-1]:
+                kick = 1
+            else:
+                n_previous.append(n_m_unbalance)
+            
+        count +=1
+    
+    print count
+
+    # Add final Moments to Beams and Get individual Beam End Reactions
+    node_r = []
+    for beam in beams:
+        if beam.type=='span':
+            beam.add_end_moments()
+            
+    for node in nodes:
+        node_r.append(node.sum_node_reactions(beams))
+    
+    node_delta = []
+    if shortening == 1:   
+        # Determine column shortening for reactions - PL/AE
+        i = 0
+        for column in columns:
+            if column.type == 'DOWN':
+                p = node_r[i]
+                
+                node_delta.append((-1.0*p*column.Length) / (column.A * column.E))
+            
+                i+=1
+        
+        # Create New Beam Set with the column shortening as loads
+        delta_load = []
+        i=0
+        for beam in beams:
+            if beam.type == 'span':
+                delta_load.append([node_delta[i],node_delta[i+1],0,10,'END_DELTA'])
+            else:
+                delta_load.append([])
+        
+            i+=1
+        '''
+        going to try not reseting the FEF to see if it speeds
+        up the second pass
+        # reset beam end moments
+        for beam in beams:
+            beam.reset_fem()
+            
+        # reset column end moments
+        for column in columns:
+            column.reset_fem()
+        '''
+            
+        # add end delta loads to beams
+        i=0
+        for beam in beams:
+            if beam.type == 'span':
+                beam.Load_List.append(delta_load[i])
+            i+=1
+            
+        # Beam Fixed End Forces
+        delta_bmfef = []
+        for beam in beams:
+            beam.applied_loads()
+            #beam.fef()
+            #delta_bmfef.extend([beam.mi[0],beam.mj[0]])
+            if beam.type == 'span':
+                beam.end_delta_fem()
+                delta_bmfef.append([beam.mi,beam.mj])
+            else:
+                pass
+        
+        # Moment Distribution Pass 1
+        moment_distribution_cycle(nodes, beams, columns, tolerance)          
+        
+        # Moment Distrubution multiple passes
+        
+        count_delta = 0
+        test_delta = False
+        n_delta_previous = []
+        delta_kick = 0
+        
+        while test_delta == False and count_delta < count_max and delta_kick<1:
+            test_delta = moment_distribution_cycle(nodes, beams, columns, tolerance)
+            
+            if count_delta <=1:
+                n_m_unbalance_delta = [node.m_unbalance for node in nodes]
+                n_delta_previous.append(n_m_unbalance_delta)        
+            else:
+                n_m_unbalance_delta = [node.m_unbalance for node in nodes]
+            
+                if n_m_unbalance_delta == n_delta_previous[-1]:
+                    delta_kick = 1
+                else:
+                    n_delta_previous.append(n_m_unbalance_delta)
+          
+            count_delta +=1
+            
+        print count_delta
+           
+        # Add final Moments to Beams and Get individual Beam End Reactions
+        delta_node_r = []
+        for beam in beams:
+            if beam.type=='span':
+                beam.add_end_moments()
+        for node in nodes:
+            delta_node_r.append(node.sum_node_reactions(beams))
+    
+    else:
+        pass
+    
+    return node_delta
+
+'''
+tolerance = 1e-6
     
 n1 = node(0)  
 n2 = node(10)
@@ -853,8 +1027,6 @@ n8 = node(70)
 n9 = node(80)
 n10 = node(90)
 n11 = node(100)
-
-Consider_shortening = 0
 
 nodes = [n1,n2,n3]
 
@@ -869,8 +1041,8 @@ I_ft4 = I_in4 * (1 / 20736.0) # in^4 * 1 ft^4 / 12^4 in^4 = ft^4
 
 bm_load = [[1,0,0,10,'UDL']]
 
-cant_left = CantBeam(n1,E_ksf,I_ft4,5,[[1,0,0,5,'UDL']],1)
-cant_right = CantBeam(n3,E_ksf,I_ft4,5,[[1,0,0,5,'UDL']],0)
+cant_left = CantBeam(nodes[0],E_ksf,I_ft4,5,[[1,0,0,5,'UDL']],1)
+cant_right = CantBeam(nodes[-1],E_ksf,I_ft4,5,[[1,0,0,5,'UDL']],0)
 
 beams = beams_all_same(nodes, E_ksf, I_ft4, bm_load)
 
@@ -879,206 +1051,23 @@ beams.append(cant_right)
 
 cantilevers = [bm for bm in beams if bm.type=='cantilever']
 
-support = 'fix'
-support_dwn = 'fix'
+Consider_shortening = 0
+support = 'pin'
+support_dwn = 'pin'
 up_hinge = 1
 down_hinge = 1
 col_height = 10
 
-columns_down = col_dwn_same(nodes, E_ksf, I_ft4, A_ft2, col_height, support_dwn, down_hinge)
+columns_down = col_dwn_same(nodes, E_ksf, 2*I_ft4, A_ft2, col_height, support_dwn, down_hinge)
 
-columns_up = col_up_same(nodes, E_ksf, I_ft4, A_ft2, col_height, support, up_hinge)
+columns_up = col_up_same(nodes, E_ksf, 2*I_ft4, A_ft2, col_height, support, up_hinge)
 
 columns=[]
 columns.extend(columns_down)
 columns.extend(columns_up)
 
-# Sum of EI/L for members at each Node
-for node in nodes:
-    node.sum_node_k(beams,columns)
 
-# Beam Distribution Factors at each Node
-bmdfs = []
-for beam in beams:
-    for node in nodes:
-        if node == beam.i:
-            beam.dfi = beam.K / node.K
-            
-            bmdfs.append(beam.dfi)
-            
-        elif node == beam.j:
-            beam.dfj = beam.K / node.K
-            bmdfs.append(beam.dfj)
-        else:
-            pass
-
-# Column Distribution Factors at each Node
-coldfs = []
-for column in columns:
-    for node in nodes:
-        if node == column.i:
-            column.dfi = column.K / node.K
-            coldfs.append(column.dfi)
-            coldfs.append(column.dfj)
-            
-        elif node == column.j:
-            column.dfj = column.K / node.K
-            coldfs.append(column.dfi)
-            coldfs.append(column.dfj)
-                       
-        else:
-            pass
-
-# Beam Fixed End Forces
-bmfef = []
-for beam in beams:
-    beam.applied_loads()
-    beam.fef()
-    bmfef.extend([beam.mi[0],beam.mj[0]])
-
-# Moment Distribution Pass 1 - left to right
-moment_distribution_cycle(nodes, beams, columns, tolerance)        
-
-# Moment Distrubution multiple passes
-
-count = 0
-count_max = 100
-n_previous = []
-kick = 0
-test = False
-while test == False and count < count_max and kick<1:
-    test = moment_distribution_cycle(nodes, beams, columns, tolerance)
-    
-    if count <=1:
-        n_m_unbalance = [node.m_unbalance for node in nodes]
-        n_previous.append(n_m_unbalance)        
-    else:
-        n_m_unbalance = [node.m_unbalance for node in nodes]
-        
-        if n_m_unbalance == n_previous[-1]:
-            kick = 1
-        else:
-            n_previous.append(n_m_unbalance)
-        
-    count +=1
-
-print count
-  
-n_m_unbalance = [node.m_unbalance for node in nodes ]
-    
-Final_bmi = [sum(bm.mi) for bm in beams]
-Final_bmj = [sum(bm.mj) for bm in beams]
-
-Final_colmi = [sum(col.mi) for col in columns]
-Final_colmj = [sum(col.mj) for col in columns]
-
-# Add final Moments to Beams and Get individual Beam End Reactions
-node_r = []
-for beam in beams:
-    if beam.type=='span':
-        beam.add_end_moments()
-        
-for node in nodes:
-    
-    node_r.append(node.sum_node_reactions(beams))
-
-if Consider_shortening == 1:   
-    # Determine column shortening for reactions - PL/AE
-    node_delta = []
-    i = 0
-    for column in columns_down:
-        p = node_r[i]
-        
-        node_delta.append((-1.0*p*column.Length) / (column.A * column.E))
-        
-        i+=1
-    
-    # Create New Beam Set with the column shortening as loads
-    delta_load = []
-    i=0
-    for beam in beams:
-        if beam.type == 'span':
-            delta_load.append([node_delta[i],node_delta[i+1],0,10,'END_DELTA'])
-        else:
-            delta_load.append([])
-    
-        i+=1
-    '''
-    going to try not reseting the FEF to see if it speeds
-    up the second pass
-    # reset beam end moments
-    for beam in beams:
-        beam.reset_fem()
-        
-    # reset column end moments
-    for column in columns:
-        column.reset_fem()
-    '''
-        
-    # add end delta loads to beams
-    i=0
-    for beam in beams:
-        if beam.type == 'span':
-            beam.Load_List.append(delta_load[i])
-        i+=1
-        
-    # Beam Fixed End Forces
-    delta_bmfef = []
-    for beam in beams:
-        beam.applied_loads()
-        #beam.fef()
-        #delta_bmfef.extend([beam.mi[0],beam.mj[0]])
-        if beam.type == 'span':
-            beam.end_delta_fem()
-            delta_bmfef.append([beam.mi,beam.mj])
-        else:
-            pass
-    
-    # Moment Distribution Pass 1
-    moment_distribution_cycle(nodes, beams, columns, tolerance)          
-    
-    # Moment Distrubution multiple passes
-    
-    count_delta = 0
-    test_delta = False
-    n_delta_previous = []
-    delta_kick = 0
-    
-    while test_delta == False and count_delta < count_max and delta_kick<1:
-        test_delta = moment_distribution_cycle(nodes, beams, columns, tolerance)
-        
-        if count_delta <=1:
-            n_m_unbalance_delta = [node.m_unbalance for node in nodes]
-            n_delta_previous.append(n_m_unbalance_delta)        
-        else:
-            n_m_unbalance_delta = [node.m_unbalance for node in nodes]
-        
-            if n_m_unbalance_delta == n_delta_previous[-1]:
-                delta_kick = 1
-            else:
-                n_delta_previous.append(n_m_unbalance_delta)
-      
-        count_delta +=1
-        
-    print count_delta
-        
-    Final_bmi_delta = [sum(bm.mi) for bm in beams]
-    Final_bmj_delta = [sum(bm.mj) for bm in beams]
-    
-    Final_colmi_delta = [sum(col.mi) for col in columns]
-    Final_colmj_delta = [sum(col.mj) for col in columns]
-       
-    # Add final Moments to Beams and Get individual Beam End Reactions
-    delta_node_r = []
-    for beam in beams:
-        if beam.type=='span':
-            beam.add_end_moments()
-    for node in nodes:
-        delta_node_r.append(node.sum_node_reactions(beams))
-
-else:
-    pass
-
+node_delta = moment_distribution(nodes,beams,columns,Consider_shortening,tolerance)
 
 # Build Beam Load Functions
 funcs = []
@@ -1121,7 +1110,8 @@ for column in columns:
 column_charts = []
 for column in columns:
     column_charts.append(column.station_values())
-
+    
+'''
     
 # Beam plots - will show one at a time
 #i = 1
@@ -1159,7 +1149,7 @@ for column in columns:
 #    
 #    i+=1
 
-# Column plots - will show one at a time
+#Column plots - will show one at a time
 #i = 1
 #for chart in column_charts:
 #    plt.close('all')
