@@ -51,7 +51,7 @@ class main_window:
         self.load_types = ['Point','Moment','UDL','TRAP']
 
         # Font Set
-        self.f_size = 12
+        self.f_size = 10
         self.helv = tkFont.Font(family=' Courier New',size=self.f_size, weight='bold')
         self.helv_norm = tkFont.Font(family=' Courier New',size=self.f_size)
         self.helv_res = tkFont.Font(family=' Courier New',size=self.f_size, weight='bold', underline = True)
@@ -75,7 +75,7 @@ class main_window:
         self.base_frame = tk.Frame(master, bd=2, relief='sunken', padx=1,pady=1)
         self.base_frame.pack(side=tk.BOTTOM, padx= 1, pady= 1, fill=tk.X)
         #Base Frame Items
-        w=18
+        w=20
         h=1
 
         self.b_quit = tk.Button(self.base_frame,text="Quit", command=self.quit_app, font=self.helv, width=w, height=h, bg='red3')
@@ -94,22 +94,22 @@ class main_window:
 
         self.geo_tab_frame = tk.Frame(self.geo_tab, bd=2, relief='sunken', padx=1,pady=1)
 
-        self.b_add_beam = tk.Button(self.geo_tab_frame, text="Add a Beam",command=self.add_beam_func, font=self.helv, width=w, height=h, bg='red3')
+        self.b_add_beam = tk.Button(self.geo_tab_frame, text="Add a Beam",command=self.add_beam_func, font=self.helv, width=w, height=h)
         self.b_add_beam.grid(row=1,column=1)
 
-        self.b_remove_beam = tk.Button(self.geo_tab_frame, text="Remove Last Beam",command=self.remove_last_beam_func, font=self.helv, width=w, height=h, bg='red3', state=tk.DISABLED)
+        self.b_remove_beam = tk.Button(self.geo_tab_frame, text="Remove Last Beam",command=self.remove_last_beam_func, font=self.helv, width=w, height=h, state=tk.DISABLED)
         self.b_remove_beam.grid(row=2,column=1)
 
-        self.b_add_left_cant = tk.Button(self.geo_tab_frame, text="Add Left Cantilever",command=self.add_cant_left_func, font=self.helv, width=w, height=h, bg='red3')
+        self.b_add_left_cant = tk.Button(self.geo_tab_frame, text="Add Left Cantilever",command=self.add_cant_left_func, font=self.helv, width=w, height=h)
         self.b_add_left_cant.grid(row=1,column=2)
 
-        self.b_remove_left_cant = tk.Button(self.geo_tab_frame, text="Remove Left Cantilever",command=self.remove_left_cant_func, font=self.helv, width=w, height=h, bg='red3', state=tk.DISABLED)
+        self.b_remove_left_cant = tk.Button(self.geo_tab_frame, text="Remove Left Cantilever",command=self.remove_left_cant_func, font=self.helv, width=w, height=h, state=tk.DISABLED)
         self.b_remove_left_cant.grid(row=2,column=2)
 
-        self.b_add_right_cant = tk.Button(self.geo_tab_frame, text="Add Right Cantilever",command=self.add_cant_right_func, font=self.helv, width=w, height=h, bg='red3')
+        self.b_add_right_cant = tk.Button(self.geo_tab_frame, text="Add Right Cantilever",command=self.add_cant_right_func, font=self.helv, width=w, height=h)
         self.b_add_right_cant.grid(row=1,column=3)
 
-        self.b_remove_right_cant = tk.Button(self.geo_tab_frame, text="Remove Right Cantilever",command=self.remove_right_cant_func, font=self.helv, width=w, height=h, bg='red3', state=tk.DISABLED)
+        self.b_remove_right_cant = tk.Button(self.geo_tab_frame, text="Remove Right Cantilever",command=self.remove_right_cant_func, font=self.helv, width=w, height=h, state=tk.DISABLED)
         self.b_remove_right_cant.grid(row=2,column=3)
 
         self.col_bm_notebook = ttk.Notebook(self.geo_tab_frame)
@@ -157,6 +157,14 @@ class main_window:
         tk.Label(self.coldwn_info_tab, text='Hinge at Beam:').grid(row=1, column=7)
 
         self.geo_tab_frame.pack(fill=tk.BOTH, expand=1)
+
+        #Loads Frame tabs
+        #Loads
+        self.loads_tab = ttk.Frame(self.nb_data)
+        self.nb_data.add(self.loads_tab, text='Loads')
+
+        self.g_loads_frame = tk.Frame(self.loads_tab, bd=2, relief='sunken', padx=1,pady=1)
+        self.g_loads_frame.pack(fill=tk.BOTH,expand=1, padx=5, pady=5)
 
         #Graphics Frame tabs and canvases
         #Geometry - Graph
@@ -255,6 +263,7 @@ class main_window:
         if self.cantL_count == 0:
             self.cantL_count +=1
             self.b_remove_left_cant.configure(state=tk.NORMAL)
+            self.b_add_left_cant.configure(state=tk.DISABLED)
             self.cantL_beam_inputs.append([tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar()])
 
             bm = self.cantL_beam_inputs[0]
@@ -276,7 +285,8 @@ class main_window:
     def remove_left_cant_func(self):
         if self.cantL_count > 0:
             self.cantL_count -=1
-
+            self.b_remove_left_cant.configure(state=tk.DISABLED)
+            self.b_add_left_cant.configure(state=tk.NORMAL)
             for element in self.cantL_beam_gui_list:
                 element.destroy()
 
@@ -285,7 +295,8 @@ class main_window:
     def remove_right_cant_func(self):
         if self.cantR_count > 0:
             self.cantR_count -=1
-
+            self.b_remove_right_cant.configure(state=tk.DISABLED)
+            self.b_add_right_cant.configure(state=tk.NORMAL)
             for element in self.cantR_beam_gui_list:
                 element.destroy()
 
@@ -295,6 +306,7 @@ class main_window:
         if self.cantR_count == 0:
             self.cantR_count +=1
             self.b_remove_right_cant.configure(state=tk.NORMAL)
+            self.b_add_right_cant.configure(state=tk.DISABLED)
             self.cantR_beam_inputs.append([tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar()])
 
             bm = self.cantR_beam_inputs[0]
@@ -398,15 +410,6 @@ class main_window:
             h.grid(row=i+2,column=7)
 
             self.column_down_gui_list.extend([b,c,d,e,f,g,h])
-
-    def beam_geo_tab(self):
-        pass
-
-    def col_geo_tab(self):
-        pass
-
-    def beam_loads_tab(self):
-        pass
 
     def update_graph(self):
         pass
