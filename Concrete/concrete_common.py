@@ -199,7 +199,7 @@ def plastic_center(bars_x=[1], bars_y=[1], fy=60000, As=[0.31], fc=3000, eu=0.00
 # above the base. The section if oriented with the 24"
 # vertical.
 b=12
-h=24
+h=20
 #na = 12
 ##lets create a list of y dstances from the top lets say 1 per 0.25"
 #count = int(24/0.25)+1
@@ -221,7 +221,7 @@ h=24
 # Say F'c = 5000 psi and Fy = 60,000 psi
 # notice units here axial force will be in pounds
 # and moment will be in in-lbs
-fc = 5000
+fc = 4000
 fy = 60000
 Es = 0
 eu = 0.003
@@ -230,9 +230,9 @@ k = 0.85
 # lets add a non-symetric steel layout
 # with (3)#5 bars in the bottom and (2)#5 bars at the top
 # cover = 2" to each corner bar
-xb = [0+2,b-2,0+2,b-2]
-yb = [2,2,h-2,h-2]
-ab = [2.54/2.0]*len(xb)
+xb = [0+2.5,b-2.5,0+2.5,b-2.5]
+yb = [2.5,2.5,h-2.5,h-2.5]
+ab = [1.0]*len(xb)
 
 acm = (b*h)-sum(ab)
 P_max = 0.8*0.65*((0.85*fc*acm)+(fy*sum(ab)))/1000.0
@@ -243,7 +243,7 @@ yc = h/2.0
 # set a point to sum moments about
 # lets try the plastic centroid
 
-pc, pc_backup = plastic_center(xb,yb,fy,ab,fc,eu,k,12*24,[6,12])
+pc, pc_backup = plastic_center(xb,yb,fy,ab,fc,eu,k,b*h,[b/2.0,h/2.0])
 
 yc_collins = pc[0][1]
 yc_desayi = pc[1][1]
@@ -265,6 +265,8 @@ count = int((h+6)/0.288)
 nas = [(h+6)-(i*0.288) for i in range(0,count-1)]
 
 nas.extend([1e-10])
+
+#nas = [24]
 
 for na in nas:
     # determine the bar strains and stresses
@@ -298,9 +300,9 @@ for na in nas:
     # Remove a component of concrete compression force from
     # area coincident with the bars in the compression zone
 
-    bforce_collins = [i-(q*stress_strain_collins_et_all(fc,eu,j)) if i>0 else 0 for i,j,q in zip(bforce,bstrains,ab)]
-    bforce_desayi = [i-(q*stress_strain_desayi_krishnan(fc,eu,k,j)) if i>0 else 0  for i,j,q in zip(bforce,bstrains,ab)]
-    bforce_whitney = [i-(q*stress_strain_whitney(fc,eu,j)[0]) if i>0 else 0  for i,j,q in zip(bforce,bstrains,ab)]
+    bforce_collins = [(q*stress_strain_collins_et_all(fc,eu,j)) if i>0 else 0 for i,j,q in zip(bforce,bstrains,ab)]
+    bforce_desayi = [(q*stress_strain_desayi_krishnan(fc,eu,k,j)) if i>0 else 0  for i,j,q in zip(bforce,bstrains,ab)]
+    bforce_whitney = [(q*stress_strain_whitney(fc,eu,j)[0]) if i>0 else 0  for i,j,q in zip(bforce,bstrains,ab)]
     #bforce_whitney = [0]*len(ab)
 
     # Bar Momments - using right hand rule tensile forces below
