@@ -47,6 +47,8 @@ class main_window:
         self.column_up_gui_list = []
         self.column_down_inputs = []
         self.column_down_gui_list = []
+        self.beam_labels = []
+        self.gui_load_list = []
 
         self.load_types = ['Point','Moment','UDL','TRAP']
 
@@ -164,6 +166,106 @@ class main_window:
         self.nb_data.add(self.loads_tab, text='Loads')
 
         self.g_loads_frame = tk.Frame(self.loads_tab, bd=2, relief='sunken', padx=1,pady=1)
+
+        # Load Types and Combinations
+        self.g_load_types_frame = tk.Frame(self.g_loads_frame, bd=2, relief='sunken', padx=1,pady=1)
+
+        self.load_kinds = ['SELF','DL','LL','LL_pat']
+        self.load_kinds_var_list = []
+        self.load_combinations = [['All_DL',1,1,0,0],['ALL_LL',0,0,1,1],['DL_LL',1,1,1,1],['CONC_D',3,3,1,1],['LRFD_1',1.4,1.4,0,0],['LRFD_2',1.2,1.2,1.6,1.6]]
+        self.load_combinations_var_list = []
+        self.load_combo_gui_items = []
+
+        i=0
+        for kind in self.load_kinds:
+            a = tk.Label(self.g_load_types_frame, text=kind)
+            a.grid(row=1,column=1+i)
+            i+=1
+            self.load_combo_gui_items.append(a)
+
+        i=0
+        for combo in self.load_combinations:
+            var_list = []
+            j=0
+            for item in combo:
+                var_list.append(tk.StringVar())
+                var_list[-1].set(item)
+                if j==0:
+                    a = tk.Entry(self.g_load_types_frame, textvariable=var_list[-1], width=8)
+                else:
+                    a = tk.Entry(self.g_load_types_frame, textvariable=var_list[-1], width=4)
+                a.grid(row=2+i,column=j)
+                self.load_combo_gui_items.append(a)
+                j+=1
+            i+=1
+
+
+
+        self.g_load_types_frame.pack(side=tk.LEFT, fill=tk.Y)
+
+        self.g_applied_loads_frame = tk.Frame(self.g_loads_frame, bd=2, relief='sunken', padx=1,pady=1)
+
+        tk.Label(self.g_applied_loads_frame, text='On Beam:').grid(row=1,column=1)
+        tk.Label(self.g_applied_loads_frame, text='P,M,W1:').grid(row=1,column=2)
+        tk.Label(self.g_applied_loads_frame, text='W2:').grid(row=1,column=3)
+        tk.Label(self.g_applied_loads_frame, text='a:').grid(row=1,column=4)
+        tk.Label(self.g_applied_loads_frame, text='b:').grid(row=1,column=5)
+        tk.Label(self.g_applied_loads_frame, text='kind:').grid(row=1,column=6)
+        tk.Label(self.g_applied_loads_frame, text='type:').grid(row=1,column=7)
+
+        self.load_span_select = tk.StringVar()
+        self.load_span_select.set('BM_1')
+        spans = ['BM_1']
+        self.load_span_selection = tk.OptionMenu(self.g_applied_loads_frame, self.load_span_select, *spans)
+        self.load_span_selection.grid(row=2,column=1, sticky = tk.W)
+
+        self.w1_gui = tk.StringVar()
+        self.w2_gui = tk.StringVar()
+        self.a_gui = tk.StringVar()
+        self.b_gui = tk.StringVar()
+
+        self.w1_gui.set(0)
+        self.w2_gui.set(0)
+        self.a_gui.set(0)
+        self.b_gui.set(0)
+
+        self.w1_gui_entry = tk.Entry(self.g_applied_loads_frame, textvariable=self.w1_gui, width=8)
+        self.w1_gui_entry.grid(row=2,column=2, sticky = tk.W)
+        self.w2_gui_entry = tk.Entry(self.g_applied_loads_frame, textvariable=self.w2_gui, width=8)
+        self.w2_gui_entry.grid(row=2,column=3, sticky = tk.W)
+        self.a_gui_entry = tk.Entry(self.g_applied_loads_frame, textvariable=self.a_gui, width=8)
+        self.a_gui_entry.grid(row=2,column=4, sticky = tk.W)
+        self.b_gui_entry = tk.Entry(self.g_applied_loads_frame, textvariable=self.b_gui, width=8)
+        self.b_gui_entry.grid(row=2,column=5, sticky = tk.W)
+
+        self.load_type = tk.StringVar()
+        self.load_type.set('Point')
+        load_types = ['Point','Moment','UDL','TRAP']
+        self.load_type_selection = tk.OptionMenu(self.g_applied_loads_frame, self.load_type, *load_types)
+        self.load_type_selection.grid(row=2,column=6, sticky = tk.W)
+
+        self.load_kind_select = tk.StringVar()
+        self.load_kind_select.set('DL')
+        load_kinds = ['SELF','DL','LL','LL_pat']
+        self.load_kind_selection = tk.OptionMenu(self.g_applied_loads_frame, self.load_kind_select, *load_kinds)
+        self.load_kind_selection.grid(row=2,column=7, sticky = tk.W)
+
+        self.b_add_load = tk.Button(self.g_applied_loads_frame, text="Add Load",command=self.add_load_gui, font=self.helv, width=w, height=h)
+        self.b_add_load.grid(row=3,column=1, columnspan=2)
+
+        self.b_remove_load = tk.Button(self.g_applied_loads_frame, text="Remove Load",command=self.remove_load_gui, font=self.helv, width=w, height=h)
+        self.b_remove_load.grid(row=3,column=4, columnspan=2)
+
+        self.loads_list_frame = tk.Frame(self.g_applied_loads_frame, pady=5)
+        self.loads_scrollbar = tk.Scrollbar(self.loads_list_frame, orient="vertical")
+        self.loads_scrollbar.grid(row=1, column=2, sticky=tk.NS)
+        self.load_listbox = tk.Listbox(self.loads_list_frame, height = 30, width = 50, font=self.helv, yscrollcommand=self.loads_scrollbar.set)
+        self.load_listbox.grid(row=1, column=1)
+        self.loads_scrollbar.configure(command=self.load_listbox.yview)
+        self.loads_list_frame.grid(row=4, column=1, columnspan=7)
+
+        self.g_applied_loads_frame.pack(side=tk.RIGHT, fill=tk.Y)
+
         self.g_loads_frame.pack(fill=tk.BOTH,expand=1, padx=5, pady=5)
 
         #Graphics Frame tabs and canvases
@@ -244,7 +346,7 @@ class main_window:
 
             self.column_up_inputs[-2][1].set('COL_UP_{0}'.format(self.beam_count))
             self.column_up_inputs[-1][1].set('COL_UP_{0}'.format(self.beam_count+1))
-            self.column_down_inputs[-2][0].set('COL_DNW_{0}'.format(self.beam_count))
+            self.column_down_inputs[-2][0].set('COL_DWN_{0}'.format(self.beam_count))
             self.column_down_inputs[-1][0].set('COL_DWN_{0}'.format(self.beam_count+1))
         else:
             self.column_up_inputs.append([tk.IntVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.IntVar(),tk.IntVar()])
@@ -254,6 +356,8 @@ class main_window:
             self.column_down_inputs[-1][0].set('COL_DWN_{0}'.format(self.beam_count+1))
 
         self.beam_inputs[-1][0].set('BM_{0}'.format(self.beam_count))
+        self.beam_labels.append('BM_{0}'.format(self.beam_count))
+        self.refesh_span_options()
 
         self.build_bm_gui_table()
         self.build_colup_gui_table()
@@ -268,7 +372,10 @@ class main_window:
 
             bm = self.cantL_beam_inputs[0]
             bm[0].set('CantL')
-            a = tk.Entry(self.bm_info_tab,textvariable=bm[0], width=8)
+            self.beam_labels.append('CantL')
+            self.refesh_span_options()
+
+            a = tk.Entry(self.bm_info_tab,textvariable=bm[0], width=8, state=tk.DISABLED)
             a.grid(row=2,column=6)
             b = tk.Entry(self.bm_info_tab,textvariable=bm[1], width=8)
             b.grid(row=2,column=7)
@@ -285,6 +392,8 @@ class main_window:
     def remove_left_cant_func(self):
         if self.cantL_count > 0:
             self.cantL_count -=1
+            self.beam_labels.remove('CantL')
+            self.refesh_span_options()
             self.b_remove_left_cant.configure(state=tk.DISABLED)
             self.b_add_left_cant.configure(state=tk.NORMAL)
             for element in self.cantL_beam_gui_list:
@@ -295,6 +404,8 @@ class main_window:
     def remove_right_cant_func(self):
         if self.cantR_count > 0:
             self.cantR_count -=1
+            self.beam_labels.remove('CantR')
+            self.refesh_span_options()
             self.b_remove_right_cant.configure(state=tk.DISABLED)
             self.b_add_right_cant.configure(state=tk.NORMAL)
             for element in self.cantR_beam_gui_list:
@@ -311,7 +422,10 @@ class main_window:
 
             bm = self.cantR_beam_inputs[0]
             bm[0].set('CantR')
-            a = tk.Entry(self.bm_info_tab,textvariable=bm[0], width=8)
+            self.beam_labels.append('CantR')
+            self.refesh_span_options()
+
+            a = tk.Entry(self.bm_info_tab,textvariable=bm[0], width=8, state=tk.DISABLED)
             a.grid(row=2,column=11)
             b = tk.Entry(self.bm_info_tab,textvariable=bm[1], width=8)
             b.grid(row=2,column=12)
@@ -330,6 +444,9 @@ class main_window:
             pass
         else:
             self.beam_count -=1
+            self.beam_labels.remove(self.beam_inputs[-1][0].get())
+
+            self.refesh_span_options()
 
             del self.beam_inputs[-1]
             del self.column_up_inputs[-1]
@@ -348,7 +465,7 @@ class main_window:
 
             for i,bm in enumerate(self.beam_inputs):
 
-                a = tk.Entry(self.bm_info_tab,textvariable=bm[0], width=8)
+                a = tk.Entry(self.bm_info_tab,textvariable=bm[0], width=8, state=tk.DISABLED)
                 a.grid(row=i+2,column=1)
                 b = tk.Entry(self.bm_info_tab,textvariable=bm[1], width=8)
                 b.grid(row=i+2,column=2)
@@ -369,7 +486,7 @@ class main_window:
 
             a = tk.Checkbutton(self.colup_info_tab,variable=col[0])
             a.grid(row=i+2,column=1)
-            b = tk.Entry(self.colup_info_tab,textvariable=col[1], width=12)
+            b = tk.Entry(self.colup_info_tab,textvariable=col[1], width=12, state=tk.DISABLED)
             b.grid(row=i+2,column=2)
             c = tk.Entry(self.colup_info_tab,textvariable=col[2], width=8)
             c.grid(row=i+2,column=3)
@@ -394,7 +511,7 @@ class main_window:
 
         for i,col in enumerate(self.column_down_inputs):
 
-            b = tk.Entry(self.coldwn_info_tab,textvariable=col[0], width=12)
+            b = tk.Entry(self.coldwn_info_tab,textvariable=col[0], width=12, state=tk.DISABLED)
             b.grid(row=i+2,column=1)
             c = tk.Entry(self.coldwn_info_tab,textvariable=col[1], width=8)
             c.grid(row=i+2,column=2)
@@ -410,6 +527,45 @@ class main_window:
             h.grid(row=i+2,column=7)
 
             self.column_down_gui_list.extend([b,c,d,e,f,g,h])
+
+    def refesh_span_options(self):
+        self.load_span_selection['menu'].delete(0,'end')
+        for choice in self.beam_labels:
+            self.load_span_selection['menu'].add_command(label=choice, command=tk._setit(self.load_span_select, choice))
+
+    def add_load_gui(self):
+        span = self.load_span_select.get()
+        w1 = float(self.w1_gui.get())
+        w2 = float(self.w2_gui.get())
+        a = float(self.a_gui.get())
+        b = float(self.b_gui.get())
+        type = self.load_type.get()
+        kind = self.load_kind_select.get()
+
+        self.gui_load_list.append([span,w1,w2,a,b,type,kind])
+
+        self.fill_load_listbox()
+
+    def remove_load_gui(self):
+        if len(self.gui_load_list)==0:
+            pass
+        else:
+            del self.gui_load_list[-1]
+            self.fill_load_listbox()
+
+    def fill_load_listbox(self):
+        self.load_listbox.delete(0,tk.END)
+
+        color = "pale green"
+        i=0
+        for x in self.gui_load_list:
+            self.load_listbox.insert(tk.END,'{0},{1:.3f},{2:.3f},{3:.3f},{4:.3f},{5},{6}'.format(x[0],x[1],x[2],x[3],x[4],x[5],x[6]))
+
+            if i % 2 == 0:
+                self.load_listbox.itemconfigure(i, background=color)
+            else:
+                pass
+            i+=1
 
     def update_graph(self):
         pass

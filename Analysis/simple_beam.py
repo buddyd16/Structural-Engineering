@@ -58,7 +58,7 @@ class Master_window:
         self.deltac = zeros(501)
         self.deltar = zeros(501)
 
-        self.f_size = 12
+        self.f_size = 10
         helv = tkFont.Font(family='Helvetica',size=self.f_size, weight='bold')
         helv_res = tkFont.Font(family='Helvetica',size=self.f_size, weight='bold', underline = True)
 

@@ -889,7 +889,6 @@ def moment_distribution(nodes, beams, columns, shortening=0, tolerance=1e-11):
     for beam in beams:
         beam.applied_loads()
         beam.fef()
-        print beam.mi
         bmfef.extend([beam.mi[0],beam.mj[0]])
 
     # Moment Distribution Pass 1 - left to right
@@ -1045,10 +1044,10 @@ I_in4 = 30.8
 E_ksf = E_ksi*144.0 # k/in^2 * 144 in^2 / 1 ft^2 = 144 k/ft^2
 I_ft4 = I_in4 * (1 / 20736.0) # in^4 * 1 ft^4 / 12^4 in^4 = ft^4
 
-bm_load = [[1,0,1,9,10,'UDL'],[1,0.5,2,8,10,'TRAP']]
+bm_load = [[1,0,1,9,10,'UDL']]
 
-cant_left = CantBeam(nodes[0],E_ksf,I_ft4,5,[[1,0,1,4,0,'UDL'],[1,0,1,4,0,'TRAP']],1)
-cant_right = CantBeam(nodes[-1],E_ksf,I_ft4,5,[[1,0,1,4,0,'UDL'],[1,0,1,4,0,'TRAP']],0)
+cant_left = CantBeam(nodes[0],E_ksf,I_ft4,5,[[1,0,1,4,0,'UDL']],1)
+cant_right = CantBeam(nodes[-1],E_ksf,I_ft4,5,[[1,0,1,4,0,'UDL']],0)
 
 beams = beams_all_same(nodes, E_ksf, I_ft4, bm_load)
 
@@ -1072,10 +1071,8 @@ columns=[]
 columns.extend(columns_down)
 columns.extend(columns_up)
 
-
 node_delta = moment_distribution(nodes,beams,columns,Consider_shortening,tolerance)
 
-print sum(beams[0].mi)
 # Build Beam Load Functions
 funcs = []
 delta_func = []
