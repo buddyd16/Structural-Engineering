@@ -22,6 +22,7 @@ Created on Wed Jan 30 14:32:29 2019
 from __future__ import division
 import pin_pin_beam_equations_classes as ppbeam
 #import matplotlib.pyplot as plt
+import time
 
 
 class node:
@@ -83,7 +84,7 @@ class node:
         return node_reaction
 
 class CantBeam:
-    def __init__(self, node, E=1, I=1, Length=1, Loads_list=1, left=1):
+    def __init__(self, node, E=1, I=1, Length=1, Loads_list=1, left=1, label=''):
         '''
         beam element
         Loads = lists of loads in text form
@@ -91,6 +92,7 @@ class CantBeam:
         '''
         self.isleft = left
         self.type = 'cantilever'
+        self.label = label
 
         if self.isleft==1:
             self.i = 'free end'
@@ -299,7 +301,7 @@ class CantBeam:
             return [self.chart_stations, zero_out, zero_out, zero_out, zero_out],end_delta_d
 
 class Beam:
-    def __init__(self, i_node, j_node, E, I, Loads_List):
+    def __init__(self, i_node, j_node, E, I, Loads_List=[], label=''):
 
         '''
         beam element
@@ -314,6 +316,7 @@ class Beam:
         self.Load_List = [load for load in Loads_List]
         self.Length = j_node.x - i_node.x
         self.type = 'span'
+        self.label = label
 
         self.mi = [0]
         self.mj = [0]
@@ -334,7 +337,7 @@ class Beam:
         self.loads_built = 0
         
     def new_load_list(self, load_list):
-        del self.Load_list[:]
+        del self.Load_List[:]
         self.Load_List = [load for load in load_list]
 
     def applied_loads(self):
@@ -343,11 +346,11 @@ class Beam:
         self.extra_station = []
 
         for load in self.Load_List:
-            w1 = float(load[0])
-            w2 = float(load[1])
-            a = float(load[2])
-            b = float(load[3])
-            load_type = load[-1]
+            w1 = float(load[1])
+            w2 = float(load[2])
+            a = float(load[3])
+            b = float(load[4])
+            load_type = load[-2]
             lc = self.Length
 
             #['Point','Moment','UDL','TRAP','END_DELTA']
@@ -505,7 +508,7 @@ class Beam:
 
 
 class Column_Up:
-    def __init__(self, i_node, height=1, E=1, I=1,A=1,support='fix', hinge_near=0):
+    def __init__(self, i_node, height=1, E=1, I=1,A=1,support=1, hinge_near=0):
         '''
         upper column element
         I is about axis aligned with beams
@@ -520,7 +523,7 @@ class Column_Up:
         self.Length = height # Use Length to make loop plotting easier
         self.type = 'UP'
 
-        if support == 'fix':
+        if support == 1:
             self.fix = 1
         else:
             self.fix = 0
@@ -625,7 +628,7 @@ class Column_Up:
         
 
 class Column_Down:
-    def __init__(self, j_node, height=1, E=1, I=1, A=1, support='fix', hinge_near=0):
+    def __init__(self, j_node, height=1, E=1, I=1, A=1, support=1, hinge_near=0):
         '''
         lower column element
         I is about axis aligned with beams
@@ -640,7 +643,7 @@ class Column_Down:
         self.Length = height # Use Length to make loop plotting easier
         self.type = 'DOWN'
 
-        if support == 'fix':
+        if support == 1:
             self.fix = 1
         else:
             self.fix = 0
@@ -847,7 +850,7 @@ def moment_distribution_cycle(nodes, beams, columns, tolerance=1e-11):
 
     return check
 
-def moment_distribution(nodes, beams, columns, shortening=0, tolerance=1e-11):
+def member_distribution_factors(nodes, beams, columns):
     # Sum of EI/L for members at each Node
     for node in nodes:
         node.sum_node_k(beams,columns)
@@ -883,7 +886,8 @@ def moment_distribution(nodes, beams, columns, shortening=0, tolerance=1e-11):
 
             else:
                 pass
-
+ 
+def beam_fef(beams):
     # Beam Fixed End Forces
     bmfef = []
     for beam in beams:
@@ -891,11 +895,15 @@ def moment_distribution(nodes, beams, columns, shortening=0, tolerance=1e-11):
         beam.fef()
         bmfef.extend([beam.mi[0],beam.mj[0]])
 
+          
+def moment_distribution(nodes, beams, columns, shortening=0, tolerance=1e-11):
+    member_distribution_factors(nodes, beams, columns)
+    
+    beam_fef(beams)
     # Moment Distribution Pass 1 - left to right
     moment_distribution_cycle(nodes, beams, columns, tolerance)
 
     # Moment Distrubution multiple passes
-
     count = 0
     count_max = 100
     n_previous = []
@@ -945,7 +953,7 @@ def moment_distribution(nodes, beams, columns, shortening=0, tolerance=1e-11):
         i=0
         for beam in beams:
             if beam.type == 'span':
-                load = [node_delta[i],node_delta[i+1],0,10,'END_DELTA']
+                load = ['',node_delta[i],node_delta[i+1],0,10,'END_DELTA']
                 delta_load.append(load)
                 beam.Load_List.append(load)
             else:
@@ -1019,108 +1027,140 @@ def moment_distribution(nodes, beams, columns, shortening=0, tolerance=1e-11):
     return node_delta
 
 
-tolerance = 1e-11
+# tolerance = 1e-6
 
-n1 = node(0)
-n2 = node(10)
-n3 = node(20)
-n4 = node(30)
-n5 = node(40)
-n6 = node(50)
-n7 = node(60)
-n8 = node(70)
-n9 = node(80)
-n10 = node(90)
-n11 = node(100)
+# n1 = node(0)
+# n2 = node(10)
+# n3 = node(20)
+# n4 = node(30)
+# n5 = node(40)
+# n6 = node(50)
+# n7 = node(60)
+# n8 = node(70)
+# n9 = node(80)
+# n10 = node(90)
+# n11 = node(100)
 
-nodes = [n1,n2,n3,n4,n5]
 
-A_in2 = 2.96
-A_ft2 = A_in2/144.0
+# nodes = [n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11]
 
-E_ksi = 29000.0
-I_in4 = 30.8
+# start = time.time()
 
-E_ksf = E_ksi*144.0 # k/in^2 * 144 in^2 / 1 ft^2 = 144 k/ft^2
-I_ft4 = I_in4 * (1 / 20736.0) # in^4 * 1 ft^4 / 12^4 in^4 = ft^4
+# time_count = 0
 
-bm_load = [[1,0,1,9,10,'UDL']]
+# A_in2 = 2.96
+# A_ft2 = A_in2/144.0
 
-cant_left = CantBeam(nodes[0],E_ksf,I_ft4,5,[[1,0,1,4,0,'UDL']],1)
-cant_right = CantBeam(nodes[-1],E_ksf,I_ft4,5,[[1,0,1,4,0,'UDL']],0)
+# E_ksi = 29000.0
+# I_in4 = 30.8
 
-beams = beams_all_same(nodes, E_ksf, I_ft4, bm_load)
+# E_ksf = E_ksi*144.0 # k/in^2 * 144 in^2 / 1 ft^2 = 144 k/ft^2
+# I_ft4 = I_in4 * (1 / 20736.0) # in^4 * 1 ft^4 / 12^4 in^4 = ft^4
 
-beams.append(cant_left)
-beams.append(cant_right)
 
-cantilevers = [bm for bm in beams if bm.type=='cantilever']
+# bm_load = ([[1,0,1,0,10,'Point'],[1,0,2,0,10,'Point'],[1,0,3,0,10,'Point'],
+            # [1,0,4,0,10,'Point'],[1,0,5,0,10,'Point'],[1,0,6,0,10,'Point'],
+            # [1,0,7,0,10,'Point'],[1,0,8,0,10,'Point'],[1,0,9,0,10,'Point'],
+            # [1,0,1,9,10,'UDL'],[1,0,2,8,'UDL'],
+            # [1,0.5,3,7,'TRAP'],[0.5,1,3,7,'TRAP']])
 
-Consider_shortening = 1
-support = 'fix'
-support_dwn = 'fix'
-up_hinge = 0
-down_hinge = 0
-col_height = 10
 
-columns_down = col_dwn_same(nodes, E_ksf, I_ft4, A_ft2, col_height, support_dwn, down_hinge)
+# #bm_load = []
 
-columns_up = col_up_same(nodes, E_ksf, I_ft4, A_ft2, col_height, support, up_hinge)
+# cant_left = CantBeam(nodes[0],E_ksf,I_ft4,5,[[3,0,0,5,0,'UDL']],1)
+# cant_right = CantBeam(nodes[-1],E_ksf,I_ft4,5,[[3,0,0,5,0,'UDL']],0)
 
-columns=[]
-columns.extend(columns_down)
-columns.extend(columns_up)
+# beams = beams_all_same(nodes, E_ksf, I_ft4, bm_load)
 
-node_delta = moment_distribution(nodes,beams,columns,Consider_shortening,tolerance)
+# beams.append(cant_left)
+# beams.append(cant_right)
+
+# cantilevers = [bm for bm in beams if bm.type=='cantilever']
+
+# Consider_shortening = 1
+# support = 1
+# support_dwn = 1
+# up_hinge = 0
+# down_hinge = 0
+# col_height = 10
+
+# columns_down = col_dwn_same(nodes, E_ksf, I_ft4, A_ft2, col_height, support_dwn, down_hinge)
+
+# columns_up = col_up_same(nodes, E_ksf, I_ft4, A_ft2, col_height, support, up_hinge)
+
+# columns=[]
+# columns.extend(columns_down)
+# columns.extend(columns_up)
+
+# member_distribution_factors(nodes,beams,columns)
+
+# beam_fef(beams)
+
+# node_delta = moment_distribution(nodes,beams,columns,Consider_shortening,tolerance)
 
 # Build Beam Load Functions
-funcs = []
-delta_func = []
-for beam in beams:
-    beam.build_load_function()
-    funcs.append(beam.equation_strings)
+# funcs = []
+# delta_func = []
+# for beam in beams:
+    # beam.build_load_function()
+    # funcs.append(beam.equation_strings)
 
-    if Consider_shortening == 1 and beam.type=='span':
-        delta_func.append(beam.equations_delta)
-    else:
-        pass
+    # if Consider_shortening == 1 and beam.type=='span':
+        # delta_func.append(beam.equations_delta)
+    # else:
+        # pass
 
 # Beam Max/Min Moments and EIDeltas
 # and Beam charting values
-final_end_moments_bms = []
-moments = []
-EIdeltas = []
-beam_charts = []
-for beam in beams:
-    final_end_moments_bms.extend([sum(beam.mi),sum(beam.mj)])
-    if beam.type == 'span':
-        moments.append(beam.max_min_moment())
-        EIdeltas.append(beam.max_min_eidelta())
+# final_end_moments_bms = []
+# moments = []
+# EIdeltas = []
+# beam_charts = []
+# for beam in beams:
+    # final_end_moments_bms.extend([sum(beam.mi),sum(beam.mj)])
+    # if beam.type == 'span':
+        # moments.append(beam.max_min_moment())
+        # EIdeltas.append(beam.max_min_eidelta())
+    
+    # if beam.type=='cantilever' and beam.isleft == 1:
+        # start_slope = beam_charts[0][0][3][0]/(beams[0].E*beams[0].I)
+        
+        # beam.add_starting_slope(start_slope)
+        # beam.build_load_function()
+    
+    # elif beam.type=='cantilever' and beam.isleft == 0: 
+        # start_slope = beams[-3].station_values()[0][3][-1]/(beams[-1].E*beams[-1].I)
+        # beam.add_starting_slope(start_slope) 
+        # beam.build_load_function()
 
-    beam_charts.append(beam.station_values())
+    # beam_charts.append(beam.station_values())
 
 # Column Load Function - only loads on columns = end moments
-if Consider_shortening == 1:
-    i=0
-    for column in columns_down:
-        h = column.Length+node_delta[i]
-        column.new_height(h)
-        i+=1
+# if Consider_shortening == 1:
+    # i=0
+    # for column in columns_down:
+        # h = column.Length+node_delta[i]
+        # column.new_height(h)
+        # i+=1
         
-final_end_moments_cols = []
-col_funcs = []
-for column in columns:
-    final_end_moments_cols.extend([sum(column.mi),sum(column.mj)])
-    column.build_load_function()
-    col_funcs.append(column.equation_strings)
+# final_end_moments_cols = []
+# col_funcs = []
+# for column in columns:
+    # final_end_moments_cols.extend([sum(column.mi),sum(column.mj)])
+    # column.build_load_function()
+    # col_funcs.append(column.equation_strings)
 
 # Column - Charts
-column_charts = []
-for column in columns:
-    column_charts.append(column.station_values())
+# column_charts = []
+# for column in columns:
+    # column_charts.append(column.station_values())
 
 
-# Beam plots - will show one at a time
+# end = time.time()
+# t = end-start
+# print t
+
+#Beam plots - will show one at a time
 #i = 1
 #for chart in beam_charts:
 #    plt.close('all')

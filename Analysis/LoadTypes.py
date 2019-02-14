@@ -23,6 +23,39 @@ Created on Wed Feb  6 20:20:20 2019
 from __future__ import division
 import math
 
+def load_patterns_by_span_ACI(n):
+    pat1 = [1 for i in range(1,n+1)]
+    pat2 = [1 if i % 2 == 0 else 0 for i in range(1,n+1)]
+    pat3 = [0 if i % 2 == 0 else 1 for i in range(1,n+1)]
+    
+    count = 0
+    pat4 = []
+    pat5 = []
+    pat6 = []
+    for i in range(1,n+1):
+        
+        if count<=1:
+            if count == 0:
+                pat4.append(1)
+                pat5.append(0)
+                pat6.append(1)
+            else:
+                pat4.append(1)
+                pat5.append(1)
+                pat6.append(0)
+            count+=1
+        else:
+            pat4.append(0)
+            pat5.append(1)
+            pat6.append(1)
+            count=0
+    
+    patterns = [pat1,pat2,pat3,pat4,pat5,pat6]
+    
+    patterns_trans = map(list, zip(*patterns))
+    
+    return patterns_trans
+
 class LoadType:
     def __init__(self, pattern=False, off_pattern_factor=0, title='Dead',symbol='DL'):
         '''
@@ -31,10 +64,11 @@ class LoadType:
         
         NOTE: unless a function notes otherwise everything expects to
         be a getting list in the form of:
-            [w1,w2,a,b,L,'Load Type'] or
-            [w1,w2,a,b,L,L,'Load Type'] in the case of a load on a cantilever
+            [w1,w2,a,b,L,span #,'Load Type'] or
+            [w1,w2,a,b,L,L,span #,'Load Type'] in the case of a load on a cantilever
             
             'Load Type' should always be the last item
+            'Span #' should always be the second to last item
             
         '''
         
@@ -69,16 +103,18 @@ class LoadType:
     def factor_loads(self,factor,on=1):
         factored_loads = []
         
-        if on == 1:
+        if self.pattern==False:
+            load_factor = factor
+        elif on == 1:
             load_factor = factor
         else:
             load_factor = factor*self.off_pattern_factor
-            
+
         for load in self.load_list:
             w1 = load[0]
             w2 = load[1]
             
-            if w1 ==0 and w2==0:
+            if w1*load_factor ==0 and w2*load_factor==0:
                 pass
             
             else:
@@ -148,9 +184,35 @@ class LoadType:
         
         return factored_patterned
                 
+
+def load_combination(load_types, factors, patterns):
+    
+    load_set = []
+    
+    for pattern in patterns:
+        pat_set = []
+        for i,load in enumerate(load_types):
+            pat_set.extend(load.factor_loads(factors[i], pattern))
+        load_set.append(pat_set)
+           
+    return load_set
+
+def load_combination_multi(load_types, factors, patterns):
+    
+    load_set = []
+    for j, factor in enumerate(factors):
+        for pattern in patterns[j]:
+            pat_set = []
+            for i,load in enumerate(load_types):
+                pat_set.extend(load.factor_loads(factor[i], pattern))
+            load_set.append(pat_set)
+           
+    return load_set
+    
             
-Dead = LoadType()
+Dead = LoadType(False,1,'Dead','DL')
 Live = LoadType(True,0,'Live','LL')
+
 
 Dead.add_single_load([1,0,0,10,10,10,'UDL'])
 Dead.add_multi_loads([[1,0,5,10,10,10,'PL'],[1,0,0,10,10,10,'TRAP']])
@@ -167,5 +229,8 @@ lfL = [0,1.6,0.5*1.6]
 test_pattern = Live.multi_pattern_and_factor(lfL,pattern)
 test_dead_pattern = Dead.multi_pattern_and_factor(lfD,pattern)
 
+combo = load_combination([Dead,Live],[1.2,1.6],pattern)
+combos = load_combination_multi([Dead,Live],[[1.4,0],[1.2,1.6]],[[1],pattern])
 
+pats = load_patterns_by_span_ACI(20)
 
