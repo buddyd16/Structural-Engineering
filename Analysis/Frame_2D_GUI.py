@@ -754,13 +754,6 @@ class main_window:
 
                 self.columns_analysis.append(column_up)
 
-        print len(self.nodes_analysis)
-        print len(self.beams_analysis)
-        print len(self.columns_analysis)
-
-        print self.max_h_dwn_graph
-        print self.max_h_up_graph
-
         self.frame_built = 1
         self.frame_solved = 0
 
@@ -800,6 +793,22 @@ class main_window:
                 pass
             else:
 
+                if self.show_v.get()==1:
+                    v_scale = 10
+                    for beam in self.beams_analysis:
+                        for i in range(1,len(beam.chart_stations)):
+                            x1 = (beam.chart_stations[i-1]+beam.i.x)*scale + spacer
+                            x2 = (beam.chart_stations[i]+beam.i.x)*scale + spacer
+                            y1 = hg - (beam.station_values()[0][1][i-1] * v_scale)
+                            y2 = hg - (beam.station_values()[0][1][i] * v_scale)
+
+                            self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="red", width=2)
+
+                        string = 'Vi: {0:.2f} kips\nVj: {1:.2f} kips'.format(beam.station_values()[0][1][0],beam.station_values()[0][1][-1])
+                        x0 =  (((beam.i.x+beam.j.x)/2)*scale) + spacer
+
+                        self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f, text=string, fill='red')
+
                 if self.show_m.get()==1:
                     if self.show_m_tension.get() == 1:
                         m_scale = 50 / (max(self.max_m,abs(self.min_m),1))* -1
@@ -807,6 +816,7 @@ class main_window:
                         m_scale = 50 / (max(self.max_m,abs(self.min_m),1))
 
                     for beam in self.beams_analysis:
+                        string_max = ''
                         for i in range(1,len(beam.chart_stations)):
                             x1 = (beam.chart_stations[i-1]+beam.i.x)*scale + spacer
                             x2 = (beam.chart_stations[i]+beam.i.x)*scale + spacer
@@ -815,22 +825,14 @@ class main_window:
 
                             self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="green", width=2)
 
-                            if beam.station_values()[0][2][i] == max(beam.station_values()[0][2]) and beam.station_values()[0][2][i] != beam.station_values()[0][2][-1]:
-                                m = beam.station_values()[0][2][i]
-                                if m_scale<0:
-                                    self.g_plan_canvas.create_text(x2, y2+10, anchor=tk.N,font=self.mono_f, text= 'M: {0:.2f} ft-kips'.format(m), fill='green')
-                                else:
-                                    self.g_plan_canvas.create_text(x2, y2-10, anchor=tk.S,font=self.mono_f, text= 'M: {0:.2f} ft-kips'.format(m), fill='green')
 
-                            if beam.station_values()[0][2][i-1] == beam.station_values()[0][2][0]:
-                                m = beam.station_values()[0][2][i-1]
-                                string = 'M: {0:.2f} ft-kips'.format(m)
-                                self.g_plan_canvas.create_text(x2, hg-5, anchor=tk.SW,font=self.mono_f, text=string, fill='green')
+                            if beam.station_values()[0][2][i] == max(beam.station_values()[0][2]) and  beam.station_values()[0][2][i] != beam.station_values()[0][2][-1]:
+                                string_max = '\nM,max {0:.2f} ft-kips @ {1:.2f} ft'.format(beam.station_values()[0][2][i],beam.chart_stations[i])
 
-                            if beam.station_values()[0][2][i] == beam.station_values()[0][2][-1]:
-                                m = beam.station_values()[0][2][i]
-                                string = 'M: {0:.2f} ft-kips'.format(m)
-                                self.g_plan_canvas.create_text(x1, hg+5, anchor=tk.NE,font=self.mono_f, text=string, fill='green')
+                        x0 =  (((beam.i.x+beam.j.x)/2)*scale) + spacer
+                        string = 'Mi {0:.2f} ft-kips\nMj {1:.2f} ft-kips'.format(beam.station_values()[0][2][0],beam.station_values()[0][2][-1])
+                        self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f, text=string+string_max, fill='green')
+
 
             for col in self.columns_analysis:
                 if col.type ==  'UP':
@@ -847,6 +849,28 @@ class main_window:
                 if self.frame_solved == 0:
                     pass
                 else:
+                    if self.show_v.get()==1:
+                        for i in range(1,len(col.chart_stations)):
+                            if col.type == 'UP':
+                                y1 = h1 - (col.chart_stations[i-1]*scale)
+                                y2 = h1 - (col.chart_stations[i]*scale)
+                            else:
+                                y1 = h2 - (col.chart_stations[i-1]*scale)
+                                y2 = h2 - (col.chart_stations[i]*scale)
+                            x1 = x + (col.station_values()[1][i-1] * v_scale)
+                            x2 = x + (col.station_values()[1][i] * v_scale)
+
+                            self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="red", width=1)
+
+                        vb = col.station_values()[1][0]
+                        vt = col.station_values()[1][-1]
+                        string = 'Vi: {0:.2f} kips\nVj: {1:.2f} kips'.format(vb,vt)
+
+                        if col.type == 'UP':
+                            self.g_plan_canvas.create_text(x, h1 - (col.Length*scale), anchor=tk.S,font=self.mono_f, text=string, fill='red')
+                        else:
+                            self.g_plan_canvas.create_text(x, h1 + (col.Length*scale), anchor=tk.N,font=self.mono_f, text=string, fill='red')
+
                     if self.show_m.get()==1:
                         for i in range(1,len(col.chart_stations)):
                             if col.type == 'UP':
@@ -859,6 +883,15 @@ class main_window:
                             x2 = x + (col.station_values()[2][i] * m_scale)
 
                             self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="green", width=1)
+
+                        mb = col.station_values()[2][0]
+                        mt = col.station_values()[2][-1]
+                        string = 'Mi: {0:.2f} ft-kips\nMj: {1:.2f} ft-kips'.format(mb,mt)
+
+                        if col.type == 'UP':
+                            self.g_plan_canvas.create_text(x, h1 - (col.Length*scale), anchor=tk.S,font=self.mono_f, text=string, fill='green')
+                        else:
+                            self.g_plan_canvas.create_text(x, h1 + (col.Length*scale), anchor=tk.N,font=self.mono_f, text=string, fill='green')
 
     def frame_analysis_gui(self, *event):
         sorted_load_list = []
