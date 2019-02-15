@@ -75,7 +75,7 @@ class main_window:
         self.helv = tkFont.Font(family=' Courier New',size=self.f_size, weight='bold')
         self.helv_norm = tkFont.Font(family=' Courier New',size=self.f_size)
         self.helv_res = tkFont.Font(family=' Courier New',size=self.f_size, weight='bold', underline = True)
-        self.mono_f = tkFont.Font(family='Consolas',size=self.f_size)
+        self.mono_f = tkFont.Font(family='Consolas',size=8)
 
         # Menubar
         self.menubar = tk.Menu(self.master)
@@ -274,13 +274,20 @@ class main_window:
 
         self.loads_list_bframe = tk.Frame(self.g_applied_loads_frame, pady=5)
         self.b_add_load = tk.Button(self.loads_list_bframe, text="Add Load",command=self.add_load_gui, font=self.helv, width=12, height=h)
-        self.b_add_load.grid(row=1,column=1, columnspan=1)
+        self.b_add_load.grid(row=1,column=1)
 
         self.b_change_load = tk.Button(self.loads_list_bframe, text="Edit Load",command=self.change_load_gui, font=self.helv, width=12, height=h, state=tk.DISABLED, bg='gray75')
-        self.b_change_load.grid(row=2,column=1, columnspan=1)
+        self.b_change_load.grid(row=2,column=1)
 
         self.b_remove_load = tk.Button(self.loads_list_bframe, text="Del Load",command=self.remove_load_gui, font=self.helv, width=12, height=h, state=tk.DISABLED, bg='gray75')
-        self.b_remove_load.grid(row=3,column=1, columnspan=1)
+        self.b_remove_load.grid(row=3,column=1)
+        
+        self.b_add_all_load = tk.Button(self.loads_list_bframe, text='Add to All', command=self.add_load_to_all_gui, font=self.helv, width=12, height=h)
+        self.b_add_all_load.grid(row=4,column=1)
+        
+        self.b_remove_all_loads = tk.Button(self.loads_list_bframe, text='*Del All*', command=self.remove_all_loads_gui, font=self.helv, width=12, height=h, bg='red3')
+        self.b_remove_all_loads.grid(row=5,column=1)
+        
         self.loads_list_bframe.grid(row=3, column=1, sticky=tk.N)
 
         self.loads_list_frame = tk.Frame(self.g_applied_loads_frame, pady=5)
@@ -316,22 +323,22 @@ class main_window:
 
         self.show_l = tk.IntVar()
         self.show_l.set(1)
-        tk.Checkbutton(self.graph_b_frame, text=' : Show Loads', variable=self.show_l, font=self.helv).grid(row=1, column=1, sticky = tk.W)
+        tk.Checkbutton(self.graph_b_frame, text=' : Show Loads', variable=self.show_l, command=self.build_frame_graph,font=self.helv).grid(row=1, column=1, sticky = tk.W)
         self.show_v = tk.IntVar()
-        tk.Checkbutton(self.graph_b_frame, text=' : Show V', variable=self.show_v, font=self.helv).grid(row=2, column=1, sticky = tk.W)
+        tk.Checkbutton(self.graph_b_frame, text=' : Show V', variable=self.show_v, command=self.build_frame_graph, font=self.helv).grid(row=2, column=1, sticky = tk.W)
         self.show_m = tk.IntVar()
-        tk.Checkbutton(self.graph_b_frame, text=' : Show M', variable=self.show_m, font=self.helv).grid(row=3, column=1, sticky = tk.W)
+        tk.Checkbutton(self.graph_b_frame, text=' : Show M', variable=self.show_m, command=self.build_frame_graph, font=self.helv).grid(row=3, column=1, sticky = tk.W)
         self.show_s = tk.IntVar()
-        tk.Checkbutton(self.graph_b_frame, text=' : Show S', variable=self.show_s, font=self.helv).grid(row=4, column=1, sticky = tk.W)
+        tk.Checkbutton(self.graph_b_frame, text=' : Show S', variable=self.show_s, command=self.build_frame_graph, font=self.helv).grid(row=4, column=1, sticky = tk.W)
         self.show_d = tk.IntVar()
-        tk.Checkbutton(self.graph_b_frame, text=' : Show D', variable=self.show_d, font=self.helv).grid(row=5, column=1, sticky = tk.W)
+        tk.Checkbutton(self.graph_b_frame, text=' : Show D', variable=self.show_d, command=self.build_frame_graph, font=self.helv).grid(row=5, column=1, sticky = tk.W)
         self.show_r = tk.IntVar()
-        tk.Checkbutton(self.graph_b_frame, text=' : Show Reactions', variable=self.show_r, font=self.helv).grid(row=6, column=1, sticky = tk.W)
+        tk.Checkbutton(self.graph_b_frame, text=' : Show Reactions', variable=self.show_r, command=self.build_frame_graph, font=self.helv).grid(row=6, column=1, sticky = tk.W)
         self.show_stations = tk.IntVar()
-        tk.Checkbutton(self.graph_b_frame, text=' : Show Stations', variable=self.show_stations, font=self.helv).grid(row=7, column=1, sticky = tk.W)
+        tk.Checkbutton(self.graph_b_frame, text=' : Show Stations', variable=self.show_stations, command=self.build_frame_graph, font=self.helv).grid(row=7, column=1, sticky = tk.W)
         self.show_m_tension = tk.IntVar()
         self.show_m_tension.set(1)
-        tk.Checkbutton(self.graph_b_frame, text=' : Show M on\ntension face', variable=self.show_m_tension, font=self.helv).grid(row=8, column=1, sticky = tk.W)
+        tk.Checkbutton(self.graph_b_frame, text=' : Show M on\ntension face', variable=self.show_m_tension, command=self.build_frame_graph, font=self.helv).grid(row=8, column=1, sticky = tk.W)
 
         self.refresh_graphic = tk.Button(self.graph_b_frame, text="Refresh",command=self.build_frame_graph, font=self.helv, width=10, height=h)
         self.refresh_graphic.grid(row=9, column=1)
@@ -641,6 +648,8 @@ class main_window:
         kind = self.load_kind_select.get()
 
         self.gui_load_list.append([span,w1,w2,a,b,type,kind])
+        self.b_change_load.configure(state=tk.DISABLED, bg='gray75')
+        self.b_remove_load.configure(state=tk.DISABLED, bg='gray75')
 
         self.fill_load_listbox()
 
@@ -659,6 +668,35 @@ class main_window:
         self.b_remove_load.configure(state=tk.DISABLED, bg='gray75')
         self.add_load_gui()
 
+    def add_load_to_all_gui(self,*event):
+    
+        w1 = float(self.w1_gui.get())
+        w2 = float(self.w2_gui.get())
+        a = float(self.a_gui.get())
+        b = float(self.b_gui.get())
+        type = self.load_type.get()
+        kind = self.load_kind_select.get()
+            
+        for beam_gui in self.beam_inputs:
+
+            span = beam_gui[0].get()
+            b_max = float(beam_gui[1].get())
+            
+            b_use = min(b,b_max)
+            
+            self.gui_load_list.append([span,w1,w2,a,b_use,type,kind])
+            
+        self.fill_load_listbox()
+
+    def remove_all_loads_gui(self,*event):
+        if len(self.gui_load_list)==0:
+            pass
+        else:
+            del self.gui_load_list[:]
+            self.b_change_load.configure(state=tk.DISABLED, bg='gray75')
+            self.b_remove_load.configure(state=tk.DISABLED, bg='gray75')
+            self.fill_load_listbox()
+            
     def load_listbox_click(self,*event):
         if self.load_listbox.size()==0:
             pass
@@ -771,7 +809,7 @@ class main_window:
             h = self.g_plan_canvas.winfo_height()
             hg = (h/2.0)
 
-            spacer= 50
+            spacer= 30
 
             total_length = self.nodes_analysis[-1].x
 
@@ -833,7 +871,8 @@ class main_window:
                         string = 'Mi {0:.2f} ft-kips\nMj {1:.2f} ft-kips'.format(beam.station_values()[0][2][0],beam.station_values()[0][2][-1])
                         self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f, text=string+string_max, fill='green')
 
-
+            
+            count = 0
             for col in self.columns_analysis:
                 if col.type ==  'UP':
                     x = (col.i.x * scale) + spacer
@@ -857,8 +896,8 @@ class main_window:
                             else:
                                 y1 = h2 - (col.chart_stations[i-1]*scale)
                                 y2 = h2 - (col.chart_stations[i]*scale)
-                            x1 = x + (col.station_values()[1][i-1] * v_scale)
-                            x2 = x + (col.station_values()[1][i] * v_scale)
+                            x1 = x - (col.station_values()[1][i-1] * v_scale)
+                            x2 = x - (col.station_values()[1][i] * v_scale)
 
                             self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="red", width=1)
 
@@ -867,9 +906,15 @@ class main_window:
                         string = 'Vi: {0:.2f} kips\nVj: {1:.2f} kips'.format(vb,vt)
 
                         if col.type == 'UP':
-                            self.g_plan_canvas.create_text(x, h1 - (col.Length*scale), anchor=tk.S,font=self.mono_f, text=string, fill='red')
+                            if count == 0:
+                                self.g_plan_canvas.create_text(x, h1 - (col.Length*scale), anchor=tk.SW,font=self.mono_f, text=string, fill='red')
+                            else:
+                                self.g_plan_canvas.create_text(x, h1 - (col.Length*scale), anchor=tk.S,font=self.mono_f, text=string, fill='red')
                         else:
-                            self.g_plan_canvas.create_text(x, h1 + (col.Length*scale), anchor=tk.N,font=self.mono_f, text=string, fill='red')
+                            if count == 0:
+                                self.g_plan_canvas.create_text(x, h1 + (col.Length*scale), anchor=tk.NW,font=self.mono_f, text=string, fill='red')
+                            else:
+                                self.g_plan_canvas.create_text(x, h1 + (col.Length*scale), anchor=tk.N,font=self.mono_f, text=string, fill='red')
 
                     if self.show_m.get()==1:
                         for i in range(1,len(col.chart_stations)):
@@ -879,19 +924,26 @@ class main_window:
                             else:
                                 y1 = h2 - (col.chart_stations[i-1]*scale)
                                 y2 = h2 - (col.chart_stations[i]*scale)
-                            x1 = x + (col.station_values()[2][i-1] * m_scale)
-                            x2 = x + (col.station_values()[2][i] * m_scale)
+                            x1 = x - (col.station_values()[2][i-1] * m_scale)
+                            x2 = x - (col.station_values()[2][i] * m_scale)
 
                             self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="green", width=1)
 
                         mb = col.station_values()[2][0]
                         mt = col.station_values()[2][-1]
                         string = 'Mi: {0:.2f} ft-kips\nMj: {1:.2f} ft-kips'.format(mb,mt)
-
+                        
                         if col.type == 'UP':
-                            self.g_plan_canvas.create_text(x, h1 - (col.Length*scale), anchor=tk.S,font=self.mono_f, text=string, fill='green')
+                            if count == 0:
+                                self.g_plan_canvas.create_text(x, h1 - (col.Length*scale), anchor=tk.SW,font=self.mono_f, text=string, fill='green')
+                            else:
+                                self.g_plan_canvas.create_text(x, h1 - (col.Length*scale), anchor=tk.S,font=self.mono_f, text=string, fill='green')
                         else:
-                            self.g_plan_canvas.create_text(x, h1 + (col.Length*scale), anchor=tk.N,font=self.mono_f, text=string, fill='green')
+                            if count == 0:
+                                self.g_plan_canvas.create_text(x, h1 + (col.Length*scale), anchor=tk.NW,font=self.mono_f, text=string, fill='green')
+                            else:
+                                self.g_plan_canvas.create_text(x, h1 + (col.Length*scale), anchor=tk.N,font=self.mono_f, text=string, fill='green')
+                    count +=1
 
     def frame_analysis_gui(self, *event):
         sorted_load_list = []
@@ -912,9 +964,9 @@ class main_window:
         for i,beam in enumerate(self.beams_analysis):
             beam.new_load_list(sorted_load_list[i])
 
-        Consider_shortening = 0
+        Consider_shortening = 1
 
-        frame2d.moment_distribution(self.nodes_analysis,self.beams_analysis,self.columns_analysis,1,1e-5)
+        frame2d.moment_distribution(self.nodes_analysis,self.beams_analysis,self.columns_analysis,Consider_shortening,1e-5)
 
         for beam in self.beams_analysis:
             beam.build_load_function()
