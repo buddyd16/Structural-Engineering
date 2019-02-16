@@ -513,22 +513,19 @@ class Master_window:
                 loads_sf = (hg - 10) / max(max(self.loads_scale), abs(min(self.loads_scale)))
 
                 for load in self.loads_left:
-                    x = load.x_graph
-                    y = load.y_graph
+                    x,y = load.chart_load(sf,loads_sf,1)
                     for i in range(1,len(x)):
-                        self.bm_canvas.create_line((x[i-1]* sf)+initial,hg - (y[i-1] * loads_sf),(x[i]* sf)+initial,hg - (y[i] * loads_sf), fill = "blue", width=2)
+                        self.bm_canvas.create_line((x[i-1])+initial,hg - (y[i-1]),(x[i])+initial,hg - (y[i]), fill = "blue", width=2)
 
                 for load in self.loads_center:
-                    x = load.x_graph
-                    y = load.y_graph
+                    x,y = load.chart_load(sf,loads_sf,1)
                     for i in range(1,len(x)):
-                        self.bm_canvas.create_line(((x[i-1] + ll)* sf)+initial,hg - (y[i-1] * loads_sf),((x[i]+ll)* sf)+initial,hg - (y[i] * loads_sf), fill = "blue", width=2)
+                        self.bm_canvas.create_line(((x[i-1] + (ll*sf)))+initial,hg - (y[i-1]),(x[i]+(ll* sf))+initial,hg - (y[i]), fill = "blue", width=2)
 
                 for load in self.loads_right:
-                    x = load.x_graph
-                    y = load.y_graph
+                    x,y = load.chart_load(sf,loads_sf,1)
                     for i in range(1,len(x)):
-                        self.bm_canvas.create_line(((x[i-1]+ll+lc)* sf)+initial,hg - (y[i-1] * loads_sf),((x[i]+ll+lc)* sf)+initial,hg - (y[i] * loads_sf), fill = "blue", width=2)
+                        self.bm_canvas.create_line((x[i-1]+((ll+lc)* sf))+initial,hg - (y[i-1]),(x[i]+((ll+lc)* sf))+initial,hg - (y[i]), fill = "blue", width=2)
 
             if self.has_run == 1:
                 xl = self.xsl

@@ -448,13 +448,13 @@ class point_moment:
             arrow_minus= (arrow_height*math.tan(math.radians(30)))
 
             if self.ma <0:
-                x = [self.a*x_scale,self.a*x_scale,self.a*x_scale]
-                y = [r*y_scale,0,-r*y_scale]
+                x = [self.a,self.a,self.a]
+                y = [r,0,-r]
                 xi=0
                 yi=0
                 for a in range(-90, 181):
-                    xi = (self.a*x_scale)+((r*math.cos(math.radians(a)))*x_scale)
-                    yi = 0+((r*math.sin(math.radians(a)))*y_scale)
+                    xi = (self.a)+((r*math.cos(math.radians(a))))
+                    yi = 0+((r*math.sin(math.radians(a))))
                     x.append(xi)
                     y.append(yi)
 
@@ -466,43 +466,39 @@ class point_moment:
                 y.append(yi+arrow_height)
             else:
                 x = [self.a-r,self.a,self.a+r, self.a+r-arrow_minus,self.a+r,self.a+r+arrow_minus,self.a+r]
-                x = [i*x_scale for i in x]
                 y = [0,0,0,arrow_height,0,arrow_height,0]
-                y = [j*y_scale for j in y]
 
                 xi=0
                 yi=0
                 for a in range(0,271):
                     xi = self.a+(r*math.cos(math.radians(a)))
                     yi = 0+(r*math.sin(math.radians(a)))
-                    x.append(xi*x_scale)
-                    y.append(yi*y_scale)
+                    x.append(xi)
+                    y.append(yi)
         else:
             if self.ma <0:
                 x = [self.a,self.a,self.a]
-                x = [i*x_scale for i in x]
                 y = [r,0,-r]
-                y = [j*y_scale for j in y]
                 xi=0
                 yi=0
                 for a in range(-90, 181):
                     xi = self.a+(r*math.cos(math.radians(a)))
                     yi = 0+(r*math.sin(math.radians(a)))
-                    x.append(xi*x_scale)
-                    y.append(yi*y_scale)
-
+                    x.append(xi)
+                    y.append(yi)
             else:
                 x = [self.a-r,self.a,self.a+r]
-                x = [i*x_scale for i in x]
                 y = [0,r,0]
-                y = [j*y_scale for j in y]
                 xi=0
                 yi=0
                 for a in range(0,271):
                     xi = self.a+(r*math.cos(math.radians(a)))
                     yi = 0+(r*math.sin(math.radians(a)))
-                    x.append(xi*x_scale)
-                    y.append(yi*y_scale)
+                    x.append(xi)
+                    y.append(yi)
+
+        x = [i*x_scale for i in x]
+        y = [j*y_scale for j in y]
         return x,y
 
     def piece_functions(self):
