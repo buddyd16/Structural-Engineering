@@ -836,6 +836,24 @@ class main_window:
             if self.frame_solved == 0:
                 pass
             else:
+                if self.show_l.get() == 1:
+                    for beam in self.beams_analysis:
+                        for load in beam.Loads:
+                            if load == beam.Loads[-1] or load == beam.Loads[-2]:
+                                pass
+                            else:
+                                y_scale = float(self.res_scale.get())
+                                x_scale = scale
+
+                                x0 = (beam.i.x)*x_scale
+
+                                x,y = load.chart_load(x_scale,y_scale,1)
+
+                                x = [i+x0 for i in x]
+
+                                for i in range(1,len(x)):
+                                    self.g_plan_canvas.create_line((x[i-1]+spacer),hg - (y[i-1]),(x[i])+spacer,hg - (y[i]), fill = "blue", width=2)
+
                 if self.show_dfs.get() == 1:
                     for beam in self.beams_analysis:
                         string = 'DFi: {0:.3f}\nDFj: {1:.3f} '.format(beam.dfi,beam.dfj)

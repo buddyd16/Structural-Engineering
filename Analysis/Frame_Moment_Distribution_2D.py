@@ -113,11 +113,11 @@ class CantBeam:
 
         self.K = 0
 
-        step = self.Length/25.0
+        step = self.Length/15.0
 
         self.chart_stations = [0]
 
-        for i in range(1,25):
+        for i in range(1,15):
             self.chart_stations.append(self.chart_stations[i-1]+step)
 
         self.chart_stations.append(self.Length)
@@ -325,17 +325,17 @@ class Beam:
 
         self.K = self.E*self.I / self.Length
 
-        step = self.Length/25.0
+        step = self.Length/15.0
 
         self.chart_stations = [0]
 
-        for i in range(1,25):
+        for i in range(1,15):
             self.chart_stations.append(self.chart_stations[i-1]+step)
 
         self.chart_stations.append(self.Length)
 
         self.loads_built = 0
-        
+
     def new_load_list(self, load_list):
         del self.Load_List[:]
         self.Load_List = [load for load in load_list]
@@ -534,11 +534,11 @@ class Column_Up:
         self.mj = [0]
         self.dfi = 0
 
-        step = self.Length/25.0
+        step = self.Length/15.0
 
         self.chart_stations = [0]
 
-        for i in range(1,25):
+        for i in range(1,15):
             self.chart_stations.append(self.chart_stations[i-1]+step)
 
         self.chart_stations.append(self.Length)
@@ -625,7 +625,7 @@ class Column_Up:
                 eid.append(res[3])
 
             return [self.chart_stations, v, m, eis, eid]
-        
+
 
 class Column_Down:
     def __init__(self, j_node, height=1, E=1, I=1, A=1, support=1, hinge_near=0):
@@ -654,11 +654,11 @@ class Column_Down:
         self.mj = [0]
         self.dfj = 0
 
-        step = self.Length/25.0
+        step = self.Length/15.0
 
         self.chart_stations = [0]
 
-        for i in range(1,25):
+        for i in range(1,15):
             self.chart_stations.append(self.chart_stations[i-1]+step)
 
         self.chart_stations.append(self.Length)
@@ -886,7 +886,7 @@ def member_distribution_factors(nodes, beams, columns):
 
             else:
                 pass
- 
+
 def beam_fef(beams):
     # Beam Fixed End Forces
     bmfef = []
@@ -895,10 +895,10 @@ def beam_fef(beams):
         beam.fef()
         bmfef.extend([beam.mi[0],beam.mj[0]])
 
-          
+
 def moment_distribution(nodes, beams, columns, shortening=0, tolerance=1e-11):
     member_distribution_factors(nodes, beams, columns)
-    
+
     beam_fef(beams)
     # Moment Distribution Pass 1 - left to right
     moment_distribution_cycle(nodes, beams, columns, tolerance)
@@ -960,7 +960,7 @@ def moment_distribution(nodes, beams, columns, shortening=0, tolerance=1e-11):
                 delta_load.append([])
 
             i+=1
-        
+
         '''
         #going to try not reseting the FEF to see if it speeds
         #up the second pass
@@ -972,7 +972,7 @@ def moment_distribution(nodes, beams, columns, shortening=0, tolerance=1e-11):
         for column in columns:
             column.reset_fem()
         '''
-        
+
         # Beam Fixed End Forces
         delta_bmfef = []
         for beam in beams:
@@ -1121,16 +1121,16 @@ def moment_distribution(nodes, beams, columns, shortening=0, tolerance=1e-11):
     # if beam.type == 'span':
         # moments.append(beam.max_min_moment())
         # EIdeltas.append(beam.max_min_eidelta())
-    
+
     # if beam.type=='cantilever' and beam.isleft == 1:
         # start_slope = beam_charts[0][0][3][0]/(beams[0].E*beams[0].I)
-        
+
         # beam.add_starting_slope(start_slope)
         # beam.build_load_function()
-    
-    # elif beam.type=='cantilever' and beam.isleft == 0: 
+
+    # elif beam.type=='cantilever' and beam.isleft == 0:
         # start_slope = beams[-3].station_values()[0][3][-1]/(beams[-1].E*beams[-1].I)
-        # beam.add_starting_slope(start_slope) 
+        # beam.add_starting_slope(start_slope)
         # beam.build_load_function()
 
     # beam_charts.append(beam.station_values())
@@ -1142,7 +1142,7 @@ def moment_distribution(nodes, beams, columns, shortening=0, tolerance=1e-11):
         # h = column.Length+node_delta[i]
         # column.new_height(h)
         # i+=1
-        
+
 # final_end_moments_cols = []
 # col_funcs = []
 # for column in columns:
