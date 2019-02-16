@@ -135,6 +135,14 @@ class no_load:
 
         self.kind = 'NL'
 
+        self.x_graph = [0]
+        self.y_graph = [0]
+
+    def chart_load(x_scale=0, y_scale=0, arrows=0):
+        x = [0]
+        y = [0]
+        return x,y
+
     def piece_functions(self):
         '''
         Returns the general piecwise function in the form of two lists
@@ -233,6 +241,21 @@ class pl:
 
         self.x_graph=[arrow_minus,self.a,arrow_plus,self.a,self.a]
         self.y_graph=[arrow_height,0,arrow_height,0,self.p]
+
+    def chart_load(x_scale=0, y_scale=0, arrows=0):
+        if arrows == 1:
+            arrow_height = (self.p/6.0)*y_scale
+            #30 degree arrow
+            arrow_plus= (self.a+(arrow_height*math.tan(math.radians(30))))*x_scale
+            arrow_minus= (self.a-(arrow_height*math.tan(math.radians(30))))*x_scale
+
+            x=[arrow_minus,self.a*x_scale,arrow_plus,self.a*x_scale,self.a*x_scale]
+            y=[arrow_height,0,arrow_height,0,self.p*y_scale]
+        else:
+            x = [self.a*x_scale, self.a*x_scale]
+            y = [0,self.p*y_scale]
+
+        return x,y
 
     def piece_functions(self):
         '''
@@ -412,6 +435,74 @@ class point_moment:
                 self.x_graph.append(x)
                 self.y_graph.append(y)
 
+    def chart_load(self, x_scale=0, y_scale=0, arrows=0):
+        x=[]
+        y=[]
+        r = (self.ma/2.0)
+
+        if arrows == 1:
+            arrow_height = r/6.0
+            #30 degree arrow
+            arrow_minus= (arrow_height*math.tan(math.radians(30)))
+
+            if self.ma <0:
+                x = [self.a*x_scale,self.a*x_scale,self.a*x_scale]
+                y = [r*y_scale,0,-r*y_scale]
+                xi=0
+                yi=0
+                for a in range(-90, 181):
+                    xi = (self.a*x_scale)+((r*math.cos(math.radians(a)))*x_scale)
+                    yi = 0+((r*math.sin(math.radians(a)))*y_scale)
+                    x.append(xi)
+                    y.append(yi)
+
+                x.append(xi-arrow_minus)
+                y.append(yi+arrow_height)
+                x.append(xi)
+                y.append(yi)
+                x.append(xi+arrow_minus)
+                y.append(yi+arrow_height)
+            else:
+                x = [self.a-r,self.a,self.a+r, self.a+r-arrow_minus,self.a+r,self.a+r+arrow_minus,self.a+r]
+                x = [i*x_scale for i in x]
+                y = [0,0,0,arrow_height,0,arrow_height,0]
+                y = [j*y_scale for j in y]
+
+                xi=0
+                yi=0
+                for a in range(0,271):
+                    xi = self.a+(r*math.cos(math.radians(a)))
+                    yi = 0+(r*math.sin(math.radians(a)))
+                    x.append(xi*x_scale)
+                    y.append(yi*y_scale)
+        else:
+            if self.ma <0:
+                x = [self.a,self.a,self.a]
+                x = [i*x_scale for i in x]
+                y = [r,0,-r]
+                y = [j*y_scale for j in y]
+                xi=0
+                yi=0
+                for a in range(-90, 181):
+                    xi = self.a+(r*math.cos(math.radians(a)))
+                    yi = 0+(r*math.sin(math.radians(a)))
+                    x.append(xi*x_scale)
+                    y.append(yi*y_scale)
+
+            else:
+                x = [self.a-r,self.a,self.a+r, self.a+r-arrow_minus,self.a+r,self.a+r+arrow_minus,self.a+r]
+                x = [i*x_scale for i in x]
+                y = [0,0,0,arrow_height,0,arrow_height,0]
+                y = [j*y_scale for j in y]
+                xi=0
+                yi=0
+                for a in range(0,271):
+                    xi = self.a+(r*math.cos(math.radians(a)))
+                    yi = 0+(r*math.sin(math.radians(a)))
+                    x.append(xi*x_scale)
+                    y.append(yi*y_scale)
+        return x,y
+
     def piece_functions(self):
         '''
         Returns the general piecwise function in the form of two lists
@@ -582,6 +673,28 @@ class udl:
         self.x_graph=[arrow_minus_start,self.a,arrow_plus_start,self.a,self.a,self.b,self.b,arrow_minus_end,self.b,arrow_plus_end]
         self.y_graph=[arrow_height,0,arrow_height,0,self.w1,self.w1,0,arrow_height,0,arrow_height]
 
+    def chart_load(self, x_scale=0, y_scale=0, arrows=0):
+        x=[]
+        y=[]
+        if arrows == 1:
+            arrow_height = self.w1/12.0
+            #30 degree arrow
+            arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(30)))
+            arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(30)))
+            arrow_plus_end= self.b+(arrow_height*math.tan(math.radians(30)))
+            arrow_minus_end= self.b-(arrow_height*math.tan(math.radians(30)))
+
+            x=[arrow_minus_start,self.a,arrow_plus_start,self.a,self.a,self.b,self.b,arrow_minus_end,self.b,arrow_plus_end]
+            x = [i*x_scale for i in x]
+            y=[arrow_height,0,arrow_height,0,self.w1,self.w1,0,arrow_height,0,arrow_height]
+            y = [j*y_scale for j in y]
+        else:
+            x=[self.a,self.a,self.b,self.b]
+            x = [i*x_scale for i in x]
+            y=[0,self.w1,self.w1,0]
+            y = [j*y_scale for j in y]
+
+        return x,y
     def piece_functions(self):
         '''
         Returns the general piecwise function in the form of two lists
@@ -777,6 +890,31 @@ class trap:
         self.x_graph=[arrow_minus_start,self.a,arrow_plus_start,self.a,self.a,self.b,self.b,arrow_minus_end,self.b,arrow_plus_end]
         self.y_graph=[arrow_height,0,arrow_height,0,self.w1,self.w2,0,arrow_height2,0,arrow_height2]
 
+    def chart_load(self, x_scale=0, y_scale=0, arrows=0):
+        x=[]
+        y=[]
+        if arrows == 1:
+            arrow_height = self.w1/6.0
+            arrow_height2 = self.w2/6.0
+            #30 degree arrow
+            arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(30)))
+            arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(30)))
+            arrow_plus_end= self.b+(arrow_height2*math.tan(math.radians(30)))
+            arrow_minus_end= self.b-(arrow_height2*math.tan(math.radians(30)))
+
+            x=[arrow_minus_start,self.a,arrow_plus_start,self.a,self.a,self.b,self.b,arrow_minus_end,self.b,arrow_plus_end]
+            x = [i*x_scale for i in x]
+            y=[arrow_height,0,arrow_height,0,self.w1,self.w2,0,arrow_height2,0,arrow_height2]
+            y = [j*y_scale for j in y]
+
+        else:
+            x=[self.a,self.a,self.b,self.b]
+            x = [i*x_scale for i in x]
+            y=[0,self.w1,self.w2,0]
+            y = [j*y_scale for j in y]
+
+        return x,y
+
     def piece_functions(self):
         '''
         Returns the general piecwise function in the form of two lists
@@ -935,6 +1073,14 @@ class end_delta:
 
         self.kind = 'END_DELTA'
 
+        self.x_graph = [0]
+        self.y_graph = [0]
+
+    def chart_load(self, x_scale=0, y_scale=0, arrows=0):
+        x=[0]
+        y=[0]
+
+        return x,y
     def piece_functions(self):
         '''
         Returns the general piecwise function in the form of two lists
@@ -1028,6 +1174,15 @@ class cant_right_nl:
         self.ml = 0
 
         self.kind = 'NL'
+
+        self.x_graph = [0]
+        self.y_graph = [0]
+
+    def chart_load(self, x_scale=0, y_scale=0, arrows=0):
+        x=[0]
+        y=[0]
+
+        return x,y
 
     def piece_functions(self):
         '''
@@ -1153,6 +1308,26 @@ class cant_right_point:
 
         self.x_graph=[arrow_minus,self.a,arrow_plus,self.a,self.a]
         self.y_graph=[arrow_height,0,arrow_height,0,self.p]
+
+    def chart_load(self, x_scale=0, y_scale=0, arrows=0):
+
+        if arrows == 1:
+            arrow_height = self.p/6.0
+            #30 degree arrow
+            arrow_plus= self.a+(arrow_height*math.tan(math.radians(30)))
+            arrow_minus= self.a-(arrow_height*math.tan(math.radians(30)))
+
+            x=[arrow_minus,self.a,arrow_plus,self.a,self.a]
+            x = [i*x_scale for i in x]
+            y=[arrow_height,0,arrow_height,0,self.p]
+            y = [j*y_scale for j in y]
+        else:
+            x=[self.a,self.a]
+            x = [i*x_scale for i in x]
+            y=[0,self.p]
+            y = [j*y_scale for j in y]
+
+        return x,y
 
     def piece_functions(self):
         '''
@@ -1340,6 +1515,44 @@ class cant_right_point_moment:
                 self.x_graph.append(x)
                 self.y_graph.append(y)
 
+    def chart_load(self, x_scale=0, y_scale=0, arrows=0):
+        r = (self.ma/2.0)
+
+        if arrows == 1:
+            arrow_height = r/6.0
+            #30 degree arrow
+            arrow_minus= (arrow_height*math.tan(math.radians(30)))
+
+            if self.ma <0:
+                x= [self.a,self.a,self.a]
+                y = [r,0,-r]
+                xi=0
+                yi=0
+                for a in range(-90, 181):
+                    xi = self.a+(r*math.cos(math.radians(a)))
+                    yi = 0+(r*math.sin(math.radians(a)))
+                    x.append(xi)
+                    y.append(yi)
+
+                x.append(xi-arrow_minus)
+                y.append(yi+arrow_height)
+                x.append(xi)
+                y.append(yi)
+                x.append(xi+arrow_minus)
+                y.append(yi+arrow_height)
+            else:
+                x= [self.a-r,self.a,self.a+r, self.a+r-arrow_minus,self.a+r,self.a+r+arrow_minus,self.a+r]
+                y = [0,0,0,arrow_height,0,arrow_height,0]
+                xi=0
+                yi=0
+                for a in range(0,271):
+                    xi = self.a+(r*math.cos(math.radians(a)))
+                    yi = 0+(r*math.sin(math.radians(a)))
+                    x.append(xi)
+                    y.append(yi)
+
+        return x,y
+
     def piece_functions(self):
         '''
         Returns the general piecwise function in the form of two lists
@@ -1502,6 +1715,27 @@ class cant_right_udl:
 
         self.x_graph=[arrow_minus_start,self.a,arrow_plus_start,self.a,self.a,self.b,self.b,arrow_minus_end,self.b,arrow_plus_end]
         self.y_graph=[arrow_height,0,arrow_height,0,self.w1,self.w1,0,arrow_height,0,arrow_height]
+
+    def chart_load(self, x_scale=0, y_scale=0, arrows=0):
+        if arrows == 1:
+            arrow_height = self.w1/12.0
+            #30 degree arrow
+            arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(30)))
+            arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(30)))
+            arrow_plus_end= self.b+(arrow_height*math.tan(math.radians(30)))
+            arrow_minus_end= self.b-(arrow_height*math.tan(math.radians(30)))
+
+            x=[arrow_minus_start,self.a,arrow_plus_start,self.a,self.a,self.b,self.b,arrow_minus_end,self.b,arrow_plus_end]
+            x = [i*x_scale for i in x]
+            y=[arrow_height,0,arrow_height,0,self.w1,self.w1,0,arrow_height,0,arrow_height]
+            y = [j*y_scale for j in y]
+        else:
+            x=[self.a,self.a,self.b,self.b]
+            x = [i*x_scale for i in x]
+            y=[0,self.w1,self.w1,0]
+            y = [j*y_scale for j in y]
+
+        return x,y
 
     def piece_functions(self):
         '''
@@ -1728,6 +1962,28 @@ class cant_right_trap:
         self.x_graph=[arrow_minus_start,self.a,arrow_plus_start,self.a,self.a,self.b,self.b,arrow_minus_end,self.b,arrow_plus_end]
         self.y_graph=[arrow_height,0,arrow_height,0,self.w1,self.w2,0,arrow_height2,0,arrow_height2]
 
+    def chart_load(self, x_scale=0, y_scale=0, arrows=0):
+        if arrows == 1:
+            arrow_height = self.w1/6.0
+            arrow_height2 = self.w2/6.0
+            #30 degree arrow
+            arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(30)))
+            arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(30)))
+            arrow_plus_end= self.b+(arrow_height2*math.tan(math.radians(30)))
+            arrow_minus_end= self.b-(arrow_height2*math.tan(math.radians(30)))
+
+            x=[arrow_minus_start,self.a,arrow_plus_start,self.a,self.a,self.b,self.b,arrow_minus_end,self.b,arrow_plus_end]
+            x = [i*x_scale for i in x]
+            y=[arrow_height,0,arrow_height,0,self.w1,self.w2,0,arrow_height2,0,arrow_height2]
+            y = [j*y_scale for j in y]
+        else:
+            x=[self.a,self.a,self.b,self.b]
+            x = [i*x_scale for i in x]
+            y=[0,self.w1,self.w2,0]
+            y = [j*y_scale for j in y]
+
+        return x,y
+
     def piece_functions(self):
         '''
         Returns the general piecwise function in the form of two lists
@@ -1917,6 +2173,15 @@ class cant_left_nl:
         self.rl = 0
         self.mr = 0
 
+        self.x_graph = [0]
+        self.y_graph = [0]
+
+    def chart_load(self, x_scale=0, y_scale=0, arrows=0):
+        x = [0]
+        y = [0]
+
+        return x,y
+
     def piece_functions(self):
         '''
         Returns the general piecwise function in the form of two lists
@@ -2040,6 +2305,25 @@ class cant_left_point:
 
         self.x_graph=[arrow_minus,self.a,arrow_plus,self.a,self.a]
         self.y_graph=[arrow_height,0,arrow_height,0,self.p]
+
+    def chart_load(self, x_scale=0, y_scale=0, arrows=0):
+        if arrows == 1:
+            arrow_height = self.p/6.0
+            #30 degree arrow
+            arrow_plus= self.a+(arrow_height*math.tan(math.radians(30)))
+            arrow_minus= self.a-(arrow_height*math.tan(math.radians(30)))
+
+            x=[arrow_minus,self.a,arrow_plus,self.a,self.a]
+            x = [i*x_scale for i in x]
+            y=[arrow_height,0,arrow_height,0,self.p]
+            y = [j*y_scale for j in y]
+        else:
+            x=[self.a,self.a]
+            x = [i*x_scale for i in x]
+            y=[0,self.p]
+            y = [j*y_scale for j in y]
+
+        return x,y
 
     def piece_functions(self):
         '''
@@ -2183,7 +2467,7 @@ class cant_left_point_moment:
         self.c1 = (1.0*self.ma*self.a) + self.c3
         self.c2 = 0.5*self.ma*self.a**2 + self.c3*self.a + self.c4 - self.c1*self.a
 
-        r = (self.ma/8.0)
+        r = (self.ma/2.0)
         arrow_height = r/6.0
         #30 degree arrow
         arrow_minus= (arrow_height*math.tan(math.radians(30)))
@@ -2215,6 +2499,44 @@ class cant_left_point_moment:
                 y = 0+(r*math.sin(math.radians(a)))
                 self.x_graph.append(x)
                 self.y_graph.append(y)
+
+    def chart_load(self, x_scale=0, y_scale=0, arrows=0):
+        r = (self.ma/2.0)
+
+        if arrows == 1:
+            arrow_height = r/6.0
+            #30 degree arrow
+            arrow_minus= (arrow_height*math.tan(math.radians(30)))
+
+            if self.ma <0:
+                x= [self.a,self.a,self.a]
+                y = [r,0,-r]
+                xi=0
+                yi=0
+                for a in range(-90, 181):
+                    xi = self.a+(r*math.cos(math.radians(a)))
+                    yi = 0+(r*math.sin(math.radians(a)))
+                    x.append(xi)
+                    y.append(yi)
+
+                x.append(xi-arrow_minus)
+                y.append(yi+arrow_height)
+                x.append(xi)
+                y.append(yi)
+                x.append(xi+arrow_minus)
+                y.append(yi+arrow_height)
+            else:
+                x= [self.a-r,self.a,self.a+r, self.a+r-arrow_minus,self.a+r,self.a+r+arrow_minus,self.a+r]
+                y = [0,0,0,arrow_height,0,arrow_height,0]
+                xi=0
+                yi=0
+                for a in range(0,271):
+                    xi = self.a+(r*math.cos(math.radians(a)))
+                    yi = 0+(r*math.sin(math.radians(a)))
+                    x.append(xi)
+                    y.append(yi)
+
+        return x,y
 
     def piece_functions(self):
         '''
@@ -2378,6 +2700,27 @@ class cant_left_udl:
 
         self.x_graph=[arrow_minus_start,self.a,arrow_plus_start,self.a,self.a,self.b,self.b,arrow_minus_end,self.b,arrow_plus_end]
         self.y_graph=[arrow_height,0,arrow_height,0,self.w1,self.w1,0,arrow_height,0,arrow_height]
+
+    def chart_load(self, x_scale=0, y_scale=0, arrows=0):
+        if arrows == 1:
+            arrow_height = self.w1/12.0
+            #30 degree arrow
+            arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(30)))
+            arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(30)))
+            arrow_plus_end= self.b+(arrow_height*math.tan(math.radians(30)))
+            arrow_minus_end= self.b-(arrow_height*math.tan(math.radians(30)))
+
+            x=[arrow_minus_start,self.a,arrow_plus_start,self.a,self.a,self.b,self.b,arrow_minus_end,self.b,arrow_plus_end]
+            x = [i*x_scale for i in x]
+            y=[arrow_height,0,arrow_height,0,self.w1,self.w1,0,arrow_height,0,arrow_height]
+            y = [j*y_scale for j in y]
+        else:
+            x=[self.a,self.a,self.b,self.b]
+            x = [i*x_scale for i in x]
+            y=[0,self.w1,self.w1,0]
+            y = [j*y_scale for j in y]
+
+        return x,y
 
     def piece_functions(self):
         '''
@@ -2622,6 +2965,28 @@ class cant_left_trap:
 
         self.x_graph=[arrow_minus_start,self.a,arrow_plus_start,self.a,self.a,self.b,self.b,arrow_minus_end,self.b,arrow_plus_end]
         self.y_graph=[arrow_height,0,arrow_height,0,self.w1,self.w2,0,arrow_height2,0,arrow_height2]
+        
+    def chart_load(self, x_scale=0, y_scale=0, arrows=0):
+        if arrows == 1:
+            arrow_height = self.w1/6.0
+            arrow_height2 = self.w2/6.0
+            #30 degree arrow
+            arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(30)))
+            arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(30)))
+            arrow_plus_end= self.b+(arrow_height2*math.tan(math.radians(30)))
+            arrow_minus_end= self.b-(arrow_height2*math.tan(math.radians(30)))
+
+            x=[arrow_minus_start,self.a,arrow_plus_start,self.a,self.a,self.b,self.b,arrow_minus_end,self.b,arrow_plus_end]
+            x = [i*x_scale for i in x]
+            y=[arrow_height,0,arrow_height,0,self.w1,self.w2,0,arrow_height2,0,arrow_height2]
+            y = [j*y_scale for j in y]
+        else:
+            x=[self.a,self.a,self.b,self.b]
+            x = [i*x_scale for i in x]
+            y=[0,self.w1,self.w2,0]
+            y = [j*y_scale for j in y]
+
+        return x,y
 
     def piece_functions(self):
         '''
