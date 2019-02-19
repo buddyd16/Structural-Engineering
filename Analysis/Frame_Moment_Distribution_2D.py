@@ -36,11 +36,11 @@ class node:
         self.K = 0
 
         for beam in beams:
-            if beam.i or beam.j == self:
+            if beam.i == self or beam.j == self:
                 self.K += beam.K
 
         for column in columns:
-            if column.i or column.j == self:
+            if column.i == self or column.j == self:
                 self.K += column.K
 
     def sum_node_moments(self, beams, columns):
@@ -787,7 +787,7 @@ def moment_distribution_cycle(nodes, beams, columns, tolerance=1e-11):
                     beam.mj.append(beam.mi[-1]*0.5)
 
                 elif beam.j == node:
-                    beam.mj.append(node.m_balance*beam.dfi)
+                    beam.mj.append(node.m_balance*beam.dfj)
                     beam.mi.append(beam.mj[-1]*0.5)
                 else:
                     pass
@@ -823,7 +823,7 @@ def moment_distribution_cycle(nodes, beams, columns, tolerance=1e-11):
                     beam.mj.append(beam.mi[-1]*0.5)
 
                 elif beam.j == node:
-                    beam.mj.append(m_bal*beam.dfi)
+                    beam.mj.append(m_bal*beam.dfj)
                     beam.mi.append(beam.mj[-1]*0.5)
 
                 else:

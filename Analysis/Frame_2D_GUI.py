@@ -934,7 +934,7 @@ class main_window:
                             y1 = hg - ((beam.station_values()[0][4][i-1]/(beam.E*beam.I)) * d_scale * 12.0)
                             y2 = hg - ((beam.station_values()[0][4][i]/(beam.E*beam.I)) * d_scale * 12.0)
 
-                            self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="gray30", width=2)
+                            self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="yellow", width=2)
 
                             if beam.station_values()[0][4][i] == max(beam.station_values()[0][4]) and  beam.station_values()[0][4][i] != beam.station_values()[0][4][-1]:
                                 string_max = '\nD,max {0:.2f} in @ {1:.2f} ft'.format(12.0*beam.station_values()[0][4][i]/(beam.E*beam.I),beam.chart_stations[i])
@@ -943,7 +943,7 @@ class main_window:
                                 string_min = '\nD,min {0:.2f} in @ {1:.2f} ft'.format(12.0*beam.station_values()[0][4][i]/(beam.E*beam.I),beam.chart_stations[i])
 
                         x0 =  (((beam.i.x+beam.j.x)/2)*scale) + spacer
-                        self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f, text=string_max+string_min, fill='gray30')
+                        self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f, text=string_max+string_min, fill='yellow')
 
             count = 0
             for col in self.columns_analysis:
@@ -1072,7 +1072,7 @@ class main_window:
                             x1 = x - ((col.station_values()[4][i-1]/(col.E*col.I)) * d_scale * 12.0)
                             x2 = x - ((col.station_values()[4][i]/(col.E*col.I)) * d_scale * 12.0)
 
-                            self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="gray30", width=1)
+                            self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="yellow", width=1)
                     count +=1
 
     def frame_analysis_gui(self, *event):
@@ -1095,7 +1095,7 @@ class main_window:
 
         Consider_shortening = 1
 
-        frame2d.moment_distribution(self.nodes_analysis,self.beams_analysis,self.columns_analysis,Consider_shortening,1e-5)
+        frame2d.moment_distribution(self.nodes_analysis,self.beams_analysis,self.columns_analysis,Consider_shortening,1e-20)
 
         for beam in self.beams_analysis:
             beam.build_load_function()
