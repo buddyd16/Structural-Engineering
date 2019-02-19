@@ -420,8 +420,13 @@ class Beam:
         for load in self.Loads:
 
             if load.kind == "END_DELTA":
+                
                 self.mi.append(load.fef()[1]*self.E*self.I)
                 self.mj.append(load.fef()[3]*self.E*self.I)
+                
+                print self.mi[-1]
+                print self.mj[-1]
+                
             else:
                 pass
 
@@ -945,6 +950,7 @@ def moment_distribution(nodes, beams, columns, shortening=0, tolerance=1e-11):
                 p = node_r[i]
 
                 node_delta.append((-1.0*p*column.Length) / (column.A * column.E))
+                print node_delta[-1]
 
                 i+=1
 
@@ -953,9 +959,10 @@ def moment_distribution(nodes, beams, columns, shortening=0, tolerance=1e-11):
         i=0
         for beam in beams:
             if beam.type == 'span':
-                load = ['',node_delta[i],node_delta[i+1],0,10,'END_DELTA']
+                load = ['a',node_delta[i],node_delta[i+1],0,10,'END_DELTA','a']
                 delta_load.append(load)
                 beam.Load_List.append(load)
+                print load
             else:
                 delta_load.append([])
 
@@ -997,7 +1004,8 @@ def moment_distribution(nodes, beams, columns, shortening=0, tolerance=1e-11):
 
         while test_delta == False and count_delta < count_max and delta_kick<1:
             test_delta = moment_distribution_cycle(nodes, beams, columns, tolerance)
-
+            
+            
             if count_delta <=1:
                 n_m_unbalance_delta = [node.m_unbalance for node in nodes]
                 n_delta_previous.append(n_m_unbalance_delta)
@@ -1008,6 +1016,7 @@ def moment_distribution(nodes, beams, columns, shortening=0, tolerance=1e-11):
                     delta_kick = 1
                 else:
                     n_delta_previous.append(n_m_unbalance_delta)
+            
 
             count_delta +=1
 
