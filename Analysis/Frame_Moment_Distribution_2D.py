@@ -84,7 +84,7 @@ class node:
         return node_reaction
 
 class CantBeam:
-    def __init__(self, node, E=1, I=1, Length=1, Loads_list=1, left=1, label=''):
+    def __init__(self, ij, E=1, I=1, Length=1, Loads_list=1, left=1, label=''):
         '''
         beam element
         Loads = lists of loads in text form
@@ -93,18 +93,20 @@ class CantBeam:
         self.isleft = left
         self.type = 'cantilever'
         self.label = label
-
+        self.Length = Length
+        
+        
         if self.isleft==1:
-            self.i = 'free end'
-            self.j = node
+            self.i = node(0)
+            self.j = ij
         else:
-            self.i = node
-            self.j = 'free end'
+            self.i = ij
+            self.j = node(self.i.x + self.Length)
 
         self.E = E
         self.I = I
-        self.Load_List = [load for load in Loads_list]
-        self.Length = Length
+        self.Load_list = [load for load in Loads_list]
+        
 
         self.mi = [0]
         self.mj = [0]
@@ -141,11 +143,11 @@ class CantBeam:
         self.extra_station = []
 
         for load in self.Load_List:
-            w1 = float(load[0])
-            w2 = float(load[1])
-            a = float(load[2])
-            b = float(load[3])
-            load_type = load[-1]
+            w1 = float(load[1])
+            w2 = float(load[2])
+            a = float(load[3])
+            b = float(load[4])
+            load_type = load[-2]
             lc = self.Length
 
             #['Point','Moment','UDL','TRAP','SLOPE']
@@ -187,11 +189,11 @@ class CantBeam:
         self.extra_station = []
 
         for load in self.Load_List:
-            w1 = float(load[0])
-            w2 = float(load[1])
-            a = float(load[2])
-            b = float(load[3])
-            load_type = load[-1]
+            w1 = float(load[1])
+            w2 = float(load[2])
+            a = float(load[3])
+            b = float(load[4])
+            load_type = load[-2]
             lc = self.Length
 
             #['Point','Moment','UDL','TRAP','SLOPE']
@@ -421,11 +423,8 @@ class Beam:
 
             if load.kind == "END_DELTA":
                 
-                self.mi.append(load.fef()[1]*self.E*self.I)
-                self.mj.append(load.fef()[3]*self.E*self.I)
-                
-                print self.mi[-1]
-                print self.mj[-1]
+                self.mi.append(load.fef()[1])
+                self.mj.append(load.fef()[3])
                 
             else:
                 pass
@@ -506,8 +505,8 @@ class Beam:
 
                 v.append(res[0])
                 m.append(res[1])
-                eis.append(res[2])
-                eid.append(res[3])
+                eis.append(res[2]+res_d[2])
+                eid.append(res[3]+res_d[3])
 
             return [self.chart_stations, v, m, eis, eid],end_delta_d
 
@@ -950,7 +949,6 @@ def moment_distribution(nodes, beams, columns, shortening=0, tolerance=1e-11):
                 p = node_r[i]
 
                 node_delta.append((-1.0*p*column.Length) / (column.A * column.E))
-                print node_delta[-1]
 
                 i+=1
 
@@ -959,14 +957,14 @@ def moment_distribution(nodes, beams, columns, shortening=0, tolerance=1e-11):
         i=0
         for beam in beams:
             if beam.type == 'span':
-                load = ['a',node_delta[i],node_delta[i+1],0,10,'END_DELTA','a']
+                load = ['a',(node_delta[i]*beam.I*beam.E),(node_delta[i+1]*beam.I*beam.E),0,10,'END_DELTA','a']
                 delta_load.append(load)
                 beam.Load_List.append(load)
-                print load
+                i+=1
             else:
                 delta_load.append([])
 
-            i+=1
+            
 
         '''
         #going to try not reseting the FEF to see if it speeds

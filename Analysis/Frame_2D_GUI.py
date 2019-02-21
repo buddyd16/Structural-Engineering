@@ -745,8 +745,20 @@ class main_window:
         del self.columns_analysis[:]
         self.max_h_up_graph = 0
         self.max_h_dwn_graph = 0
-
-        self.nodes_analysis.append(frame2d.node(0))
+        
+        if self.cantL_count == 0:
+            self.nodes_analysis.append(frame2d.node(0))
+        else:
+            cantL_label = self.cantL_beam_inputs[-1][0].get()
+            cantL_span = float(self.cantL_beam_inputs[-1][1].get())
+            E_ksf = float(self.cantL_beam_inputs[-1][2].get())*144.0 # k/in^2 * 144 in^2 / 1 ft^2 = 144 k/ft^2
+            I_ft4 = float(self.cantL_beam_inputs[-1][3].get())*(1 / 20736.0) # in^4 * 1 ft^4 / 12^4 in^4 = ft^4
+            self.nodes_analysis.append(frame2d.node(cantL_span))
+            j = self.nodes_analysis[-1]
+            
+            cantL = frame2d.CantBeam(j, E_ksf, I_ft4, cantL_span, [], 1, cantL_label)
+            
+            self.beams_analysis.append(cantL)
 
         for beam_gui in self.beam_inputs:
 
@@ -762,6 +774,20 @@ class main_window:
             beam = frame2d.Beam(newi,newj,E_ksf,I_ft4, [], label)
 
             self.beams_analysis.append(beam)
+        
+        if self.cantR_count == 0:
+            pass
+        
+        else:
+            cantR_label = self.cantR_beam_inputs[-1][0].get()
+            cantR_span = float(self.cantR_beam_inputs[-1][1].get())
+            E_ksf = float(self.cantR_beam_inputs[-1][2].get())*144.0 # k/in^2 * 144 in^2 / 1 ft^2 = 144 k/ft^2
+            I_ft4 = float(self.cantR_beam_inputs[-1][3].get())*(1 / 20736.0) # in^4 * 1 ft^4 / 12^4 in^4 = ft^4
+            i = self.nodes_analysis[-1]
+            
+            cantR = frame2d.CantBeam(i, E_ksf, I_ft4, cantR_span, [], 0, cantR_label)
+            
+            self.beams_analysis.append(cantR)
 
         for i,col in enumerate(self.column_down_inputs):
             j_node = self.nodes_analysis[i]
@@ -816,8 +842,11 @@ class main_window:
             hg = (h/2.0)
 
             spacer= 30
-
-            total_length = self.nodes_analysis[-1].x
+            
+            if self.cantR_count == 0:
+                total_length = self.nodes_analysis[-1].x
+            else:
+                total_length = self.nodes_analysis[-1].x + self.beams_analysis[-1].Length
 
             scale_x = (w - 2*spacer) / total_length
 
@@ -832,6 +861,21 @@ class main_window:
                     x1 = (node.x*scale) + spacer
                     x2 = (self.nodes_analysis[i+1].x*scale)+spacer
                     self.g_plan_canvas.create_line(x1, hg, x2, hg, fill="white", width=2)
+            
+            if self.cantL_count == 0:
+                pass
+            else:
+                x1 = spacer
+                x2 = (node.x*scale) + spacer
+                self.g_plan_canvas.create_line(x1, hg, x2, hg, fill="white", width=2)
+            
+            if self.cantR_count == 0:
+                pass
+            else:
+            
+                x1 = (self.nodes_analysis[-1].x*scale)+spacer
+                x2 = ((self.nodes_analysis[-1].x+self.beams_analysis[-1].Length)*scale)+spacer
+                self.g_plan_canvas.create_line(x1, hg, x2, hg, fill="white", width=2)
 
             if self.frame_solved == 0:
                 pass
@@ -839,7 +883,7 @@ class main_window:
                 if self.show_l.get() == 1:
                     for beam in self.beams_analysis:
                         for load in beam.Loads:
-                            if load == beam.Loads[-1] or load == beam.Loads[-2]:
+                            if load == beam.Loads[-1] or load == beam.Loads[-2] and beam.type == 'span':
                                 pass
                             else:
                                 y_scale = float(self.res_scale.get())
@@ -917,8 +961,12 @@ class main_window:
                             y2 = hg - ((beam.station_values()[0][3][i]/(beam.E*beam.I)) * s_scale)
 
                             self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="magenta", width=2)
+                        
 
-                        string = 'Si: {0:.5f} rad\nSj: {1:.5f} rad'.format(beam.station_values()[0][3][0]/(beam.E*beam.I),beam.station_values()[0][3][-1]/(beam.E*beam.I))
+                        si = (beam.station_values()[0][3][0]) /(beam.E*beam.I)
+                        sj = (beam.station_values()[0][3][-1]) /(beam.E*beam.I)
+                        
+                        string = 'Si: {0:.5f} rad\nSj: {1:.5f} rad'.format(si,sj)
                         x0 =  (((beam.i.x+beam.j.x)/2)*scale) + spacer
 
                         self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f, text=string, fill='magenta')
@@ -929,18 +977,30 @@ class main_window:
                         string_max = ''
                         string_min = ''
                         for i in range(1,len(beam.chart_stations)):
+                            if beam.type == 'cantilever' and beam.isleft == 1:
+                                d0 = (self.beams_analysis[1].station_values()[0][4][0]/(self.beams_analysis[1].E*self.beams_analysis[1].I))*12.0
+                            elif beam.type == 'cantilever' and beam.isleft == 0:
+                                d0 = (self.beams_analysis[-2].station_values()[0][4][-1]/(self.beams_analysis[-2].E*self.beams_analysis[-2].I))*12.0
+                            else:
+                                d0 = 0
                             x1 = (beam.chart_stations[i-1]+beam.i.x)*scale + spacer
                             x2 = (beam.chart_stations[i]+beam.i.x)*scale + spacer
-                            y1 = hg - ((beam.station_values()[0][4][i-1]/(beam.E*beam.I)) * d_scale * 12.0)
-                            y2 = hg - ((beam.station_values()[0][4][i]/(beam.E*beam.I)) * d_scale * 12.0)
+                            y1 = hg - ((beam.station_values()[0][4][i-1]/(beam.E*beam.I)) * d_scale * 12.0) - (d0*d_scale)
+                            y2 = hg - ((beam.station_values()[0][4][i]/(beam.E*beam.I)) * d_scale * 12.0) - (d0*d_scale)
 
                             self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="yellow", width=2)
 
-                            if beam.station_values()[0][4][i] == max(beam.station_values()[0][4]) and  beam.station_values()[0][4][i] != beam.station_values()[0][4][-1]:
+                            if beam.station_values()[0][4][i] == max(beam.station_values()[0][4]) and  beam.station_values()[0][4][i] != beam.station_values()[0][4][-1] and beam.type=='span':
                                 string_max = '\nD,max {0:.2f} in @ {1:.2f} ft'.format(12.0*beam.station_values()[0][4][i]/(beam.E*beam.I),beam.chart_stations[i])
 
-                            if beam.station_values()[0][4][i] == min(beam.station_values()[0][4]) and  beam.station_values()[0][4][i] != beam.station_values()[0][4][-1]:
+                            if beam.station_values()[0][4][i] == min(beam.station_values()[0][4]) and  beam.station_values()[0][4][i] != beam.station_values()[0][4][-1] and beam.type=='span':
                                 string_min = '\nD,min {0:.2f} in @ {1:.2f} ft'.format(12.0*beam.station_values()[0][4][i]/(beam.E*beam.I),beam.chart_stations[i])
+                                
+                            if beam.type == 'cantilever' and beam.isleft == 1:
+                                string_max = '\nD {0:.2f} in @ 0 ft'.format(12.0*beam.station_values()[0][4][0]/(beam.E*beam.I))
+                            
+                            if beam.type == 'cantilever' and beam.isleft == 0:
+                                string_max = '\nD {0:.2f} in @ {1:.2f} ft'.format(12.0*beam.station_values()[0][4][-1]/(beam.E*beam.I), beam.Length)
 
                         x0 =  (((beam.i.x+beam.j.x)/2)*scale) + spacer
                         self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f, text=string_max+string_min, fill='yellow')
@@ -1105,13 +1165,13 @@ class main_window:
         for beam in self.beams_analysis:
 
             if beam.type=='cantilever' and beam.isleft == 1:
-                start_slope = beam_charts[0][0][3][0]/(beams[0].E*beams[0].I)
+                start_slope = self.beams_analysis[1].station_values()[0][3][0]/(self.beams_analysis[1].E*self.beams_analysis[1].I)
 
                 beam.add_starting_slope(start_slope)
                 beam.build_load_function()
 
             elif beam.type=='cantilever' and beam.isleft == 0:
-                start_slope = beams[-3].station_values()[0][3][-1]/(beams[-1].E*beams[-1].I)
+                start_slope = self.beams_analysis[-2].station_values()[0][3][-1]/(self.beams_analysis[-2].E*self.beams_analysis[-2].I)
                 beam.add_starting_slope(start_slope)
                 beam.build_load_function()
 
