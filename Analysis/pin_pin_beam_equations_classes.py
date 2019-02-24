@@ -1324,7 +1324,7 @@ class cant_right_point:
             x = [i*x_scale for i in x]
             y=[0,self.p]
             y = [j*y_scale for j in y]
-
+        
         return x,y
 
     def piece_functions(self):
@@ -1548,7 +1548,10 @@ class cant_right_point_moment:
                     yi = 0+(r*math.sin(math.radians(a)))
                     x.append(xi)
                     y.append(yi)
-
+                    
+        x = [i*x_scale for i in x]
+        y = [j*y_scale for j in y]
+        
         return x,y
 
     def piece_functions(self):
@@ -2533,7 +2536,10 @@ class cant_left_point_moment:
                     yi = 0+(r*math.sin(math.radians(a)))
                     x.append(xi)
                     y.append(yi)
-
+                    
+        x = [i*x_scale for i in x]
+        y = [j*y_scale for j in y]
+        
         return x,y
 
     def piece_functions(self):

@@ -1158,7 +1158,8 @@ class main_window:
         frame2d.moment_distribution(self.nodes_analysis,self.beams_analysis,self.columns_analysis,Consider_shortening,1e-20)
 
         for beam in self.beams_analysis:
-            beam.build_load_function()
+            if len(beam.Loads) > 0:
+                beam.build_load_function()
 
         max_m = 0
         min_m = 0
