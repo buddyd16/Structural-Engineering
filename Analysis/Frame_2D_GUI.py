@@ -1158,13 +1158,13 @@ class main_window:
         frame2d.moment_distribution(self.nodes_analysis,self.beams_analysis,self.columns_analysis,Consider_shortening,1e-20)
 
         for beam in self.beams_analysis:
-            if len(beam.Loads) > 0:
+            if beam.type == 'span':
                 beam.build_load_function()
-
+                
         max_m = 0
         min_m = 0
         for beam in self.beams_analysis:
-
+                
             if beam.type=='cantilever' and beam.isleft == 1:
                 start_slope = self.beams_analysis[1].station_values()[0][3][0]/(self.beams_analysis[1].E*self.beams_analysis[1].I)
 
@@ -1175,6 +1175,7 @@ class main_window:
                 start_slope = self.beams_analysis[-2].station_values()[0][3][-1]/(self.beams_analysis[-2].E*self.beams_analysis[-2].I)
                 beam.add_starting_slope(start_slope)
                 beam.build_load_function()
+                
 
             max_m = max(max_m,max(beam.station_values()[0][2]))
             min_m = min(min_m,min(beam.station_values()[0][2]))

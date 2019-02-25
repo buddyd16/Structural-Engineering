@@ -274,7 +274,7 @@ class CantBeam:
             self.Loads.append(ppbeam.cant_right_nl(slope_load,self.Length))
 
     def build_load_function(self):
-
+        
         self.equations, self.equation_strings = ppbeam.center_span_piecewise_function(self.Loads)
 
         self.loads_built = 1

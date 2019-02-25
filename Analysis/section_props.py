@@ -807,7 +807,65 @@ def stl_wf(d,bf,tf,tw,k):
     
     return WF
     
+def stl_angle(vleg, hleg, thickness, k):
+    '''
+    given the defining geometric
+    properties for an Angle from
+    AISC 
     
+    return a Shape with appropriate
+    coordinates
+    0,0 point will be the bottom left of the section
+    '''
+    r1 = k - thickness # leg-to-leg Fillet
+    r2 = r1/2.0        # toe fillet 1/2*Fillet per ISO 657-1: 1989 (E)
+    
+    # Bottom horizontal leg
+    x = [0,hleg,hleg]
+    y = [0,0,thickness - r2]
+    
+    # outisde horizontal leg fillet
+    # for the first radius
+    r=r2
+    x_r1, y_r1 = circle_coordinates(hleg-(r2),thickness - r2,r,1,90)
+    
+    x.extend(x_r1)
+    y.extend(y_r1)
+    
+    # horizontal top flat   
+    x.append(k)
+    y.append(thickness)
+    
+    #interior corner radii    
+    r = r1
+    x_r1, y_r1 = circle_coordinates(k,k,r,180,269)
+    
+    x_r1.reverse()
+    y_r1.reverse()
+    
+    x.extend(x_r1)
+    y.extend(y_r1)
+    
+    # vertical inside flat
+    x.append(thickness)
+    y.append(vleg - r2)
+    
+    # outside vertical leg fillet
+    r=r2
+    x_r1, y_r1 = circle_coordinates(thickness - r2,vleg-(r2),r,1,90)
+    
+    x.extend(x_r1)
+    y.extend(y_r1)
+    
+    x.append(0)
+    y.append(vleg)
+    
+    x.append(0)
+    y.append(0)
+    
+    Angle = Section(x,y)
+    
+    return Angle
 
     
     
@@ -972,12 +1030,15 @@ def stl_wf(d,bf,tf,tw,k):
 #    props_solid += '{1} = {0}\n'.format(i,j)
 
 
-shape = stl_wf(4.16,4.06,0.345,0.28,0.595)
-props_solid = 'WF:\n'
+#shape = stl_wf(4.16,4.06,0.345,0.28,0.595)
+shape = stl_angle(6,6,1,1.5)
+
+props_solid = 'Angle:\n'
 for i,j in zip(shape.output,shape.output_strings):
     props_solid += '{1} = {0}\n'.format(i,j)
     
 plt.plot(shape.x,shape.y)
+plt.axes().set_aspect('equal', 'datalim')
 
 plt.show()
 
