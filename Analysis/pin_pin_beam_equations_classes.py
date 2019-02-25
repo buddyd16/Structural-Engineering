@@ -1773,7 +1773,7 @@ class cant_right_udl:
 
         eid = ([
                 # Range 0 to a
-                [[self.c2,self.c1,(1.0/6.0)*self.rl + 0.5*self.ml],[0,self.a]],
+                [[self.c2,self.c1,0.5*self.ml,(1.0/6.0)*self.rl],[0,self.a]],
                 # Range a to b
                 [[self.c4-((1.0/24.0)*math.pow(self.a,4)*self.w1),      #x^0
                 ((1.0/6.0)*math.pow(self.a,3)*self.w1)+self.c3,         #x^1
@@ -1845,14 +1845,14 @@ class cant_right_udl:
 
         for i in range(0,iters):
             if x[i] <= self.a:
-                eid[i] = ((1.0/6.0)*self.rl*x[i]*x[i] +
+                eid[i] = ((1.0/6.0)*self.rl*x[i]*x[i]*x[i]+
                             0.5*self.ml*x[i]*x[i] +
                             self.c1 * x[i] +
                             self.c2)
             elif x[i] <= self.b:
                 eid[i] = ((1.0/6.0)*self.rl*x[i]*x[i]*x[i] +
                             0.5*self.ml*x[i]*x[i] -
-                            (1.0/24.0)*self.w1*(x[i]-self.a)**4 +
+                            ((1.0/24.0)*self.w1*(x[i]-self.a)**4) +
                             self.c3*x[i] +
                             self.c4)
             else:
