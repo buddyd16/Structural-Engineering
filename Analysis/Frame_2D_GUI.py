@@ -383,7 +383,7 @@ class main_window:
         tkMessageBox.showerror("License Information",license_string)
         self.master.focus_force()
 
-    def quit_app(self,*event):
+    def quit_app(self,*args):
         self.master.quit()
         self.master.destroy()
 
@@ -394,12 +394,14 @@ class main_window:
         self.g_plan_canvas.scan_dragto(event.x, event.y, gain=1)
 
     def canvas_zoom(self, event):
+        x = self.g_plan_canvas.canvasx(event.x)
+        y = self.g_plan_canvas.canvasx(event.y)
         if event.delta > 0:
-            self.g_plan_canvas.scale('all', event.x, event.y, 1.1, 1.1)
+            self.g_plan_canvas.scale('all', x, y, 1.1, 1.1)
         elif event.delta < 0:
-            self.g_plan_canvas.scale('all', event.x, event.y, 0.9, 0.9)
+            self.g_plan_canvas.scale('all', x, y, 0.9, 0.9)
 
-    def canvas_reset(self, *event):
+    def canvas_reset(self, *args):
         x, y = self.origin
         self.g_plan_canvas.yview_moveto(x)
         self.g_plan_canvas.xview_moveto(y)
