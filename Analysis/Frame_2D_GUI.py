@@ -76,6 +76,7 @@ class main_window:
         self.helv_norm = tkFont.Font(family=' Courier New',size=self.f_size)
         self.helv_res = tkFont.Font(family=' Courier New',size=self.f_size, weight='bold', underline = True)
         self.mono_f = tkFont.Font(family='Consolas',size=8)
+        self.mono_f_chart = tkFont.Font(family='Consolas',size=10)
 
         # Menubar
         self.menubar = tk.Menu(self.master)
@@ -319,6 +320,13 @@ class main_window:
         #self.g_plan_canvas.bind("<Configure>", self.build_frame_graph)
         self.g_plan_canvas.pack(side = tk.LEFT, anchor='w', padx= 1, pady= 1, fill=tk.BOTH, expand=1)
 
+        self.origin = self.g_plan_canvas.xview()[0], self.g_plan_canvas.yview()[0]
+
+        self.g_plan_canvas.bind("<Button-1>", self.canvas_mouse_start)
+        self.g_plan_canvas.bind("<B1-Motion>", self.canvas_mouse_move)
+        self.g_plan_canvas.bind("<MouseWheel>", self.canvas_zoom)
+        self.g_plan_canvas.bind("<Double-Button-1>", self.canvas_reset)
+
         self.graph_b_frame = tk.Frame(self.g_a_frame, bd=2, relief='sunken', padx=4 ,pady=1)
 
         self.show_l = tk.IntVar()
@@ -345,7 +353,7 @@ class main_window:
 
         tk.Label(self.graph_b_frame, text='Result Scale:', font=self.helv).grid(row=10, column=1, sticky=tk.W)
         self.res_scale = tk.StringVar()
-        self.res_scale.set('50')
+        self.res_scale.set('10')
         self.res_scale_entry = tk.Entry(self.graph_b_frame, textvariable=self.res_scale, width=8)
         self.res_scale_entry.grid(row=10, column=2, sticky=tk.W)
 
@@ -379,7 +387,24 @@ class main_window:
         self.master.quit()
         self.master.destroy()
 
-    def add_beam_func(self,*event):
+    def canvas_mouse_start(self, event):
+        self.g_plan_canvas.scan_mark(event.x, event.y)
+
+    def canvas_mouse_move(self, event):
+        self.g_plan_canvas.scan_dragto(event.x, event.y, gain=1)
+
+    def canvas_zoom(self, event):
+        if event.delta > 0:
+            self.g_plan_canvas.scale('all', event.x, event.y, 1.1, 1.1)
+        elif event.delta < 0:
+            self.g_plan_canvas.scale('all', event.x, event.y, 0.9, 0.9)
+
+    def canvas_reset(self, *event):
+        x, y = self.origin
+        self.g_plan_canvas.yview_moveto(x)
+        self.g_plan_canvas.xview_moveto(y)
+
+    def add_beam_func(self, *event):
         self.frame_built = 0
         self.frame_solved = 0
         self.beam_count +=1
@@ -745,7 +770,7 @@ class main_window:
         del self.columns_analysis[:]
         self.max_h_up_graph = 0
         self.max_h_dwn_graph = 0
-        
+
         if self.cantL_count == 0:
             self.nodes_analysis.append(frame2d.node(0))
         else:
@@ -755,9 +780,9 @@ class main_window:
             I_ft4 = float(self.cantL_beam_inputs[-1][3].get())*(1 / 20736.0) # in^4 * 1 ft^4 / 12^4 in^4 = ft^4
             self.nodes_analysis.append(frame2d.node(cantL_span))
             j = self.nodes_analysis[-1]
-            
+
             cantL = frame2d.CantBeam(j, E_ksf, I_ft4, cantL_span, [], 1, cantL_label)
-            
+
             self.beams_analysis.append(cantL)
 
         for beam_gui in self.beam_inputs:
@@ -774,19 +799,19 @@ class main_window:
             beam = frame2d.Beam(newi,newj,E_ksf,I_ft4, [], label)
 
             self.beams_analysis.append(beam)
-        
+
         if self.cantR_count == 0:
             pass
-        
+
         else:
             cantR_label = self.cantR_beam_inputs[-1][0].get()
             cantR_span = float(self.cantR_beam_inputs[-1][1].get())
             E_ksf = float(self.cantR_beam_inputs[-1][2].get())*144.0 # k/in^2 * 144 in^2 / 1 ft^2 = 144 k/ft^2
             I_ft4 = float(self.cantR_beam_inputs[-1][3].get())*(1 / 20736.0) # in^4 * 1 ft^4 / 12^4 in^4 = ft^4
             i = self.nodes_analysis[-1]
-            
+
             cantR = frame2d.CantBeam(i, E_ksf, I_ft4, cantR_span, [], 0, cantR_label)
-            
+
             self.beams_analysis.append(cantR)
 
         for i,col in enumerate(self.column_down_inputs):
@@ -837,12 +862,13 @@ class main_window:
 
         else:
             self.g_plan_canvas.delete("all")
+            self.canvas_reset()
             w = self.g_plan_canvas.winfo_width()
             h = self.g_plan_canvas.winfo_height()
             hg = (h/2.0)
 
             spacer= 30
-            
+
             if self.cantR_count == 0:
                 total_length = self.nodes_analysis[-1].x
             else:
@@ -861,18 +887,18 @@ class main_window:
                     x1 = (node.x*scale) + spacer
                     x2 = (self.nodes_analysis[i+1].x*scale)+spacer
                     self.g_plan_canvas.create_line(x1, hg, x2, hg, fill="white", width=2)
-            
+
             if self.cantL_count == 0:
                 pass
             else:
                 x1 = spacer
                 x2 = (node.x*scale) + spacer
                 self.g_plan_canvas.create_line(x1, hg, x2, hg, fill="white", width=2)
-            
+
             if self.cantR_count == 0:
                 pass
             else:
-            
+
                 x1 = (self.nodes_analysis[-1].x*scale)+spacer
                 x2 = ((self.nodes_analysis[-1].x+self.beams_analysis[-1].Length)*scale)+spacer
                 self.g_plan_canvas.create_line(x1, hg, x2, hg, fill="white", width=2)
@@ -903,7 +929,7 @@ class main_window:
                         string = 'DFi: {0:.3f}\nDFj: {1:.3f} '.format(beam.dfi,beam.dfj)
                         x0 =  (((beam.i.x+beam.j.x)/2)*scale) + spacer
 
-                        self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f, text=string, fill='cyan')
+                        self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f_chart, text=string, fill='cyan')
 
                 if self.show_v.get()==1:
                     v_scale = float(self.res_scale.get())
@@ -919,7 +945,7 @@ class main_window:
                         string = 'Vi: {0:.2f} kips\nVj: {1:.2f} kips'.format(beam.station_values()[0][1][0],beam.station_values()[0][1][-1])
                         x0 =  (((beam.i.x+beam.j.x)/2)*scale) + spacer
 
-                        self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f, text=string, fill='red')
+                        self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f_chart, text=string, fill='red')
 
                 if self.show_m.get()==1:
                     if self.show_m_tension.get() == 1:
@@ -949,7 +975,7 @@ class main_window:
 
                         x0 =  (((beam.i.x+beam.j.x)/2)*scale) + spacer
                         string = 'Mi {0:.2f} ft-kips\nMj {1:.2f} ft-kips'.format(beam.station_values()[0][2][0],beam.station_values()[0][2][-1])
-                        self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f, text=string+string_max+string_min, fill='green')
+                        self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f_chart, text=string+string_max+string_min, fill='green')
 
                 if self.show_s.get()==1:
                     s_scale = float(self.res_scale.get())
@@ -961,15 +987,15 @@ class main_window:
                             y2 = hg - ((beam.station_values()[0][3][i]/(beam.E*beam.I)) * s_scale)
 
                             self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="magenta", width=2)
-                        
+
 
                         si = (beam.station_values()[0][3][0]) /(beam.E*beam.I)
                         sj = (beam.station_values()[0][3][-1]) /(beam.E*beam.I)
-                        
+
                         string = 'Si: {0:.5f} rad\nSj: {1:.5f} rad'.format(si,sj)
                         x0 =  (((beam.i.x+beam.j.x)/2)*scale) + spacer
 
-                        self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f, text=string, fill='magenta')
+                        self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f_chart, text=string, fill='magenta')
 
                 if self.show_d.get()==1:
                     d_scale = float(self.res_scale.get())
@@ -995,15 +1021,15 @@ class main_window:
 
                             if beam.station_values()[0][4][i] == min(beam.station_values()[0][4]) and  beam.station_values()[0][4][i] != beam.station_values()[0][4][-1] and beam.type=='span':
                                 string_min = '\nD,min {0:.2f} in @ {1:.2f} ft'.format(12.0*beam.station_values()[0][4][i]/(beam.E*beam.I),beam.chart_stations[i])
-                                
+
                             if beam.type == 'cantilever' and beam.isleft == 1:
                                 string_max = '\nD {0:.2f} in @ 0 ft'.format(12.0*beam.station_values()[0][4][0]/(beam.E*beam.I))
-                            
+
                             if beam.type == 'cantilever' and beam.isleft == 0:
                                 string_max = '\nD {0:.2f} in @ {1:.2f} ft'.format(12.0*beam.station_values()[0][4][-1]/(beam.E*beam.I), beam.Length)
 
                         x0 =  (((beam.i.x+beam.j.x)/2)*scale) + spacer
-                        self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f, text=string_max+string_min, fill='yellow')
+                        self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f_chart, text=string_max+string_min, fill='yellow')
 
             count = 0
             for col in self.columns_analysis:
@@ -1028,14 +1054,14 @@ class main_window:
 
                         if col.type == 'UP':
                             if count == 0:
-                                self.g_plan_canvas.create_text(x, h1 - (col.Length*scale), anchor=tk.SW,font=self.mono_f, text=string, fill='cyan')
+                                self.g_plan_canvas.create_text(x, h1 - (col.Length*scale), anchor=tk.SW,font=self.mono_f_chart, text=string, fill='cyan')
                             else:
-                                self.g_plan_canvas.create_text(x, h1 - (col.Length*scale), anchor=tk.S,font=self.mono_f, text=string, fill='cyan')
+                                self.g_plan_canvas.create_text(x, h1 - (col.Length*scale), anchor=tk.S,font=self.mono_f_chart, text=string, fill='cyan')
                         else:
                             if count == 0:
-                                self.g_plan_canvas.create_text(x, h1 + (col.Length*scale), anchor=tk.NW,font=self.mono_f, text=string, fill='cyan')
+                                self.g_plan_canvas.create_text(x, h1 + (col.Length*scale), anchor=tk.NW,font=self.mono_f_chart, text=string, fill='cyan')
                             else:
-                                self.g_plan_canvas.create_text(x, h1 + (col.Length*scale), anchor=tk.N,font=self.mono_f, text=string, fill='cyan')
+                                self.g_plan_canvas.create_text(x, h1 + (col.Length*scale), anchor=tk.N,font=self.mono_f_chart, text=string, fill='cyan')
 
                     if self.show_v.get()==1:
                         for i in range(1,len(col.chart_stations)):
@@ -1056,14 +1082,14 @@ class main_window:
 
                         if col.type == 'UP':
                             if count == 0:
-                                self.g_plan_canvas.create_text(x, h1 - (col.Length*scale), anchor=tk.SW,font=self.mono_f, text=string, fill='red')
+                                self.g_plan_canvas.create_text(x, h1 - (col.Length*scale), anchor=tk.SW,font=self.mono_f_chart, text=string, fill='red')
                             else:
-                                self.g_plan_canvas.create_text(x, h1 - (col.Length*scale), anchor=tk.S,font=self.mono_f, text=string, fill='red')
+                                self.g_plan_canvas.create_text(x, h1 - (col.Length*scale), anchor=tk.S,font=self.mono_f_chart, text=string, fill='red')
                         else:
                             if count == 0:
-                                self.g_plan_canvas.create_text(x, h1 + (col.Length*scale), anchor=tk.NW,font=self.mono_f, text=string, fill='red')
+                                self.g_plan_canvas.create_text(x, h1 + (col.Length*scale), anchor=tk.NW,font=self.mono_f_chart, text=string, fill='red')
                             else:
-                                self.g_plan_canvas.create_text(x, h1 + (col.Length*scale), anchor=tk.N,font=self.mono_f, text=string, fill='red')
+                                self.g_plan_canvas.create_text(x, h1 + (col.Length*scale), anchor=tk.N,font=self.mono_f_chart, text=string, fill='red')
 
                     if self.show_m.get()==1:
                         for i in range(1,len(col.chart_stations)):
@@ -1084,14 +1110,14 @@ class main_window:
 
                         if col.type == 'UP':
                             if count == 0:
-                                self.g_plan_canvas.create_text(x, h1 - (col.Length*scale), anchor=tk.SW,font=self.mono_f, text=string, fill='green')
+                                self.g_plan_canvas.create_text(x, h1 - (col.Length*scale), anchor=tk.SW,font=self.mono_f_chart, text=string, fill='green')
                             else:
-                                self.g_plan_canvas.create_text(x, h1 - (col.Length*scale), anchor=tk.S,font=self.mono_f, text=string, fill='green')
+                                self.g_plan_canvas.create_text(x, h1 - (col.Length*scale), anchor=tk.S,font=self.mono_f_chart, text=string, fill='green')
                         else:
                             if count == 0:
-                                self.g_plan_canvas.create_text(x, h1 + (col.Length*scale), anchor=tk.NW,font=self.mono_f, text=string, fill='green')
+                                self.g_plan_canvas.create_text(x, h1 + (col.Length*scale), anchor=tk.NW,font=self.mono_f_chart, text=string, fill='green')
                             else:
-                                self.g_plan_canvas.create_text(x, h1 + (col.Length*scale), anchor=tk.N,font=self.mono_f, text=string, fill='green')
+                                self.g_plan_canvas.create_text(x, h1 + (col.Length*scale), anchor=tk.N,font=self.mono_f_chart, text=string, fill='green')
 
                     if self.show_s.get()==1:
                         for i in range(1,len(col.chart_stations)):
@@ -1112,14 +1138,14 @@ class main_window:
 
                         if col.type == 'UP':
                             if count == 0:
-                                self.g_plan_canvas.create_text(x, h1 - (col.Length*scale), anchor=tk.SW,font=self.mono_f, text=string, fill='magenta')
+                                self.g_plan_canvas.create_text(x, h1 - (col.Length*scale), anchor=tk.SW,font=self.mono_f_chart, text=string, fill='magenta')
                             else:
-                                self.g_plan_canvas.create_text(x, h1 - (col.Length*scale), anchor=tk.S,font=self.mono_f, text=string, fill='magenta')
+                                self.g_plan_canvas.create_text(x, h1 - (col.Length*scale), anchor=tk.S,font=self.mono_f_chart, text=string, fill='magenta')
                         else:
                             if count == 0:
-                                self.g_plan_canvas.create_text(x, h1 + (col.Length*scale), anchor=tk.NW,font=self.mono_f, text=string, fill='magenta')
+                                self.g_plan_canvas.create_text(x, h1 + (col.Length*scale), anchor=tk.NW,font=self.mono_f_chart, text=string, fill='magenta')
                             else:
-                                self.g_plan_canvas.create_text(x, h1 + (col.Length*scale), anchor=tk.N,font=self.mono_f, text=string, fill='magenta')
+                                self.g_plan_canvas.create_text(x, h1 + (col.Length*scale), anchor=tk.N,font=self.mono_f_chart, text=string, fill='magenta')
 
                     if self.show_d.get()==1:
                         for i in range(1,len(col.chart_stations)):
@@ -1160,11 +1186,11 @@ class main_window:
         for beam in self.beams_analysis:
             if beam.type == 'span':
                 beam.build_load_function()
-                
+
         max_m = 0
         min_m = 0
         for beam in self.beams_analysis:
-                
+
             if beam.type=='cantilever' and beam.isleft == 1:
                 start_slope = self.beams_analysis[1].station_values()[0][3][0]/(self.beams_analysis[1].E*self.beams_analysis[1].I)
 
@@ -1175,7 +1201,7 @@ class main_window:
                 start_slope = self.beams_analysis[-2].station_values()[0][3][-1]/(self.beams_analysis[-2].E*self.beams_analysis[-2].I)
                 beam.add_starting_slope(start_slope)
                 beam.build_load_function()
-                
+
 
             max_m = max(max_m,max(beam.station_values()[0][2]))
             min_m = min(min_m,min(beam.station_values()[0][2]))
