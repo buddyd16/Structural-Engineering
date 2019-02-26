@@ -324,7 +324,7 @@ class main_window:
 
         self.g_plan_canvas.bind("<Button-1>", self.canvas_mouse_start)
         self.g_plan_canvas.bind("<B1-Motion>", self.canvas_mouse_move)
-        self.g_plan_canvas.bind("<MouseWheel>", self.canvas_zoom)
+        self.g_plan_canvas.bind_all("<MouseWheel>", self.canvas_zoom)
         self.g_plan_canvas.bind("<Double-Button-1>", self.canvas_reset)
 
         self.graph_b_frame = tk.Frame(self.g_a_frame, bd=2, relief='sunken', padx=4 ,pady=1)
@@ -347,15 +347,18 @@ class main_window:
         self.show_m_tension = tk.IntVar()
         self.show_m_tension.set(1)
         tk.Checkbutton(self.graph_b_frame, text=' : Show M on\ntension face', variable=self.show_m_tension, command=self.build_frame_graph, font=self.helv).grid(row=8, column=1, sticky = tk.W)
+        self.show_col_charts = tk.IntVar()
+        self.show_col_charts.set(1)
+        tk.Checkbutton(self.graph_b_frame, text=' : Show Col\nCharts', variable=self.show_col_charts, command=self.build_frame_graph, font=self.helv).grid(row=9, column=1, sticky = tk.W)
 
         self.refresh_graphic = tk.Button(self.graph_b_frame, text="Refresh",command=self.build_frame_graph, font=self.helv, width=10, height=h)
-        self.refresh_graphic.grid(row=9, column=1)
+        self.refresh_graphic.grid(row=10, column=1)
 
-        tk.Label(self.graph_b_frame, text='Result Scale:', font=self.helv).grid(row=10, column=1, sticky=tk.W)
+        tk.Label(self.graph_b_frame, text='Result Scale:', font=self.helv).grid(row=11, column=1, sticky=tk.W)
         self.res_scale = tk.StringVar()
         self.res_scale.set('10')
         self.res_scale_entry = tk.Entry(self.graph_b_frame, textvariable=self.res_scale, width=8)
-        self.res_scale_entry.grid(row=10, column=2, sticky=tk.W)
+        self.res_scale_entry.grid(row=11, column=2, sticky=tk.W)
 
         self.graph_b_frame.pack(side=tk.RIGHT, anchor='e')
 
@@ -394,8 +397,15 @@ class main_window:
         self.g_plan_canvas.scan_dragto(event.x, event.y, gain=1)
 
     def canvas_zoom(self, event):
-        x = self.g_plan_canvas.canvasx(event.x)
-        y = self.g_plan_canvas.canvasx(event.y)
+        #x = self.g_plan_canvas.canvasx(event.x)
+        #y = self.g_plan_canvas.canvasx(event.y)
+        
+        w = self.g_plan_canvas.winfo_width()
+        h = self.g_plan_canvas.winfo_height()
+        
+        x = w/2
+        y = h/2
+        
         if event.delta > 0:
             self.g_plan_canvas.scale('all', x, y, 1.1, 1.1)
         elif event.delta < 0:
@@ -1049,7 +1059,7 @@ class main_window:
                 if self.frame_solved == 0:
                     pass
                 else:
-                    if self.show_dfs.get()==1:
+                    if self.show_dfs.get()==1 and self.show_col_charts.get()==1:
                         dfb = col.dfi
                         dft = col.dfj
                         string = 'DFi: {0:.3f}\nDFj: {1:.3f}'.format(dfb,dft)
@@ -1065,7 +1075,7 @@ class main_window:
                             else:
                                 self.g_plan_canvas.create_text(x, h1 + (col.Length*scale), anchor=tk.N,font=self.mono_f_chart, text=string, fill='cyan')
 
-                    if self.show_v.get()==1:
+                    if self.show_v.get()==1 and self.show_col_charts.get()==1:
                         for i in range(1,len(col.chart_stations)):
                             if col.type == 'UP':
                                 y1 = h1 - (col.chart_stations[i-1]*scale)
@@ -1093,7 +1103,7 @@ class main_window:
                             else:
                                 self.g_plan_canvas.create_text(x, h1 + (col.Length*scale), anchor=tk.N,font=self.mono_f_chart, text=string, fill='red')
 
-                    if self.show_m.get()==1:
+                    if self.show_m.get()==1 and self.show_col_charts.get()==1:
                         for i in range(1,len(col.chart_stations)):
                             if col.type == 'UP':
                                 y1 = h1 - (col.chart_stations[i-1]*scale)
@@ -1121,7 +1131,7 @@ class main_window:
                             else:
                                 self.g_plan_canvas.create_text(x, h1 + (col.Length*scale), anchor=tk.N,font=self.mono_f_chart, text=string, fill='green')
 
-                    if self.show_s.get()==1:
+                    if self.show_s.get()==1 and self.show_col_charts.get()==1:
                         for i in range(1,len(col.chart_stations)):
                             if col.type == 'UP':
                                 y1 = h1 - (col.chart_stations[i-1]*scale)
@@ -1149,7 +1159,7 @@ class main_window:
                             else:
                                 self.g_plan_canvas.create_text(x, h1 + (col.Length*scale), anchor=tk.N,font=self.mono_f_chart, text=string, fill='magenta')
 
-                    if self.show_d.get()==1:
+                    if self.show_d.get()==1 and self.show_col_charts.get()==1:
                         for i in range(1,len(col.chart_stations)):
                             if col.type == 'UP':
                                 y1 = h1 - (col.chart_stations[i-1]*scale)
