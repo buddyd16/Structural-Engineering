@@ -47,6 +47,8 @@ class main_window:
         self.column_up_gui_list = []
         self.column_down_inputs = []
         self.column_down_gui_list = []
+        self.nodetorsion_inputs = []
+        self.nodetorsion_gui_list = []
         self.beam_labels = []
         self.gui_load_list = []
         self.load_change_index = 0
@@ -126,6 +128,9 @@ class main_window:
 
         self.b_remove_beam = tk.Button(self.geo_tab_frame, text="Remove Last Beam",command=self.remove_last_beam_func, font=self.helv, width=w, height=h, state=tk.DISABLED)
         self.b_remove_beam.grid(row=2,column=1)
+        
+        self.b_copy_beam = tk.Button(self.geo_tab_frame, text="Copy BM_1 to All",command=self.copy_beam_func, font=self.helv, width=w, height=h)
+        self.b_copy_beam.grid(row=3,column=1)
 
         self.b_add_left_cant = tk.Button(self.geo_tab_frame, text="Add Left Cantilever",command=self.add_cant_left_func, font=self.helv, width=w, height=h)
         self.b_add_left_cant.grid(row=1,column=2)
@@ -140,7 +145,7 @@ class main_window:
         self.b_remove_right_cant.grid(row=2,column=3)
 
         self.col_bm_notebook = ttk.Notebook(self.geo_tab_frame)
-        self.col_bm_notebook.grid(row=3,column=1, columnspan=4)
+        self.col_bm_notebook.grid(row=4,column=1, columnspan=4)
 
         self.bm_info_tab = ttk.Frame(self.col_bm_notebook)
         self.col_bm_notebook.add(self.bm_info_tab, text='Beam Data')
@@ -171,6 +176,9 @@ class main_window:
         tk.Label(self.colup_info_tab, text='A (in^2):').grid(row=1, column=6)
         tk.Label(self.colup_info_tab, text='Fixed Top:').grid(row=1, column=7)
         tk.Label(self.colup_info_tab, text='Hinge at Beam:').grid(row=1, column=8)
+        
+        self.b_copy_colup = tk.Button(self.colup_info_tab, text="Copy Col_1 to All",command=self.copy_colup_func, font=self.helv, width=w, height=h)
+        self.b_copy_colup.grid(row=1,column=9)
 
         self.coldwn_info_tab = ttk.Frame(self.col_bm_notebook)
         self.col_bm_notebook.add(self.coldwn_info_tab, text='Column Down Data')
@@ -182,7 +190,10 @@ class main_window:
         tk.Label(self.coldwn_info_tab, text='A (in^2):').grid(row=1, column=5)
         tk.Label(self.coldwn_info_tab, text='Fixed Base:').grid(row=1, column=6)
         tk.Label(self.coldwn_info_tab, text='Hinge at Beam:').grid(row=1, column=7)
-
+        
+        self.b_copy_coldwn = tk.Button(self.coldwn_info_tab, text="Copy Col_1 to All",command=self.copy_coldwn_func, font=self.helv, width=w, height=h)
+        self.b_copy_coldwn.grid(row=1,column=8)
+        
         self.geo_tab_frame.pack(fill=tk.BOTH, expand=1)
 
         #Loads Frame tabs
@@ -350,15 +361,18 @@ class main_window:
         self.show_col_charts = tk.IntVar()
         self.show_col_charts.set(1)
         tk.Checkbutton(self.graph_b_frame, text=' : Show Col\nCharts', variable=self.show_col_charts, command=self.build_frame_graph, font=self.helv).grid(row=9, column=1, sticky = tk.W)
+        self.show_bm_charts = tk.IntVar()
+        self.show_bm_charts.set(1)
+        tk.Checkbutton(self.graph_b_frame, text=' : Show Bm\nCharts', variable=self.show_bm_charts, command=self.build_frame_graph, font=self.helv).grid(row=10, column=1, sticky = tk.W)
 
-        self.refresh_graphic = tk.Button(self.graph_b_frame, text="Refresh",command=self.build_frame_graph, font=self.helv, width=10, height=h)
-        self.refresh_graphic.grid(row=10, column=1)
+        self.refresh_graphic = tk.Button(self.graph_b_frame, text="Refresh/Reset",command=self.build_frame_graph, font=self.helv, width=15, height=h)
+        self.refresh_graphic.grid(row=11, column=1)
 
-        tk.Label(self.graph_b_frame, text='Result Scale:', font=self.helv).grid(row=11, column=1, sticky=tk.W)
+        tk.Label(self.graph_b_frame, text='Result Scale:', font=self.helv).grid(row=12, column=1, sticky=tk.W)
         self.res_scale = tk.StringVar()
         self.res_scale.set('10')
         self.res_scale_entry = tk.Entry(self.graph_b_frame, textvariable=self.res_scale, width=8)
-        self.res_scale_entry.grid(row=11, column=2, sticky=tk.W)
+        self.res_scale_entry.grid(row=12, column=2, sticky=tk.W)
 
         self.graph_b_frame.pack(side=tk.RIGHT, anchor='e')
 
@@ -435,7 +449,7 @@ class main_window:
             self.column_up_inputs.append([tk.IntVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.IntVar(),tk.IntVar()])
             self.column_down_inputs.append([tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.IntVar(),tk.IntVar()])
             self.column_down_inputs.append([tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.IntVar(),tk.IntVar()])
-
+            
             self.column_up_inputs[-2][1].set('COL_UP_{0}'.format(self.beam_count))
             self.column_up_inputs[-2][2].set(10)
             self.column_up_inputs[-2][3].set(29000)
@@ -466,7 +480,7 @@ class main_window:
         else:
             self.column_up_inputs.append([tk.IntVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.IntVar(),tk.IntVar()])
             self.column_down_inputs.append([tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.IntVar(),tk.IntVar()])
-
+            
             self.column_up_inputs[-1][1].set('COL_UP_{0}'.format(self.beam_count+1))
             self.column_up_inputs[-1][2].set(self.column_up_inputs[-2][2].get())
             self.column_up_inputs[-1][3].set(self.column_up_inputs[-2][3].get())
@@ -489,6 +503,53 @@ class main_window:
         self.build_colup_gui_table()
         self.build_coldwn_gui_table()
 
+    def copy_beam_func(self, *args):
+        
+        l = self.beam_inputs[0][1].get()
+        E = self.beam_inputs[0][2].get()
+        I = self.beam_inputs[0][3].get()
+        
+        for i, bm in enumerate(self.beam_inputs):
+            bm[1].set(l)
+            bm[2].set(E)
+            bm[3].set(I)
+        
+    def copy_colup_func(self, *args):
+            
+            na = self.column_up_inputs[0][0].get()
+            h = self.column_up_inputs[0][2].get()
+            E = self.column_up_inputs[0][3].get()
+            I = self.column_up_inputs[0][4].get()
+            A = self.column_up_inputs[0][5].get()
+            fix = self.column_up_inputs[0][6].get()
+            hinge = self.column_up_inputs[0][7].get()
+            
+            for i, col in enumerate(self.column_up_inputs):
+                col[0].set(na)
+                col[2].set(h)
+                col[3].set(E)
+                col[4].set(I)
+                col[5].set(A)
+                col[6].set(fix)
+                col[7].set(hinge)
+        
+    def copy_coldwn_func(self, *args):
+    
+            h = self.column_down_inputs[0][1].get()
+            E = self.column_down_inputs[0][2].get()
+            I = self.column_down_inputs[0][3].get()
+            A = self.column_down_inputs[0][4].get()
+            fix = self.column_down_inputs[0][5].get()
+            hinge = self.column_down_inputs[0][6].get()
+            
+            for i, col in enumerate(self.column_down_inputs):
+                col[1].set(h)
+                col[2].set(E)
+                col[3].set(I)
+                col[4].set(A)
+                col[5].set(fix)
+                col[6].set(hinge)
+    
     def add_cant_left_func(self,*event):
 
         if self.cantL_count == 0:
@@ -599,6 +660,7 @@ class main_window:
             del self.beam_inputs[-1]
             del self.column_up_inputs[-1]
             del self.column_down_inputs[-1]
+            del self.nodetorsion_inputs[-1]
 
             self.build_bm_gui_table()
             self.build_colup_gui_table()
@@ -623,7 +685,7 @@ class main_window:
                 d.grid(row=i+2,column=4)
 
                 self.beam_gui_list.extend([a,b,c,d])
-
+            
     def build_colup_gui_table(self,*event):
         for element in self.column_up_gui_list:
             element.destroy()
@@ -860,7 +922,8 @@ class main_window:
                 column_up = frame2d.Column_Up(i_node, height, E, I, A, support, hinge_near)
 
                 self.columns_analysis.append(column_up)
-
+            
+            
         self.frame_built = 1
         self.frame_solved = 0
 
@@ -891,6 +954,17 @@ class main_window:
             scale_y = (hg-spacer)/ max(self.max_h_dwn_graph,self.max_h_up_graph)
 
             scale = min(scale_x, scale_y)
+            
+            v_scale = float(self.res_scale.get())
+            
+            s_scale = float(self.res_scale.get())
+            
+            d_scale = float(self.res_scale.get())
+            
+            if self.show_m_tension.get() == 1:
+                m_scale = float(self.res_scale.get())* -1
+            else:
+                m_scale = float(self.res_scale.get())
 
             for i,node in enumerate(self.nodes_analysis):
                 if node == self.nodes_analysis[-1]:
@@ -918,7 +992,7 @@ class main_window:
             if self.frame_solved == 0:
                 pass
             else:
-                if self.show_l.get() == 1:
+                if self.show_l.get() == 1 and self.show_bm_charts.get()==1:
                     for beam in self.beams_analysis:
                         for load in beam.Loads:
                             if load == beam.Loads[-1] or load == beam.Loads[-2] and beam.type == 'span':
@@ -936,15 +1010,14 @@ class main_window:
                                 for i in range(1,len(x)):
                                     self.g_plan_canvas.create_line((x[i-1]+spacer),hg - (y[i-1]),(x[i])+spacer,hg - (y[i]), fill = "blue", width=2)
 
-                if self.show_dfs.get() == 1:
+                if self.show_dfs.get() == 1 and self.show_bm_charts.get()==1:
                     for beam in self.beams_analysis:
                         string = 'DFi: {0:.3f}\nDFj: {1:.3f} '.format(beam.dfi,beam.dfj)
                         x0 =  (((beam.i.x+beam.j.x)/2)*scale) + spacer
 
                         self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f_chart, text=string, fill='cyan')
 
-                if self.show_v.get()==1:
-                    v_scale = float(self.res_scale.get())
+                if self.show_v.get()==1 and self.show_bm_charts.get()==1:
                     for beam in self.beams_analysis:
                         for i in range(1,len(beam.chart_stations)):
                             x1 = (beam.chart_stations[i-1]+beam.i.x)*scale + spacer
@@ -959,13 +1032,8 @@ class main_window:
 
                         self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f_chart, text=string, fill='red')
 
-                if self.show_m.get()==1:
-                    if self.show_m_tension.get() == 1:
-                        m_scale = float(self.res_scale.get())* -1
-                    else:
-                        m_scale = float(self.res_scale.get())
-
-
+                if self.show_m.get()==1 and self.show_bm_charts.get()==1:
+                
                     for beam in self.beams_analysis:
                         string_max = ''
                         string_min = ''
@@ -989,8 +1057,8 @@ class main_window:
                         string = 'Mi {0:.2f} ft-kips\nMj {1:.2f} ft-kips'.format(beam.station_values()[0][2][0],beam.station_values()[0][2][-1])
                         self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f_chart, text=string+string_max+string_min, fill='green')
 
-                if self.show_s.get()==1:
-                    s_scale = float(self.res_scale.get())
+                if self.show_s.get()==1 and self.show_bm_charts.get()==1:
+                    
                     for beam in self.beams_analysis:
                         for i in range(1,len(beam.chart_stations)):
                             x1 = (beam.chart_stations[i-1]+beam.i.x)*scale + spacer
@@ -1009,8 +1077,8 @@ class main_window:
 
                         self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f_chart, text=string, fill='magenta')
 
-                if self.show_d.get()==1:
-                    d_scale = float(self.res_scale.get())
+                if self.show_d.get()==1 and self.show_bm_charts.get()==1:
+                    
                     for beam in self.beams_analysis:
                         string_max = ''
                         string_min = ''

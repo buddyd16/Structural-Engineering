@@ -31,7 +31,6 @@ class node:
         self.x = x
         self.K = 0
 
-
     def sum_node_k(self, beams, columns):
         self.K = 0
 
@@ -42,7 +41,7 @@ class node:
         for column in columns:
             if column.i == self or column.j == self:
                 self.K += column.K
-
+        
     def sum_node_moments(self, beams, columns):
         self.m_unbalance = 0
         self.m_balance = 0
@@ -63,8 +62,8 @@ class node:
                 self.m_unbalance += sum(column.mj)
             else:
                 pass
-
-        self.m_balance = -1.0*self.m_unbalance
+        
+        self.m_balance = -1.0*(self.m_unbalance)
 
     def sum_node_reactions(self, beams):
         node_reaction = 0
