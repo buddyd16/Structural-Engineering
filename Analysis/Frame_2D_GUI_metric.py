@@ -894,7 +894,7 @@ class main_window:
             height=float(col[1].get())
             E=float(col[2].get())* (1/1000) * (1/math.pow(0.001,2))       #convert Mpa = N/mm^2 to kN/m^2
             I=float(col[3].get()) * (math.pow(0.001,4))                   #covert from mm^4 to m^4
-            A=float(col[4].get())/144.0
+            A=float(col[4].get())*math.pow(0.001,2) #convert mm^2 to m^2
             support=col[5].get()
             hinge_near=col[6].get()
 
@@ -914,7 +914,7 @@ class main_window:
                 height=float(col[2].get())
                 E=float(col[3].get())* (1/1000) * (1/math.pow(0.001,2))       #convert Mpa = N/mm^2 to kN/m^2
                 I=float(col[4].get()) * (math.pow(0.001,4))                   #covert from mm^4 to m^4
-                A=float(col[5].get())/144.0
+                A=float(col[5].get())*math.pow(0.001,2) #convert mm^2 to m^2
                 support=col[6].get()
                 hinge_near=col[7].get()
 
