@@ -1085,9 +1085,9 @@ class main_window:
                         string_min = ''
                         for i in range(1,len(beam.chart_stations)):
                             if beam.type == 'cantilever' and beam.isleft == 1:
-                                d0 = (self.beams_analysis[1].station_values()[0][4][0]/(self.beams_analysis[1].E*self.beams_analysis[1].I))*12.0
+                                d0 = (self.beams_analysis[1].station_values()[0][4][0]/(self.beams_analysis[1].E*self.beams_analysis[1].I))*1000.0
                             elif beam.type == 'cantilever' and beam.isleft == 0:
-                                d0 = (self.beams_analysis[-2].station_values()[0][4][-1]/(self.beams_analysis[-2].E*self.beams_analysis[-2].I))*12.0
+                                d0 = (self.beams_analysis[-2].station_values()[0][4][-1]/(self.beams_analysis[-2].E*self.beams_analysis[-2].I))*1000.0
                             else:
                                 d0 = 0
                             x1 = (beam.chart_stations[i-1]+beam.i.x)*scale + spacer
