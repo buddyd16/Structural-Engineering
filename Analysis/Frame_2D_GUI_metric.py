@@ -241,10 +241,10 @@ class main_window:
         self.g_applied_loads_frame = tk.Frame(self.g_loads_frame, bd=2, relief='sunken', padx=1,pady=1)
 
         tk.Label(self.g_applied_loads_frame, text='On Beam:').grid(row=1,column=1)
-        tk.Label(self.g_applied_loads_frame, text='P,M,W1:').grid(row=1,column=2)
-        tk.Label(self.g_applied_loads_frame, text='W2:').grid(row=1,column=3)
-        tk.Label(self.g_applied_loads_frame, text='a:').grid(row=1,column=4)
-        tk.Label(self.g_applied_loads_frame, text='b:').grid(row=1,column=5)
+        tk.Label(self.g_applied_loads_frame, text='P,M,W1:\n(kN,kN*m,kN/m)').grid(row=1,column=2)
+        tk.Label(self.g_applied_loads_frame, text='W2:\n(kN/m)').grid(row=1,column=3)
+        tk.Label(self.g_applied_loads_frame, text='a:\n(m)').grid(row=1,column=4)
+        tk.Label(self.g_applied_loads_frame, text='b:\n(m)').grid(row=1,column=5)
         tk.Label(self.g_applied_loads_frame, text='kind:').grid(row=1,column=6)
         tk.Label(self.g_applied_loads_frame, text='type:').grid(row=1,column=7)
 
