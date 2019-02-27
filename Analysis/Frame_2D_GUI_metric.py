@@ -27,6 +27,7 @@ import ttk
 import tkFont
 import tkFileDialog
 import Frame_Moment_Distribution_2D as frame2d
+import math
 
 class main_window:
 
@@ -867,8 +868,8 @@ class main_window:
             self.nodes_analysis.append(frame2d.node(j))
             newi = self.nodes_analysis[-2]
             newj = self.nodes_analysis[-1]
-            E_ksf = float(self.cantL_beam_inputs[-1][2].get())* (1/1000) * (1/math.pow(0.001,2))       #convert Mpa = N/mm^2 to kN/m^2
-            I_ft4 = float(self.cantL_beam_inputs[-1][3].get()) * (math.pow(0.001,4))                   #covert from mm^4 to m^4
+            E_ksf = float(self.beam_inputs[-1][2].get())* (1/1000) * (1/math.pow(0.001,2))       #convert Mpa = N/mm^2 to kN/m^2
+            I_ft4 = float(self.beam_inputs[-1][3].get()) * (math.pow(0.001,4))                   #covert from mm^4 to m^4
 
             beam = frame2d.Beam(newi,newj,E_ksf,I_ft4, [], label)
 
