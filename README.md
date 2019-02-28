@@ -13,7 +13,7 @@ Currently and alpha level program. Load combinations have not been implemented i
 Backend solver utilizes moment distribution. By default only the columns down provide vertical suppot and the solver performs a 2-pass moment distribution where after pass 1 the beam reactions are applied to the columns down and the columns are shortened by PL/AE pass 2 determines the fixed end moments created by the column shortening and then performs the distrubtion of those moments.
 
 In action (video was recorded on Linux and is a bit rough, graphics are a bit better on mac and windows machines):
-<video src="images/frame_2d.webm?raw=true" width="320" height="200" controls preload></video>
+![Frame_2D.webm](images/frame_2d.webm?raw=true "Frame_2D.webm")
 
 ## Strap Beam - strap_beam_gui.py
 Tkinter GUI based Python Program
