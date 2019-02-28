@@ -13,7 +13,7 @@ Currently and alpha level program. Load combinations have not been implemented i
 Bacend solver utilizes moment distribution.
 
 In action (gif was recorded on Linux and is a bit rough, graphics are a bit better on mac and windows machines):
-![Frame 2D gif](images/frame_2d.gif?raw=true "Frame_2D")
+![Frame 2D gif](images/frame_2d.webm?raw=true "Frame_2D")
 
 ## Strap Beam - strap_beam_gui.py
 Tkinter GUI based Python Program
