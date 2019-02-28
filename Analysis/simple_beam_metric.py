@@ -1938,7 +1938,7 @@ class Master_window:
             file.write('<tr>\n<td colspan="2"><u>Center Span Max/Min Moments (kN*m):</u></td>\n</tr>\n')
             for x in self.zero_shear_loc:
                 v,m,s,d = self.analysisx(x)
-                file.write('<tr>\n<td>@{0:.4f} ft</td>\n<td>{1:.4f}</td>\n</tr>\n'.format(x,m[1]))
+                file.write('<tr>\n<td>@{0:.4f} m</td>\n<td>{1:.4f}</td>\n</tr>\n'.format(x,m[1]))
             file.write('<tr>\n<td colspan="2"><u>Center Span Max/Min Deflections (mm):</u></td>\n</tr>\n')
             
             E = float(self.E_ksi.get()) * (1/1000) * (1/math.pow(0.001,2))       #convert Mpa = N/mm^2 to kN/m^2
@@ -1946,7 +1946,7 @@ class Master_window:
 
             for x in self.zero_slope_loc:
                 v,m,s,d = self.analysisx(x)
-                file.write('<tr>\n<td>@{0:.3E} ft</td>\n<td>{1:.4f}</td>\n</tr>\n'.format(x,(d[1]/(E*I))*1000.0))
+                file.write('<tr>\n<td>@{0:.3E} m</td>\n<td>{1:.4f}</td>\n</tr>\n'.format(x,(d[1]/(E*I))*1000.0))
 
         file.write('</table>\n<br>\n</div>\n<br>\n')
         # Equations
