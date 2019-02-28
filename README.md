@@ -4,6 +4,17 @@ Everything was developed using a standard install of the 2.7.10 version of Pytho
 
 This is a collection of various scripts I have been and continue to work on for various day to day calculations. I intend to keep the scripts organized by design topic ie the folder structure presented. The intent is for the scripts to cover simple one off calculations so don't plan on any full building modeling programs. When things develope beyond simple scripts I'll create additional repositories that fit a better organizational structure.
 
+## Frame_2D_GUI.py or Frame_2D_GUI_metric.py
+Tkinter GUI based Python Program
+Requires the analysis folder and contained py files
+
+Currently and alpha level program. Load combinations have not been implemented in the back end but do show up in the graphical interface, so all loads input will be currently applied with a load factor of 1.
+
+Bacend solver utilizes moment distribution.
+
+In action:
+![Frame 2D gif](images/frame_2d.gif?raw=true "Frame_2D")
+
 ## Strap Beam - strap_beam_gui.py
 Tkinter GUI based Python Program
 requires the analysis folder and contained py files and the concrete folder and contained python files.
