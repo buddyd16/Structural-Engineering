@@ -10,10 +10,10 @@ Requires the analysis folder and contained py files
 
 Currently and alpha level program. Load combinations have not been implemented in the back end but do show up in the graphical interface, so all loads input will be currently applied with a load factor of 1.
 
-Bacend solver utilizes moment distribution.
+Backend solver utilizes moment distribution. By default only the columns down provide vertical suppot and the solver performs a 2-pass moment distribution where after pass 1 the beam reactions are applied to the columns down and the columns are shortened by PL/AE pass 2 determines the fixed end moments created by the column shortening and then performs the distrubtion of those moments.
 
-In action (gif was recorded on Linux and is a bit rough, graphics are a bit better on mac and windows machines):
-![Frame 2D gif](images/frame_2d.webm?raw=true "Frame_2D")
+In action (video was recorded on Linux and is a bit rough, graphics are a bit better on mac and windows machines):
+![Frame 2D webm](images/frame_2d.webm?raw=true "Frame_2D")
 
 ## Strap Beam - strap_beam_gui.py
 Tkinter GUI based Python Program
