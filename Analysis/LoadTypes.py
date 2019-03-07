@@ -217,25 +217,30 @@ def load_combination_multi(load_types, factors, patterns):
 
     return load_set
 
-
+Self = LoadType(False,1,'Self','SW')
 Dead = LoadType(False,1,'Dead','DL')
-Live = LoadType(True,0,'Live','LL')
+Live = LoadType(False,0,'Live','LL')
+Live_pat = LoadType(True,0.5,'Live_pat','LL_pat')
 
-
+Self.add_multi_loads([[0,1,0,0,10,30,0,'UDL'],[1,1,0,10,20,30,0,'UDL'],[2,1,0,20,30,30,0,'UDL']])
 Dead.add_multi_loads([[0,1,0,0,10,30,0,'UDL'],[1,1,0,10,20,30,0,'UDL'],[2,1,0,20,30,30,0,'UDL']])
 
 Live.add_multi_loads([[0,1,0,0,10,30,0,'UDL'],[1,1,0,10,20,30,0,'UDL'],[2,1,0,20,30,30,0,'UDL']])
+Live_pat.add_multi_loads([[0,1,0,0,10,30,0,'UDL'],[1,1,0,10,20,30,0,'UDL'],[2,1,0,20,30,30,0,'UDL']])
 
 patterns = load_patterns_by_span_ACI(3, False)
-#patterns = [[1,1,1]]
 
-dlf = [1.4,1.2,1.2]
-llf = [0,1.6,0.5*1.6]
 
-combos = [[i,j] for i,j in zip(dlf,llf)]
+combos = [[1,1,0,0],[0,0,1,1],[1,1,1,1],[3,3,1,1],[1.4,1.4,0,0],[1.2,1.2,1.6,1.6]]
 
-combined_loads = load_combination_multi([Dead,Live],combos,patterns)
+combined_loads = load_combination_multi([Self,Dead,Live,Live_pat],combos,patterns)
 
-single_combo = load_combination([Dead,Live],[1.2,1.6],patterns)
+unique_combo = []
 
+for i, combined in enumerate(combined_loads):
+    if i == 0 or combined != combined_loads[i-1]:
+        unique_combo.append(combined)
+    else:
+        pass
+            
 
