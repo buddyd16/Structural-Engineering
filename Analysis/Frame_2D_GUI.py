@@ -194,6 +194,11 @@ class main_window:
         self.b_copy_coldwn = tk.Button(self.coldwn_info_tab, text="Copy Col_1 to All",command=self.copy_coldwn_func, font=self.helv, width=w, height=h)
         self.b_copy_coldwn.grid(row=1,column=8)
         
+        self.cols_compress = tk.IntVar()
+        self.cols_compress.set(1)
+        tk.Checkbutton(self.coldwn_info_tab, text=' : Columns are Compressible', variable=self.cols_compress,font=self.helv).grid(row=2, column=8, sticky = tk.W)
+        
+        
         self.geo_tab_frame.pack(fill=tk.BOTH, expand=1)
 
         #Loads Frame tabs
@@ -1260,7 +1265,7 @@ class main_window:
         for i,beam in enumerate(self.beams_analysis):
             beam.new_load_list(sorted_load_list[i])
 
-        Consider_shortening = 1
+        Consider_shortening = self.cols_compress.get()
 
         frame2d.moment_distribution(self.nodes_analysis,self.beams_analysis,self.columns_analysis,Consider_shortening,1e-20)
 

@@ -114,11 +114,11 @@ class CantBeam:
 
         self.K = 0
 
-        step = self.Length/15.0
+        step = self.Length/20.0
 
         self.chart_stations = [0]
 
-        for i in range(1,15):
+        for i in range(1,20):
             self.chart_stations.append(self.chart_stations[i-1]+step)
 
         self.chart_stations.append(self.Length)
@@ -326,11 +326,11 @@ class Beam:
 
         self.K = self.E*self.I / self.Length
 
-        step = self.Length/15.0
+        step = self.Length/20.0
 
         self.chart_stations = [0]
 
-        for i in range(1,15):
+        for i in range(1,20):
             self.chart_stations.append(self.chart_stations[i-1]+step)
 
         self.chart_stations.append(self.Length)
@@ -497,15 +497,18 @@ class Beam:
                 res = ppbeam.eval_beam_piece_function(self.equations,x)
 
                 if len(self.loads_delta) == 0:
-                    pass
+                    v.append(res[0])
+                    m.append(res[1])
+                    eis.append(res[2])
+                    eid.append(res[3])
                 else:
                     res_d = ppbeam.eval_beam_piece_function(self.equations_delta,x)
                     end_delta_d.append(res_d[3])
 
-                v.append(res[0])
-                m.append(res[1])
-                eis.append(res[2]+res_d[2])
-                eid.append(res[3]+res_d[3])
+                    v.append(res[0])
+                    m.append(res[1])
+                    eis.append(res[2]+res_d[2])
+                    eid.append(res[3]+res_d[3])
 
             return [self.chart_stations, v, m, eis, eid],end_delta_d
 
@@ -537,11 +540,11 @@ class Column_Up:
         self.mj = [0]
         self.dfi = 0
 
-        step = self.Length/15.0
+        step = self.Length/20.0
 
         self.chart_stations = [0]
 
-        for i in range(1,15):
+        for i in range(1,20):
             self.chart_stations.append(self.chart_stations[i-1]+step)
 
         self.chart_stations.append(self.Length)
@@ -568,11 +571,11 @@ class Column_Up:
     def new_height(self, height):
 
         self.Length = height
-        step = self.Length/25.0
+        step = self.Length/20.0
 
         self.chart_stations = [0]
 
-        for i in range(1,25):
+        for i in range(1,20):
             self.chart_stations.append(self.chart_stations[i-1]+step)
 
         self.chart_stations.append(self.Length)
@@ -657,11 +660,11 @@ class Column_Down:
         self.mj = [0]
         self.dfj = 0
 
-        step = self.Length/15.0
+        step = self.Length/20.0
 
         self.chart_stations = [0]
 
-        for i in range(1,15):
+        for i in range(1,20):
             self.chart_stations.append(self.chart_stations[i-1]+step)
 
         self.chart_stations.append(self.Length)
@@ -688,11 +691,11 @@ class Column_Down:
     def new_height(self, height):
 
         self.Length = height
-        step = self.Length/25.0
+        step = self.Length/20.0
 
         self.chart_stations = [0]
 
-        for i in range(1,25):
+        for i in range(1,20):
             self.chart_stations.append(self.chart_stations[i-1]+step)
 
         self.chart_stations.append(self.Length)
