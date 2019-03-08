@@ -30,6 +30,7 @@ class node:
 
         self.x = x
         self.K = 0
+        self.ry = 0
 
     def sum_node_k(self, beams, columns):
         self.K = 0
@@ -79,6 +80,8 @@ class node:
 
             else:
                 pass
+        
+        self.ry = node_reaction
 
         return node_reaction
 
@@ -527,7 +530,10 @@ class Column_Up:
         self.I = I
         self.A = A
         self.Length = height # Use Length to make loop plotting easier
+        self.orig_Length = height
         self.type = 'UP'
+        self.rix = 0
+        self.rjx = 0
 
         if support == 1:
             self.fix = 1
@@ -571,6 +577,7 @@ class Column_Up:
     def new_height(self, height):
 
         self.Length = height
+        
         step = self.Length/20.0
 
         self.chart_stations = [0]
@@ -629,9 +636,12 @@ class Column_Up:
                 m.append(res[1])
                 eis.append(res[2])
                 eid.append(res[3])
-
+            
+            self.rix = -1*v[0]
+            self.rjx = -1*v[-1]
+            
             return [self.chart_stations, v, m, eis, eid]
-
+            
 
 class Column_Down:
     def __init__(self, j_node, height=1, E=1, I=1, A=1, support=1, hinge_near=0):
@@ -647,7 +657,11 @@ class Column_Down:
         self.I = I
         self.A = A
         self.Length = height # Use Length to make loop plotting easier
+        self.orig_Length = height
         self.type = 'DOWN'
+        self.rix = 0
+        self.rjx = 0
+        self.riy = 0
 
         if support == 1:
             self.fix = 1
@@ -749,8 +763,15 @@ class Column_Down:
                 m.append(res[1])
                 eis.append(res[2])
                 eid.append(res[3])
-
+                
+            self.rix = -1*v[0]
+            self.rjx = -1*v[-1]
+            
             return [self.chart_stations, v, m, eis, eid]
+            
+    def base_reaction(self):
+        self.riy = self.j.ry
+    
 
 def beams_all_same(nodes, E, I, load):
     beams = []
@@ -943,6 +964,7 @@ def moment_distribution(nodes, beams, columns, shortening=0, tolerance=1e-11):
         node_r.append(node.sum_node_reactions(beams))
 
     node_delta = []
+    
     if shortening == 1:
         # Determine column shortening for reactions - PL/AE
         i = 0
@@ -1031,9 +1053,9 @@ def moment_distribution(nodes, beams, columns, shortening=0, tolerance=1e-11):
             delta_node_r.append(node.sum_node_reactions(beams))
 
     else:
-        pass
-
-    return node_delta
+        delta_node_r = [0 for node in nodes]
+    
+    return [node_r, delta_node_r]
 
 
 # tolerance = 1e-6

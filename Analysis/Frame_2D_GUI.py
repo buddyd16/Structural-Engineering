@@ -998,141 +998,158 @@ class main_window:
             if self.frame_solved == 0:
                 pass
             else:
-                if self.show_l.get() == 1 and self.show_bm_charts.get()==1:
-                    for beam in self.beams_analysis:
-                        for load in beam.Loads:
-                            if load == beam.Loads[-1] or load == beam.Loads[-2] and beam.type == 'span':
-                                pass
-                            else:
-                                y_scale = float(self.res_scale.get())
-                                x_scale = scale
+                for beam in self.beams_analysis:
+                    if self.show_l.get() == 1 and self.show_bm_charts.get()==1:
+                            for load in beam.Loads:
+                                if load == beam.Loads[-1] or load == beam.Loads[-2] and beam.type == 'span':
+                                    pass
+                                else:
+                                    y_scale = float(self.res_scale.get())
+                                    x_scale = scale
 
-                                x0 = (beam.i.x)*x_scale
+                                    x0 = (beam.i.x)*x_scale
 
-                                x,y = load.chart_load(x_scale,y_scale,1)
+                                    x,y = load.chart_load(x_scale,y_scale,1)
 
-                                x = [i+x0 for i in x]
+                                    x = [i+x0 for i in x]
 
-                                for i in range(1,len(x)):
-                                    self.g_plan_canvas.create_line((x[i-1]+spacer),hg - (y[i-1]),(x[i])+spacer,hg - (y[i]), fill = "blue", width=2)
+                                    for i in range(1,len(x)):
+                                        self.g_plan_canvas.create_line((x[i-1]+spacer),hg - (y[i-1]),(x[i])+spacer,hg - (y[i]), fill = "blue", width=2)
 
-                if self.show_dfs.get() == 1 and self.show_bm_charts.get()==1:
-                    for beam in self.beams_analysis:
-                        string = 'DFi: {0:.3f}\nDFj: {1:.3f} '.format(beam.dfi,beam.dfj)
-                        x0 =  (((beam.i.x+beam.j.x)/2)*scale) + spacer
+                    if self.show_dfs.get() == 1 and self.show_bm_charts.get()==1:
+                        
+                            string = 'DFi: {0:.3f}\nDFj: {1:.3f} '.format(beam.dfi,beam.dfj)
+                            x0 =  (((beam.i.x+beam.j.x)/2)*scale) + spacer
 
-                        self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f_chart, text=string, fill='cyan')
-
-                if self.show_v.get()==1 and self.show_bm_charts.get()==1:
-                    for beam in self.beams_analysis:
-                        for i in range(1,len(beam.chart_stations)):
-                            x1 = (beam.chart_stations[i-1]+beam.i.x)*scale + spacer
-                            x2 = (beam.chart_stations[i]+beam.i.x)*scale + spacer
-                            y1 = hg - (beam.station_values()[0][1][i-1] * v_scale)
-                            y2 = hg - (beam.station_values()[0][1][i] * v_scale)
-
-                            self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="red", width=2)
-
-                        string = 'Vi: {0:.2f} kips\nVj: {1:.2f} kips'.format(beam.station_values()[0][1][0],beam.station_values()[0][1][-1])
-                        x0 =  (((beam.i.x+beam.j.x)/2)*scale) + spacer
-
-                        self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f_chart, text=string, fill='red')
-
-                if self.show_m.get()==1 and self.show_bm_charts.get()==1:
-                
-                    for beam in self.beams_analysis:
-                        string_max = ''
-                        string_min = ''
-                        for i in range(1,len(beam.chart_stations)):
-                            x1 = (beam.chart_stations[i-1]+beam.i.x)*scale + spacer
-                            x2 = (beam.chart_stations[i]+beam.i.x)*scale + spacer
-                            y1 = hg - (beam.station_values()[0][2][i-1] * m_scale)
-                            y2 = hg - (beam.station_values()[0][2][i] * m_scale)
-
-                            self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="green", width=2)
-
-
-                            if beam.station_values()[0][2][i] == max(beam.station_values()[0][2]) and  beam.station_values()[0][2][i] != beam.station_values()[0][2][-1]:
-                                string_max = '\nM,max {0:.2f} ft-kips @ {1:.2f} ft'.format(beam.station_values()[0][2][i],beam.chart_stations[i])
-
-
-                            if beam.station_values()[0][2][i] == min(beam.station_values()[0][2]) and  beam.station_values()[0][2][i] != beam.station_values()[0][2][-1]:
-                                string_min = '\nM,min {0:.2f} ft-kips @ {1:.2f} ft'.format(beam.station_values()[0][2][i],beam.chart_stations[i])
-
-                        x0 =  (((beam.i.x+beam.j.x)/2)*scale) + spacer
-                        string = 'Mi {0:.2f} ft-kips\nMj {1:.2f} ft-kips'.format(beam.station_values()[0][2][0],beam.station_values()[0][2][-1])
-                        self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f_chart, text=string+string_max+string_min, fill='green')
-
-                if self.show_s.get()==1 and self.show_bm_charts.get()==1:
+                            self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f_chart, text=string, fill='cyan')
                     
-                    for beam in self.beams_analysis:
-                        for i in range(1,len(beam.chart_stations)):
-                            x1 = (beam.chart_stations[i-1]+beam.i.x)*scale + spacer
-                            x2 = (beam.chart_stations[i]+beam.i.x)*scale + spacer
-                            y1 = hg - ((beam.station_values()[0][3][i-1]/(beam.E*beam.I)) * s_scale)
-                            y2 = hg - ((beam.station_values()[0][3][i]/(beam.E*beam.I)) * s_scale)
+                    if self.show_r.get() == 1 and self.show_bm_charts.get()==1:
+                            string = 'Riy: {0:.3f} kips\nRjy: {1:.3f} kips'.format(beam.reactions()[0],beam.reactions()[1])
+                            x0 =  (((beam.i.x+beam.j.x)/2)*scale) + spacer
 
-                            self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="magenta", width=2)
-
-
-                        si = (beam.station_values()[0][3][0]) /(beam.E*beam.I)
-                        sj = (beam.station_values()[0][3][-1]) /(beam.E*beam.I)
-
-                        string = 'Si: {0:.5f} rad\nSj: {1:.5f} rad'.format(si,sj)
-                        x0 =  (((beam.i.x+beam.j.x)/2)*scale) + spacer
-
-                        self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f_chart, text=string, fill='magenta')
-
-                if self.show_d.get()==1 and self.show_bm_charts.get()==1:
+                            self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f_chart, text=string, fill='red')
                     
-                    for beam in self.beams_analysis:
-                        string_max = ''
-                        string_min = ''
-                        for i in range(1,len(beam.chart_stations)):
-                            if beam.type == 'cantilever' and beam.isleft == 1:
-                                d0 = (self.beams_analysis[1].station_values()[0][4][0]/(self.beams_analysis[1].E*self.beams_analysis[1].I))*12.0
-                            elif beam.type == 'cantilever' and beam.isleft == 0:
-                                d0 = (self.beams_analysis[-2].station_values()[0][4][-1]/(self.beams_analysis[-2].E*self.beams_analysis[-2].I))*12.0
-                            else:
-                                d0 = 0
-                            x1 = (beam.chart_stations[i-1]+beam.i.x)*scale + spacer
-                            x2 = (beam.chart_stations[i]+beam.i.x)*scale + spacer
-                            y1 = hg - ((beam.station_values()[0][4][i-1]/(beam.E*beam.I)) * d_scale * 12.0) - (d0*d_scale)
-                            y2 = hg - ((beam.station_values()[0][4][i]/(beam.E*beam.I)) * d_scale * 12.0) - (d0*d_scale)
+                    if self.show_v.get()==1 and self.show_bm_charts.get()==1:
+                            for i in range(1,len(beam.chart_stations)):
+                                x1 = (beam.chart_stations[i-1]+beam.i.x)*scale + spacer
+                                x2 = (beam.chart_stations[i]+beam.i.x)*scale + spacer
+                                y1 = hg - (beam.station_values()[0][1][i-1] * v_scale)
+                                y2 = hg - (beam.station_values()[0][1][i] * v_scale)
 
-                            self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="yellow", width=2)
+                                self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="red", width=2)
 
-                            if beam.station_values()[0][4][i] == max(beam.station_values()[0][4]) and  beam.station_values()[0][4][i] != beam.station_values()[0][4][-1] and beam.type=='span':
-                                string_max = '\nD,max {0:.2f} in @ {1:.2f} ft'.format(12.0*beam.station_values()[0][4][i]/(beam.E*beam.I),beam.chart_stations[i])
+                            string = 'Vi: {0:.2f} kips\nVj: {1:.2f} kips'.format(beam.station_values()[0][1][0],beam.station_values()[0][1][-1])
+                            x0 =  (((beam.i.x+beam.j.x)/2)*scale) + spacer
 
-                            if beam.station_values()[0][4][i] == min(beam.station_values()[0][4]) and  beam.station_values()[0][4][i] != beam.station_values()[0][4][-1] and beam.type=='span':
-                                string_min = '\nD,min {0:.2f} in @ {1:.2f} ft'.format(12.0*beam.station_values()[0][4][i]/(beam.E*beam.I),beam.chart_stations[i])
+                            self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f_chart, text=string, fill='red')
 
-                            if beam.type == 'cantilever' and beam.isleft == 1:
-                                string_max = '\nD {0:.2f} in @ 0 ft'.format(12.0*beam.station_values()[0][4][0]/(beam.E*beam.I))
+                    if self.show_m.get()==1 and self.show_bm_charts.get()==1:
+                            string_max = ''
+                            string_min = ''
+                            for i in range(1,len(beam.chart_stations)):
+                                x1 = (beam.chart_stations[i-1]+beam.i.x)*scale + spacer
+                                x2 = (beam.chart_stations[i]+beam.i.x)*scale + spacer
+                                y1 = hg - (beam.station_values()[0][2][i-1] * m_scale)
+                                y2 = hg - (beam.station_values()[0][2][i] * m_scale)
 
-                            if beam.type == 'cantilever' and beam.isleft == 0:
-                                string_max = '\nD {0:.2f} in @ {1:.2f} ft'.format(12.0*beam.station_values()[0][4][-1]/(beam.E*beam.I), beam.Length)
+                                self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="green", width=2)
 
-                        x0 =  (((beam.i.x+beam.j.x)/2)*scale) + spacer
-                        self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f_chart, text=string_max+string_min, fill='yellow')
+
+                                if beam.station_values()[0][2][i] == max(beam.station_values()[0][2]) and  beam.station_values()[0][2][i] != beam.station_values()[0][2][-1]:
+                                    string_max = '\nM,max {0:.2f} ft-kips @ {1:.2f} ft'.format(beam.station_values()[0][2][i],beam.chart_stations[i])
+
+
+                                if beam.station_values()[0][2][i] == min(beam.station_values()[0][2]) and  beam.station_values()[0][2][i] != beam.station_values()[0][2][-1]:
+                                    string_min = '\nM,min {0:.2f} ft-kips @ {1:.2f} ft'.format(beam.station_values()[0][2][i],beam.chart_stations[i])
+
+                            x0 =  (((beam.i.x+beam.j.x)/2)*scale) + spacer
+                            string = 'Mi {0:.2f} ft-kips\nMj {1:.2f} ft-kips'.format(beam.station_values()[0][2][0],beam.station_values()[0][2][-1])
+                            self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f_chart, text=string+string_max+string_min, fill='green')
+
+                    if self.show_s.get()==1 and self.show_bm_charts.get()==1:
+                        
+                            for i in range(1,len(beam.chart_stations)):
+                                x1 = (beam.chart_stations[i-1]+beam.i.x)*scale + spacer
+                                x2 = (beam.chart_stations[i]+beam.i.x)*scale + spacer
+                                y1 = hg - ((beam.station_values()[0][3][i-1]/(beam.E*beam.I)) * s_scale)
+                                y2 = hg - ((beam.station_values()[0][3][i]/(beam.E*beam.I)) * s_scale)
+
+                                self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="magenta", width=2)
+
+
+                            si = (beam.station_values()[0][3][0]) /(beam.E*beam.I)
+                            sj = (beam.station_values()[0][3][-1]) /(beam.E*beam.I)
+
+                            string = 'Si: {0:.5f} rad\nSj: {1:.5f} rad'.format(si,sj)
+                            x0 =  (((beam.i.x+beam.j.x)/2)*scale) + spacer
+
+                            self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f_chart, text=string, fill='magenta')
+
+                    if self.show_d.get()==1 and self.show_bm_charts.get()==1:
+                        
+                            string_max = ''
+                            string_min = ''
+                            for i in range(1,len(beam.chart_stations)):
+                                if beam.type == 'cantilever' and beam.isleft == 1:
+                                    d0 = (self.beams_analysis[1].station_values()[0][4][0]/(self.beams_analysis[1].E*self.beams_analysis[1].I))*12.0
+                                elif beam.type == 'cantilever' and beam.isleft == 0:
+                                    d0 = (self.beams_analysis[-2].station_values()[0][4][-1]/(self.beams_analysis[-2].E*self.beams_analysis[-2].I))*12.0
+                                else:
+                                    d0 = 0
+                                x1 = (beam.chart_stations[i-1]+beam.i.x)*scale + spacer
+                                x2 = (beam.chart_stations[i]+beam.i.x)*scale + spacer
+                                y1 = hg - ((beam.station_values()[0][4][i-1]/(beam.E*beam.I)) * d_scale * 12.0) - (d0*d_scale)
+                                y2 = hg - ((beam.station_values()[0][4][i]/(beam.E*beam.I)) * d_scale * 12.0) - (d0*d_scale)
+
+                                self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="yellow", width=2)
+
+                                if beam.station_values()[0][4][i] == max(beam.station_values()[0][4]) and  beam.station_values()[0][4][i] != beam.station_values()[0][4][-1] and beam.type=='span':
+                                    string_max = '\nD,max {0:.2f} in @ {1:.2f} ft'.format(12.0*beam.station_values()[0][4][i]/(beam.E*beam.I),beam.chart_stations[i])
+
+                                if beam.station_values()[0][4][i] == min(beam.station_values()[0][4]) and  beam.station_values()[0][4][i] != beam.station_values()[0][4][-1] and beam.type=='span':
+                                    string_min = '\nD,min {0:.2f} in @ {1:.2f} ft'.format(12.0*beam.station_values()[0][4][i]/(beam.E*beam.I),beam.chart_stations[i])
+
+                                if beam.type == 'cantilever' and beam.isleft == 1:
+                                    string_max = '\nD {0:.2f} in @ 0 ft'.format(12.0*beam.station_values()[0][4][0]/(beam.E*beam.I))
+
+                                if beam.type == 'cantilever' and beam.isleft == 0:
+                                    string_max = '\nD {0:.2f} in @ {1:.2f} ft'.format(12.0*beam.station_values()[0][4][-1]/(beam.E*beam.I), beam.Length)
+
+                            x0 =  (((beam.i.x+beam.j.x)/2)*scale) + spacer
+                            self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f_chart, text=string_max+string_min, fill='yellow')
 
             count = 0
             for col in self.columns_analysis:
                 if col.type ==  'UP':
                     x = (col.i.x * scale) + spacer
                     h1 = hg
-                    h2 = h1 - (col.Length*scale)
+                    h2 = h1 - (col.orig_Length*scale)
                     self.g_plan_canvas.create_line(x, h1, x, h2, fill="white", width=2)
                 else:
                     x = (col.j.x * scale) + spacer
                     h1 = hg
-                    h2 = h1 + (col.Length*scale)
+                    h2 = h1 + (col.orig_Length*scale)
                     self.g_plan_canvas.create_line(x, h1, x, h2, fill="white", width=2)
 
                 if self.frame_solved == 0:
                     pass
                 else:
+                    
+                    if self.show_r.get() == 1 and self.show_col_charts.get()==1:
+                        if col.type == 'DOWN':
+                            col.base_reaction()
+                            string = 'Riy: {0:.3f} kips\n'.format(col.riy)
+                        else:
+                            string = ''
+                            
+                        string += 'Rix: {0:.3f} kips\nRjx: {1:.3f} kips'.format(col.rix,col.rjx)
+
+                            
+                        if col.type == 'UP':
+                            self.g_plan_canvas.create_text(x, h1 - (col.Length*scale), anchor=tk.S,font=self.mono_f_chart, text=string, fill='red')
+                        else:
+                            self.g_plan_canvas.create_text(x, h1 + (col.Length*scale), anchor=tk.N,font=self.mono_f_chart, text=string, fill='red')
+                                
                     if self.show_dfs.get()==1 and self.show_col_charts.get()==1:
                         dfb = col.dfi
                         dft = col.dfj
