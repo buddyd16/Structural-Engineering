@@ -220,7 +220,7 @@ def load_combination_multi(load_types, factors, patterns):
 Self = LoadType(False,1,'Self','SW')
 Dead = LoadType(False,1,'Dead','DL')
 Live = LoadType(False,0,'Live','LL')
-Live_pat = LoadType(True,0.5,'Live_pat','LL_pat')
+Live_pat = LoadType(True,0,'Live_pat','LL_pat')
 
 Self.add_multi_loads([[0,1,0,0,10,30,0,'UDL'],[1,1,0,10,20,30,0,'UDL'],[2,1,0,20,30,30,0,'UDL']])
 Dead.add_multi_loads([[0,1,0,0,10,30,0,'UDL'],[1,1,0,10,20,30,0,'UDL'],[2,1,0,20,30,30,0,'UDL']])
@@ -229,7 +229,6 @@ Live.add_multi_loads([[0,1,0,0,10,30,0,'UDL'],[1,1,0,10,20,30,0,'UDL'],[2,1,0,20
 Live_pat.add_multi_loads([[0,1,0,0,10,30,0,'UDL'],[1,1,0,10,20,30,0,'UDL'],[2,1,0,20,30,30,0,'UDL']])
 
 patterns = load_patterns_by_span_ACI(3, False)
-
 
 combos = [[1,1,0,0],[0,0,1,1],[1,1,1,1],[3,3,1,1],[1.4,1.4,0,0],[1.2,1.2,1.6,1.6]]
 
@@ -242,5 +241,10 @@ for i, combined in enumerate(combined_loads):
         unique_combo.append(combined)
     else:
         pass
-            
 
+pat_live = []
+for i,pat in enumerate(patterns):
+    pat_live.append([])          
+    f = 1
+    out = Live_pat.pattern_and_factor_loads(f,pat)
+    pat_live[i].extend(out)
