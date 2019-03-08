@@ -1131,7 +1131,7 @@ class main_window:
                     if self.show_dfs.get()==1 and self.show_col_charts.get()==1:
                         dfb = col.dfi
                         dft = col.dfj
-                        string = 'DFi: {0:.3f}\nDFj: {1:.3f}'.format(dfb,dft)
+                        string = 'DFj: {1:.3f}\nDFi: {0:.3f}'.format(dfb,dft)
 
                         if col.type == 'UP':
                             if count == 0:
@@ -1159,7 +1159,7 @@ class main_window:
 
                         vb = col.station_values()[1][0]
                         vt = col.station_values()[1][-1]
-                        string = 'Vi: {0:.2f} kN\nVj: {1:.2f} kN'.format(vb,vt)
+                        string = 'Vj: {1:.2f} kN\nVi: {0:.2f} kN'.format(vb,vt)
 
                         if col.type == 'UP':
                             if count == 0:
@@ -1187,7 +1187,7 @@ class main_window:
 
                         mb = col.station_values()[2][0]
                         mt = col.station_values()[2][-1]
-                        string = 'Mi: {0:.2f} kN*m\nMj: {1:.2f} kN*m'.format(mb,mt)
+                        string = 'Mj: {1:.2f} kN*m\nMi: {0:.2f} kN*m'.format(mb,mt)
 
                         if col.type == 'UP':
                             if count == 0:
@@ -1215,7 +1215,7 @@ class main_window:
 
                         sb = col.station_values()[3][0]/(col.E*col.I)
                         st = col.station_values()[3][-1]/(col.E*col.I)
-                        string = 'Si: {0:.3E} rad\nSj: {1:.3E} rad'.format(sb,st)
+                        string = 'Sj: {1:.3E} rad\nSi: {0:.3E} rad'.format(sb,st)
 
                         if col.type == 'UP':
                             if count == 0:

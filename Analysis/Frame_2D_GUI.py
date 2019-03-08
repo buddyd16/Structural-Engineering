@@ -1130,7 +1130,7 @@ class main_window:
                     if self.show_dfs.get()==1 and self.show_col_charts.get()==1:
                         dfb = col.dfi
                         dft = col.dfj
-                        string = 'DFi: {0:.3f}\nDFj: {1:.3f}'.format(dfb,dft)
+                        string = 'DFj: {1:.3f}\nDFi: {0:.3f}'.format(dfb,dft)
 
                         if col.type == 'UP':
                             if count == 0:
@@ -1158,7 +1158,7 @@ class main_window:
 
                         vb = col.station_values()[1][0]
                         vt = col.station_values()[1][-1]
-                        string = 'Vi: {0:.2f} kips\nVj: {1:.2f} kips'.format(vb,vt)
+                        string = 'Vj: {1:.2f} kips\nVi: {0:.2f} kips'.format(vb,vt)
 
                         if col.type == 'UP':
                             if count == 0:
@@ -1186,7 +1186,7 @@ class main_window:
 
                         mb = col.station_values()[2][0]
                         mt = col.station_values()[2][-1]
-                        string = 'Mi: {0:.2f} ft-kips\nMj: {1:.2f} ft-kips'.format(mb,mt)
+                        string = 'Mj: {1:.2f} ft-kips\nMi: {0:.2f} ft-kips'.format(mb,mt)
 
                         if col.type == 'UP':
                             if count == 0:
@@ -1214,7 +1214,7 @@ class main_window:
 
                         sb = col.station_values()[3][0]/(col.E*col.I)
                         st = col.station_values()[3][-1]/(col.E*col.I)
-                        string = 'Si: {0:.5f} kips\nSj: {1:.5f} kips'.format(sb,st)
+                        string = 'Sj: {1:.5f} kips\nSi: {0:.5f} kips'.format(sb,st)
 
                         if col.type == 'UP':
                             if count == 0:
@@ -1239,6 +1239,7 @@ class main_window:
                             x2 = x - ((col.station_values()[4][i]/(col.E*col.I)) * d_scale * 12.0)
 
                             self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="yellow", width=1)
+                            
                     count +=1
 
     def frame_analysis_gui(self, *event):
