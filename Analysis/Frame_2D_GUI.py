@@ -1038,7 +1038,7 @@ class main_window:
 
                                 self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="red", width=2)
 
-                            string = 'Vi: {0:.2f} kips\nVj: {1:.2f} kips'.format(beam.station_values()[0][1][0],beam.station_values()[0][1][-1])
+                            string = 'Vi: {0:.3f} kips\nVj: {1:.3f} kips'.format(beam.station_values()[0][1][0],beam.station_values()[0][1][-1])
                             x0 =  (((beam.i.x+beam.j.x)/2)*scale) + spacer
 
                             self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f_chart, text=string, fill='red')
@@ -1056,14 +1056,14 @@ class main_window:
 
 
                                 if beam.station_values()[0][2][i] == max(beam.station_values()[0][2]) and  beam.station_values()[0][2][i] != beam.station_values()[0][2][-1]:
-                                    string_max = '\nM,max {0:.2f} ft-kips @ {1:.2f} ft'.format(beam.station_values()[0][2][i],beam.chart_stations[i])
+                                    string_max = '\nM,max {0:.3f} ft-kips @ {1:.3f} ft'.format(beam.station_values()[0][2][i],beam.chart_stations[i])
 
 
                                 if beam.station_values()[0][2][i] == min(beam.station_values()[0][2]) and  beam.station_values()[0][2][i] != beam.station_values()[0][2][-1]:
-                                    string_min = '\nM,min {0:.2f} ft-kips @ {1:.2f} ft'.format(beam.station_values()[0][2][i],beam.chart_stations[i])
+                                    string_min = '\nM,min {0:.3f} ft-kips @ {1:.3f} ft'.format(beam.station_values()[0][2][i],beam.chart_stations[i])
 
                             x0 =  (((beam.i.x+beam.j.x)/2)*scale) + spacer
-                            string = 'Mi {0:.2f} ft-kips\nMj {1:.2f} ft-kips'.format(beam.station_values()[0][2][0],beam.station_values()[0][2][-1])
+                            string = 'Mi {0:.3f} ft-kips\nMj {1:.3f} ft-kips'.format(beam.station_values()[0][2][0],beam.station_values()[0][2][-1])
                             self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f_chart, text=string+string_max+string_min, fill='green')
 
                     if self.show_s.get()==1 and self.show_bm_charts.get()==1:
@@ -1104,16 +1104,16 @@ class main_window:
                                 self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="yellow", width=2)
 
                                 if beam.station_values()[0][4][i] == max(beam.station_values()[0][4]) and  beam.station_values()[0][4][i] != beam.station_values()[0][4][-1] and beam.type=='span':
-                                    string_max = '\nD,max {0:.2f} in @ {1:.2f} ft'.format(12.0*beam.station_values()[0][4][i]/(beam.E*beam.I),beam.chart_stations[i])
+                                    string_max = '\nD,max {0:.3f} in @ {1:.3f} ft'.format(12.0*beam.station_values()[0][4][i]/(beam.E*beam.I),beam.chart_stations[i])
 
                                 if beam.station_values()[0][4][i] == min(beam.station_values()[0][4]) and  beam.station_values()[0][4][i] != beam.station_values()[0][4][-1] and beam.type=='span':
-                                    string_min = '\nD,min {0:.2f} in @ {1:.2f} ft'.format(12.0*beam.station_values()[0][4][i]/(beam.E*beam.I),beam.chart_stations[i])
+                                    string_min = '\nD,min {0:.3f} in @ {1:.3f} ft'.format(12.0*beam.station_values()[0][4][i]/(beam.E*beam.I),beam.chart_stations[i])
 
                                 if beam.type == 'cantilever' and beam.isleft == 1:
-                                    string_max = '\nD {0:.2f} in @ 0 ft'.format(12.0*beam.station_values()[0][4][0]/(beam.E*beam.I))
+                                    string_max = '\nD {0:.3f} in @ 0 ft'.format(12.0*beam.station_values()[0][4][0]/(beam.E*beam.I))
 
                                 if beam.type == 'cantilever' and beam.isleft == 0:
-                                    string_max = '\nD {0:.2f} in @ {1:.2f} ft'.format(12.0*beam.station_values()[0][4][-1]/(beam.E*beam.I), beam.Length)
+                                    string_max = '\nD {0:.3f} in @ {1:.3f} ft'.format(12.0*beam.station_values()[0][4][-1]/(beam.E*beam.I), beam.Length)
 
                             x0 =  (((beam.i.x+beam.j.x)/2)*scale) + spacer
                             self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f_chart, text=string_max+string_min, fill='yellow')
@@ -1181,7 +1181,7 @@ class main_window:
 
                         vb = col.station_values()[1][0]
                         vt = col.station_values()[1][-1]
-                        string = 'Vj: {1:.2f} kips\nVi: {0:.2f} kips'.format(vb,vt)
+                        string = 'Vj: {1:.3f} kips\nVi: {0:.3f} kips'.format(vb,vt)
 
                         if col.type == 'UP':
                             if count == 0:
@@ -1209,7 +1209,7 @@ class main_window:
 
                         mb = col.station_values()[2][0]
                         mt = col.station_values()[2][-1]
-                        string = 'Mj: {1:.2f} ft-kips\nMi: {0:.2f} ft-kips'.format(mb,mt)
+                        string = 'Mj: {1:.3f} ft-kips\nMi: {0:.3f} ft-kips'.format(mb,mt)
 
                         if col.type == 'UP':
                             if count == 0:
