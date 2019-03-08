@@ -370,15 +370,19 @@ class main_window:
         self.show_bm_charts = tk.IntVar()
         self.show_bm_charts.set(1)
         tk.Checkbutton(self.graph_b_frame, text=' : Show Bm\nCharts', variable=self.show_bm_charts, command=self.build_frame_graph, font=self.helv).grid(row=10, column=1, sticky = tk.W)
-
+    
+        self.show_stations = tk.IntVar()
+        self.show_stations.set(1)
+        tk.Checkbutton(self.graph_b_frame, text=' : Show Stations', variable=self.show_stations, command=self.build_frame_graph, font=self.helv).grid(row=11, column=1, sticky = tk.W)
+        
         self.refresh_graphic = tk.Button(self.graph_b_frame, text="Refresh/Reset",command=self.build_frame_graph, font=self.helv, width=15, height=h)
-        self.refresh_graphic.grid(row=11, column=1)
+        self.refresh_graphic.grid(row=12, column=1)
 
-        tk.Label(self.graph_b_frame, text='Result Scale:', font=self.helv).grid(row=12, column=1, sticky=tk.W)
+        tk.Label(self.graph_b_frame, text='Result Scale:', font=self.helv).grid(row=13, column=1, sticky=tk.W)
         self.res_scale = tk.StringVar()
         self.res_scale.set('10')
         self.res_scale_entry = tk.Entry(self.graph_b_frame, textvariable=self.res_scale, width=8)
-        self.res_scale_entry.grid(row=12, column=2, sticky=tk.W)
+        self.res_scale_entry.grid(row=13, column=2, sticky=tk.W)
 
         self.graph_b_frame.pack(side=tk.RIGHT, anchor='e')
 
@@ -666,7 +670,7 @@ class main_window:
             del self.beam_inputs[-1]
             del self.column_up_inputs[-1]
             del self.column_down_inputs[-1]
-            del self.nodetorsion_inputs[-1]
+            #del self.nodetorsion_inputs[-1]
 
             self.build_bm_gui_table()
             self.build_colup_gui_table()
@@ -1037,6 +1041,9 @@ class main_window:
                                 y2 = hg - (beam.station_values()[0][1][i] * v_scale)
 
                                 self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="red", width=2)
+                                
+                                if self.show_stations.get() == 1:
+                                    self.g_plan_canvas.create_line(x2, hg, x2, y2, fill="salmon", width=1)
 
                             string = 'Vi: {0:.3f} kips\nVj: {1:.3f} kips'.format(beam.station_values()[0][1][0],beam.station_values()[0][1][-1])
                             x0 =  (((beam.i.x+beam.j.x)/2)*scale) + spacer
@@ -1053,6 +1060,9 @@ class main_window:
                                 y2 = hg - (beam.station_values()[0][2][i] * m_scale)
 
                                 self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="green", width=2)
+                                
+                                if self.show_stations.get() == 1:
+                                    self.g_plan_canvas.create_line(x2, hg, x2, y2, fill="SeaGreen2", width=1)
 
 
                                 if beam.station_values()[0][2][i] == max(beam.station_values()[0][2]) and  beam.station_values()[0][2][i] != beam.station_values()[0][2][-1]:
@@ -1075,7 +1085,9 @@ class main_window:
                                 y2 = hg - ((beam.station_values()[0][3][i]/(beam.E*beam.I)) * s_scale)
 
                                 self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="magenta", width=2)
-
+                                
+                                if self.show_stations.get() == 1:
+                                    self.g_plan_canvas.create_line(x2, hg, x2, y2, fill="orchid1", width=1)
 
                             si = (beam.station_values()[0][3][0]) /(beam.E*beam.I)
                             sj = (beam.station_values()[0][3][-1]) /(beam.E*beam.I)
@@ -1102,6 +1114,9 @@ class main_window:
                                 y2 = hg - ((beam.station_values()[0][4][i]/(beam.E*beam.I)) * d_scale * 12.0) - (d0*d_scale)
 
                                 self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="yellow", width=2)
+                                
+                                if self.show_stations.get() == 1:
+                                    self.g_plan_canvas.create_line(x2, hg, x2, y2, fill="khaki", width=1)
 
                                 if beam.station_values()[0][4][i] == max(beam.station_values()[0][4]) and  beam.station_values()[0][4][i] != beam.station_values()[0][4][-1] and beam.type=='span':
                                     string_max = '\nD,max {0:.3f} in @ {1:.3f} ft'.format(12.0*beam.station_values()[0][4][i]/(beam.E*beam.I),beam.chart_stations[i])
@@ -1178,6 +1193,9 @@ class main_window:
                             x2 = x - (col.station_values()[1][i] * v_scale)
 
                             self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="red", width=1)
+                            
+                            if self.show_stations.get() == 1:
+                                self.g_plan_canvas.create_line(x, y2, x2, y2, fill="salmon", width=1)
 
                         vb = col.station_values()[1][0]
                         vt = col.station_values()[1][-1]
@@ -1206,6 +1224,9 @@ class main_window:
                             x2 = x - (col.station_values()[2][i] * m_scale)
 
                             self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="green", width=1)
+                            
+                            if self.show_stations.get() == 1:
+                                self.g_plan_canvas.create_line(x, y2, x2, y2, fill="SeaGreen2", width=1)
 
                         mb = col.station_values()[2][0]
                         mt = col.station_values()[2][-1]
@@ -1234,6 +1255,9 @@ class main_window:
                             x2 = x - ((col.station_values()[3][i]/(col.E*col.I)) * s_scale)
 
                             self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="magenta", width=1)
+                            
+                            if self.show_stations.get() == 1:
+                                self.g_plan_canvas.create_line(x, y2, x2, y2, fill="orchid1", width=1)
 
                         sb = col.station_values()[3][0]/(col.E*col.I)
                         st = col.station_values()[3][-1]/(col.E*col.I)
@@ -1262,6 +1286,9 @@ class main_window:
                             x2 = x - ((col.station_values()[4][i]/(col.E*col.I)) * d_scale * 12.0)
 
                             self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="yellow", width=1)
+                            
+                            if self.show_stations.get() == 1:
+                                self.g_plan_canvas.create_line(x, y2, x2, y2, fill="khaki", width=1)
                             
                     count +=1
 
