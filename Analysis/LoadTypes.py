@@ -54,7 +54,7 @@ def load_patterns_by_span_ACI(n, byspan=True):
         patterns = [pat1]
         
     elif n==2:
-        patterns = [pat1,pat3,pat3]
+        patterns = [pat1,pat2,pat3]
     
     elif n==3:
         patterns = [pat1,pat2,pat3,pat4,pat5]
@@ -70,7 +70,7 @@ def load_patterns_by_span_ACI(n, byspan=True):
         return patterns
 
 class Load:
-    def __init__(self,span=0, span_label='0', w1=0, w2=0, a=0, b=0, span_length=0, backspan_length=0, cantilever_side=0, load_kind = 'NL'):
+    def __init__(self, span=0, span_label='0', w1=0, w2=0, a=0, b=0, span_length=0, backspan_length=0, cantilever_side=0, load_kind = 'NL'):
         '''
         A class to define loads vs using a list or dictionary 
         to allow for more consistent property definitions 
@@ -154,6 +154,10 @@ class Load:
         self.make_analytical()
         
         self.fef = self.analytical.fef()
+    
+    def load_as_list(self):
+        
+        return [self.span, self.w1, self.w2, self.a, self.b, self.span_length, self.backspan_length, self.load_kind]
 
 
         
@@ -337,8 +341,9 @@ for i,pat in enumerate(patterns):
     out = Live_pat.pattern_and_factor_loads(f,pat)
     pat_live[i].extend(out)
 
-test_load = Load(0,'BM_1',1,0,0,10,10,0,2,'UDL')
+test_load = Load(0,'BM_1',1,0,0,10,10,0,0,'UDL')
 
 test_load.fixed_end_forces()
 
 print test_load.fef
+print test_load.load_as_list()
