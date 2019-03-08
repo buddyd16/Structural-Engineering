@@ -21,7 +21,7 @@ Created on Wed Feb  6 20:20:20 2019
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from __future__ import division
-import math
+import pin_pin_beam_equations_classes as ppbeam
 
 def load_patterns_by_span_ACI(n, byspan=True):
     pat1 = [1 for i in range(1,n+1)] # all spans loaded
@@ -69,6 +69,94 @@ def load_patterns_by_span_ACI(n, byspan=True):
     else:
         return patterns
 
+class Load:
+    def __init__(self,span=0, span_label='0', w1=0, w2=0, a=0, b=0, span_length=0, backspan_length=0, cantilever_side=0, load_kind = 'NL'):
+        '''
+        A class to define loads vs using a list or dictionary 
+        to allow for more consistent property definitions 
+        and future embeded functions for things such as
+        fixed end forces
+        '''
+        
+        self.span = span
+        self.span_label = span_label
+        self.w1 = w1
+        self.w2 = w2
+        self.a = a
+        self.b = b
+        self.span_length = span_length
+        self.backspan_length = backspan_length
+        self.cantilever_side = cantilever_side
+        self.load_kind = load_kind
+
+    def make_analytical(self):
+        
+        if self.cantilever_side == 1:
+            
+            if self.load_kind == 'Point':
+                self.analytical = ppbeam.cant_left_point(self.w1,self.a,self.span_length,self.backspan_length)
+
+            elif self.load_kind == 'Moment':
+                self.analytical = ppbeam.cant_left_point_moment(self.w1,self.a,self.span_length,self.backspan_length)
+
+            elif self.load_kind == 'UDL':
+                self.analytical = ppbeam.cant_left_udl(self.w1,self.a,self.b,self.span_length,self.backspan_length)
+
+            elif self.load_kind == 'TRAP':
+                self.analytical = ppbeam.cant_left_trap(self.w1, self.w2, self.a, self.b, self.span_length, self.backspan_length)
+
+            elif self.load_kind == 'SLOPE':
+                self.analytical = ppbeam.cant_left_nl(self.w1,self.span_length)
+
+            else:
+                self.analytical = ppbeam.no_load(0)
+            
+        elif self.cantilever_side == 2:
+            
+            if self.load_kind == 'Point':
+                self.analytical = ppbeam.cant_right_point(self.w1,self.a,self.span_length,self.backspan_length)
+
+            elif self.load_kind == 'Moment':
+                self.analytical = ppbeam.cant_right_point_moment(self.w1,self.a,self.span_length,self.backspan_length)
+
+            elif self.load_kind == 'UDL':
+                self.analytical = ppbeam.cant_right_udl(self.w1,self.a,self.b,self.span_length,self.backspan_length)
+
+            elif self.load_kind == 'TRAP':
+                self.analytical = ppbeam.cant_right_trap(self.w1, self.w2, self.a, self.b, self.span_length, self.backspan_length)
+
+            elif self.load_kind == 'SLOPE':
+                self.analytical = ppbeam.cant_right_nl(self.w1,self.span_length)
+
+            else:
+                self.analytical = ppbeam.no_load(0)
+        else:
+            if self.load_kind == 'Point':
+                self.analytical = ppbeam.pl(self.w1,self.a,self.span_length)
+
+            elif self.load_kind == 'Moment':
+                self.analytical = ppbeam.point_moment(self.w1,self.a,self.span_length)
+
+            elif self.load_kind == 'UDL':
+                self.analytical = ppbeam.udl(self.w1,self.a,self.b,self.span_length)
+
+            elif self.load_kind == 'TRAP':
+                self.analytical = ppbeam.trap(self.w1,self.w2,self.a,self.b,self.span_length)
+
+            elif self.load_kind == 'END_DELTA':
+               self.analytical = ppbeam.end_delta(self.w1,self.w2,self.span_length)
+
+            else:
+                self.analytical = ppbeam.no_load(0)          
+        
+                
+    def fixed_end_forces(self):
+        self.make_analytical()
+        
+        self.fef = self.analytical.fef()
+
+
+        
 class LoadType:
     def __init__(self, pattern=False, off_pattern_factor=0, title='Dead',symbol='DL'):
         '''
@@ -248,3 +336,9 @@ for i,pat in enumerate(patterns):
     f = 1
     out = Live_pat.pattern_and_factor_loads(f,pat)
     pat_live[i].extend(out)
+
+test_load = Load(0,'BM_1',1,0,0,10,10,0,2,'UDL')
+
+test_load.fixed_end_forces()
+
+print test_load.fef
