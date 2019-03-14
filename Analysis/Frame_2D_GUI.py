@@ -1189,8 +1189,8 @@ class main_window:
                             else:
                                 y1 = h2 - (col.chart_stations[i-1]*scale)
                                 y2 = h2 - (col.chart_stations[i]*scale)
-                            x1 = x - (col.station_values()[1][i-1] * v_scale)
-                            x2 = x - (col.station_values()[1][i] * v_scale)
+                            x1 = x + (col.station_values()[1][i-1] * v_scale)
+                            x2 = x + (col.station_values()[1][i] * v_scale)
 
                             self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="red", width=1)
                             

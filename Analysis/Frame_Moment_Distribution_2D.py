@@ -632,12 +632,12 @@ class Column_Up:
             for x in self.chart_stations:
                 res = ppbeam.eval_beam_piece_function(self.equations,x)
 
-                v.append(res[0])
+                v.append(-1*res[0])
                 m.append(res[1])
                 eis.append(res[2])
                 eid.append(res[3])
             
-            self.rix = -1*v[0]
+            self.rix = v[0]
             self.rjx = -1*v[-1]
             
             return [self.chart_stations, v, m, eis, eid]
@@ -759,12 +759,12 @@ class Column_Down:
             for x in self.chart_stations:
                 res = ppbeam.eval_beam_piece_function(self.equations,x)
 
-                v.append(res[0])
+                v.append(-1*res[0])
                 m.append(res[1])
                 eis.append(res[2])
                 eid.append(res[3])
                 
-            self.rix = -1*v[0]
+            self.rix = v[0]
             self.rjx = -1*v[-1]
             
             return [self.chart_stations, v, m, eis, eid]
