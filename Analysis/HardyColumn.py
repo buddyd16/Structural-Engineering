@@ -27,10 +27,12 @@ member end stiffnesses and carry over factors to be used in a moment
 distribution analysis
 '''
 
+# Inputs
 segmentLengths = [12,12] #ft
 E = [288000]*len(segmentLengths) #k/ft^2
 I = [0.667,5.333] #ft^4
 
+# Calculation
 L_tot = sum(segmentLengths)
 
 hardy_segment_widths = [1.0/(e*i) for e,i in zip(E,I)]
