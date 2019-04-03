@@ -1,23 +1,17 @@
 '''
 BSD 3-Clause License
-
 Copyright (c) 2019, Donald N. Bockoven III
 All rights reserved.
-
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-
 * Redistributions of source code must retain the above copyright notice, this
   list of conditions and the following disclaimer.
-
 * Redistributions in binary form must reproduce the above copyright notice,
   this list of conditions and the following disclaimer in the documentation
   and/or other materials provided with the distribution.
-
 * Neither the name of the copyright holder nor the names of its
   contributors may be used to endorse or promote products derived from
   this software without specific prior written permission.
-
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -110,13 +104,13 @@ class three_moment_method(object):
 
         sumL = np.cumsum(beam_spans)              # cumulative sum of beam lengths
         sumL = sumL.tolist()
-
+        
         #Additional calculation stations at point loads +/-0.0001 and start and end of line loads
         xs_add = []#create a list of 0's x N - to add additional stations per span
-
+        
         for s in range(0,N):
             xs_add.append([])
-
+        
         for load in beam_loads_raw:
             if load[4] == 'POINT' or load[4] == "POINT_MOMENT":
                 inspan = int(load[5])
@@ -133,13 +127,13 @@ class three_moment_method(object):
                 inspan = int(load[5])
                 xs_add[inspan].append(load[2])
                 xs_add[inspan].append(load[3])
-
+                
         xs_add = [list(set(i)) for i in xs_add]
         max_plus = max([len(i) for i in xs_add])
         [i.extend([0]*(max_plus-len(i))) for i in xs_add if len(i) < max_plus]
-
+        
         self.add_stations = xs_add
-
+        
         #Create calculation stations
         new_iters = iters+max_plus+1
         xs = np.zeros((new_iters, N))
@@ -150,7 +144,7 @@ class three_moment_method(object):
             i = 0
             for i in range(1, iters):
                 xs[i, j] = xs[i-1, j] + beam_spans[j]/iters
-
+            
             z=0
             for i in range((iters+1),(new_iters)):
                 xs[i,j] = xs_add[j][z]
@@ -160,7 +154,7 @@ class three_moment_method(object):
             to_sort = xs[:,j].tolist()
             to_sort.sort()
             xs[:,j] = np.asarray(to_sort)
-
+            
         self.stations = xs
         v_diag = np.zeros((new_iters, N))
         v_diag_cantL = np.zeros((new_iters, N))
@@ -228,7 +222,7 @@ class three_moment_method(object):
                         d_diag[:, j] = d_diag[:, j]+d
                         r_span[0, j] = r_span[0, j]+load.rl
                         r_span[1, j] = r_span[1, j]+load.rr
-
+                        
                     elif loads[4] == "NL":
                         load = ppbeam.no_load()
                         v = load.v(xs[:,j])
@@ -265,7 +259,7 @@ class three_moment_method(object):
                 xl = (1/A)*xl_A[-1]
                 a_xl_xr[1, j] = xl
                 a_xl_xr[2, j] = beam_spans[j] - xl
-
+        
         # Cantilever Moments, Shears, and reactions
         mr_cant = 0
         ml_cant = 0
@@ -569,7 +563,7 @@ class three_moment_method(object):
                    d_diag[:,-1] = d_diag[:,-1]+displace[-2]
         else:
             pass
-
+        
         #correct cantilever slope and deflection for interior span end slopes
         if cant[0]=='L' or cant[0]=='B':
             cant_l_fix = ppbeam.cant_left_nl(s_diag[0,1], beam_spans[0])

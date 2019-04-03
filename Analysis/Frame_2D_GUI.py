@@ -1,23 +1,17 @@
 '''
 BSD 3-Clause License
-
 Copyright (c) 2019, Donald N. Bockoven III
 All rights reserved.
-
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-
 * Redistributions of source code must retain the above copyright notice, this
   list of conditions and the following disclaimer.
-
 * Redistributions in binary form must reproduce the above copyright notice,
   this list of conditions and the following disclaimer in the documentation
   and/or other materials provided with the distribution.
-
 * Neither the name of the copyright holder nor the names of its
   contributors may be used to endorse or promote products derived from
   this software without specific prior written permission.
-
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -138,7 +132,7 @@ class main_window:
 
         self.b_remove_beam = tk.Button(self.geo_tab_frame, text="Remove Last Beam",command=self.remove_last_beam_func, font=self.helv, width=w, height=h, state=tk.DISABLED)
         self.b_remove_beam.grid(row=2,column=1)
-
+        
         self.b_copy_beam = tk.Button(self.geo_tab_frame, text="Copy BM_1 to All",command=self.copy_beam_func, font=self.helv, width=w, height=h)
         self.b_copy_beam.grid(row=3,column=1)
 
@@ -186,7 +180,7 @@ class main_window:
         tk.Label(self.colup_info_tab, text='A (in^2):').grid(row=1, column=6)
         tk.Label(self.colup_info_tab, text='Fixed Top:').grid(row=1, column=7)
         tk.Label(self.colup_info_tab, text='Hinge at Beam:').grid(row=1, column=8)
-
+        
         self.b_copy_colup = tk.Button(self.colup_info_tab, text="Copy Col_1 to All",command=self.copy_colup_func, font=self.helv, width=w, height=h)
         self.b_copy_colup.grid(row=1,column=9)
 
@@ -200,15 +194,15 @@ class main_window:
         tk.Label(self.coldwn_info_tab, text='A (in^2):').grid(row=1, column=5)
         tk.Label(self.coldwn_info_tab, text='Fixed Base:').grid(row=1, column=6)
         tk.Label(self.coldwn_info_tab, text='Hinge at Beam:').grid(row=1, column=7)
-
+        
         self.b_copy_coldwn = tk.Button(self.coldwn_info_tab, text="Copy Col_1 to All",command=self.copy_coldwn_func, font=self.helv, width=w, height=h)
         self.b_copy_coldwn.grid(row=1,column=8)
-
+        
         self.cols_compress = tk.IntVar()
         self.cols_compress.set(1)
         tk.Checkbutton(self.coldwn_info_tab, text=' : Columns are Compressible', variable=self.cols_compress,font=self.helv).grid(row=2, column=8, sticky = tk.W)
-
-
+        
+        
         self.geo_tab_frame.pack(fill=tk.BOTH, expand=1)
 
         #Loads Frame tabs
@@ -380,11 +374,11 @@ class main_window:
         self.show_bm_charts = tk.IntVar()
         self.show_bm_charts.set(1)
         tk.Checkbutton(self.graph_b_frame, text=' : Show Bm\nCharts', variable=self.show_bm_charts, command=self.build_frame_graph, font=self.helv).grid(row=10, column=1, sticky = tk.W)
-
+    
         self.show_stations = tk.IntVar()
         self.show_stations.set(1)
         tk.Checkbutton(self.graph_b_frame, text=' : Show Stations', variable=self.show_stations, command=self.build_frame_graph, font=self.helv).grid(row=11, column=1, sticky = tk.W)
-
+        
         self.refresh_graphic = tk.Button(self.graph_b_frame, text="Refresh/Reset",command=self.build_frame_graph, font=self.helv, width=15, height=h)
         self.refresh_graphic.grid(row=12, column=1)
 
@@ -417,6 +411,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n
 https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
 )
+
         tkMessageBox.showerror("License Information",license_string)
         self.master.focus_force()
 
@@ -433,13 +428,13 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
     def canvas_zoom(self, event):
         #x = self.g_plan_canvas.canvasx(event.x)
         #y = self.g_plan_canvas.canvasx(event.y)
-
+        
         w = self.g_plan_canvas.winfo_width()
         h = self.g_plan_canvas.winfo_height()
-
+        
         x = w/2
         y = h/2
-
+        
         if event.delta > 0:
             self.g_plan_canvas.scale('all', x, y, 1.1, 1.1)
         elif event.delta < 0:
@@ -469,7 +464,7 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
             self.column_up_inputs.append([tk.IntVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.IntVar(),tk.IntVar()])
             self.column_down_inputs.append([tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.IntVar(),tk.IntVar()])
             self.column_down_inputs.append([tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.IntVar(),tk.IntVar()])
-
+            
             self.column_up_inputs[-2][1].set('COL_UP_{0}'.format(self.beam_count))
             self.column_up_inputs[-2][2].set(10)
             self.column_up_inputs[-2][3].set(29000)
@@ -500,7 +495,7 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
         else:
             self.column_up_inputs.append([tk.IntVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.IntVar(),tk.IntVar()])
             self.column_down_inputs.append([tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.StringVar(),tk.IntVar(),tk.IntVar()])
-
+            
             self.column_up_inputs[-1][1].set('COL_UP_{0}'.format(self.beam_count+1))
             self.column_up_inputs[-1][2].set(self.column_up_inputs[-2][2].get())
             self.column_up_inputs[-1][3].set(self.column_up_inputs[-2][3].get())
@@ -524,18 +519,18 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
         self.build_coldwn_gui_table()
 
     def copy_beam_func(self, *args):
-
+        
         l = self.beam_inputs[0][1].get()
         E = self.beam_inputs[0][2].get()
         I = self.beam_inputs[0][3].get()
-
+        
         for i, bm in enumerate(self.beam_inputs):
             bm[1].set(l)
             bm[2].set(E)
             bm[3].set(I)
-
+        
     def copy_colup_func(self, *args):
-
+            
             na = self.column_up_inputs[0][0].get()
             h = self.column_up_inputs[0][2].get()
             E = self.column_up_inputs[0][3].get()
@@ -543,7 +538,7 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
             A = self.column_up_inputs[0][5].get()
             fix = self.column_up_inputs[0][6].get()
             hinge = self.column_up_inputs[0][7].get()
-
+            
             for i, col in enumerate(self.column_up_inputs):
                 col[0].set(na)
                 col[2].set(h)
@@ -552,16 +547,16 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                 col[5].set(A)
                 col[6].set(fix)
                 col[7].set(hinge)
-
+        
     def copy_coldwn_func(self, *args):
-
+    
             h = self.column_down_inputs[0][1].get()
             E = self.column_down_inputs[0][2].get()
             I = self.column_down_inputs[0][3].get()
             A = self.column_down_inputs[0][4].get()
             fix = self.column_down_inputs[0][5].get()
             hinge = self.column_down_inputs[0][6].get()
-
+            
             for i, col in enumerate(self.column_down_inputs):
                 col[1].set(h)
                 col[2].set(E)
@@ -569,7 +564,7 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                 col[4].set(A)
                 col[5].set(fix)
                 col[6].set(hinge)
-
+    
     def add_cant_left_func(self,*event):
 
         if self.cantL_count == 0:
@@ -705,7 +700,7 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                 d.grid(row=i+2,column=4)
 
                 self.beam_gui_list.extend([a,b,c,d])
-
+            
     def build_colup_gui_table(self,*event):
         for element in self.column_up_gui_list:
             element.destroy()
@@ -942,8 +937,8 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                 column_up = frame2d.Column_Up(i_node, height, E, I, A, support, hinge_near)
 
                 self.columns_analysis.append(column_up)
-
-
+            
+            
         self.frame_built = 1
         self.frame_solved = 0
 
@@ -974,13 +969,13 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
             scale_y = (hg-spacer)/ max(self.max_h_dwn_graph,self.max_h_up_graph)
 
             scale = min(scale_x, scale_y)
-
+            
             v_scale = float(self.res_scale.get())
-
+            
             s_scale = float(self.res_scale.get())
-
+            
             d_scale = float(self.res_scale.get())
-
+            
             if self.show_m_tension.get() == 1:
                 m_scale = float(self.res_scale.get())* -1
             else:
@@ -1031,18 +1026,18 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                                         self.g_plan_canvas.create_line((x[i-1]+spacer),hg - (y[i-1]),(x[i])+spacer,hg - (y[i]), fill = "blue", width=2)
 
                     if self.show_dfs.get() == 1 and self.show_bm_charts.get()==1:
-
+                        
                             string = 'DFi: {0:.3f}\nDFj: {1:.3f} '.format(beam.dfi,beam.dfj)
                             x0 =  (((beam.i.x+beam.j.x)/2)*scale) + spacer
 
                             self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f_chart, text=string, fill='cyan')
-
+                    
                     if self.show_r.get() == 1 and self.show_bm_charts.get()==1:
                             string = 'Riy: {0:.3f} kips\nRjy: {1:.3f} kips'.format(beam.reactions()[0],beam.reactions()[1])
                             x0 =  (((beam.i.x+beam.j.x)/2)*scale) + spacer
 
                             self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f_chart, text=string, fill='red')
-
+                    
                     if self.show_v.get()==1 and self.show_bm_charts.get()==1:
                             for i in range(1,len(beam.chart_stations)):
                                 x1 = (beam.chart_stations[i-1]+beam.i.x)*scale + spacer
@@ -1051,7 +1046,7 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                                 y2 = hg - (beam.station_values()[0][1][i] * v_scale)
 
                                 self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="red", width=2)
-
+                                
                                 if self.show_stations.get() == 1:
                                     self.g_plan_canvas.create_line(x2, hg, x2, y2, fill="salmon", width=1)
 
@@ -1070,7 +1065,7 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                                 y2 = hg - (beam.station_values()[0][2][i] * m_scale)
 
                                 self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="green", width=2)
-
+                                
                                 if self.show_stations.get() == 1:
                                     self.g_plan_canvas.create_line(x2, hg, x2, y2, fill="SeaGreen2", width=1)
 
@@ -1087,7 +1082,7 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                             self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f_chart, text=string+string_max+string_min, fill='green')
 
                     if self.show_s.get()==1 and self.show_bm_charts.get()==1:
-
+                        
                             for i in range(1,len(beam.chart_stations)):
                                 x1 = (beam.chart_stations[i-1]+beam.i.x)*scale + spacer
                                 x2 = (beam.chart_stations[i]+beam.i.x)*scale + spacer
@@ -1095,7 +1090,7 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                                 y2 = hg - ((beam.station_values()[0][3][i]/(beam.E*beam.I)) * s_scale)
 
                                 self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="magenta", width=2)
-
+                                
                                 if self.show_stations.get() == 1:
                                     self.g_plan_canvas.create_line(x2, hg, x2, y2, fill="orchid1", width=1)
 
@@ -1108,7 +1103,7 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                             self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f_chart, text=string, fill='magenta')
 
                     if self.show_d.get()==1 and self.show_bm_charts.get()==1:
-
+                        
                             string_max = ''
                             string_min = ''
                             for i in range(1,len(beam.chart_stations)):
@@ -1124,7 +1119,7 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                                 y2 = hg - ((beam.station_values()[0][4][i]/(beam.E*beam.I)) * d_scale * 12.0) - (d0*d_scale)
 
                                 self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="yellow", width=2)
-
+                                
                                 if self.show_stations.get() == 1:
                                     self.g_plan_canvas.create_line(x2, hg, x2, y2, fill="khaki", width=1)
 
@@ -1159,22 +1154,22 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                 if self.frame_solved == 0:
                     pass
                 else:
-
+                    
                     if self.show_r.get() == 1 and self.show_col_charts.get()==1:
                         if col.type == 'DOWN':
                             col.base_reaction()
                             string = 'Riy: {0:.3f} kips\n'.format(col.riy)
                         else:
                             string = ''
-
+                            
                         string += 'Rix: {0:.3f} kips\nRjx: {1:.3f} kips'.format(col.rix,col.rjx)
 
-
+                            
                         if col.type == 'UP':
                             self.g_plan_canvas.create_text(x, h1 - (col.Length*scale), anchor=tk.S,font=self.mono_f_chart, text=string, fill='red')
                         else:
                             self.g_plan_canvas.create_text(x, h1 + (col.Length*scale), anchor=tk.N,font=self.mono_f_chart, text=string, fill='red')
-
+                                
                     if self.show_dfs.get()==1 and self.show_col_charts.get()==1:
                         dfb = col.dfi
                         dft = col.dfj
@@ -1203,7 +1198,7 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                             x2 = x + (col.station_values()[1][i] * v_scale)
 
                             self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="red", width=1)
-
+                            
                             if self.show_stations.get() == 1:
                                 self.g_plan_canvas.create_line(x, y2, x2, y2, fill="salmon", width=1)
 
@@ -1234,7 +1229,7 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                             x2 = x - (col.station_values()[2][i] * m_scale)
 
                             self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="green", width=1)
-
+                            
                             if self.show_stations.get() == 1:
                                 self.g_plan_canvas.create_line(x, y2, x2, y2, fill="SeaGreen2", width=1)
 
@@ -1265,7 +1260,7 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                             x2 = x - ((col.station_values()[3][i]/(col.E*col.I)) * s_scale)
 
                             self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="magenta", width=1)
-
+                            
                             if self.show_stations.get() == 1:
                                 self.g_plan_canvas.create_line(x, y2, x2, y2, fill="orchid1", width=1)
 
@@ -1296,10 +1291,10 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                             x2 = x - ((col.station_values()[4][i]/(col.E*col.I)) * d_scale * 12.0)
 
                             self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="yellow", width=1)
-
+                            
                             if self.show_stations.get() == 1:
                                 self.g_plan_canvas.create_line(x, y2, x2, y2, fill="khaki", width=1)
-
+                            
                     count +=1
 
     def frame_analysis_gui(self, *event):
@@ -1322,7 +1317,7 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
 
         Consider_shortening = self.cols_compress.get()
 
-        frame2d.moment_distribution(self.nodes_analysis,self.beams_analysis,self.columns_analysis,Consider_shortening,1e-20)
+        frame2d.moment_distribution(self.nodes_analysis,self.beams_analysis,self.columns_analysis,Consider_shortening,1e-5)
 
         for beam in self.beams_analysis:
             if beam.type == 'span':

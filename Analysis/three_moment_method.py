@@ -1,23 +1,17 @@
 '''
 BSD 3-Clause License
-
 Copyright (c) 2019, Donald N. Bockoven III
 All rights reserved.
-
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-
 * Redistributions of source code must retain the above copyright notice, this
   list of conditions and the following disclaimer.
-
 * Redistributions in binary form must reproduce the above copyright notice,
   this list of conditions and the following disclaimer in the documentation
   and/or other materials provided with the distribution.
-
 * Neither the name of the copyright holder nor the names of its
   contributors may be used to endorse or promote products derived from
   this software without specific prior written permission.
-
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -224,7 +218,7 @@ def cant_left_trap(w1, w2, a, b, l, x):
     return(rr, mr, v, m)
 
 class three_moment_method(object):
-
+    
     def __init__(self,beam_spans=[120.00], beam_momentofinertia=[120.00], cant='N', beam_loads_raw=[[1000.00,1000.00,60.00,60.00,'POINT',0]], E=29000000.00, iters=100, displace=[0,0]):
         # Implementation of the Theory of Three Momements, https://en.wikipedia.org/wiki/Theorem_of_three_moments
         #   Inputs:
@@ -271,7 +265,7 @@ class three_moment_method(object):
         #   iters = Integer number of stations to create per span
         #   displace = list of support displacements -- Expected Units: in -- Example: if you have N spans you should have N+1 displacement values inclusive of cantilever ends
         #               take care to make sure values are 0 for cantilever ends. 4 span total both cantilever list would be [0,1,0,0,0]
-
+        
         N = len(beam_spans)                       # number of spans
 
         sumL = np.cumsum(beam_spans)              # cumulative sum of beam lengths
@@ -493,7 +487,7 @@ class three_moment_method(object):
 
         self.delta = np.zeros((N+1,1))
         j=0
-        for j in range(1,N):
+        for j in range(1,N): 
 
             l = j-1
             r = j
@@ -563,7 +557,7 @@ class three_moment_method(object):
                 m_diag[x,j] = m_diag[x,j]-(((M[j]-M[j+1])/beam_spans[j])*xs[x,j])+M[j]
             s_diag[:,j] = (sci.integrate.cumtrapz(m_diag[:,j],xs[:,j], initial = 0)/(E*beam_momentofinertia[j]))+slope[j,0]
             d_diag[:,j] = sci.integrate.cumtrapz(s_diag[:,j],xs[:,j], initial = 0)
-
+            
         #correct d for support displacement
         #based on small angle approximations and similar triangles
         for j in range(0,N):
@@ -571,7 +565,7 @@ class three_moment_method(object):
             for i in range(0,len(xs[:,j])):
                 delt_i = displace[j] + (((displace[j+1]-displace[j])/span)*xs[i,j])
                 d_diag[i,j] = d_diag[i,j] + delt_i
-
+                
         #Cantilever Diagram Corrections
         #For left side compatibility states slope at right of support should be equal and opposite to slope on cantilever side of support
         #calculate slope and deflection from left to right and then invert results for actual condition.
@@ -601,7 +595,7 @@ class three_moment_method(object):
         if cant[0]=='L' or cant[0] =='B':
             if displace[2] == 0 and displace[1] == 0:
                 pass
-            else:
+            else:        
                 span_cant = beam_spans[0]
                 span_int = beam_spans[1]
                 for i in range(0,len(xs[:,0])):
@@ -622,7 +616,7 @@ class three_moment_method(object):
         if cant[0]=='R' or cant[0] =='B':
             if displace[N-2] == 0 and displace[N-1] == 0:
                 pass
-            else:
+            else: 
                 span_cant= beam_spans[N-1]
                 span_int= beam_spans[N-2]
                 for i in range(0,len(xs[:,0])):
@@ -647,7 +641,7 @@ class three_moment_method(object):
         for j in range(0,N):
             v_diag[:,j] = -1*v_diag[:,j]/1000       #assumes input of lbs and converts output to kips
             m_diag[:,j] = m_diag[:,j]/(12*1000)     #assumes input of in and lbs and converts output to ft-kips
-
+            
         self.xs = xs
         self.v_diag = v_diag
         self.m_diag = m_diag

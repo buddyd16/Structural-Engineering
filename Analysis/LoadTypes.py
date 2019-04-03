@@ -1,23 +1,17 @@
 '''
 BSD 3-Clause License
-
 Copyright (c) 2019, Donald N. Bockoven III
 All rights reserved.
-
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-
 * Redistributions of source code must retain the above copyright notice, this
   list of conditions and the following disclaimer.
-
 * Redistributions in binary form must reproduce the above copyright notice,
   this list of conditions and the following disclaimer in the documentation
   and/or other materials provided with the distribution.
-
 * Neither the name of the copyright holder nor the names of its
   contributors may be used to endorse or promote products derived from
   this software without specific prior written permission.
-
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -59,19 +53,19 @@ def load_patterns_by_span_ACI(n, byspan=True):
             pat5.append(1)
             pat6.append(1)
             count=0
-
+    
     if n==1:
         patterns = [pat1]
-
+        
     elif n==2:
         patterns = [pat1,pat2,pat3]
-
+    
     elif n==3:
         patterns = [pat1,pat2,pat3,pat4,pat5]
-
+        
     else:
         patterns = [pat1,pat2,pat3,pat4,pat5,pat6]
-
+    
     if byspan == True:
         patterns_transpose = map(list, zip(*patterns))
 
@@ -82,12 +76,12 @@ def load_patterns_by_span_ACI(n, byspan=True):
 class Load:
     def __init__(self, span=0, span_label='0', w1=0, w2=0, a=0, b=0, span_length=0, backspan_length=0, cantilever_side=0, load_kind = 'NL'):
         '''
-        A class to define loads vs using a list or dictionary
-        to allow for more consistent property definitions
+        A class to define loads vs using a list or dictionary 
+        to allow for more consistent property definitions 
         and future embeded functions for things such as
         fixed end forces
         '''
-
+        
         self.span = span
         self.span_label = span_label
         self.w1 = w1
@@ -100,9 +94,9 @@ class Load:
         self.load_kind = load_kind
 
     def make_analytical(self):
-
+        
         if self.cantilever_side == 1:
-
+            
             if self.load_kind == 'Point':
                 self.analytical = ppbeam.cant_left_point(self.w1,self.a,self.span_length,self.backspan_length)
 
@@ -120,9 +114,9 @@ class Load:
 
             else:
                 self.analytical = ppbeam.no_load(0)
-
+            
         elif self.cantilever_side == 2:
-
+            
             if self.load_kind == 'Point':
                 self.analytical = ppbeam.cant_right_point(self.w1,self.a,self.span_length,self.backspan_length)
 
@@ -157,20 +151,20 @@ class Load:
                self.analytical = ppbeam.end_delta(self.w1,self.w2,self.span_length)
 
             else:
-                self.analytical = ppbeam.no_load(0)
-
-
+                self.analytical = ppbeam.no_load(0)          
+        
+                
     def fixed_end_forces(self):
         self.make_analytical()
-
+        
         self.fef = self.analytical.fef()
-
+    
     def load_as_list(self):
-
+        
         return [self.span, self.w1, self.w2, self.a, self.b, self.span_length, self.backspan_length, self.load_kind]
 
 
-
+        
 class LoadType:
     def __init__(self, pattern=False, off_pattern_factor=0, title='Dead',symbol='DL'):
         '''
@@ -260,9 +254,9 @@ class LoadType:
         del self.patterned_factored_loads[:]
 
         for i, pattern in enumerate(patterns):
-
+            
             for load in self.load_list:
-
+                
                 if load[0] == i:
 
                     on = pattern
@@ -309,7 +303,7 @@ def load_combination(load_types, factors, patterns):
 def load_combination_multi(load_types, factors, patterns):
 
     load_set = []
-
+    
     for factor in factors:
         for pattern in patterns:
             pat_set = []
@@ -346,7 +340,7 @@ for i, combined in enumerate(combined_loads):
 
 pat_live = []
 for i,pat in enumerate(patterns):
-    pat_live.append([])
+    pat_live.append([])          
     f = 1
     out = Live_pat.pattern_and_factor_loads(f,pat)
     pat_live[i].extend(out)

@@ -1,23 +1,17 @@
 '''
 BSD 3-Clause License
-
 Copyright (c) 2019, Donald N. Bockoven III
 All rights reserved.
-
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-
 * Redistributions of source code must retain the above copyright notice, this
   list of conditions and the following disclaimer.
-
 * Redistributions in binary form must reproduce the above copyright notice,
   this list of conditions and the following disclaimer in the documentation
   and/or other materials provided with the distribution.
-
 * Neither the name of the copyright holder nor the names of its
   contributors may be used to endorse or promote products derived from
   this software without specific prior written permission.
-
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -53,7 +47,7 @@ class node:
         for column in columns:
             if column.i == self or column.j == self:
                 self.K += column.K
-
+        
     def sum_node_moments(self, beams, columns):
         self.m_unbalance = 0
         self.m_balance = 0
@@ -74,7 +68,7 @@ class node:
                 self.m_unbalance += sum(column.mj)
             else:
                 pass
-
+        
         self.m_balance = -1.0*(self.m_unbalance)
 
     def sum_node_reactions(self, beams):
@@ -91,7 +85,7 @@ class node:
 
             else:
                 pass
-
+        
         self.ry = node_reaction
 
         return node_reaction
@@ -99,7 +93,7 @@ class node:
 class CantBeam:
     def __init__(self, ij, E=1, I=1, Length=1, Loads_list=1, left=1, label=''):
         '''
-        cantilever beam element
+        beam element
         Loads = lists of loads in text form
         E, I, and Loads should have consistent units
         '''
@@ -107,8 +101,8 @@ class CantBeam:
         self.type = 'cantilever'
         self.label = label
         self.Length = Length
-
-
+        
+        
         if self.isleft==1:
             self.i = node(0)
             self.j = ij
@@ -119,7 +113,7 @@ class CantBeam:
         self.E = E
         self.I = I
         self.Load_list = [load for load in Loads_list]
-
+        
 
         self.mi = [0]
         self.mj = [0]
@@ -287,7 +281,7 @@ class CantBeam:
             self.Loads.append(ppbeam.cant_right_nl(slope_load,self.Length))
 
     def build_load_function(self):
-
+        
         self.equations, self.equation_strings = ppbeam.center_span_piecewise_function(self.Loads)
 
         self.loads_built = 1
@@ -435,10 +429,10 @@ class Beam:
         for load in self.Loads:
 
             if load.kind == "END_DELTA":
-
+                
                 self.mi.append(load.fef()[1])
                 self.mj.append(load.fef()[3])
-
+                
             else:
                 pass
 
@@ -588,7 +582,7 @@ class Column_Up:
     def new_height(self, height):
 
         self.Length = height
-
+        
         step = self.Length/20.0
 
         self.chart_stations = [0]
@@ -647,12 +641,12 @@ class Column_Up:
                 m.append(res[1])
                 eis.append(res[2])
                 eid.append(res[3])
-
+            
             self.rix = v[0]
             self.rjx = -1*v[-1]
-
+            
             return [self.chart_stations, v, m, eis, eid]
-
+            
 
 class Column_Down:
     def __init__(self, j_node, height=1, E=1, I=1, A=1, support=1, hinge_near=0):
@@ -774,15 +768,15 @@ class Column_Down:
                 m.append(res[1])
                 eis.append(res[2])
                 eid.append(res[3])
-
+                
             self.rix = v[0]
             self.rjx = -1*v[-1]
-
+            
             return [self.chart_stations, v, m, eis, eid]
-
+            
     def base_reaction(self):
         self.riy = self.j.ry
-
+    
 
 def beams_all_same(nodes, E, I, load):
     beams = []
@@ -975,7 +969,7 @@ def moment_distribution(nodes, beams, columns, shortening=0, tolerance=1e-11):
         node_r.append(node.sum_node_reactions(beams))
 
     node_delta = []
-
+    
     if shortening == 1:
         # Determine column shortening for reactions - PL/AE
         i = 0
@@ -999,7 +993,7 @@ def moment_distribution(nodes, beams, columns, shortening=0, tolerance=1e-11):
             else:
                 delta_load.append([])
 
-
+            
 
         '''
         #going to try not reseting the FEF to see if it speeds
@@ -1037,8 +1031,8 @@ def moment_distribution(nodes, beams, columns, shortening=0, tolerance=1e-11):
 
         while test_delta == False and count_delta < count_max and delta_kick<1:
             test_delta = moment_distribution_cycle(nodes, beams, columns, tolerance)
-
-
+            
+            
             if count_delta <=1:
                 n_m_unbalance_delta = [node.m_unbalance for node in nodes]
                 n_delta_previous.append(n_m_unbalance_delta)
@@ -1049,7 +1043,7 @@ def moment_distribution(nodes, beams, columns, shortening=0, tolerance=1e-11):
                     delta_kick = 1
                 else:
                     n_delta_previous.append(n_m_unbalance_delta)
-
+            
 
             count_delta +=1
 
@@ -1065,7 +1059,7 @@ def moment_distribution(nodes, beams, columns, shortening=0, tolerance=1e-11):
 
     else:
         delta_node_r = [0 for node in nodes]
-
+    
     return [node_r, delta_node_r]
 
 

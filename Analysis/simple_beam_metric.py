@@ -1,23 +1,17 @@
 '''
 BSD 3-Clause License
-
 Copyright (c) 2019, Donald N. Bockoven III
 All rights reserved.
-
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-
 * Redistributions of source code must retain the above copyright notice, this
   list of conditions and the following disclaimer.
-
 * Redistributions in binary form must reproduce the above copyright notice,
   this list of conditions and the following disclaimer in the documentation
   and/or other materials provided with the distribution.
-
 * Neither the name of the copyright holder nor the names of its
   contributors may be used to endorse or promote products derived from
   this software without specific prior written permission.
-
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -1957,7 +1951,7 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                 v,m,s,d = self.analysisx(x)
                 file.write('<tr>\n<td>@{0:.4f} m</td>\n<td>{1:.4f}</td>\n</tr>\n'.format(x,m[1]))
             file.write('<tr>\n<td colspan="2"><u>Center Span Max/Min Deflections (mm):</u></td>\n</tr>\n')
-
+            
             E = float(self.E_ksi.get()) * (1/1000) * (1/math.pow(0.001,2))       #convert Mpa = N/mm^2 to kN/m^2
             I = float(self.I_in4.get()) * (math.pow(0.001,4))                   #covert from mm^4 to m^4
 
