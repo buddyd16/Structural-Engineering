@@ -1,16 +1,28 @@
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+'''
+BSD 3-Clause License
+Copyright (c) 2019, Donald N. Bockoven III
+All rights reserved.
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+* Neither the name of the copyright holder nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+'''
 
 from __future__ import division
 import math
@@ -199,7 +211,7 @@ def plastic_center(bars_x=[1], bars_y=[1], fy=60000, As=[0.31], fc=3000, eu=0.00
 # above the base. The section if oriented with the 24"
 # vertical.
 b=12
-h=20
+h=24
 #na = 12
 ##lets create a list of y dstances from the top lets say 1 per 0.25"
 #count = int(24/0.25)+1
@@ -221,7 +233,7 @@ h=20
 # Say F'c = 5000 psi and Fy = 60,000 psi
 # notice units here axial force will be in pounds
 # and moment will be in in-lbs
-fc = 4000
+fc = 5000
 fy = 60000
 Es = 0
 eu = 0.003
@@ -232,7 +244,7 @@ k = 0.85
 # cover = 2" to each corner bar
 xb = [0+2.5,b-2.5,0+2.5,b-2.5]
 yb = [2.5,2.5,h-2.5,h-2.5]
-ab = [1.0]*len(xb)
+ab = [0.79]*len(xb)
 
 acm = (b*h)-sum(ab)
 P_max = 0.8*0.65*((0.85*fc*acm)+(fy*sum(ab)))/1000.0
