@@ -1,18 +1,34 @@
-#!/usr/bin/env python
+'''
+BSD 3-Clause License
 
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
+Copyright (c) 2019, Donald N. Bockoven III
+All rights reserved.
 
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
 
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+* Neither the name of the copyright holder nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+'''
 
 from __future__ import division
 import numpy as np
@@ -22,9 +38,11 @@ import scipy.integrate
 import pin_pin_beam_equations_classes as ppbeam
 import math
 
+import time
+
 class three_moment_method(object):
 
-    def __init__(self,beam_spans=[120.00], beam_momentofinertia=[120.00], cant='N', beam_loads_raw=[[1000.00,1000.00,60.00,60.00,'POINT',0]], E=29000000.00, iters=100, displace=[0,0]):
+    def __init__(self,beam_spans=[120.00], beam_momentofinertia=[120.00], cant='N', beam_loads_raw=[[1000.00,1000.00,60.00,60.00,'POINT',0]], E=29000000.00, iters=20, displace=[0,0]):
         # Implementation of the Theory of Three Momements, https://en.wikipedia.org/wiki/Theorem_of_three_moments
         #   Inputs:
         #   beam_spans = a list of span lengths -- Expected Units: in -- Example: [120,120]
@@ -93,7 +111,38 @@ class three_moment_method(object):
         sumL = np.cumsum(beam_spans)              # cumulative sum of beam lengths
         sumL = sumL.tolist()
 
-        xs = np.zeros((iters+1, N))
+        #Additional calculation stations at point loads +/-0.0001 and start and end of line loads
+        xs_add = []#create a list of 0's x N - to add additional stations per span
+
+        for s in range(0,N):
+            xs_add.append([])
+
+        for load in beam_loads_raw:
+            if load[4] == 'POINT' or load[4] == "POINT_MOMENT":
+                inspan = int(load[5])
+                xs_add[inspan].append(load[2])
+                if load[2]+0.0001 > beam_spans[inspan]:
+                    pass
+                else:
+                    xs_add[inspan].append(load[2]+0.0001)
+                if load[2]-0.0001 < beam_spans[inspan]:
+                    pass
+                else:
+                    xs_add[inspan].append(load[2]-0.0001)
+            else:
+                inspan = int(load[5])
+                xs_add[inspan].append(load[2])
+                xs_add[inspan].append(load[3])
+
+        xs_add = [list(set(i)) for i in xs_add]
+        max_plus = max([len(i) for i in xs_add])
+        [i.extend([0]*(max_plus-len(i))) for i in xs_add if len(i) < max_plus]
+
+        self.add_stations = xs_add
+
+        #Create calculation stations
+        new_iters = iters+max_plus+1
+        xs = np.zeros((new_iters, N))
         j = 0
         for j in range(0, N):
             xs[0, j] = 0
@@ -102,14 +151,25 @@ class three_moment_method(object):
             for i in range(1, iters):
                 xs[i, j] = xs[i-1, j] + beam_spans[j]/iters
 
-        v_diag = np.zeros((iters+1, N))
-        v_diag_cantL = np.zeros((iters+1, N))
-        v_diag_cantR = np.zeros((iters+1, N))
-        m_diag = np.zeros((iters+1, N))
-        m_diag_cantL = np.zeros((iters+1, N))
-        m_diag_cantR = np.zeros((iters+1, N))
-        s_diag = np.zeros((iters+1, N))
-        d_diag = np.zeros((iters+1, N))
+            z=0
+            for i in range((iters+1),(new_iters)):
+                xs[i,j] = xs_add[j][z]
+                z+=1
+                j = 0
+        for j in range(0, N):
+            to_sort = xs[:,j].tolist()
+            to_sort.sort()
+            xs[:,j] = np.asarray(to_sort)
+
+        self.stations = xs
+        v_diag = np.zeros((new_iters, N))
+        v_diag_cantL = np.zeros((new_iters, N))
+        v_diag_cantR = np.zeros((new_iters, N))
+        m_diag = np.zeros((new_iters, N))
+        m_diag_cantL = np.zeros((new_iters, N))
+        m_diag_cantR = np.zeros((new_iters, N))
+        s_diag = np.zeros((new_iters, N))
+        d_diag = np.zeros((new_iters, N))
         r_span = np.zeros((2, N))
 
         # Span as simple support Moment, Shears, and Reactions
@@ -168,6 +228,7 @@ class three_moment_method(object):
                         d_diag[:, j] = d_diag[:, j]+d
                         r_span[0, j] = r_span[0, j]+load.rl
                         r_span[1, j] = r_span[1, j]+load.rr
+
                     elif loads[4] == "NL":
                         load = ppbeam.no_load()
                         v = load.v(xs[:,j])
@@ -188,17 +249,20 @@ class three_moment_method(object):
         # Horizontal center of moment region
         j = 0
         a_xl_xr = np.zeros((3, N))
-        m_xx = np.zeros((iters+1, N))
+        m_xx = np.zeros((new_iters, N))
         for j in range(0, N):
 
             m_xx[:, j] = m_diag[:, j]*xs[:, j]
-            A = sci.integrate.simps(m_diag[:, j], xs[:, j])
+            A = sci.integrate.cumtrapz(m_diag[:, j], xs[:, j])
+            A = A[-1]
+            print A
             a_xl_xr[0, j] = A
             if A == 0:
                 a_xl_xr[1, j] = 0
                 a_xl_xr[2, j] = 0
             else:
-                xl = (1/A)*sci.integrate.simps(m_xx[:, j], xs[:, j])
+                xl_A = sci.integrate.cumtrapz(m_xx[:, j], xs[:, j])
+                xl = (1/A)*xl_A[-1]
                 a_xl_xr[1, j] = xl
                 a_xl_xr[2, j] = beam_spans[j] - xl
 
@@ -471,30 +535,40 @@ class three_moment_method(object):
                 s_diag[:, j] = s_diag[:, j]+s
                 d_diag[:, j] = d_diag[:, j]+d
 
-        #correct d for support displacement
-        for j in range(0,N):
-            span = beam_spans[j]
-
-            slope_i = math.atan(-1.0*(displace[j]-displace[j+1])/span)
-            s_diag[:,j] = s_diag[:,j] + slope_i
-
-            for i in range(0,len(xs[:,j])):
-                delt_i = displace[j] + (((displace[j+1]-displace[j])/span)*xs[i,j])
-                d_diag[i,j] = d_diag[i,j] + delt_i
-
-        #correct cantilever d for support displacement
-        if cant[0]=='L' or cant[0] =='B':
-            if displace[2] == 0 and displace[1] == 0:
-                pass
+        run = 0
+        for con in displace:
+            if con == 0:
+                run = run + 0
             else:
-                d_diag[:,0] = d_diag[:,0]+displace[1]
+                run = run + 1
+
+        if run == 1:
+            #correct d for support displacement
+            for j in range(0,N):
+                span = beam_spans[j]
+
+                slope_i = math.atan(-1.0*(displace[j]-displace[j+1])/span)
+                s_diag[:,j] = s_diag[:,j] + slope_i
+
+                for i in range(0,len(xs[:,j])):
+                    delt_i = displace[j] + (((displace[j+1]-displace[j])/span)*xs[i,j])
+                    d_diag[i,j] = d_diag[i,j] + delt_i
+
+            #correct cantilever d for support displacement
+            if cant[0]=='L' or cant[0] =='B':
+                if displace[2] == 0 and displace[1] == 0:
+                    pass
+                else:
+                    d_diag[:,0] = d_diag[:,0]+displace[1]
 
 
-        if cant[0]=='R' or cant[0] =='B':
-            if displace[N-2] == 0 and displace[N-1] == 0:
-                pass
-            else:
-               d_diag[:,-1] = d_diag[:,-1]+displace[-2]
+            if cant[0]=='R' or cant[0] =='B':
+                if displace[N-2] == 0 and displace[N-1] == 0:
+                    pass
+                else:
+                   d_diag[:,-1] = d_diag[:,-1]+displace[-2]
+        else:
+            pass
 
         #correct cantilever slope and deflection for interior span end slopes
         if cant[0]=='L' or cant[0]=='B':
@@ -517,7 +591,7 @@ class three_moment_method(object):
 
         j=0
         for j in range(1,N):
-            xs[:,j] = xs[:,j] + sumL[j-1]           #converts lengths to global rather than local ie span 2 x[0] now = span 1 x[-1] or length in lieu of 0
+            xs[:,j] = xs[:,j] + sumL[j-1]   #converts lengths to global rather than local ie span 2 x[0] now = span 1 x[-1] or length in lieu of 0
 
         xs = xs/12
         for j in range(0,N):
@@ -534,3 +608,19 @@ class three_moment_method(object):
 
     def res(self):
         return self.xs, self.v_diag, self.m_diag, self.s_diag, self.d_diag, self.R, self.M
+
+
+start = time.time()
+loads = [[1000.00,1000.00,30.0,30.0,'POINT',0],[1000.00,1000.00,0,120.0,'UDL',1],[1000.00,1000.00,60.0,60.0,'POINT_MOMENT',2],[1000.00,1000.00,45.0,45.0,'POINT',2],[1000.00,1000.00,0,60.0,'UDL',3]]
+test = three_moment_method([60.0,120.0,120.0,60.0],[30.8,30.8,30.8,30.8],'B',loads, 29000000.00, 20, [0,0,0,0,0])
+end = time.time()
+t = end-start
+m = test.m_diag
+s = test.s_diag
+s1 = s[:,1]
+
+stations = test.stations
+add_stations = test.add_stations
+len_add = max([len(i) for i in add_stations])
+Mo = test.M
+Re = test.R

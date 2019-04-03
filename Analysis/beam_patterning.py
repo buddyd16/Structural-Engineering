@@ -1,4 +1,34 @@
-#!/usr/bin/env python
+'''
+BSD 3-Clause License
+
+Copyright (c) 2019, Donald N. Bockoven III
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+* Neither the name of the copyright holder nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+'''
 
 from __future__ import division
 import matplotlib
@@ -31,7 +61,7 @@ def load_pattern(num_spans):
                check[i] = 0
            test.append(check)
     return test
-    
+
 def align_yaxis(ax1, v1, ax2, v2):
     """adjust ax2 ylimit so that v2 in ax2 is aligned to v1 in ax1"""
     _, y1 = ax1.transData.transform((0, v1))
@@ -471,7 +501,7 @@ def three_moment_method(beam_spans, beam_momentofinertia, cant, beam_loads_raw, 
 
     delta = np.zeros((N+1,1))
     j=0
-    for j in range(1,N): 
+    for j in range(1,N):
 
         l = j-1
         r = j
@@ -544,17 +574,17 @@ def three_moment_method(beam_spans, beam_momentofinertia, cant, beam_loads_raw, 
             m_diag[x,j] = m_diag[x,j]-(((M[j]-M[j+1])/beam_spans[j])*xs[x,j])+M[j]
         s_diag[:,j] = (sci.integrate.cumtrapz(m_diag[:,j],xs[:,j], initial = 0)/(E*beam_momentofinertia[j]))+slope[j,0]
         d_diag[:,j] = sci.integrate.cumtrapz(s_diag[:,j],xs[:,j], initial = 0)
-        
-        
+
+
     #correct d for support displacement
     for j in range(0,N):
         span = beam_spans[j]
-        
+
         #test slope correction
         slope_i = math.atan(-1.0*(displace[j]-displace[j+1])/span)
         s_diag[:,j] = s_diag[:,j] + slope_i
         #slope_i = 0
-        
+
         for i in range(0,len(xs[:,j])):
             delt_i = displace[j] + (((displace[j+1]-displace[j])/span)*xs[i,j])
             d_diag[i,j] = d_diag[i,j] + delt_i
@@ -579,14 +609,14 @@ def three_moment_method(beam_spans, beam_momentofinertia, cant, beam_loads_raw, 
 
     else:
         pass
-    
+
     #Below not needed with slope correction above for support displacement
     ''''
     #correct cantilever d for support displacement
     if cant[0]=='L' or cant[0] =='B':
         if displace[2] == 0 and displace[1] == 0:
             pass
-        else:        
+        else:
             span_cant = beam_spans[0]
             span_int = beam_spans[1]
             for i in range(0,len(xs[:,0])):
@@ -607,7 +637,7 @@ def three_moment_method(beam_spans, beam_momentofinertia, cant, beam_loads_raw, 
     if cant[0]=='R' or cant[0] =='B':
         if displace[N-2] == 0 and displace[N-1] == 0:
             pass
-        else: 
+        else:
             span_cant= beam_spans[N-1]
             span_int= beam_spans[N-2]
             for i in range(0,len(xs[:,0])):
@@ -630,16 +660,16 @@ def three_moment_method(beam_spans, beam_momentofinertia, cant, beam_loads_raw, 
     if cant[0]=='L' or cant[0] =='B':
         if displace[2] == 0 and displace[1] == 0:
             pass
-        else:        
+        else:
             d_diag[:,0] = d_diag[:,0]+displace[1]
 
 
     if cant[0]=='R' or cant[0] =='B':
         if displace[N-2] == 0 and displace[N-1] == 0:
             pass
-        else: 
-           d_diag[:,-1] = d_diag[:,-1]+displace[-2] 	 
- 
+        else:
+           d_diag[:,-1] = d_diag[:,-1]+displace[-2]
+
     j=0
     for j in range(1,N):
         xs[:,j] = xs[:,j] + sumL[j-1]
@@ -686,7 +716,7 @@ class Results_window():
         self.lrfd_type = tk.Radiobutton(self.type_frame_select, text = "LRFD", variable=self.combo_type, value=3, command= self.lrfd).pack(side=tk.LEFT, anchor=tk.NW, padx= 5, pady= 1)
         self.combo_type.set(1)
         self.type_frame_select.pack(side=tk.TOP, anchor=tk.NW, fill=tk.BOTH)
-        
+
         self.combo_pattern_frame = tk.Frame(self.frame_selection)
         self.combo_frame = tk.LabelFrame(self.combo_pattern_frame, text='Combo', relief='sunken', padx=5, pady=5)
 
@@ -712,7 +742,7 @@ class Results_window():
         self.pattern_list = tk.Listbox(self.pattern_frame, height = 25, width = 20, exportselection=False)
         self.pattern_list.pack(side = tk.LEFT)
         self.pattern_list.bind("<<ListboxSelect>>",self.pattern_click)
-        i=1        
+        i=1
         for pattern in Main_window.pats:
             pat_string = 'Pattern ' + str(i) +' - '
             for y in pattern:
@@ -727,7 +757,7 @@ class Results_window():
         self.pattern_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.pattern_frame.pack(side = tk.LEFT)
         self.combo_pattern_frame.pack(side = tk.TOP)
-        
+
         self.per_span_res_frame = tk.Frame(self.frame_selection,relief='sunken')
         stations = Main_window.stations
         print stations
@@ -740,7 +770,7 @@ class Results_window():
         self.span_res_label = tk.Label(self.per_span_res_frame, text="per span results here")
         self.span_res_label.pack(side=tk.TOP)
         self.per_span_res_frame.pack(side = tk.TOP)
-        
+
         self.frame_selection.pack(side=tk.LEFT, fill=tk.BOTH)
 
         ## Chart Frame and selection frames
@@ -804,10 +834,10 @@ class Results_window():
         self.b1.pack(side=tk.RIGHT, anchor=tk.SW, padx=5, pady=5)
         self.annos_scale = tk.Scale(self.master, from_=3, to=30, orient=tk.HORIZONTAL, label = "Graph Annotations:", length = 200)
         self.annos_scale.pack(side=tk.RIGHT, anchor=tk.SW, padx=5, pady=5)
-        
+
         self.sup_disp_var = tk.IntVar()
         self.ch_sup_disp = tk.Checkbutton(self.master, text=": Remove Support Displacement\nResponse", justify=tk.LEFT, variable=self.sup_disp_var, command=self.sup_disp_click)
-        self.ch_sup_disp.pack(side=tk.RIGHT, anchor=tk.SW, padx=5, pady=5)        
+        self.ch_sup_disp.pack(side=tk.RIGHT, anchor=tk.SW, padx=5, pady=5)
 
         self.label_error = tk.Label(self.master, text='Error Info')
         self.label_error.pack(side=tk.LEFT, anchor=tk.SE, padx=5, pady=5)
@@ -850,7 +880,7 @@ class Results_window():
             self.drun()
         else:
             pass
-            
+
     def sup_disp_click(self, *event):
         dia = self.vmsd.get()
         self.graph_start()
@@ -863,7 +893,7 @@ class Results_window():
         elif dia == 4:
             self.drun()
         else:
-            pass              
+            pass
 
     def asd(self):
         self.combo_list.delete(0,tk.END)
@@ -872,7 +902,7 @@ class Results_window():
             for y in range(0,len(self.load_types)):
                 if Main_window.basic_factors[i][y] == 0.0 or Main_window.load_exist[y]==0:
                     pass
-                else:        
+                else:
                     combo = combo + ' {0:.2f}*{1} +'.format(Main_window.basic_factors[i][y],self.load_types[y])
             self.combo_list.insert(tk.END, combo[:-1])
         self.combo_list.insert(tk.END, 'ASD/Basic Envelope')
@@ -909,7 +939,7 @@ class Results_window():
         self.d.config(state='normal')
         self.combo_list.selection_set(0)
         self.pattern_list.selection_set(0)
- 
+
     def save_graph(self):
         self.Fig.savefig(self.path, dpi=150)
 
@@ -982,7 +1012,7 @@ class Results_window():
                     M = Main_window.load_results[basic_combo][7]
         else:
             pass
-        
+
         if len(Rmin) == 0:
             r_string = 'Reactions (kips) : '
             for reaction in R:
@@ -1003,7 +1033,7 @@ class Results_window():
             m_string = m_string + '\nMin Moments at Supports (ft-kips) : '
             for moment in Mmin:
                 m_string = m_string + ' {0:.2f}  '.format(moment[0]/(1000*12))
-    
+
         self.res_R.configure(text=r_string)
         self.res_M.configure(text=m_string)
         self.res_combo.configure(text=self.combo_string)
@@ -1075,9 +1105,9 @@ class Results_window():
                         pass
                 x.append(self.x[station,j])
                 y.append(self.y[station,j])
-            
+
         self.span_res_label.config(text = text_res)
-        
+
         self.res_points[0].set_xdata(x)
         self.res_points[0].set_ydata(y)
         self.canvas.draw()
@@ -1085,11 +1115,11 @@ class Results_window():
     def set_span_res_plus(self):
         station = self.span_res_scale.get()
         self.span_res_scale.set(station+1)
-        
+
     def set_span_res_minus(self):
         station = self.span_res_scale.get()
         self.span_res_scale.set(station-1)
-        
+
     def refreshFigure(self, x, y, yenv, dia, dec):
         self.x = x
         self.y = y
@@ -1165,7 +1195,7 @@ class Results_window():
         if combo == 2:
 
             asd_combo = self.combo_index
-            
+
             if asd_combo in range(0, len(self.asd_combos)):
                 if self.pattern_index in range(0,len(Main_window.pats)):
                     y = Main_window.basic_v[asd_combo][1][self.pattern_index] - (self.sup_disp_var.get() * Main_window.displace_initial_results[0])
@@ -1178,7 +1208,7 @@ class Results_window():
                     line2 = '\n  Min. V (kips): '
                     for i in range(0,n):
                         line2 = line2 + '{0:.2f}  '.format(y[:,i].min())
-                        
+
                     self.res_min_max.configure(text='   Max. V: {0:.2f} kips  Min. V: {1:.2f} kips'.format(y.max(),y.min())+line1+line2)
                     dia = dia+'\nMax. V: {0:.2f} kips  Min. V: {1:.2f} kips'.format(y.max(),y.min())
                 else:
@@ -1192,7 +1222,7 @@ class Results_window():
                     line2 = '\n  Min. V (kips): '
                     for i in range(0,n):
                         line2 = line2 + '{0:.2f}  '.format(ymin[:,i].min())
-                        
+
                     self.res_min_max.configure(text='   Max. V: {0:.2f} kips  Min. V: {1:.2f} kips'.format(y.max(),ymin.min())+line1+line2)
                     dia = dia+'\nMax. V: {0:.2f} kips  Min. V: {1:.2f} kips'.format(y.max(),ymin.min())
             else:
@@ -1206,16 +1236,16 @@ class Results_window():
                 line2 = '\n  Min. V (kips): '
                 for i in range(0,n):
                     line2 = line2 + '{0:.2f}  '.format(ymin[:,i].min())
-                    
+
                 self.res_min_max.configure(text='   Max. V: {0:.2f} kips  Min. V: {1:.2f} kips'.format(y.max(),ymin.min())+line1+line2)
-                dia = dia+'\nMax. V: {0:.2f} kips  Min. V: {1:.2f} kips'.format(y.max(),ymin.min())           
+                dia = dia+'\nMax. V: {0:.2f} kips  Min. V: {1:.2f} kips'.format(y.max(),ymin.min())
 
             self.refreshFigure(x,y,ymin,dia,2)
-        
+
         elif combo ==3:
 
             lrfd_combo = self.combo_index
-            
+
             if lrfd_combo in range(0, len(self.lrfd_combos)):
                 if self.pattern_index in range(0,len(Main_window.pats)):
                     y = Main_window.lrfd_v[lrfd_combo][1][self.pattern_index] - (self.sup_disp_var.get() * Main_window.displace_initial_results[0])
@@ -1228,7 +1258,7 @@ class Results_window():
                     line2 = '\n  Min. V (kips): '
                     for i in range(0,n):
                         line2 = line2 + '{0:.2f}  '.format(y[:,i].min())
-                        
+
                     self.res_min_max.configure(text='   Max. V: {0:.2f} kips  Min. V: {1:.2f} kips'.format(y.max(),y.min())+line1+line2)
                     dia = dia+'\nMax. V: {0:.2f} kips  Min. V: {1:.2f} kips'.format(y.max(),y.min())
                 else:
@@ -1242,7 +1272,7 @@ class Results_window():
                     line2 = '\n  Min. V (kips): '
                     for i in range(0,n):
                         line2 = line2 + '{0:.2f}  '.format(ymin[:,i].min())
-                        
+
                     self.res_min_max.configure(text='   Max. V: {0:.2f} kips  Min. V: {1:.2f} kips'.format(y.max(),ymin.min())+line1+line2)
                     dia = dia+'\nMax. V: {0:.2f} kips  Min. V: {1:.2f} kips'.format(y.max(),ymin.min())
             else:
@@ -1256,9 +1286,9 @@ class Results_window():
                 line2 = '\n  Min. V (kips): '
                 for i in range(0,n):
                     line2 = line2 + '{0:.2f}  '.format(ymin[:,i].min())
-                    
+
                 self.res_min_max.configure(text='   Max. V: {0:.2f} kips  Min. V: {1:.2f} kips'.format(y.max(),ymin.min())+line1+line2)
-                dia = dia+'\nMax. V: {0:.2f} kips  Min. V: {1:.2f} kips'.format(y.max(),ymin.min())           
+                dia = dia+'\nMax. V: {0:.2f} kips  Min. V: {1:.2f} kips'.format(y.max(),ymin.min())
 
             self.refreshFigure(x,y,ymin,dia,2)
         elif combo ==1:
@@ -1280,7 +1310,7 @@ class Results_window():
                     line2 = '\n  Min. V (kips): '
                     for i in range(0,n):
                         line2 = line2 + '{0:.2f}  '.format(y[:,i].min())
-                        
+
                     self.res_min_max.configure(text='   Max. V: {0:.2f} kips  Min. V: {1:.2f} kips'.format(y.max(),y.min())+line1+line2)
                     dia = dia+'\nMax. V: {0:.2f} kips  Min. V: {1:.2f} kips'.format(y.max(),y.min())
                 else:
@@ -1299,9 +1329,9 @@ class Results_window():
                     line2 = '\n  Min. V (kips): '
                     for i in range(0,n):
                         line2 = line2 + '{0:.2f}  '.format(ymin[:,i].min())
-                        
+
                     self.res_min_max.configure(text='   Max. V: {0:.2f} kips  Min. V: {1:.2f} kips'.format(y.max(),ymin.min())+line1+line2)
-                    dia = dia+'\nMax. V: {0:.2f} kips  Min. V: {1:.2f} kips'.format(y.max(),ymin.min())                             
+                    dia = dia+'\nMax. V: {0:.2f} kips  Min. V: {1:.2f} kips'.format(y.max(),ymin.min())
             else:
                 if basic_combo == 11:
                     y = Main_window.displace_initial_results[0]
@@ -1315,7 +1345,7 @@ class Results_window():
                     line2 = '\n  Min. V (kips): '
                     for i in range(0,n):
                         line2 = line2 + '{0:.2f}  '.format(y[:,i].min())
-                        
+
                     self.res_min_max.configure(text='   Max. V: {0:.2f} kips  Min. V: {1:.2f} kips'.format(y.max(),y.min())+line1+line2)
                     dia = dia+'\nMax. V: {0:.2f} kips  Min. V: {1:.2f} kips'.format(y.max(),y.min())
                 else:
@@ -1330,10 +1360,10 @@ class Results_window():
                     line2 = '\n  Min. V (kips): '
                     for i in range(0,n):
                         line2 = line2 + '{0:.2f}  '.format(y[:,i].min())
-                        
+
                     self.res_min_max.configure(text='   Max. V: {0:.2f} kips  Min. V: {1:.2f} kips'.format(y.max(),y.min())+line1+line2)
                     dia = dia+'\nMax. V: {0:.2f} kips  Min. V: {1:.2f} kips'.format(y.max(),y.min())
-            
+
             self.refreshFigure(x,y,ymin,dia,2)
 
         else:
@@ -1358,7 +1388,7 @@ class Results_window():
                     line2 = '\n  Min. M (ft-kips): '
                     for i in range(0,n):
                         line2 = line2 + '{0:.2f}  '.format(y[:,i].min())
-                    
+
                     self.res_min_max.configure(text='   Max. M: {0:.2f} ft-kips  Min. M: {1:.2f} ft-kips'.format(y.max(),y.min())+line1+line2)
                     dia = dia + '\nMax. M: {0:.2f} ft-kips  Min. M: {1:.2f} ft-kips'.format(y.max(),y.min())
                 else:
@@ -1373,7 +1403,7 @@ class Results_window():
                     line2 = '\n  Min. M (ft-kips): '
                     for i in range(0,n):
                         line2 = line2 + '{0:.2f}  '.format(ymin[:,i].min())
-                    
+
                     self.res_min_max.configure(text='   Max. M: {0:.2f} ft-kips  Min. M: {1:.2f} ft-kips'.format(y.max(),ymin.min())+line1+line2)
                     dia = dia + '\nMax. M: {0:.2f} ft-kips  Min. M: {1:.2f} ft-kips'.format(y.max(),ymin.min())
             else:
@@ -1388,7 +1418,7 @@ class Results_window():
                 line2 = '\n  Min. M (ft-kips): '
                 for i in range(0,n):
                     line2 = line2 + '{0:.2f}  '.format(ymin[:,i].min())
-                
+
                 self.res_min_max.configure(text='   Max. M: {0:.2f} ft-kips  Min. M: {1:.2f} ft-kips'.format(y.max(),ymin.min())+line1+line2)
                 dia = dia + '\nMax. M: {0:.2f} ft-kips  Min. M: {1:.2f} ft-kips'.format(y.max(),ymin.min())
             self.refreshFigure(x,y,ymin,dia,2)
@@ -1407,9 +1437,9 @@ class Results_window():
                     line2 = '\n  Min. M (ft-kips): '
                     for i in range(0,n):
                         line2 = line2 + '{0:.2f}  '.format(y[:,i].min())
-                    
+
                     self.res_min_max.configure(text='   Max. M: {0:.2f} ft-kips  Min. M: {1:.2f} ft-kips'.format(y.max(),y.min())+line1+line2)
-                    
+
                     dia = dia + '\nMax. M: {0:.2f} ft-kips  Min. M: {1:.2f} ft-kips'.format(y.max(),y.min())
                 else:
                     y = Main_window.lrfd_m_env_max[lrfd_combo] - (self.sup_disp_var.get() * Main_window.displace_initial_results[1])
@@ -1423,9 +1453,9 @@ class Results_window():
                     line2 = '\n  Min. M (ft-kips): '
                     for i in range(0,n):
                         line2 = line2 + '{0:.2f}  '.format(ymin[:,i].min())
-                    
+
                     self.res_min_max.configure(text='   Max. M: {0:.2f} ft-kips  Min. M: {1:.2f} ft-kips'.format(y.max(),ymin.min())+line1+line2)
-                    
+
                     dia = dia + '\nMax. M: {0:.2f} ft-kips  Min. M: {1:.2f} ft-kips'.format(y.max(),ymin.min())
             else:
                 y = Main_window.lrfd_m_max_diag - (self.sup_disp_var.get() * Main_window.displace_initial_results[1])
@@ -1439,15 +1469,15 @@ class Results_window():
                 line2 = '\n  Min. M (ft-kips): '
                 for i in range(0,n):
                     line2 = line2 + '{0:.2f}  '.format(ymin[:,i].min())
-                
+
                 self.res_min_max.configure(text='   Max. M: {0:.2f} ft-kips  Min. M: {1:.2f} ft-kips'.format(y.max(),ymin.min())+line1+line2)
-                
+
                 dia = dia + '\nMax. M: {0:.2f} ft-kips  Min. M: {1:.2f} ft-kips'.format(y.max(),ymin.min())
 
             self.refreshFigure(x,y,ymin,dia,2)
         elif combo ==1:
             basic_combo = self.combo_index
-            
+
             if basic_combo in range(5,9):
                 if self.pattern_index in range(0,len(Main_window.pats)):
                     y = Main_window.load_results[basic_combo][3][1][self.pattern_index]
@@ -1464,7 +1494,7 @@ class Results_window():
                     line2 = '\n  Min. M (ft-kips): '
                     for i in range(0,n):
                         line2 = line2 + '{0:.2f}  '.format(y[:,i].min())
-                    
+
                     self.res_min_max.configure(text='   Max. M: {0:.2f} ft-kips  Min. M: {1:.2f} ft-kips'.format(y.max(),y.min())+line1+line2)
                     dia = dia + '\nMax. M: {0:.2f} ft-kips  Min. M: {1:.2f} ft-kips'.format(y.max(),y.min())
                 else:
@@ -1483,9 +1513,9 @@ class Results_window():
                     line2 = '\n  Min. M (ft-kips): '
                     for i in range(0,n):
                         line2 = line2 + '{0:.2f}  '.format(ymin[:,i].min())
-                    
+
                     self.res_min_max.configure(text='   Max. M: {0:.2f} ft-kips  Min. M: {1:.2f} ft-kips'.format(y.max(),ymin.min())+line1+line2)
-                    dia = dia + '\nMax. M: {0:.2f} ft-kips  Min. M: {1:.2f} ft-kips'.format(y.max(),ymin.min())          
+                    dia = dia + '\nMax. M: {0:.2f} ft-kips  Min. M: {1:.2f} ft-kips'.format(y.max(),ymin.min())
             else:
                 if basic_combo == 11:
                     y = Main_window.displace_initial_results[1]
@@ -1499,7 +1529,7 @@ class Results_window():
                     line2 = '\n  Min. M (ft-kips): '
                     for i in range(0,n):
                         line2 = line2 + '{0:.2f}  '.format(y[:,i].min())
-                        
+
                     self.res_min_max.configure(text='   Max. M: {0:.2f} ft-kips  Min. M: {1:.2f} ft-kips'.format(y.max(),y.min())+line1+line2)
                     dia = dia+'\nMax. M: {0:.2f} ft-kips  Min. M: {1:.2f} ft-kips'.format(y.max(),y.min())
                 else:
@@ -1514,7 +1544,7 @@ class Results_window():
                     line2 = '\n  Min. M (ft-kips): '
                     for i in range(0,n):
                         line2 = line2 + '{0:.2f}  '.format(y[:,i].min())
-                    
+
                     self.res_min_max.configure(text='   Max. M: {0:.2f} ft-kips  Min. M: {1:.2f} ft-kips'.format(y.max(),y.min())+line1+line2)
                     dia = dia + '\nMax. M: {0:.2f} ft-kips  Min. M: {1:.2f} ft-kips'.format(y.max(),y.min())
             self.refreshFigure(x,y,ymin,dia,2)
@@ -1548,7 +1578,7 @@ class Results_window():
                 x = Main_window.xs
 
                 self.res_min_max.configure(text='   Max. S: {0:.4f} rad  Min. S: {1:.4f} rad'.format(y.max(),ymin.min()))
-                dia = dia+'\nMax. S: {0:.4f} rad  Min. S: {1:.4f} rad'.format(y.max(),ymin.min())           
+                dia = dia+'\nMax. S: {0:.4f} rad  Min. S: {1:.4f} rad'.format(y.max(),ymin.min())
             self.refreshFigure(x,y,ymin,dia,4)
         elif combo ==3:
             pass
@@ -1575,7 +1605,7 @@ class Results_window():
                         ymin = ymin + Main_window.load_results[basic_combo][4][0]
                     x = Main_window.xs
                     self.res_min_max.configure(text='   Max. S: {0:.4f} rad  Min. S: {1:.4f} rad'.format(y.max(),ymin.min()))
-                    dia = dia+'\nMax. S: {0:.4f} rad  Min. S: {1:.4f} rad'.format(y.max(),ymin.min())                             
+                    dia = dia+'\nMax. S: {0:.4f} rad  Min. S: {1:.4f} rad'.format(y.max(),ymin.min())
             else:
                 if basic_combo == 11:
                     y = Main_window.displace_initial_results[2]
@@ -1583,7 +1613,7 @@ class Results_window():
                     x = Main_window.xs
                     self.res_min_max.configure(text='   Max. S: {0:.4f} rad  Min. S: {1:.4f} rad'.format(y.max(),y.min()))
                     dia = dia+'\nMax. S: {0:.4f} rad  Min. S: {1:.4f} rad'.format(y.max(),y.min())
-                    
+
                 else:
                     y = Main_window.load_results[basic_combo][4]
                     ymin = Main_window.bm
@@ -1606,7 +1636,7 @@ class Results_window():
                     y = Main_window.basic_d[asd_combo][1][self.pattern_index] - (self.sup_disp_var.get() * Main_window.displace_initial_results[3])
                     ymin = Main_window.bm
                     x = Main_window.xs
-                    
+
                     n = len(y[0])
                     line1 = '\n  Per Span Max/Min:\n  Max. D (in): '
                     for i in range(0,n):
@@ -1623,7 +1653,7 @@ class Results_window():
                     y = Main_window.basic_d_env_max[asd_combo] - (self.sup_disp_var.get() * Main_window.displace_initial_results[3])
                     ymin = Main_window.basic_d_env_min[asd_combo] - (self.sup_disp_var.get() * Main_window.displace_initial_results[3])
                     x = Main_window.xs
-                    
+
                     n = len(y[0])
                     line1 = '\n  Per Span Max/Min:\n  Max. D (in): '
                     for i in range(0,n):
@@ -1640,7 +1670,7 @@ class Results_window():
                 y = Main_window.asd_d_max_diag - (self.sup_disp_var.get() * Main_window.displace_initial_results[3])
                 ymin = Main_window.asd_d_min_diag - (self.sup_disp_var.get() * Main_window.displace_initial_results[3])
                 x = Main_window.xs
-                
+
                 n = len(y[0])
                 line1 = '\n  Per Span Max/Min:\n  Max. D (in): '
                 for i in range(0,n):
@@ -1658,7 +1688,7 @@ class Results_window():
             pass
         elif combo ==1:
             basic_combo = self.combo_index
-            
+
             if basic_combo in range(5,9):
                 if self.pattern_index in range(0,len(Main_window.pats)):
                     y = Main_window.load_results[basic_combo][5][1][self.pattern_index]
@@ -1715,7 +1745,7 @@ class Results_window():
                         line2 = line2 + '{0:.4f}  '.format(y[:,i].min())
                     self.res_min_max.configure(text='   Max. D: {0:.4f} in.  Min. D: {1:.4f} in.'.format(y.max(),y.min())+line1+line2)
                     dia = dia+'\nMax. D: {0:.4f} in.  Min. D: {1:.4f} in.'.format(y.max(),y.min())
-                
+
                 else:
                     y = Main_window.load_results[basic_combo][5]
                     ymin = Main_window.bm
@@ -1748,7 +1778,7 @@ class Main_window:
         self.menu.add_command(label="Results", state="disabled", command= self.res_window)
         self.menu.add_separator()
         self.menu.add_command(label="Exit", command=self.quit_app)
-        
+
         try:
             self.master.config(menu=self.menubar)
         except AttributeError:
@@ -1756,7 +1786,7 @@ class Main_window:
 
         self.main_frame = tk.Frame(self.master, bd=2, relief='sunken', padx=10,pady=20)
         self.main_frame.pack(anchor='c', padx= 10, pady= 20)
-        
+
         self.bminfo = tk.StringVar()
         self.bminfol = tk.Label(self.main_frame, text="Calculation Label : ")
         self.bminfol.grid(row=0,column=0, pady=10, sticky="E")
@@ -1850,7 +1880,7 @@ class Main_window:
         self.e_fy_lrfd = tk.OptionMenu(self.f_lrfd_frame, self.fy_lrfd, '0.7', '0.2')
         self.e_fy_lrfd.pack(side=tk.LEFT)
         self.f_lrfd_frame.grid(row=12, column=0, padx= 10, sticky=tk.W)
-        
+
         self.point_gif = PhotoImage(file="point.gif")
         self.point_key = tk.Label(self.main_frame,image=self.point_gif)
         self.point_key.point_gif = self.point_gif
@@ -1878,11 +1908,11 @@ class Main_window:
         self.lb_loads = tk.Listbox(self.main_frame,height = 10, width = 20)
         self.lb_loads.grid(row=1, column=9, columnspan = 10, rowspan = 9,sticky='WENS', padx=5, pady=5 )
         self.lb_loads.bind("<<ListboxSelect>>",self.load_click)
-        
+
         self.support_displace_label = tk.Label(self.main_frame, text="Support Displacements (in.):\n(+ is upward)")
         self.support_displace_label.grid(row=11, column =3, padx=5, pady=5)
         self.displace_widget = []
-        
+
         self.b1 = tk.Button(self.main_frame,text="Close", command=self.quit_app)
         self.b1.grid(row=13, column=19, padx=5, pady=5)
         self.bprint = tk.Button(self.main_frame,text="Save Inputs", command=self.print_ins)
@@ -1916,25 +1946,26 @@ class Main_window:
 
         self.ins_validate()
         self.license_display()
-    
+
     def license_display(self, *event):
-        license_string = ("This program is free software; you can redistribute it and/or modify\n"
-                    "it under the terms of the GNU General Public License as published by\n"
-                    "the Free Software Foundation; either version 2 of the License, or\n"
-                    "(at your option) any later version.\n\n"
+        license_string = (
+"""Copyright (c) 2019, Donald N. Bockoven III\n
+All rights reserved.\n\n
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n
+https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE""")
 
-                    "This program is distributed in the hope that it will be useful,\n"
-                    "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-                    "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
-                    "GNU General Public License for more details.\n\n"
-
-                    "You should have received a copy of the GNU General Public License along"
-                    "with this program; if not, write to the Free Software Foundation, Inc.,"
-                    "51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA\n"
-                    "\nA copy of the License can be viewed at:\n https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE")
         tkMessageBox.showerror("License Information",license_string)
         self.master.focus_force()
-        
+
     def _reset_option_menu(self, spans):
         '''reset the values in the option menu
         if index is given, set the value of the menu to
@@ -2023,14 +2054,14 @@ class Main_window:
             self.displace_widget.append(tk.Entry(self.main_frame,width = 5, justify=tk.CENTER))
             self.displace_widget[i].insert(tk.END, sup_disp[i])
             self.displace_widget[i].grid(row=11,column=5+i, padx= 2)
-        
+
         if self.cant_in.get() == 'L' or self.cant_in.get() == 'B':
             self.displace_widget[0].configure(state="disabled")
             self.displace_widget[0].delete(0,tk.END)
             self.displace_widget[0].insert(tk.END, '0.0')
         else:
             self.displace_widget[0].configure(state="normal")
-        
+
         if self.cant_in.get() == 'R' or self.cant_in.get() == 'B':
             self.displace_widget[-1].configure(state="disabled")
             self.displace_widget[-1].delete(0,tk.END)
@@ -2063,8 +2094,8 @@ class Main_window:
             path = os.path.join(os.path.expanduser('~'),'Desktop','RESULTS', label)
 
             path_exists(path)
-            sup_disp = '' 
-            for widget in self.displace_widget:            
+            sup_disp = ''
+            for widget in self.displace_widget:
                 sup_disp = sup_disp + '{0},'.format(widget.get())
             sup_disp = sup_disp[:-1]
 
@@ -2099,14 +2130,14 @@ class Main_window:
                     trap_reversal_check = 1
                 else:
                     trap_reversal_check = w1/w2
-                
+
                 if a < 0 or a > span_l or b<a or b> span_l or trap_reversal_check < 0:
                     return 0
                 else:
                     return 1
     def add_load(self):
         load_test = self.load_input_validation()
-        
+
         if load_test == 0:
             pass
         else:
@@ -2114,14 +2145,14 @@ class Main_window:
             self.lb_loads.insert(tk.END,load)
 
         self.ins_validate()
-        
+
     def add_udl_to_all(self):
         spans = self.lb_spans.size()
         a = self.e_a.get()
         b = self.e_b.get()
         w1 = float(self.e_p.get())
         w2 = float(self.e_w2.get())
-        
+
         if w1 == 0:
             pass
         else:
@@ -2158,16 +2189,16 @@ class Main_window:
                 runme = 0
             else:
                 runme = 1
-            
+
             if runme == 1:
                 spans_l_string = self.lb_spans.get(0,tk.END)
-                
+
                 for line in spans_l_string:
                     span_l.append(float(line))
-                    
+
                 overall_length = sum(span_l)
                 slope = (w1-w2)/overall_length
-                
+
                 for i in range(0,len(span_l)):
                     if i == 0:
                         w1_out = w1
@@ -2188,7 +2219,7 @@ class Main_window:
                     self.ins_validate()
             else:
                 pass
-            
+
     def remove_load(self):
         self.lb_loads.delete(tk.END)
 
@@ -2239,27 +2270,27 @@ class Main_window:
             self._reset_option_menu([1])
         else:
             self._reset_option_menu(range(1,self.lb_spans.size()+1))
-        
+
         for i in range(0,self.lb_spans.size()+1):
             self.displace_widget.append(tk.Entry(self.main_frame,width = 5, justify=tk.CENTER))
             self.displace_widget[i].insert(tk.END, '0.0')
             self.displace_widget[i].grid(row=11,column=5+i, padx= 2)
-        
+
         if self.cant_in.get() == 'L' or self.cant_in.get() == 'B':
             self.displace_widget[0].configure(state="disabled")
             self.displace_widget[0].delete(0,tk.END)
             self.displace_widget[0].insert(tk.END, '0.0')
         else:
             self.displace_widget[0].configure(state="normal")
-        
+
         if self.cant_in.get() == 'R' or self.cant_in.get() == 'B':
             self.displace_widget[-1].configure(state="disabled")
             self.displace_widget[-1].delete(0,tk.END)
             self.displace_widget[-1].insert(tk.END, '0.0')
         else:
             self.displace_widget[-1].configure(state="normal")
-        
-            
+
+
         self.ins_validate()
 
     def remove_span(self):
@@ -2450,7 +2481,7 @@ class Main_window:
         Main_window.live_deflection_goal = []
         Main_window.total_deflection_goal = []
         pattern_loads = []
-        no_pattern_loads = []       
+        no_pattern_loads = []
         for y in range(0,4):
             pattern_loads.append([])
             no_pattern_loads.append([])
@@ -2460,7 +2491,7 @@ class Main_window:
 
         pattern_loads_apply = [[0]*len(patterns),[0]*len(patterns),[0]*len(patterns),[0]*len(patterns)]
 
-        
+
         for i in range(5,9):
             for applied in loads[i][1]:
                 index = applied[5]
@@ -2471,7 +2502,7 @@ class Main_window:
                         pattern_loads[i-5][index].append(applied)
                 else:
                     no_pattern_loads[i-5].append(applied)
-                    
+
             loads[i][1] = [no_pattern_loads[i-5],pattern_loads[i-5]]
             for y in range(2,8):
                 loads[i][y] = [[0],[0]*len(patterns)]
@@ -2481,7 +2512,7 @@ class Main_window:
                 pat_holder = []
                 for a in range(0,len(patterns[z])):
                     if i == 8:
-                        
+
                         if patterns[z][a] == 1:
                             if len(loads[i][1][1][a]) == 0:
                                 pat_holder.append([0.00,0.00,0.00,0.00,'POINT',0,0])
@@ -2507,7 +2538,7 @@ class Main_window:
         for span in beam_spans:
             Main_window.live_deflection_goal.append(span/360)
             Main_window.total_deflection_goal.append(span/240)
-            
+
         startt = time.time()
         print 'Perform analysis for all load types defined....'
         for i in range(0,11):
@@ -2516,7 +2547,7 @@ class Main_window:
                     pass
                 else:
                     Main_window.xs,loads[i][2][0],loads[i][3][0],loads[i][4][0],loads[i][5][0], loads[i][6][0], loads[i][7][0] = three_moment_method(beam_spans, beam_momentofinertia, cant, loads[i][1][0], E, iters, displace_loads)
-                
+
                 if len(loads[i][1][1]) == 0:
                     for y in range(0,len(patterns)):
                         loads[i][2][1][y] = 0.0
@@ -2528,19 +2559,19 @@ class Main_window:
                 else:
                     for y in range(0,len(patterns)):
                         Main_window.xs, loads[i][2][1][y], loads[i][3][1][y],  loads[i][4][1][y], loads[i][5][1][y], loads[i][6][1][y], loads[i][7][1][y] = three_moment_method(beam_spans, beam_momentofinertia, cant, pattern_loads_apply[i-5][y], E, iters, displace_loads)
-                        
+
             elif len(loads[i][1]) == 0:
                 pass
-            
+
             else:
                 Main_window.xs,loads[i][2],loads[i][3],loads[i][4],loads[i][5], loads[i][6], loads[i][7] = three_moment_method(beam_spans, beam_momentofinertia, cant, loads[i][1], E, iters, displace_loads)
-        
+
         #solve for prescribed displacements
         Main_window.xs,Main_window.displace_initial_results[0],Main_window.displace_initial_results[1],Main_window.displace_initial_results[2],Main_window.displace_initial_results[3], Main_window.displace_initial_results[4], Main_window.displace_initial_results[5] = three_moment_method(beam_spans, beam_momentofinertia, cant, [[0.00,0.00,0.00,0.00,'POINT',0,0]], E, iters, displace_initial)
-        
+
         endt = time.time()
         print '**Analysis Complete** in {0:.4f} sec'.format(endt-startt)
-        
+
         Main_window.load_results = loads
         Main_window.bm = np.zeros((iters+1,N))
         # # ['D', 'Ex', 'Ey', 'F', 'H', 'L', 'Lr', 'R', 'S', 'Wx', 'Wy']
@@ -2550,7 +2581,7 @@ class Main_window:
 
         fi = float(self.fi_lrfd.get())
         fy = float(self.fy_lrfd.get())
-        
+
         Main_window.LRFD_factors = [[1.4, 0.0, 0.0, 1.4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
                                              [1.2, 0.0, 0.0, 1.2, 1.6, 1.6, 0.5, 0.0, 0.0, 0.0, 0.0],
                                              [1.2, 0.0, 0.0, 1.2, 1.6, 1.6, 0.0, 0.5, 0.0, 0.0, 0.0],
@@ -2631,7 +2662,7 @@ class Main_window:
         Main_window.lrfd_r_env_max = []
         Main_window.lrfd_m_support_env_min = []
         Main_window.lrfd_m_support_env_max = []
-        
+
         for i in range(0,len(Main_window.lrfd_combos)):
             combo = Main_window.lrfd_combos[i]
             v_diag = np.zeros((iters+1, N)) + Main_window.displace_initial_results[0]
@@ -2655,7 +2686,7 @@ class Main_window:
                     else:
                         v_diag = v_diag + (loads[y][2][0]*Main_window.LRFD_factors[i][y])
                         m_diag = m_diag + (loads[y][3][0]*Main_window.LRFD_factors[i][y])
-                    
+
                         r = r + (loads[y][6][0]*Main_window.LRFD_factors[i][y])
                         m = m + (loads[y][7][0]*Main_window.LRFD_factors[i][y])
 
@@ -2664,19 +2695,19 @@ class Main_window:
                         m_diag_pattern[z] = (loads[y][3][1][z]*Main_window.LRFD_factors[i][y]) + m_diag_pattern[z]
                         r_pattern[z] = (loads[y][6][1][z]*Main_window.LRFD_factors[i][y]) + r_pattern[z]
                         m_pattern[z] = (loads[y][7][1][z]*Main_window.LRFD_factors[i][y]) + m_pattern[z]
-                            
+
                 elif y in range(5,9):
                     pass
                 else:
                     if type(loads[y][2]) == type(v_diag):
                         v_diag = v_diag + (loads[y][2]*Main_window.LRFD_factors[i][y])
                         m_diag = m_diag + (loads[y][3]*Main_window.LRFD_factors[i][y])
-                  
+
                         r = r + (loads[y][6]*Main_window.LRFD_factors[i][y])
                         m = m + (loads[y][7]*Main_window.LRFD_factors[i][y])
                     else:
                         pass
-                        
+
             for z in range(0,len(patterns)):
                 v_diag_pattern[z] = v_diag_pattern[z] + v_diag
                 m_diag_pattern[z] = m_diag_pattern[z] + m_diag
@@ -2708,14 +2739,14 @@ class Main_window:
         Main_window.basic_s_env_max = []
         Main_window.basic_d_env_max = []
         Main_window.basic_r_env_max = []
-        Main_window.basic_m_support_env_max = [] 
+        Main_window.basic_m_support_env_max = []
         Main_window.basic_v_env_min = []
         Main_window.basic_m_env_min = []
         Main_window.basic_s_env_min = []
         Main_window.basic_d_env_min = []
         Main_window.basic_r_env_min = []
-        Main_window.basic_m_support_env_min = []  
-        
+        Main_window.basic_m_support_env_min = []
+
         for i in range(0,len(Main_window.basic_combos)):
             combo = Main_window.basic_combos[i]
             v_diag = np.zeros((iters+1, N)) + Main_window.displace_initial_results[0]
@@ -2739,14 +2770,14 @@ class Main_window:
                 m_pattern.append(np.zeros((N+1,1)))
             for y in range(0,len(Main_window.basic_factors[i])):
                 if y in range(5,9) and Main_window.basic_factors[i][y] != 0.0:
-                    if len(loads[y][2][0]) <= 1:                        
+                    if len(loads[y][2][0]) <= 1:
                         pass
                     else:
                         v_diag = v_diag + (loads[y][2][0]*Main_window.basic_factors[i][y])
                         m_diag = m_diag + (loads[y][3][0]*Main_window.basic_factors[i][y])
                         s_diag = s_diag + (loads[y][4][0]*Main_window.basic_factors[i][y])
                         d_diag = d_diag + (loads[y][5][0]*Main_window.basic_factors[i][y])
-                    
+
                         r = r + (loads[y][6][0]*Main_window.basic_factors[i][y])
                         m = m + (loads[y][7][0]*Main_window.basic_factors[i][y])
 
@@ -2757,7 +2788,7 @@ class Main_window:
                         d_diag_pattern[z] = (loads[y][5][1][z]*Main_window.basic_factors[i][y]) + d_diag_pattern[z]
                         r_pattern[z] = (loads[y][6][1][z]*Main_window.basic_factors[i][y]) + r_pattern[z]
                         m_pattern[z] = (loads[y][7][1][z]*Main_window.basic_factors[i][y]) + m_pattern[z]
-                            
+
                 elif y in range(5,9):
                     pass
                 else:
@@ -2766,12 +2797,12 @@ class Main_window:
                         m_diag = m_diag + (loads[y][3]*Main_window.basic_factors[i][y])
                         s_diag = s_diag + (loads[y][4]*Main_window.basic_factors[i][y])
                         d_diag = d_diag + (loads[y][5]*Main_window.basic_factors[i][y])
-                    
+
                         r = r + (loads[y][6]*Main_window.basic_factors[i][y])
                         m = m + (loads[y][7]*Main_window.basic_factors[i][y])
                     else:
                         pass
-                        
+
             for z in range(0,len(patterns)):
                 v_diag_pattern[z] = v_diag + v_diag_pattern[z]
                 m_diag_pattern[z] = m_diag + m_diag_pattern[z]
@@ -2798,7 +2829,7 @@ class Main_window:
             Main_window.basic_d_env_min.append(np.minimum.reduce(d_diag_pattern))
             Main_window.basic_r_env_min.append(np.minimum.reduce(r_pattern))
             Main_window.basic_m_support_env_min.append(np.minimum.reduce(m_pattern))
-        
+
         print 'Enveloping Results...'
 
         Main_window.lrfd_Rmax_print = np.maximum.reduce(Main_window.lrfd_r_env_max)
@@ -2809,7 +2840,7 @@ class Main_window:
         Main_window.asd_Rmin_print = np.minimum.reduce(Main_window.basic_r_env_min)
         Main_window.asd_Mmax_print = np.maximum.reduce(Main_window.basic_m_support_env_max)
         Main_window.asd_Mmin_print = np.minimum.reduce(Main_window.basic_m_support_env_min)
-        
+
         Main_window.lrfd_v_max_diag = np.maximum.reduce(Main_window.lrfd_v_env_max)
         Main_window.lrfd_v_min_diag = np.minimum.reduce(Main_window.lrfd_v_env_min)
         Main_window.lrfd_m_max_diag = np.maximum.reduce(Main_window.lrfd_m_env_max)
@@ -2823,7 +2854,7 @@ class Main_window:
         Main_window.asd_s_min_diag = np.minimum.reduce(Main_window.basic_s_env_min)
         Main_window.asd_d_max_diag = np.maximum.reduce(Main_window.basic_d_env_max)
         Main_window.asd_d_min_diag = np.minimum.reduce(Main_window.basic_d_env_min)
-        
+
         #Create CSV file of LRFD Envelope Results
         print 'Writing CSV Files...'
         file = open(os.path.join(path,bmlabel+'_04_LRFD_Envelope_Results.csv'),'w')
@@ -2838,7 +2869,7 @@ class Main_window:
                 else:
                     file.write('{0},{1:.6f},{2:.6f},{3:.6f},{4:.6f},{5:.6f},{6:.6f}\n'.format(j+1,(Main_window.xs[k,j]-Main_window.xs[-1,j-1]), Main_window.xs[k,j], Main_window.lrfd_v_min_diag[k,j], Main_window.lrfd_v_max_diag[k,j], Main_window.lrfd_m_min_diag[k,j], Main_window.lrfd_m_max_diag[k,j]))
         file.close()
-        
+
         #Create CSV file of ASD Envelope Results
         file = open(os.path.join(path,bmlabel+'_05_ASD_Envelope_Results.csv'),'w')
         file.write('ASD Envelope Results\n')
@@ -2852,7 +2883,7 @@ class Main_window:
                 else:
                     file.write('{0:.6f},{1:.6f},{2:.6f},{3:.6f},{4:.6f},{5:.6f},{6:.6f},{7:.6f},{8:.6f}\n'.format(j+1,(Main_window.xs[k,j]-Main_window.xs[-1,j-1]), Main_window.xs[k,j], Main_window.asd_v_min_diag[k,j], Main_window.asd_v_max_diag[k,j], Main_window.asd_m_min_diag[k,j], Main_window.asd_m_max_diag[k,j], Main_window.asd_d_min_diag[k,j], Main_window.asd_d_max_diag[k,j]))
         file.close()
-        
+
         #Create CSV file of ASD Envelope Results
         file = open(os.path.join(path,bmlabel+'_05_ASD_Envelope_Results.csv'),'w')
         file.write('ASD Envelope Results\n')
@@ -2866,7 +2897,7 @@ class Main_window:
                 else:
                     file.write('{0:.6f},{1:.6f},{2:.6f},{3:.6f},{4:.6f},{5:.6f},{6:.6f},{7:.6f},{8:.6f}\n'.format(j+1,(Main_window.xs[k,j]-Main_window.xs[-1,j-1]), Main_window.xs[k,j], Main_window.asd_v_min_diag[k,j], Main_window.asd_v_max_diag[k,j], Main_window.asd_m_min_diag[k,j], Main_window.asd_m_max_diag[k,j], Main_window.asd_d_min_diag[k,j], Main_window.asd_d_max_diag[k,j]))
         file.close()
-        
+
         cad_points = iters
         #Create DXF of Envelope Results
         print 'Creating DXF of Results ...'
@@ -3348,7 +3379,7 @@ class Main_window:
                     file.write('  0\nTEXT\n 62\n241\n  8\nASD_deflection_min_labels\n 10\n{0:.3f}\n 20\n{1:.3f}\n 30\n0.0\n 40\n1.0\n  1\n{2:.4f} in\n 50\n45.0\n'.format((Main_window.xs[k,j]*12), (Main_window.asd_d_min_diag[k,j]*100),Main_window.asd_d_min_diag[k,j]))
         file.write('  0\nENDSEC\n  0\nEOF')
         file.close()
-        
+
         print 'Done!'
         self.brun.configure(bg='green')
         self.bresults.configure(state="normal", bg='green')
