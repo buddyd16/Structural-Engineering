@@ -1008,6 +1008,13 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                 pass
             else:
                 for beam in self.beams_analysis:
+                    values, end_delta = beam.station_values()
+                    stations = values[0]
+                    shears = values[1]
+                    moments = values[2]
+                    eislopes = values[3]
+                    eideltas = values[4]
+                    
                     if self.show_l.get() == 1 and self.show_bm_charts.get()==1:
                             for load in beam.Loads:
                                 if load == beam.Loads[-1] or load == beam.Loads[-2] and beam.type == 'span':
@@ -1039,18 +1046,20 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                             self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f_chart, text=string, fill='red')
                     
                     if self.show_v.get()==1 and self.show_bm_charts.get()==1:
-                            for i in range(1,len(beam.chart_stations)):
-                                x1 = (beam.chart_stations[i-1]+beam.i.x)*scale + spacer
-                                x2 = (beam.chart_stations[i]+beam.i.x)*scale + spacer
-                                y1 = hg - (beam.station_values()[0][1][i-1] * v_scale)
-                                y2 = hg - (beam.station_values()[0][1][i] * v_scale)
+                            for i in range(1,len(stations)):
+                                x1 = (stations[i-1]+beam.i.x)*scale + spacer
+                                x2 = (stations[i]+beam.i.x)*scale + spacer
+                                y1 = hg - (shears[i-1] * v_scale)
+                                y2 = hg - (shears[i] * v_scale)
 
                                 self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="red", width=2)
                                 
                                 if self.show_stations.get() == 1:
+                                    if i == 1:
+                                        self.g_plan_canvas.create_line(x1, hg, x1, y1, fill="salmon", width=1)
                                     self.g_plan_canvas.create_line(x2, hg, x2, y2, fill="salmon", width=1)
 
-                            string = 'Vi: {0:.3f} kips\nVj: {1:.3f} kips'.format(beam.station_values()[0][1][0],beam.station_values()[0][1][-1])
+                            string = 'Vi: {0:.3f} kips\nVj: {1:.3f} kips'.format(shears[0],shears[-1])
                             x0 =  (((beam.i.x+beam.j.x)/2)*scale) + spacer
 
                             self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f_chart, text=string, fill='red')
@@ -1058,44 +1067,48 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                     if self.show_m.get()==1 and self.show_bm_charts.get()==1:
                             string_max = ''
                             string_min = ''
-                            for i in range(1,len(beam.chart_stations)):
-                                x1 = (beam.chart_stations[i-1]+beam.i.x)*scale + spacer
-                                x2 = (beam.chart_stations[i]+beam.i.x)*scale + spacer
-                                y1 = hg - (beam.station_values()[0][2][i-1] * m_scale)
-                                y2 = hg - (beam.station_values()[0][2][i] * m_scale)
+                            for i in range(1,len(stations)):
+                                x1 = (stations[i-1]+beam.i.x)*scale + spacer
+                                x2 = (stations[i]+beam.i.x)*scale + spacer
+                                y1 = hg - (moments[i-1] * m_scale)
+                                y2 = hg - (moments[i] * m_scale)
 
                                 self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="green", width=2)
                                 
                                 if self.show_stations.get() == 1:
+                                    if i == 1:
+                                        self.g_plan_canvas.create_line(x1, hg, x1, y1, fill="SeaGreen2", width=1)
                                     self.g_plan_canvas.create_line(x2, hg, x2, y2, fill="SeaGreen2", width=1)
 
 
-                                if beam.station_values()[0][2][i] == max(beam.station_values()[0][2]) and  beam.station_values()[0][2][i] != beam.station_values()[0][2][-1]:
-                                    string_max = '\nM,max {0:.3f} ft-kips @ {1:.3f} ft'.format(beam.station_values()[0][2][i],beam.chart_stations[i])
+                                if moments[i] == max(moments) and  moments[i] != moments[-1]:
+                                    string_max = '\nM,max {0:.3f} ft-kips @ {1:.3f} ft'.format(moments[i],stations[i])
 
 
-                                if beam.station_values()[0][2][i] == min(beam.station_values()[0][2]) and  beam.station_values()[0][2][i] != beam.station_values()[0][2][-1]:
-                                    string_min = '\nM,min {0:.3f} ft-kips @ {1:.3f} ft'.format(beam.station_values()[0][2][i],beam.chart_stations[i])
+                                if moments[i] == min(moments) and  moments[i] != moments[-1]:
+                                    string_min = '\nM,min {0:.3f} ft-kips @ {1:.3f} ft'.format(moments[i],stations[i])
 
                             x0 =  (((beam.i.x+beam.j.x)/2)*scale) + spacer
-                            string = 'Mi {0:.3f} ft-kips\nMj {1:.3f} ft-kips'.format(beam.station_values()[0][2][0],beam.station_values()[0][2][-1])
+                            string = 'Mi {0:.3f} ft-kips\nMj {1:.3f} ft-kips'.format(moments[0],moments[-1])
                             self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f_chart, text=string+string_max+string_min, fill='green')
 
                     if self.show_s.get()==1 and self.show_bm_charts.get()==1:
                         
                             for i in range(1,len(beam.chart_stations)):
-                                x1 = (beam.chart_stations[i-1]+beam.i.x)*scale + spacer
-                                x2 = (beam.chart_stations[i]+beam.i.x)*scale + spacer
-                                y1 = hg - ((beam.station_values()[0][3][i-1]/(beam.E*beam.I)) * s_scale)
-                                y2 = hg - ((beam.station_values()[0][3][i]/(beam.E*beam.I)) * s_scale)
+                                x1 = (stations[i-1]+beam.i.x)*scale + spacer
+                                x2 = (stations[i]+beam.i.x)*scale + spacer
+                                y1 = hg - ((eislopes[i-1]/(beam.E*beam.I)) * s_scale)
+                                y2 = hg - ((eislopes[i]/(beam.E*beam.I)) * s_scale)
 
                                 self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="magenta", width=2)
                                 
                                 if self.show_stations.get() == 1:
+                                    if i == 1:
+                                        self.g_plan_canvas.create_line(x1, hg, x1, y1, fill="orchid1", width=1)
                                     self.g_plan_canvas.create_line(x2, hg, x2, y2, fill="orchid1", width=1)
 
-                            si = (beam.station_values()[0][3][0]) /(beam.E*beam.I)
-                            sj = (beam.station_values()[0][3][-1]) /(beam.E*beam.I)
+                            si = (eislopes[0]) /(beam.E*beam.I)
+                            sj = (eislopes[-1]) /(beam.E*beam.I)
 
                             string = 'Si: {0:.5f} rad\nSj: {1:.5f} rad'.format(si,sj)
                             x0 =  (((beam.i.x+beam.j.x)/2)*scale) + spacer
@@ -1113,27 +1126,27 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                                     d0 = (self.beams_analysis[-2].station_values()[0][4][-1]/(self.beams_analysis[-2].E*self.beams_analysis[-2].I))*12.0
                                 else:
                                     d0 = 0
-                                x1 = (beam.chart_stations[i-1]+beam.i.x)*scale + spacer
-                                x2 = (beam.chart_stations[i]+beam.i.x)*scale + spacer
-                                y1 = hg - ((beam.station_values()[0][4][i-1]/(beam.E*beam.I)) * d_scale * 12.0) - (d0*d_scale)
-                                y2 = hg - ((beam.station_values()[0][4][i]/(beam.E*beam.I)) * d_scale * 12.0) - (d0*d_scale)
+                                x1 = (stations[i-1]+beam.i.x)*scale + spacer
+                                x2 = (stations[i]+beam.i.x)*scale + spacer
+                                y1 = hg - ((eideltas[i-1]/(beam.E*beam.I)) * d_scale * 12.0) - (d0*d_scale)
+                                y2 = hg - ((eideltas[i]/(beam.E*beam.I)) * d_scale * 12.0) - (d0*d_scale)
 
                                 self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="yellow", width=2)
                                 
                                 if self.show_stations.get() == 1:
                                     self.g_plan_canvas.create_line(x2, hg, x2, y2, fill="khaki", width=1)
 
-                                if beam.station_values()[0][4][i] == max(beam.station_values()[0][4]) and  beam.station_values()[0][4][i] != beam.station_values()[0][4][-1] and beam.type=='span':
-                                    string_max = '\nD,max {0:.3f} in @ {1:.3f} ft'.format(12.0*beam.station_values()[0][4][i]/(beam.E*beam.I),beam.chart_stations[i])
+                                if eideltas[i] == max(eideltas) and  eideltas[i] != eideltas[-1] and beam.type=='span':
+                                    string_max = '\nD,max {0:.3f} in @ {1:.3f} ft'.format(12.0*eideltas[i]/(beam.E*beam.I),stations[i])
 
-                                if beam.station_values()[0][4][i] == min(beam.station_values()[0][4]) and  beam.station_values()[0][4][i] != beam.station_values()[0][4][-1] and beam.type=='span':
-                                    string_min = '\nD,min {0:.3f} in @ {1:.3f} ft'.format(12.0*beam.station_values()[0][4][i]/(beam.E*beam.I),beam.chart_stations[i])
+                                if eideltas[i] == min(eideltas) and  eideltas[i] != eideltas[-1] and beam.type=='span':
+                                    string_min = '\nD,min {0:.3f} in @ {1:.3f} ft'.format(12.0*eideltas[i]/(beam.E*beam.I),stations[i])
 
                                 if beam.type == 'cantilever' and beam.isleft == 1:
-                                    string_max = '\nD {0:.3f} in @ 0 ft'.format(12.0*beam.station_values()[0][4][0]/(beam.E*beam.I))
+                                    string_max = '\nD {0:.3f} in @ 0 ft'.format(12.0*eideltas[0]/(beam.E*beam.I))
 
                                 if beam.type == 'cantilever' and beam.isleft == 0:
-                                    string_max = '\nD {0:.3f} in @ {1:.3f} ft'.format(12.0*beam.station_values()[0][4][-1]/(beam.E*beam.I), beam.Length)
+                                    string_max = '\nD {0:.3f} in @ {1:.3f} ft'.format(12.0*eideltas[-1]/(beam.E*beam.I), beam.Length)
 
                             x0 =  (((beam.i.x+beam.j.x)/2)*scale) + spacer
                             self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f_chart, text=string_max+string_min, fill='yellow')
