@@ -147,6 +147,12 @@ class main_window:
 
         self.b_remove_right_cant = tk.Button(self.geo_tab_frame, text="Remove Right Cantilever",command=self.remove_right_cant_func, font=self.helv, width=w, height=h, state=tk.DISABLED)
         self.b_remove_right_cant.grid(row=2,column=3)
+        
+        self.precision = tk.StringVar()
+        self.precision.set('1e-5')
+        tk.Label(self.geo_tab_frame, text='Calc. Precision:').grid(row=1,column=4)
+        self.precision_entry = tk.Entry(self.geo_tab_frame, textvariable=self.precision, width=10)
+        self.precision_entry.grid(row=2, column=4)
 
         self.col_bm_notebook = ttk.Notebook(self.geo_tab_frame)
         self.col_bm_notebook.grid(row=4,column=1, columnspan=4)
@@ -1134,6 +1140,8 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                                 self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="yellow", width=2)
                                 
                                 if self.show_stations.get() == 1:
+                                    if i==1:
+                                        self.g_plan_canvas.create_line(x1, hg, x1, y1, fill="khaki", width=1)
                                     self.g_plan_canvas.create_line(x2, hg, x2, y2, fill="khaki", width=1)
 
                                 if eideltas[i] == max(eideltas) and  eideltas[i] != eideltas[-1] and beam.type=='span':
@@ -1213,6 +1221,9 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                             self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="red", width=1)
                             
                             if self.show_stations.get() == 1:
+                                if i==1:
+                                    self.g_plan_canvas.create_line(x, y1, x1, y1, fill="salmon", width=1)
+                                    
                                 self.g_plan_canvas.create_line(x, y2, x2, y2, fill="salmon", width=1)
 
                         vb = col.station_values()[1][0]
@@ -1244,6 +1255,8 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                             self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="green", width=1)
                             
                             if self.show_stations.get() == 1:
+                                if i==1:
+                                    self.g_plan_canvas.create_line(x, y1, x1, y1, fill="SeaGreen2", width=1)
                                 self.g_plan_canvas.create_line(x, y2, x2, y2, fill="SeaGreen2", width=1)
 
                         mb = col.station_values()[2][0]
@@ -1275,6 +1288,8 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                             self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="magenta", width=1)
                             
                             if self.show_stations.get() == 1:
+                                if i==1:
+                                    self.g_plan_canvas.create_line(x, y1, x1, y1, fill="orchid1", width=1)
                                 self.g_plan_canvas.create_line(x, y2, x2, y2, fill="orchid1", width=1)
 
                         sb = col.station_values()[3][0]/(col.E*col.I)
@@ -1306,6 +1321,8 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                             self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="yellow", width=1)
                             
                             if self.show_stations.get() == 1:
+                                if i==1:
+                                    self.g_plan_canvas.create_line(x, y1, x1, y1, fill="khaki", width=1)
                                 self.g_plan_canvas.create_line(x, y2, x2, y2, fill="khaki", width=1)
                             
                     count +=1
@@ -1329,8 +1346,10 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
             beam.new_load_list(sorted_load_list[i])
 
         Consider_shortening = self.cols_compress.get()
-
-        frame2d.moment_distribution(self.nodes_analysis,self.beams_analysis,self.columns_analysis,Consider_shortening,1e-5)
+        
+        precision = float(self.precision.get())
+        
+        frame2d.moment_distribution(self.nodes_analysis,self.beams_analysis,self.columns_analysis,Consider_shortening,precision)
 
         for beam in self.beams_analysis:
             if beam.type == 'span':
