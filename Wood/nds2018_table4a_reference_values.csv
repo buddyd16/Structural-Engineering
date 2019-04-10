@@ -1,0 +1,263 @@
+﻿Species,Grade,Size Classification,Fb_psi,Ft_psi,Fv_psi,Fcp_psi,Fc_psi,E_psi,Emin_psi,G,Agency
+Alaska Cedar,Select Structural,"2"" & wider",1150,626,165,525,1000,1400000,510000,0.47,WCLIB
+Alaska Cedar,No. 1,"2"" & wider",975,525,165,525,900,1300000,470000,0.47,WCLIB
+Alaska Cedar,No. 2,"2"" & wider",800,425,165,525,750,1200000,440000,0.47,WCLIB
+Alaska Cedar,No. 3,"2"" & wider",450,250,165,525,425,1100000,400000,0.47,WCLIB
+Alaska Cedar,Stud,"2"" & wider",625,350,165,525,475,1100000,400000,0.47,WCLIB
+Alaska Cedar,Construction,"2"" - 4"" wide",900,500,165,525,950,1200000,440000,0.47,WCLIB
+Alaska Cedar,Standard,"2"" - 4"" wide",500,275,165,525,775,1100000,400000,0.47,WCLIB
+Alaska Cedar,Utility,"2"" - 4"" wide",250,125,165,525,500,1000000,370000,0.47,WCLIB
+Alaska Hemlock,Select Structural,"2"" & wider",1300,825,185,440,1200,1700000,620000,0.49,WWPA
+Alaska Hemlock,No. 1,"2"" & wider",900,550,185,440,1100,1600000,580000,0.49,WWPA
+Alaska Hemlock,No. 2,"2"" & wider",825,475,185,440,1050,1500000,550000,0.49,WWPA
+Alaska Hemlock,No. 3,"2"" & wider",475,275,185,440,600,1400000,510000,0.49,WWPA
+Alaska Hemlock,Stud,"2"" & wider",650,375,185,440,650,1400000,510000,0.49,WWPA
+Alaska Hemlock,Construction,"2"" - 4"" wide",950,550,185,440,1250,1400000,510000,0.49,WWPA
+Alaska Hemlock,Standard,"2"" - 4"" wide",525,300,185,440,1050,1300000,470000,0.49,WWPA
+Alaska Hemlock,Utility,"2"" - 4"" wide",250,150,185,440,700,1200000,440000,0.49,WWPA
+Alaska Spruce,Select Structural,"2"" & wider",1400,900,160,330,1200,1600000,580000,0.41,WWPA
+Alaska Spruce,No. 1,"2"" & wider",950,600,160,330,1100,1500000,550000,0.41,WWPA
+Alaska Spruce,No. 2,"2"" & wider",875,500,160,330,1050,1400000,510000,0.41,WWPA
+Alaska Spruce,No. 3,"2"" & wider",500,300,160,330,600,1300000,470000,0.41,WWPA
+Alaska Spruce,Stud,"2"" & wider",675,400,160,330,675,1300000,470000,0.41,WWPA
+Alaska Spruce,Construction,"2"" - 4"" wide",1000,575,160,330,1250,1300000,470000,0.41,WWPA
+Alaska Spruce,Standard,"2"" - 4"" wide",550,325,160,330,1050,1200000,440000,0.41,WWPA
+Alaska Spruce,Utility,"2"" - 4"" wide",275,150,160,330,700,1100000,400000,0.41,WWPA
+Alaska Yellow Cedar,Select Structural,"2"" & wider",1350,800,225,510,1200,1500000,550000,0.46,WCLIB-WWPA
+Alaska Yellow Cedar,No. 1,"2"" & wider",900,525,225,510,1050,1400000,510000,0.46,WCLIB-WWPA
+Alaska Yellow Cedar,No. 2,"2"" & wider",800,450,225,510,1000,1300000,470000,0.46,WCLIB-WWPA
+Alaska Yellow Cedar,No. 3,"2"" & wider",475,250,225,510,575,1200000,440000,0.46,WCLIB-WWPA
+Alaska Yellow Cedar,Stud,"2"" & wider",625,350,225,510,625,1200000,440000,0.46,WCLIB-WWPA
+Alaska Yellow Cedar,Construction,"2"" - 4"" wide",925,500,225,510,1250,1300000,470000,0.46,WCLIB-WWPA
+Alaska Yellow Cedar,Standard,"2"" - 4"" wide",500,275,225,510,1050,1100000,400000,0.46,WCLIB-WWPA
+Alaska Yellow Cedar,Utility,"2"" - 4"" wide",250,125,225,510,675,1100000,400000,0.46,WCLIB-WWPA
+Aspen,Select Structural,"2"" & wider",875,500,120,265,725,1100000,400000,0.39,NELMA-WWPA
+Aspen,No. 1,"2"" & wider",625,375,120,265,600,1100000,400000,0.39,NELMA-WWPA
+Aspen,No. 2,"2"" & wider",600,350,120,265,450,1000000,370000,0.39,NELMA-WWPA
+Aspen,No. 3,"2"" & wider",350,200,120,265,275,900000,330000,0.39,NELMA-WWPA
+Aspen,Stud,"2"" & wider",475,275,120,265,300,900000,330000,0.39,NELMA-WWPA
+Aspen,Construction,"2"" - 4"" wide",700,400,120,265,625,900000,330000,0.39,NELMA-WWPA
+Aspen,Standard,"2"" - 4"" wide",375,225,120,265,475,900000,330000,0.39,NELMA-WWPA
+Aspen,Utility,"2"" - 4"" wide",175,100,120,265,300,800000,290000,0.39,NELMA-WWPA
+Baldcypress,Select Structural,"2"" & wider",1200,650,160,615,1200,1400000,510000,0.47,SPIB
+Baldcypress,No. 1,"2"" & wider",1000,550,160,615,1050,1400000,510000,0.47,SPIB
+Baldcypress,No. 2,"2"" & wider",25,450,160,615,900,1300000,470000,0.47,SPIB
+Baldcypress,No. 3,"2"" & wider",475,250,160,615,525,1200000,440000,0.47,SPIB
+Baldcypress,Stud,"2"" & wider",650,350,160,615,575,1200000,440000,0.47,SPIB
+Baldcypress,Construction,"2"" - 4"" wide",925,500,160,615,1100,1200000,440000,0.47,SPIB
+Baldcypress,Standard,"2"" - 4"" wide",525,275,160,615,925,1100000,400000,0.47,SPIB
+Baldcypress,Utility,"2"" - 4"" wide",250,125,160,615,600,1000000,370000,0.47,SPIB
+Beech-Birch-Hickory,Select Structural,"2"" & wider",1450,850,195,715,1200,1700000,620000,0.71,NELMA
+Beech-Birch-Hickory,No. 1,"2"" & wider",1050,600,195,715,950,1600000,580000,0.71,NELMA
+Beech-Birch-Hickory,No. 2,"2"" & wider",1000,600,195,715,750,1500000,550000,0.71,NELMA
+Beech-Birch-Hickory,No. 3,"2"" & wider",575,350,195,715,425,1300000,470000,0.71,NELMA
+Beech-Birch-Hickory,Stud,"2"" & wider",775,450,195,715,475,1300000,470000,0.71,NELMA
+Beech-Birch-Hickory,Construction,"2"" - 4"" wide",1150,675,195,715,1000,1400000,510000,0.71,NELMA
+Beech-Birch-Hickory,Standard,"2"" - 4"" wide",650,375,195,715,775,1300000,470000,0.71,NELMA
+Beech-Birch-Hickory,Utility,"2"" - 4"" wide",300,175,195,715,500,1200000,440000,0.71,NELMA
+Coast Sitka Spruce,Select Structural,"2"" & wider",1300,950,125,455,1200,1700000,620000,0.43,NLGA
+Coast Sitka Spruce,No. 1 / No. 2,"2"" & wider",925,550,125,455,1100,1500000,550000,0.43,NLGA
+Coast Sitka Spruce,No. 3,"2"" & wider",525,325,125,455,625,1400000,510000,0.43,NLGA
+Coast Sitka Spruce,Stud,"2"" & wider",725,450,125,455,675,1400000,510000,0.43,NLGA
+Coast Sitka Spruce,Construction,"2"" - 4"" wide",1050,650,125,455,1300,1400000,510000,0.43,NLGA
+Coast Sitka Spruce,Standard,"2"" - 4"" wide",600,350,125,455,1100,1300000,470000,0.43,NLGA
+Coast Sitka Spruce,Utility,"2"" - 4"" wide",275,175,125,455,725,1200000,440000,0.43,NLGA
+Cottonwood,Select Structural,"2"" & wider",875,525,125,320,775,1200000,440000,0.41,NELMA
+Cottonwood,No. 1,"2"" & wider",625,375,125,320,625,1200000,440000,0.41,NELMA
+Cottonwood,No. 2,"2"" & wider",625,350,125,320,475,1100000,400000,0.41,NELMA
+Cottonwood,No. 3,"2"" & wider",350,200,125,320,275,1000000,370000,0.41,NELMA
+Cottonwood,Stud,"2"" & wider",475,275,125,320,300,1000000,370000,0.41,NELMA
+Cottonwood,Construction,"2"" - 4"" wide",700,400,125,320,650,1000000,370000,0.41,NELMA
+Cottonwood,Standard,"2"" - 4"" wide",400,225,125,320,500,900000,330000,0.41,NELMA
+Cottonwood,Utility,"2"" - 4"" wide",175,100,125,320,325,900000,330000,0.41,NELMA
+Douglas Fir-Larch,Select Structural,"2"" & wider",1500,1000,180,625,1700,1900000,690000,0.5,WCLIB-WWPA
+Douglas Fir-Larch,No. 1 & Btr,"2"" & wider",1200,800,180,625,1550,1800000,660000,0.5,WCLIB-WWPA
+Douglas Fir-Larch,No. 1,"2"" & wider",1000,675,180,625,1500,1700000,620000,0.5,WCLIB-WWPA
+Douglas Fir-Larch,No. 2,"2"" & wider",900,575,180,625,1350,1600000,580000,0.5,WCLIB-WWPA
+Douglas Fir-Larch,No. 3,"2"" & wider",525,325,180,625,775,1400000,510000,0.5,WCLIB-WWPA
+Douglas Fir-Larch,Stud,"2"" & wider",700,450,180,625,850,1400000,510000,0.5,WCLIB-WWPA
+Douglas Fir-Larch,Construction,"2"" - 4"" wide",1000,650,180,625,1650,1500000,550000,0.5,WCLIB-WWPA
+Douglas Fir-Larch,Standard,"2"" - 4"" wide",575,375,180,625,1400,1400000,510000,0.5,WCLIB-WWPA
+Douglas Fir-Larch,Utility,"2"" - 4"" wide",275,175,180,625,900,1300000,470000,0.5,WCLIB-WWPA
+Douglas Fir-Larch (North),Select Structural,"2"" & wider",1350,825,180,625,1900,1900000,690000,0.49,NLGA
+Douglas Fir-Larch (North),No. 1 & Btr,"2"" & wider",1150,750,180,625,1800,1800000,660000,0.49,NLGA
+Douglas Fir-Larch (North),No. 1 / No. 2,"2"" & wider",850,500,180,625,1400,1600000,580000,0.49,NLGA
+Douglas Fir-Larch (North),No. 3,"2"" & wider",475,300,180,625,825,1400000,510000,0.49,NLGA
+Douglas Fir-Larch (North),Stud,"2"" & wider",650,400,180,625,900,1400000,510000,0.49,NLGA
+Douglas Fir-Larch (North),Construction,"2"" - 4"" wide",950,575,180,625,1800,1500000,550000,0.49,NLGA
+Douglas Fir-Larch (North),Standard,"2"" - 4"" wide",525,325,180,625,1450,1400000,510000,0.49,NLGA
+Douglas Fir-Larch (North),Utility,"2"" - 4"" wide",250,150,180,625,950,1300000,470000,0.49,NLGA
+Douglas Fir-South,Select Structural,"2"" & wider",1350,900,180,520,1600,1400000,510000,0.46,WWPA
+Douglas Fir-South,No. 1,"2"" & wider",925,600,180,520,1450,1300000,470000,0.46,WWPA
+Douglas Fir-South,No. 2,"2"" & wider",850,525,180,520,1350,1200000,440000,0.46,WWPA
+Douglas Fir-South,No. 3,"2"" & wider",500,300,180,520,775,1100000,400000,0.46,WWPA
+Douglas Fir-South,Stud,"2"" & wider",675,425,180,520,850,1100000,400000,0.46,WWPA
+Douglas Fir-South,Construction,"2"" - 4"" wide",975,600,180,520,1650,1200000,440000,0.46,WWPA
+Douglas Fir-South,Standard,"2"" - 4"" wide",550,350,180,520,1400,1100000,400000,0.46,WWPA
+Douglas Fir-South,Utility,"2"" - 4"" wide",250,150,180,520,900,1000000,370000,0.46,WWPA
+Eastern Hemlock-Balsam Fir,Select Structural,"2"" & wider",1250,575,140,335,1200,1200000,440000,0.36,NELMA
+Eastern Hemlock-Balsam Fir,No. 1,"2"" & wider",775,350,140,335,1000,1100000,400000,0.36,NELMA
+Eastern Hemlock-Balsam Fir,No. 2,"2"" & wider",575,275,140,335,825,1100000,400000,0.36,NELMA
+Eastern Hemlock-Balsam Fir,No. 3,"2"" & wider",350,150,140,335,475,900000,330000,0.36,NELMA
+Eastern Hemlock-Balsam Fir,Stud,"2"" & wider",450,200,140,335,525,900000,330000,0.36,NELMA
+Eastern Hemlock-Balsam Fir,Construction,"2"" - 4"" wide",675,300,140,335,1050,1000000,370000,0.36,NELMA
+Eastern Hemlock-Balsam Fir,Standard,"2"" - 4"" wide",375,175,140,335,850,900000,330000,0.36,NELMA
+Eastern Hemlock-Balsam Fir,Utility,"2"" - 4"" wide",175,75,140,335,550,800000,290000,0.36,NELMA
+Eastern Hemlock-Tamarack,Select Structural,"2"" & wider",1250,575,170,555,1200,1200000,440000,0.41,NELMA
+Eastern Hemlock-Tamarack,No. 1,"2"" & wider",775,350,170,555,1000,1100000,400000,0.41,NELMA
+Eastern Hemlock-Tamarack,No. 2,"2"" & wider",575,275,170,555,825,1100000,400000,0.41,NELMA
+Eastern Hemlock-Tamarack,No. 3,"2"" & wider",350,150,170,555,475,900000,330000,0.41,NELMA
+Eastern Hemlock-Tamarack,Stud,"2"" & wider",450,200,170,555,525,900000,330000,0.41,NELMA
+Eastern Hemlock-Tamarack,Construction,"2"" - 4"" wide",675,300,170,555,1050,1000000,370000,0.41,NELMA
+Eastern Hemlock-Tamarack,Standard,"2"" - 4"" wide",375,175,170,555,850,900000,330000,0.41,NELMA
+Eastern Hemlock-Tamarack,Utility,"2"" - 4"" wide",1750,75,170,555,550,800000,290000,0.41,NELMA
+Eastern Softwoods,Select Structural,"2"" & wider",1250,575,140,335,1200,1200000,440000,0.36,NELMA
+Eastern Softwoods,No. 1,"2"" & wider",775,350,140,335,1000,1100000,400000,0.36,NELMA
+Eastern Softwoods,No. 2,"2"" & wider",575,275,140,335,825,1100000,400000,0.36,NELMA
+Eastern Softwoods,No. 3,"2"" & wider",350,150,140,335,475,900000,330000,0.36,NELMA
+Eastern Softwoods,Stud,"2"" & wider",450,200,140,335,525,900000,330000,0.36,NELMA
+Eastern Softwoods,Construction,"2"" - 4"" wide",675,300,140,335,1050,1000000,370000,0.36,NELMA
+Eastern Softwoods,Standard,"2"" - 4"" wide",375,175,140,335,850,900000,330000,0.36,NELMA
+Eastern Softwoods,Utility,"2"" - 4"" wide",175,75,140,335,550,800000,290000,0.36,NELMA
+Eastern White Pine,Select Structural,"2"" & wider",1250,575,135,350,1200,1200000,440000,0.36,NELMA
+Eastern White Pine,No. 1,"2"" & wider",775,350,135,350,1000,1100000,400000,0.36,NELMA
+Eastern White Pine,No. 2,"2"" & wider",575,275,135,350,825,1100000,400000,0.36,NELMA
+Eastern White Pine,No. 3,"2"" & wider",350,150,135,350,475,900000,330000,0.36,NELMA
+Eastern White Pine,Stud,"2"" & wider",450,200,135,350,525,900000,330000,0.36,NELMA
+Eastern White Pine,Construction,"2"" - 4"" wide",675,300,135,350,1050,1000000,370000,0.36,NELMA
+Eastern White Pine,Standard,"2"" - 4"" wide",375,175,135,350,850,900000,330000,0.36,NELMA
+Eastern White Pine,Utility,"2"" - 4"" wide",175,75,135,350,550,800000,290000,0.36,NELMA
+Hem-Fir,Select Structural,"2"" & wider",1400,925,150,405,1500,1600000,580000,0.43,WCLIB-WWPA
+Hem-Fir,No. 1 & Btr,"2"" & wider",1100,725,150,405,1350,1500000,550000,0.43,WCLIB-WWPA
+Hem-Fir,No. 1,"2"" & wider",975,625,150,405,1350,1500000,550000,0.43,WCLIB-WWPA
+Hem-Fir,No. 2,"2"" & wider",850,525,150,405,1300,1300000,470000,0.43,WCLIB-WWPA
+Hem-Fir,No. 3,"2"" & wider",500,300,150,405,725,1200000,440000,0.43,WCLIB-WWPA
+Hem-Fir,Stud,"2"" & wider",675,400,150,405,800,1200000,440000,0.43,WCLIB-WWPA
+Hem-Fir,Construction,"2"" - 4"" wide",975,600,150,405,1550,1300000,470000,0.43,WCLIB-WWPA
+Hem-Fir,Standard,"2"" - 4"" wide",550,325,150,405,1300,1200000,440000,0.43,WCLIB-WWPA
+Hem-Fir,Utility,"2"" - 4"" wide",250,150,150,405,850,1100000,400000,0.43,WCLIB-WWPA
+Hem-Fir (North),Select Structural,"2"" & wider",1300,775,145,405,1700,1700000,620000,0.46,NLGA
+Hem-Fir (North),No. 1 & Btr,"2"" & wider",1200,725,145,405,1550,1700000,620000,0.46,NLGA
+Hem-Fir (North),No. 1 / No. 2,"2"" & wider",1000,575,145,405,1450,1600000,580000,0.46,NLGA
+Hem-Fir (North),No. 3,"2"" & wider",575,325,145,405,850,1400000,510000,0.46,NLGA
+Hem-Fir (North),Stud,"2"" & wider",775,450,145,405,925,1400000,510000,0.46,NLGA
+Hem-Fir (North),Construction,"2"" - 4"" wide",1150,650,145,405,1750,1500000,550000,0.46,NLGA
+Hem-Fir (North),Standard,"2"" - 4"" wide",650,350,145,405,1500,1400000,510000,0.46,NLGA
+Hem-Fir (North),Utility,"2"" - 4"" wide",300,175,145,405,975,1300000,470000,0.46,NLGA
+Mixed Maple,Select Structural,"2"" & wider",1000,600,195,620,875,1300000,470000,0.55,NELMA
+Mixed Maple,No. 1,"2"" & wider",725,425,195,620,700,1200000,440000,0.55,NELMA
+Mixed Maple,No. 2,"2"" & wider",700,425,195,620,550,1100000,400000,0.55,NELMA
+Mixed Maple,No. 3,"2"" & wider",400,250,195,620,325,1000000,370000,0.55,NELMA
+Mixed Maple,Stud,"2"" & wider",550,325,195,620,350,1000000,370000,0.55,NELMA
+Mixed Maple,Construction,"2"" - 4"" wide",800,475,195,620,725,1100000,400000,0.55,NELMA
+Mixed Maple,Standard,"2"" - 4"" wide",450,275,195,620,575,1000000,370000,0.55,NELMA
+Mixed Maple,Utility,"2"" - 4"" wide",225,125,195,620,375,900000,330000,0.55,NELMA
+Mixed Oak,Select Structural,"2"" & wider",1150,675,170,800,1000,1100000,400000,0.68,NELMA
+Mixed Oak,No. 1,"2"" & wider",825,500,170,800,825,1000000,370000,0.68,NELMA
+Mixed Oak,No. 2,"2"" & wider",800,475,170,800,625,900000,330000,0.68,NELMA
+Mixed Oak,No. 3,"2"" & wider",475,275,170,800,375,800000,290000,0.68,NELMA
+Mixed Oak,Stud,"2"" & wider",625,375,170,800,400,800000,290000,0.68,NELMA
+Mixed Oak,Construction,"2"" - 4"" wide",925,550,170,800,850,900000,330000,0.68,NELMA
+Mixed Oak,Standard,"2"" - 4"" wide",525,300,170,800,650,800000,290000,0.68,NELMA
+Mixed Oak,Utility,"2"" - 4"" wide",250,150,170,800,425,800000,290000,0.68,NELMA
+Northern Red Oak,Select Structural,"2"" & wider",1400,800,220,885,1150,1400000,510000,0.68,NELMA
+Northern Red Oak,No. 1,"2"" & wider",1000,575,220,885,925,1400000,510000,0.68,NELMA
+Northern Red Oak,No. 2,"2"" & wider",975,575,220,885,725,1300000,470000,0.68,NELMA
+Northern Red Oak,No. 3,"2"" & wider",550,325,220,885,425,1200000,440000,0.68,NELMA
+Northern Red Oak,Stud,"2"" & wider",750,450,220,885,450,1200000,440000,0.68,NELMA
+Northern Red Oak,Construction,"2"" - 4"" wide",1100,650,220,885,975,1200000,440000,0.68,NELMA
+Northern Red Oak,Standard,"2"" - 4"" wide",625,350,220,885,750,1100000,400000,0.68,NELMA
+Northern Red Oak,Utility,"2"" - 4"" wide",300,175,220,885,500,1000000,370000,0.68,NELMA
+Northern Species,Select Structural,"2"" & wider",975,425,110,350,1100,1100000,400000,0.35,NLGA
+Northern Species,No. 1 / No. 2,"2"" & wider",625,275,110,350,850,1100000,400000,0.35,NLGA
+Northern Species,No. 3,"2"" & wider",350,150,110,350,500,1000000,370000,0.35,NLGA
+Northern Species,Stud,"2"" & wider",475,225,110,350,550,1000000,370000,0.35,NLGA
+Northern Species,Construction,"2"" - 4"" wide",700,325,110,350,1050,1000000,370000,0.35,NLGA
+Northern Species,Standard,"2"" - 4"" wide",400,175,110,350,875,900000,330000,0.35,NLGA
+Northern Species,Utility,"2"" - 4"" wide",175,75,110,350,575,900000,330000,0.35,NLGA
+Northern White Cedar,Select Structural,"2"" & wider",775,450,120,370,750,800000,290000,0.31,NELMA
+Northern White Cedar,No. 1,"2"" & wider",575,325,120,370,600,700000,260000,0.31,NELMA
+Northern White Cedar,No. 2,"2"" & wider",550,325,120,370,475,700000,260000,0.31,NELMA
+Northern White Cedar,No. 3,"2"" & wider",325,175,120,370,275,600000,220000,0.31,NELMA
+Northern White Cedar,Stud,"2"" & wider",425,250,120,370,300,600000,220000,0.31,NELMA
+Northern White Cedar,Construction,"2"" - 4"" wide",625,375,120,370,625,700000,260000,0.31,NELMA
+Northern White Cedar,Standard,"2"" - 4"" wide",350,200,120,370,475,600000,220000,0.31,NELMA
+Northern White Cedar,Utility,"2"" - 4"" wide",175,100,120,370,325,600000,220000,0.31,NELMA
+Red Maple,Select Structural,"2"" & wider",1300,750,210,615,1100,1700000,620000,0.58,NELMA
+Red Maple,No. 1,"2"" & wider",925,550,210,615,900,1600000,580000,0.58,NELMA
+Red Maple,No. 2,"2"" & wider",900,525,210,615,700,1500000,550000,0.58,NELMA
+Red Maple,No. 3,"2"" & wider",525,300,210,615,400,1300000,470000,0.58,NELMA
+Red Maple,Stud,"2"" & wider",700,425,210,615,450,1300000,470000,0.58,NELMA
+Red Maple,Construction,"2"" - 4"" wide",1050,600,210,615,925,1400000,510000,0.58,NELMA
+Red Maple,Standard,"2"" - 4"" wide",575,325,210,615,725,1300000,470000,0.58,NELMA
+Red Maple,Utility,"2"" - 4"" wide",275,150,210,615,475,1200000,440000,0.58,NELMA
+Red Oak,Select Structural,"2"" & wider",1150,675,170,820,1000,1400000,510000,0.67,NELMA
+Red Oak,No. 1,"2"" & wider",825,500,170,820,825,1300000,470000,0.67,NELMA
+Red Oak,No. 2,"2"" & wider",800,475,170,820,625,1200000,440000,0.67,NELMA
+Red Oak,No. 3,"2"" & wider",475,275,170,820,375,1100000,400000,0.67,NELMA
+Red Oak,Stud,"2"" & wider",625,375,170,820,400,1100000,400000,0.67,NELMA
+Red Oak,Construction,"2"" - 4"" wide",925,550,170,820,850,1200000,440000,0.67,NELMA
+Red Oak,Standard,"2"" - 4"" wide",525,300,170,820,650,1100000,400000,0.67,NELMA
+Red Oak,Utility,"2"" - 4"" wide",250,150,170,820,425,1000000,370000,0.67,NELMA
+Redwood,Select Structural,"2"" & wider",1100,625,160,425,1100,1100000,400000,0.37,RIS
+Redwood,No. 1,"2"" & wider",775,450,160,425,900,1100000,400000,0.37,RIS
+Redwood,No. 2,"2"" & wider",725,425,160,425,700,1000000,370000,0.37,RIS
+Redwood,No. 3,"2"" & wider",425,250,160,425,400,900000,370000,0.37,RIS
+Redwood,Stud,"2"" & wider",575,325,160,425,450,900000,370000,0.37,RIS
+Redwood,Construction,"2"" - 4"" wide",825,475,160,425,925,900000,370000,0.37,RIS
+Redwood,Standard,"2"" - 4"" wide",450,275,160,425,725,900000,370000,0.37,RIS
+Redwood,Utility,"2"" - 4"" wide",225,125,160,425,475,800000,290000,0.37,RIS
+Spruce-Pine-Fir,Select Structural,"2"" & wider",1250,700,135,425,1400,1500000,550000,0.42,NLGA
+Spruce-Pine-Fir,No. 1 / No. 2,"2"" & wider",875,450,135,425,1150,1400000,510000,0.42,NLGA
+Spruce-Pine-Fir,No. 3,"2"" & wider",500,250,135,425,650,1200000,440000,0.42,NLGA
+Spruce-Pine-Fir,Stud,"2"" & wider",675,350,135,425,725,1200000,440000,0.42,NLGA
+Spruce-Pine-Fir,Construction,"2"" - 4"" wide",1000,500,135,425,1400,1300000,470000,0.42,NLGA
+Spruce-Pine-Fir,Standard,"2"" - 4"" wide",550,275,135,425,1150,1200000,440000,0.42,NLGA
+Spruce-Pine-Fir,Utility,"2"" - 4"" wide",275,125,135,425,750,1100000,400000,0.42,NLGA
+Spruce-Pine-Fir (South),Select Structural,"2"" & wider",1300,575,135,335,1200,1300000,470000,0.36,NELMA-WCLIB-WWPA
+Spruce-Pine-Fir (South),No. 1,"2"" & wider",875,400,135,335,1050,1200000,440000,0.36,NELMA-WCLIB-WWPA
+Spruce-Pine-Fir (South),No. 2,"2"" & wider",775,350,135,335,1000,1100000,400000,0.36,NELMA-WCLIB-WWPA
+Spruce-Pine-Fir (South),No. 3,"2"" & wider",450,200,135,335,575,1000000,370000,0.36,NELMA-WCLIB-WWPA
+Spruce-Pine-Fir (South),Stud,"2"" & wider",600,275,135,335,625,1000000,370000,0.36,NELMA-WCLIB-WWPA
+Spruce-Pine-Fir (South),Construction,"2"" - 4"" wide",875,400,135,335,1200,1000000,370000,0.36,NELMA-WCLIB-WWPA
+Spruce-Pine-Fir (South),Standard,"2"" - 4"" wide",500,225,135,335,1000,900000,330000,0.36,NELMA-WCLIB-WWPA
+Spruce-Pine-Fir (South),Utility,"2"" - 4"" wide",225,100,135,335,875,900000,330000,0.36,NELMA-WCLIB-WWPA
+Western Cedars,Select Structural,"2"" & wider",1000,600,155,425,1000,1100000,400000,0.36,WCLIB-WWPA
+Western Cedars,No. 1,"2"" & wider",725,425,155,425,825,1000000,370000,0.36,WCLIB-WWPA
+Western Cedars,No. 2,"2"" & wider",700,425,155,425,650,1000000,370000,0.36,WCLIB-WWPA
+Western Cedars,No. 3,"2"" & wider",400,250,155,425,375,900000,330000,0.36,WCLIB-WWPA
+Western Cedars,Stud,"2"" & wider",550,325,155,425,400,900000,330000,0.36,WCLIB-WWPA
+Western Cedars,Construction,"2"" - 4"" wide",800,475,155,425,850,900000,330000,0.36,WCLIB-WWPA
+Western Cedars,Standard,"2"" - 4"" wide",450,275,155,425,650,800000,290000,0.36,WCLIB-WWPA
+Western Cedars,Utility,"2"" - 4"" wide",225,125,155,425,425,800000,290000,0.36,WCLIB-WWPA
+Western Woods,Select Structural,"2"" & wider",900,400,135,335,1050,1200000,440000,0.36,WCLIB-WWPA
+Western Woods,No. 1,"2"" & wider",675,300,135,335,950,1100000,400000,0.36,WCLIB-WWPA
+Western Woods,No. 2,"2"" & wider",675,300,135,335,900,1000000,370000,0.36,WCLIB-WWPA
+Western Woods,No. 3,"2"" & wider",375,175,135,335,525,900000,330000,0.36,WCLIB-WWPA
+Western Woods,Stud,"2"" & wider",525,225,135,335,575,900000,330000,0.36,WCLIB-WWPA
+Western Woods,Construction,"2"" - 4"" wide",775,350,135,335,1100,1000000,370000,0.36,WCLIB-WWPA
+Western Woods,Standard,"2"" - 4"" wide",425,200,135,335,925,900000,330000,0.36,WCLIB-WWPA
+Western Woods,Utility,"2"" - 4"" wide",200,100,135,335,600,800000,290000,0.36,WCLIB-WWPA
+White Oak,Select Structural,"2"" & wider",1200,700,220,800,1100,1100000,400000,0.73,NELMA
+White Oak,No. 1,"2"" & wider",875,500,220,800,900,1000000,370000,0.73,NELMA
+White Oak,No. 2,"2"" & wider",850,500,220,800,700,900000,330000,0.73,NELMA
+White Oak,No. 3,"2"" & wider",475,275,220,800,400,800000,290000,0.73,NELMA
+White Oak,Stud,"2"" & wider",650,375,220,800,450,800000,290000,0.73,NELMA
+White Oak,Construction,"2"" - 4"" wide",950,550,220,800,925,900000,330000,0.73,NELMA
+White Oak,Standard,"2"" - 4"" wide",525,325,220,800,725,800000,290000,0.73,NELMA
+White Oak,Utility,"2"" - 4"" wide",250,150,220,800,475,800000,290000,0.73,NELMA
+Yellow Cedar,Select Structural,"2"" & wider",1200,725,175,540,1200,1600000,580000,0.46,NLGA
+Yellow Cedar,No. 1 / No. 2,"2"" & wider",800,475,175,540,1000,1400000,510000,0.46,NLGA
+Yellow Cedar,No. 3,"2"" & wider",475,275,175,540,575,1200000,440000,0.46,NLGA
+Yellow Cedar,Stud,"2"" & wider",625,375,175,540,650,1200000,440000,0.46,NLGA
+Yellow Cedar,Construction,"2"" - 4"" wide",925,550,175,540,1200,1300000,470000,0.46,NLGA
+Yellow Cedar,Standard,"2"" - 4"" wide",525,300,175,540,1050,1200000,440000,0.46,NLGA
+Yellow Cedar,Utility,"2"" - 4"" wide",250,150,175,540,675,1100000,400000,0.46,NLGA
+Yellow Poplar,Select Structural,"2"" & wider",1000,575,145,420,900,1500000,550000,0.43,NELMA
+Yellow Poplar,No. 1,"2"" & wider",725,425,145,420,725,1400000,510000,0.43,NELMA
+Yellow Poplar,No. 2,"2"" & wider",700,400,145,420,575,1300000,470000,0.43,NELMA
+Yellow Poplar,No. 3,"2"" & wider",400,225,145,420,325,1200000,440000,0.43,NELMA
+Yellow Poplar,Stud,"2"" & wider",550,325,145,420,350,1200000,440000,0.43,NELMA
+Yellow Poplar,Construction,"2"" - 4"" wide",800,475,145,420,750,1300000,470000,0.43,NELMA
+Yellow Poplar,Standard,"2"" - 4"" wide",450,250,145,420,575,1100000,400000,0.43,NELMA
+Yellow Poplar,Utility,"2"" - 4"" wide",200,125,145,420,375,1100000,400000,0.43,NELMA
