@@ -1158,6 +1158,7 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                             self.g_plan_canvas.create_text(x0, hg+12, anchor=tk.N, font=self.mono_f_chart, text=string_max+string_min, fill='yellow')
 
             count = 0
+            non_sway_reaction = 0
             for col in self.columns_analysis:
                 if col.type ==  'UP':
                     x = (col.i.x * scale) + spacer
@@ -1177,7 +1178,9 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                         if col.type == 'DOWN':
                             col.base_reaction()
                             string = 'Riy: {0:.3f} kN\n'.format(col.riy)
+                            non_sway_reaction += col.rjx
                         else:
+                            non_sway_reaction += col.rix
                             string = ''
                             
                         string += 'Rix: {0:.3f} kN\nRjx: {1:.3f} kN'.format(col.rix,col.rjx)
@@ -1187,6 +1190,11 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                             self.g_plan_canvas.create_text(x, h1 - (col.Length*scale), anchor=tk.S,font=self.mono_f_chart, text=string, fill='red')
                         else:
                             self.g_plan_canvas.create_text(x, h1 + (col.Length*scale), anchor=tk.N,font=self.mono_f_chart, text=string, fill='red')
+                            
+                        if col == self.columns_analysis[-1]:
+                            non_sway_string = 'Non-Sway Reaction:\nRx: {0:.3f} kN'.format(non_sway_reaction)
+                            
+                            self.g_plan_canvas.create_text(x+5, hg, anchor=tk.SW,font=self.mono_f_chart, text=non_sway_string, fill='red')
                             
                     if self.show_dfs.get()==1 and self.show_col_charts.get()==1:
                         dfb = col.dfi
