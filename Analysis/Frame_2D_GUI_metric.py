@@ -993,6 +993,8 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                     x1 = (node.x*scale) + spacer
                     x2 = (self.nodes_analysis[i+1].x*scale)+spacer
                     self.g_plan_canvas.create_line(x1, hg, x2, hg, fill="white", width=2)
+                    
+            max_x = x2
 
             if self.cantL_count == 0:
                 pass
@@ -1008,6 +1010,7 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                 x1 = (self.nodes_analysis[-1].x*scale)+spacer
                 x2 = ((self.nodes_analysis[-1].x+self.beams_analysis[-1].Length)*scale)+spacer
                 self.g_plan_canvas.create_line(x1, hg, x2, hg, fill="white", width=2)
+                max_x = x2
 
             if self.frame_solved == 0:
                 pass
@@ -1202,7 +1205,7 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                         if col == self.columns_analysis[-1]:
                             non_sway_string = 'Non-Sway Reaction:\nRx: {0:.3f} kN'.format(non_sway_reaction)
                             
-                            self.g_plan_canvas.create_text(x+5, hg, anchor=tk.SW,font=self.mono_f_chart, text=non_sway_string, fill='red')
+                            self.g_plan_canvas.create_text(max_x+5, hg, anchor=tk.SW,font=self.mono_f_chart, text=non_sway_string, fill='red')
                             
                     if self.show_dfs.get()==1 and self.show_col_charts.get()==1:
                         dfb = col.dfi
