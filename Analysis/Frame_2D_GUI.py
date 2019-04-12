@@ -963,7 +963,7 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
             h = self.g_plan_canvas.winfo_height()
             hg = (h/2.0)
 
-            spacer= 30
+            spacer= 60
 
             if self.cantR_count == 0:
                 total_length = self.nodes_analysis[-1].x
@@ -1162,6 +1162,14 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
             count = 0
             non_sway_reaction = 0
             for col in self.columns_analysis:
+            
+                values = col.station_values()
+                stations = values[0]
+                shears = values[1]
+                moments = values[2]
+                eislopes = values[3]
+                eideltas = values[4]
+                
                 if col.type ==  'UP':
                     x = (col.i.x * scale) + spacer
                     h1 = hg
@@ -1218,13 +1226,13 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                     if self.show_v.get()==1 and self.show_col_charts.get()==1:
                         for i in range(1,len(col.chart_stations)):
                             if col.type == 'UP':
-                                y1 = h1 - (col.chart_stations[i-1]*scale)
-                                y2 = h1 - (col.chart_stations[i]*scale)
+                                y1 = h1 - (stations[i-1]*scale)
+                                y2 = h1 - (stations[i]*scale)
                             else:
-                                y1 = h2 - (col.chart_stations[i-1]*scale)
-                                y2 = h2 - (col.chart_stations[i]*scale)
-                            x1 = x + (col.station_values()[1][i-1] * v_scale)
-                            x2 = x + (col.station_values()[1][i] * v_scale)
+                                y1 = h2 - (stations[i-1]*scale)
+                                y2 = h2 - (stations[i]*scale)
+                            x1 = x + (shears[i-1] * v_scale)
+                            x2 = x + (shears[i] * v_scale)
 
                             self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="red", width=1)
                             
@@ -1234,8 +1242,8 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                                     
                                 self.g_plan_canvas.create_line(x, y2, x2, y2, fill="salmon", width=1)
 
-                        vb = col.station_values()[1][0]
-                        vt = col.station_values()[1][-1]
+                        vb = shears[0]
+                        vt = shears[-1]
                         string = 'Vj: {1:.3f} kips\nVi: {0:.3f} kips'.format(vb,vt)
 
                         if col.type == 'UP':
@@ -1252,13 +1260,13 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                     if self.show_m.get()==1 and self.show_col_charts.get()==1:
                         for i in range(1,len(col.chart_stations)):
                             if col.type == 'UP':
-                                y1 = h1 - (col.chart_stations[i-1]*scale)
-                                y2 = h1 - (col.chart_stations[i]*scale)
+                                y1 = h1 - (stations[i-1]*scale)
+                                y2 = h1 - (stations[i]*scale)
                             else:
-                                y1 = h2 - (col.chart_stations[i-1]*scale)
-                                y2 = h2 - (col.chart_stations[i]*scale)
-                            x1 = x - (col.station_values()[2][i-1] * m_scale)
-                            x2 = x - (col.station_values()[2][i] * m_scale)
+                                y1 = h2 - (stations[i-1]*scale)
+                                y2 = h2 - (stations[i]*scale)
+                            x1 = x - (moments[i-1] * m_scale)
+                            x2 = x - (moments[i] * m_scale)
 
                             self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="green", width=1)
                             
@@ -1267,8 +1275,8 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                                     self.g_plan_canvas.create_line(x, y1, x1, y1, fill="SeaGreen2", width=1)
                                 self.g_plan_canvas.create_line(x, y2, x2, y2, fill="SeaGreen2", width=1)
 
-                        mb = col.station_values()[2][0]
-                        mt = col.station_values()[2][-1]
+                        mb = moments[0]
+                        mt = moments[-1]
                         string = 'Mj: {1:.3f} ft-kips\nMi: {0:.3f} ft-kips'.format(mb,mt)
 
                         if col.type == 'UP':
@@ -1285,13 +1293,13 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                     if self.show_s.get()==1 and self.show_col_charts.get()==1:
                         for i in range(1,len(col.chart_stations)):
                             if col.type == 'UP':
-                                y1 = h1 - (col.chart_stations[i-1]*scale)
-                                y2 = h1 - (col.chart_stations[i]*scale)
+                                y1 = h1 - (stations[i-1]*scale)
+                                y2 = h1 - (stations[i]*scale)
                             else:
-                                y1 = h2 - (col.chart_stations[i-1]*scale)
-                                y2 = h2 - (col.chart_stations[i]*scale)
-                            x1 = x - ((col.station_values()[3][i-1]/(col.E*col.I)) * s_scale)
-                            x2 = x - ((col.station_values()[3][i]/(col.E*col.I)) * s_scale)
+                                y1 = h2 - (stations[i-1]*scale)
+                                y2 = h2 - (stations[i]*scale)
+                            x1 = x - ((eislopes[i-1]/(col.E*col.I)) * s_scale)
+                            x2 = x - ((eislopes[i]/(col.E*col.I)) * s_scale)
 
                             self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="magenta", width=1)
                             
@@ -1300,8 +1308,8 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                                     self.g_plan_canvas.create_line(x, y1, x1, y1, fill="orchid1", width=1)
                                 self.g_plan_canvas.create_line(x, y2, x2, y2, fill="orchid1", width=1)
 
-                        sb = col.station_values()[3][0]/(col.E*col.I)
-                        st = col.station_values()[3][-1]/(col.E*col.I)
+                        sb = eislopes[0]/(col.E*col.I)
+                        st = eislopes[-1]/(col.E*col.I)
                         string = 'Sj: {1:.5f} kips\nSi: {0:.5f} kips'.format(sb,st)
 
                         if col.type == 'UP':
@@ -1318,13 +1326,13 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
                     if self.show_d.get()==1 and self.show_col_charts.get()==1:
                         for i in range(1,len(col.chart_stations)):
                             if col.type == 'UP':
-                                y1 = h1 - (col.chart_stations[i-1]*scale)
-                                y2 = h1 - (col.chart_stations[i]*scale)
+                                y1 = h1 - (stations[i-1]*scale)
+                                y2 = h1 - (stations[i]*scale)
                             else:
-                                y1 = h2 - (col.chart_stations[i-1]*scale)
-                                y2 = h2 - (col.chart_stations[i]*scale)
-                            x1 = x - ((col.station_values()[4][i-1]/(col.E*col.I)) * d_scale * 12.0)
-                            x2 = x - ((col.station_values()[4][i]/(col.E*col.I)) * d_scale * 12.0)
+                                y1 = h2 - (stations[i-1]*scale)
+                                y2 = h2 - (stations[i]*scale)
+                            x1 = x - ((eideltas[i-1]/(col.E*col.I)) * d_scale * 12.0)
+                            x2 = x - ((eideltas[i]/(col.E*col.I)) * d_scale * 12.0)
 
                             self.g_plan_canvas.create_line(x1, y1, x2, y2, fill="yellow", width=1)
                             

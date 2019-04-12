@@ -539,6 +539,7 @@ class Column_Up:
         self.type = 'UP'
         self.rix = 0
         self.rjx = 0
+        self.loads_built = 0
 
         if support == 1:
             self.fix = 1
@@ -646,6 +647,10 @@ class Column_Up:
             self.rjx = -1*v[-1]
             
             return [self.chart_stations, v, m, eis, eid]
+        
+        else:
+            zero_out = [0]*len(self.chart_stations)
+            return [self.chart_stations, zero_out, zero_out, zero_out, zero_out]
             
 
 class Column_Down:
@@ -667,6 +672,7 @@ class Column_Down:
         self.rix = 0
         self.rjx = 0
         self.riy = 0
+        self.loads_built = 0
 
         if support == 1:
             self.fix = 1
@@ -773,6 +779,9 @@ class Column_Down:
             self.rjx = -1*v[-1]
             
             return [self.chart_stations, v, m, eis, eid]
+        else:
+            zero_out = [0]*len(self.chart_stations)
+            return [self.chart_stations, zero_out, zero_out, zero_out, zero_out]
             
     def base_reaction(self):
         self.riy = self.j.ry
