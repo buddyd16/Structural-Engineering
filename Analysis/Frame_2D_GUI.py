@@ -1352,8 +1352,11 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
 
         #sort the load list by beam
         for beam in self.beams_analysis:
+            beam.reset_fem()
             sorted_load_list.append([load for load in self.gui_load_list if load[0]==beam.label])
-
+        
+        for column in self.columns_analysis:
+            column.reset_fem()
         # Determine number of Spans and load patterns
         # load patterns will be returned as a list of
         # off, on per span

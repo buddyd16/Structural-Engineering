@@ -145,7 +145,6 @@ class CantBeam:
             self.applied_loads_right()
 
     def applied_loads_left(self):
-
         self.Loads = []
         self.extra_station = []
 
@@ -350,7 +349,6 @@ class Beam:
         self.Load_List = [load for load in load_list]
 
     def applied_loads(self):
-
         self.Loads = []
         self.extra_station = []
 
