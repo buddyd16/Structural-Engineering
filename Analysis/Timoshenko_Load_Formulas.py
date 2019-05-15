@@ -83,6 +83,14 @@ class point_load_TB:
         self.rr = (self.P*self.a)/self.L
         
         # Integration constants
+        # resulting from integration of the two formulas
+        # M = -EI dtheta/dx
+        # V = kAG (-theta + ddelta/dx)
+        # and the initial conditions of:
+        # delta = 0 at x=0 and x = L
+        # theta = constant at x = a
+        # delta = constant at x = a
+        
         self.c1 = ((-1*self.P*math.pow(self.a,2)) / (2*self.E*self.I) +
                     ((self.P*math.pow(self.a,3)) / (6*self.E*self.I*self.L)) +
                     ((self.P*self.a*self.L) / (3*self.E*self.I)))
