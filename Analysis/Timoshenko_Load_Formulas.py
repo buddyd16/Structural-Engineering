@@ -30,7 +30,7 @@ from numpy import zeros
 import numpy as np
 import math
 
-class timoshenko_beam:
+class TimoshenkoBeam:
     def __init__(L, E, I, G, kA):
         '''
         Timoshenko General form equations for beam stiffness
@@ -91,7 +91,7 @@ class timoshenko_beam:
         else:
             return [K_farfixed,K_farfixed]
     
-class point_load_TB:
+class PointLoadTB:
     def __init__(self, P, a, L, E, I, G, kA):
         '''
         Timoshenko General form equations for a simply
