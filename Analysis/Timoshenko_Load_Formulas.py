@@ -30,6 +30,67 @@ from numpy import zeros
 import numpy as np
 import math
 
+class timoshenko_beam:
+    def __init__(L, E, I, G, kA):
+        '''
+        Timoshenko General form equations for beam stiffness
+        and carry over factors
+
+        
+        ** Maintain consistent units among the inputs **
+
+        L = beam span
+        E = beam modulus of elastacity
+        I = beam second moment of area about the axis of bending
+        G = beam shear modulus
+        kA = beam shear area, typically the beam web area for steel W shapes
+        
+        '''
+
+        self.L = L
+        self.E = E
+        self.I = I
+        self.G = G
+        self.kA = kA
+        
+    def COF(self, fixed=[1,1]):
+        '''
+        carry over factor 
+        g = 6EI / kAGL^2
+        
+        '''
+        
+        g = ((6*self.E*self.I) / (self.kA*self.G*self.L*self.L))
+        
+        COF_fixed = (1-g) / (2+g)
+        
+        COF = [i*COF_fixed for i in fixed]
+        
+        return COF
+    
+    def K(self, fixed=[1,1]):
+        '''
+        Stiffness factors
+        g = 6EI / kAGL^2
+        '''
+        g = ((6*self.E*self.I) / (self.kA*self.G*self.L*self.L))
+        
+        K_farfixed = ((4*self.E*self.I) / self.L) * ((2+g)/(2*(1+(2*g))))
+        
+        K_farpinned = ((3*self.E*self.I)/self.L) * (2/(2+g))
+        
+        if fixed == [0,1]:
+            return [0,K_farpinned]
+        
+        elif fixed == [1,0]:
+            return [K_farpinned,0]
+        
+        elif fixed == [0,0]:
+            return [0,0]
+        
+        else:
+            return [K_farfixed,K_farfixed]
+    
 class point_load_TB:
     def __init__(self, P, a, L, E, I, G, kA):
         '''
