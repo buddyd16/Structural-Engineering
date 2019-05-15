@@ -134,6 +134,38 @@ class point_load_TB:
 
         return x,y
 
+    def fef(self):
+        '''
+        fixed end forces
+        g = 6EI / kAGL^2
+        
+        Sign convention:
+        (+) positive moments are clock-wise
+        
+        '''
+        
+        # redefine variables from self. to local to
+        # make formulas easier to read
+        P = self.P
+        a = self.a
+        b = self.b
+        L = self.L
+        
+        g = ((6*self.E*self.I) / (self.kA*self.G*self.L*self.L))
+        
+        ML = -1.0 * ((P*a*b*b) / (L*L))*((1+((L/b)*g))/(1+(2*g)))
+        MR = ((P*a*a*b) / (L*L))*((1+((L/a)*g))/(1+(2*g)))
+        
+        # additional vertical reactions caused by fixed end moments
+        
+        MRL = -1.0*(ML+MR)/L
+        MRR = -1.0*MRL
+        
+        RL = self.rl + MRL
+        RR = self.rr + MRR
+        
+        return [RL, ML, RR, MR]
+        
     def v(self,x):
         '''
         function takes an array of x locations along the beam and
