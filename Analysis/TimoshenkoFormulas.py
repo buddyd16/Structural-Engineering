@@ -359,7 +359,7 @@ class PointMoment:
     def __init__(self, M, a, L, E, I, G, kA):
         '''
         Timoshenko General form equations for a simply
-        supported beam with an applied Point load anywhere
+        supported beam with an applied Point Moment anywhere
         along the beam span.
         
         Note unlike the Euler-Bernoulli beam formulas

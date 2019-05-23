@@ -14,9 +14,9 @@ kA_in2 = 21.36
 I_in4 = 7800
 
 # Span Info
-L_ft = 10
-a_ft = 0
-M_ftkips = 10000.0
+L_ft = 25
+a_ft = 12.5
+M_ftkips = 1000.0
 
 #convert G and E to ksf
 G_ksf = G_ksi*144.0
@@ -26,28 +26,30 @@ E_ksf = E_ksi*144.0
 kA_ft2 = kA_in2 * (1/144.0)
 
 #convert I to ft^4
-I_ft4 = I_in4 * math.pow(12,4)
+I_ft4 = I_in4 / math.pow(12,4)
 
-step = L_ft/10.0
+step = L_ft/20.0
 
-x = [0+(i*step) for i in range(11)]
+x = [0+(i*step) for i in range(21)]
 bm = [0 for i in x]
 
-M_timo = timobm.PointMoment(M_ftkips,a_ft,L_ft,E_ksf,I_ft4,G_ksf,kA_ft2)
+M_timo = timobm.PointLoad(M_ftkips,a_ft,L_ft,E_ksf,I_ft4,G_ksf,kA_ft2)
 
-M_ebb = ebbm.point_moment(M_ftkips,a_ft,L_ft)
+M_ebb = ebbm.pl(M_ftkips,a_ft,L_ft)
 
 theta_timo = [-1.0*M_timo.thetax(i) for i in x]
 
 theta_ebb = [M_ebb.eisx(i)/(E_ksf*I_ft4) for i in x]
 
-theta_dif = [i-y for i,y in zip(theta_timo,theta_ebb)]
+tol = 1e-15
+
+theta_dif = [i-y if abs(i-y) > abs(tol) else 0 for i,y in zip(theta_timo,theta_ebb)]
 
 delta_timo = [-12.0*M_timo.deltax(i) for i in x]
 
 delta_ebb = [12.0*M_ebb.eidx(i)/(E_ksf*I_ft4) for i in x]
 
-delta_dif = [i-y for i,y in zip(delta_timo,delta_ebb)]
+delta_dif = [i-y if abs(i-y) > abs(tol) else 0 for i,y in zip(delta_timo,delta_ebb)]
 
 c1 = M_timo.c1
 c2 = M_timo.c2
@@ -74,18 +76,17 @@ ax7.plot(x,bm)
 ax8.plot(x,bm)
 ax9.plot(x,bm)
 
+theta_timo_norm = [(i)/max((max(theta_timo), abs(min(theta_timo))))*1.25 if max((max(theta_timo), abs(min(theta_timo)))) != 0 else 0 for i in theta_timo]
+theta_ebb_norm = [(i)/max((max(theta_ebb), abs(min(theta_ebb))))*1.25 if max((max(theta_ebb), abs(min(theta_ebb)))) != 0 else 0 for i in theta_ebb]
+theta_dif_norm = [(i)/max((max(theta_dif), abs(min(theta_dif))))*1.25 if max((max(theta_dif), abs(min(theta_dif)))) !=0 else 0 for i in theta_dif]
 
 for i,y in enumerate(x):
     
     h = 0.5
     
-    f=1000
-    
-    xs_timo = [y+(theta_timo[i]*h*f), y-(theta_timo[i]*h*f)]
-    xs_ebb = [y+(theta_ebb[i]*h*f), y-(theta_ebb[i]*h*f)]
-    xs_dif = [y+(theta_dif[i]*h*f), y-(theta_dif[i]*h*f)]
-    
-    print xs_timo
+    xs_timo = [y+(theta_timo_norm[i]*h), y-(theta_timo_norm[i]*h)]
+    xs_ebb = [y+(theta_ebb_norm[i]*h), y-(theta_ebb_norm[i]*h)]
+    xs_dif = [y+(theta_dif_norm[i]*h), y-(theta_dif_norm[i]*h)]
     
     ys = [-h,h]
     
