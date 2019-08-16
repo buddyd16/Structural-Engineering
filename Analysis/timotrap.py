@@ -176,3 +176,89 @@ c9  [0,0,L/kAG + (-1*L^3)/(6*EI),0,0,-1*L^2/2*EI,0,0,L,0,0,1] [0]
 c10  [0,0,0,0,0,0,0,0,0,1,0,0] [0]
 c11  [a/kAG + (-1*a^3)/(6*EI),-1*a/kAG + (a^3)/6*EI,0,-1*a^2/2*EI,a^2/2*EI,0,a,-a,0,0,-1,0] [w1*a^2/2*kAG + (-w1*a^4)/(24*EI)]
 c12  [0,-1*c/kAG + (c^3)/6*EI,c/kAG + (-1*c^3)/(6*EI),0,c^2/2*EI,-1*c^2/2*EI,0,-1*c,c,0,-1,1] [w1*c^2/2*kAG - (s(c-a)^3)/6*kAG  + (-w1*c^4)/(24*EI) + (s(c-a)^5)/(120*EI)]
+'''
+
+from __future__ import division
+from numpy import sign
+from numpy import zeros
+import numpy as np
+import math
+
+w1= 1
+w2= 0
+a= 0
+b= 8
+c= b - a
+s= (w2 - w1) / c
+L=10
+
+W = (w1 + w2)*c*0.5
+xbar = (c * ((2 * w2) + w1)) / (3 * (w2 + w1))
+
+RR = W*(a+xbar) / L
+RL = W - RR
+
+#Material and Cross section data
+E = 29000*math.pow(12,2)
+I = 30.8 * 1/math.pow(12,4)
+kA = 10 * 1/math.pow(12,2)
+G = 11500*math.pow(12,2)
+
+#Boundary and Compatibility equation
+#Lists of coefficients and lists of associated equalities
+
+bc1_coeff = [1,0,0,0,0,0,0,0,0,0,0,0] 
+bc1_eq = [RL]
+
+bc2_coeff = [-1,1,0,0,0,0,0,0,0,0,0,0] 
+bc2_eq = [-1*w1*a]
+
+bc3_coeff = [0,0,1,0,0,0,0,0,0,0,0,0]
+bc3_eq = [-1*RR]
+
+bc4_coeff = [0,0,0,1,0,0,0,0,0,0,0,0] 
+bc4_eq = [0]
+
+bc5_coeff = [-1*a,a,0,0,1,0,0,0,0,0,0,0]
+bc5_eq = [(-1*w1*math.pow(a,2))/2.0]
+
+bc6_coeff = [0,0,L,0,0,1,0,0,0,0,0,0]
+bc6_eq = [0]
+
+bc7_coeff = [(-1*math.pow(a,2))/(2*E*I),(math.pow(a,2))/(2*E*I),0,-1*a/(E*I),a/(E*I),0,1,-1,0,0,0,0] 
+bc7_eq = [(-1*w1*math.pow(a,3))/(6*E*I)]
+
+bc8_coeff = [0,
+             (-1*math.pow(c,2))/(2*E*I),
+             (math.pow(c,2))/(2*E*I),
+             0,
+             -1*c/(E*I),
+             c/(E*I),
+             0,
+             1,
+             -1,
+             0,
+             0,
+             0] 
+bc8_eq = [(w1*math.pow(c,3))/(6*E*I) - (s*math.pow((c-a),4))/(24*E*I)]
+ 
+bc9_coeff = [0,0,(L/(kA*G)) + ((-1*math.pow(L,3))/(6*E*I)),0,0,-1*math.pow(L,2)/(2*E*I),0,0,L,0,0,1]
+bc9_eq = [0]
+
+bc10_coeff = [0,0,0,0,0,0,0,0,0,1,0,0] 
+bc10_eq = [0]
+
+bc11_coeff = [(a/(kA*G)) + ((-1*math.pow(a,3))/(6*E*I)),(-1*a/(kA*G)) + ((math.pow(a,3))/(6*E*I)),0,((-1*math.pow(a,2))/(2*E*I)),(math.pow(a,2)/(2*E*I)),0,a,-1*a,0,0,-1,0]
+bc11_eq = [(w1*math.pow(a,2)/(2*kA*G)) + ((-1*w1*math.pow(a,4))/(24*E*I))]
+
+bc12_coeff = [0,(-1*c/(kA*G)) + ((math.pow(c,3))/(6*E*I)),(c/(kA*G)) + ((-1*math.pow(c,3))/(6*E*I)),0,math.pow(c,2)/(2*E*I),-1*math.pow(c,2)/(2*E*I),0,-1*c,c,0,-1,1] 
+bc12_eq = [((w1*math.pow(c,2))/(2*kA*G)) - ((s*math.pow((c-a),3))/(6*kA*G)) + ((-1*w1*math.pow(c,4))/(24*E*I)) + ((s*math.pow((c-a),5))/(120*E*I))]
+
+
+bceq = [bc1_coeff,bc2_coeff,bc3_coeff,bc4_coeff,bc5_coeff,bc6_coeff,bc7_coeff,bc8_coeff,bc9_coeff,bc10_coeff,bc11_coeff,bc12_coeff]
+bcs = [bc1_eq,bc2_eq,bc3_eq,bc4_eq,bc5_eq,bc6_eq,bc7_eq,bc8_eq,bc9_eq,bc10_eq,bc11_eq,bc12_eq]
+
+bceq = np.array(bceq)
+bcs = np.array(bcs)
+
+coef = np.linalg.solve(bceq,bcs)
