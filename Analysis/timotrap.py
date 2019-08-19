@@ -179,8 +179,6 @@ c12  [0,-1*c/kAG + (c^3)/6*EI,c/kAG + (-1*c^3)/(6*EI),0,c^2/2*EI,-1*c^2/2*EI,0,-
 '''
 
 from __future__ import division
-from numpy import sign
-from numpy import zeros
 import numpy as np
 import math
 
@@ -204,7 +202,8 @@ print RL,RR
 E = 29000*math.pow(12,2)
 I = 30.8 * 1/math.pow(12,4)
 kA = 1.34 * 1/math.pow(12,2)
-G = 11500*math.pow(12,2)
+#kA = 10000000000000000
+G = E /(2+(2*0.3))
 
 #Boundary and Compatibility equation
 #Lists of coefficients and lists of associated equalities
@@ -284,10 +283,10 @@ Moment5 = (((-1*w1*math.pow(x,2))/2.0) -
             
 x2 = 2.0
 
-delta2 = (((c[0]*x2)/(kA*G)) + 
+delta2 = ((((c[0]*x2)/(kA*G)) + 
         ((-1*c[0]*math.pow(x2,3))/(6*E*I)) - 
         ((c[3]*math.pow(x2,2))/(2*E*I)) + 
         (c[6]*x2) + 
-        c[9])
+        c[9])) * 12.0
 
 Moment2 = c[0]*x2 + c[3]
