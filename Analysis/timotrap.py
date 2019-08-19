@@ -344,7 +344,7 @@ class VariableLoad:
         elif b < x <= L:
             theta = (((-1*c[2][0]*math.pow(x,2))/(2.0*E*I)) - 
                     ((c[5][0]*x)/(E*I)) + 
-                    c[9][0])
+                    c[8][0])
         else:
             theta = 0     
         
@@ -409,7 +409,7 @@ class VariableLoad:
 
 
 w1= 1
-w2= 0
+w2= 0.5
 a= 3
 b= 7
 L=10
