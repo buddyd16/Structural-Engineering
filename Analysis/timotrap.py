@@ -423,6 +423,8 @@ G = E /(2+(2*0.3))
 
 load = VariableLoad(w1, w2, a, b, L, E, I, G, kA)
 
+res0 = [load.vx(0),load.mx(0),load.thetax(0),load.deltax(0)*12.0]
 res2 = [load.vx(2),load.mx(2),load.thetax(2),load.deltax(2)*12.0]
 res5 = [load.vx(5),load.mx(5),load.thetax(5),load.deltax(5)*12.0]
 res8 = [load.vx(8),load.mx(8),load.thetax(8),load.deltax(8)*12.0]
+resL = [load.vx(L),load.mx(L),load.thetax(L),load.deltax(L)*12.0]
