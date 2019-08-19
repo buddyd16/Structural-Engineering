@@ -93,7 +93,7 @@ Solve for Constants using boundary conditions and compatibility:
 **Compatibility @ x=a, V=constant:**
 c1 = -1*w1*a - (s(a-a)^2)/2 + c2
 c1 = -1*w1*a + c2
-c1 / -1*w1*a = c2
+c1 + 1*w1*a = c2
 
 or
 
@@ -185,20 +185,20 @@ import numpy as np
 import math
 
 w1= 1
-w2= 0
-a= 0
-b= 10
-c= b - a
-s= (w2 - w1) / c
+w2= 0.5
+a= 3
+b= 7
+d= b - a
+s= (w2 - w1) / d
 L=10
 
-W = (w1 + w2)*c*0.5
-xbar = (c * ((2 * w2) + w1)) / (3 * (w2 + w1))
+W = (w1 + w2)*d*0.5
+xbar = (d * ((2 * w2) + w1)) / (3 * (w2 + w1))
 
 RR = W*(a+xbar) / L
 RL = W - RR
 
-print RR,RL
+print RL,RR
 
 #Material and Cross section data
 E = 29000*math.pow(12,2)
@@ -231,18 +231,18 @@ bc7_coeff = [(-1*math.pow(a,2))/(2*E*I),(math.pow(a,2))/(2*E*I),0,-1*a/(E*I),a/(
 bc7_eq = [(w1*math.pow(a,3))/(6*E*I)]
 
 bc8_coeff = [0,
-             (-1*math.pow(c,2))/(2*E*I),
-             (math.pow(c,2))/(2*E*I),
+             (-1*math.pow(d,2))/(2*E*I),
+             (math.pow(d,2))/(2*E*I),
              0,
-             -1*c/(E*I),
-             c/(E*I),
+             -1*d/(E*I),
+             d/(E*I),
              0,
              1,
              -1,
              0,
              0,
              0] 
-bc8_eq = [(-1*w1*math.pow(c,3))/(6*E*I) - (s*math.pow((c-a),4))/(24*E*I)]
+bc8_eq = [(-1*w1*math.pow(d,3))/(6*E*I) - (s*math.pow((d-a),4))/(24*E*I)]
  
 bc9_coeff = [0,0,(L/(kA*G)) + ((-1*math.pow(L,3))/(6*E*I)),0,0,-1*math.pow(L,2)/(2*E*I),0,0,L,0,0,1]
 bc9_eq = [0]
@@ -253,8 +253,8 @@ bc10_eq = [0]
 bc11_coeff = [(a/(kA*G)) + ((-1*math.pow(a,3))/(6*E*I)),(-1*a/(kA*G)) + ((math.pow(a,3))/(6*E*I)),0,((-1*math.pow(a,2))/(2*E*I)),(math.pow(a,2)/(2*E*I)),0,a,-1*a,0,0,-1,0]
 bc11_eq = [(-1*w1*math.pow(a,2)/(2*kA*G)) + ((w1*math.pow(a,4))/(24*E*I))]
 
-bc12_coeff = [0,(-1*c/(kA*G)) + ((math.pow(c,3))/(6*E*I)),(c/(kA*G)) + ((-1*math.pow(c,3))/(6*E*I)),0,math.pow(c,2)/(2*E*I),-1*math.pow(c,2)/(2*E*I),0,-1*c,c,0,-1,1] 
-bc12_eq = [((-1*w1*math.pow(c,2))/(2*kA*G)) - ((s*math.pow((c-a),3))/(6*kA*G)) + ((w1*math.pow(c,4))/(24*E*I)) + ((s*math.pow((c-a),5))/(120*E*I))]
+bc12_coeff = [0,(-1*d/(kA*G)) + ((math.pow(d,3))/(6*E*I)),(d/(kA*G)) + ((-1*math.pow(d,3))/(6*E*I)),0,math.pow(d,2)/(2*E*I),-1*math.pow(d,2)/(2*E*I),0,-1*d,d,0,-1,1] 
+bc12_eq = [((-1*w1*math.pow(d,2))/(2*kA*G)) - ((s*math.pow((d-a),3))/(6*kA*G)) + ((w1*math.pow(d,4))/(24*E*I)) + ((s*math.pow((d-a),5))/(120*E*I))]
 
 
 bceq = [bc1_coeff,bc2_coeff,bc3_coeff,bc4_coeff,bc5_coeff,bc6_coeff,bc7_coeff,bc8_coeff,bc9_coeff,bc10_coeff,bc11_coeff,bc12_coeff]
@@ -263,21 +263,31 @@ bcs = [bc1_eq,bc2_eq,bc3_eq,bc4_eq,bc5_eq,bc6_eq,bc7_eq,bc8_eq,bc9_eq,bc10_eq,bc
 bceq = np.array(bceq)
 bcs = np.array(bcs)
 
-coef = np.linalg.solve(bceq,bcs)
+c = np.linalg.solve(bceq,bcs)
 
 
 x=5.0
-delta = ((-1*w1*math.pow(x,2)/(2*kA*G)) - 
+delta5 = ((-1*w1*math.pow(x,2)/(2*kA*G)) - 
         ((s*math.pow((x-a),3))/(6*kA*G)) + 
-        ((coef[1]*x)/(kA*G)) + 
+        ((c[1]*x)/(kA*G)) + 
         ((w1*math.pow(x,4))/(24*E*I)) + 
         ((s*math.pow((x-a),5))/(120*E*I)) - 
-        ((coef[1]*math.pow(x,3))/(6*E*I)) - 
-        (coef[4]*math.pow(x,2)/(2*E*I)) + 
-        coef[7]*x + 
-        coef[10]) * 12.0
+        ((c[1]*math.pow(x,3))/(6*E*I)) - 
+        (c[4]*math.pow(x,2)/(2*E*I)) + 
+        c[7]*x + 
+        c[10]) * 12.0
 
-Moment = (((-1*w1*math.pow(x,2))/2.0) - 
+Moment5 = (((-1*w1*math.pow(x,2))/2.0) - 
             ((s*math.pow((x-a),3))/6.0) + 
-            (coef[1]*x) + 
-            coef[4])
+            (c[1]*x) + 
+            c[4])
+            
+x2 = 2.0
+
+delta2 = (((c[0]*x2)/(kA*G)) + 
+        ((-1*c[0]*math.pow(x2,3))/(6*E*I)) - 
+        ((c[3]*math.pow(x2,2))/(2*E*I)) + 
+        (c[6]*x2) + 
+        c[9])
+
+Moment2 = c[0]*x2 + c[3]
