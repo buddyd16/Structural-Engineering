@@ -6,7 +6,7 @@ import math
 class UniformLoad:
     def __init__(self, w, a, b, L, E, I, G, kA):
         '''
-        Timoshenko derivation for trapezoidal/variable loading
+        Timoshenko derivation for uniform loading
         pin-pin single span beam
         
         w - Load left end value
