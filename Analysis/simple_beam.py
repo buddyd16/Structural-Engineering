@@ -48,6 +48,8 @@ class Master_window:
 
         self.loads_scale = [0.0001]
         self.load_last_add = []
+        self.extra_reactions = []
+        self.end_moments = []
 
         self.reaction_left = 0
         self.reaction_right = 0
@@ -466,21 +468,20 @@ class Master_window:
         self.license_display()
 
     def license_display(self, *event):
-        license_string = (
-"""Copyright (c) 2019, Donald N. Bockoven III\n
-All rights reserved.\n\n
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n
-https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
-)
+        license_string = ("Copyright (c) 2019, Donald N. Bockoven III\n"
+                            "All rights reserved.\n\n"
+                            "THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\""
+                            " AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE"
+                            " IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE"
+                            " DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE"
+                            " FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"
+                            " DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"
+                            " SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"
+                            " CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"
+                            " OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"
+                            " OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n\n"
+                            "https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"
+                            )
         tkMessageBox.showerror("License Information",license_string)
         self.master.focus_force()
 
@@ -875,6 +876,7 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
         self.rm_listbox.delete(0,tk.END)
         self.rs_listbox.delete(0,tk.END)
         self.rd_listbox.delete(0,tk.END)
+        
 
         if self.left_cant_ft.get() == '' or self.span_ft.get()== '' or self.right_cant_ft.get() == '':
             pass
@@ -1880,93 +1882,89 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
         file.write('  -moz-user-select: none;\n')
         file.write('  -webkit-user-select: none;\n')
         file.write('  -ms-user-select: none;\n}\n')
-        file.write('''table {
-                    font-family: Arial, Helvetica, sans-serif;
-                    border-collapse: collapse;
-                    width: 4.9in;
-                    font-size: 12px;
-                    }
-
-                    td,  th {
-                            border: 1px solid #BDC3C7;
-                            text-align: center;
-                            padding: 2px;
-                            }
-
-                     tr:nth-child(even){background-color: #E5E7E9}
-
-                     tr:hover {background-color: #BDC3C7;}
-
-                     th {
-                         padding-top: 2px;
-                         padding-bottom: 2px;
-                         background-color: #D5D8DC;
-                         color: #353535;
-                 }\n''')
+        file.write('table {\n')
+        file.write('font-family: Arial, Helvetica, sans-serif;\n')
+        file.write('border-collapse: collapse;\n')
+        file.write('width: 4.9in;\n')
+        file.write('font-size: 12px;\n')
+        file.write('}\n')
+        file.write('td,  th {\n')
+        file.write('border: 1px solid #BDC3C7;\n')
+        file.write('text-align: center;\n')
+        file.write('padding: 2px;\n')
+        file.write('}\n')
+        file.write('tr:nth-child(even){background-color: #E5E7E9}\n')
+        file.write('tr:hover {background-color: #BDC3C7;}\n')
+        file.write('th {\n')
+        file.write('padding-top: 2px;\n')
+        file.write('padding-bottom: 2px;\n')
+        file.write('background-color: #D5D8DC;\n')
+        file.write('color: #353535;\n')
+        file.write('}\n')
         file.write('</style>\n')
         file.write('</head>\n\n<body>\n')
         file.write('<div>\n')
         file.write('<br>\n<table>\n')
         ins = ['Left Cant. (ft):','Center Span (ft):','Right Cant. (ft):','E (ksi):','I (in^4):','Stations:','Fixed Left:','Fixed Right:','Interior Supports(ft):']
         i=0
-        file.write('<tr>\n')
-        file.write('<th colspan="2">Inputs:</th>\n')
-        file.write('</tr>\n')
+        file.write('  <tr>\n')
+        file.write('    <th colspan="2">Inputs:</th>\n')
+        file.write('  </tr>\n')
         for x in self.inputs:
-            file.write('<tr>\n')
-            file.write('<td>{0}</td>\n'.format(ins[i]))
-            file.write('<td>{0}</td>\n'.format(x.get()))
-            file.write('</tr>\n')
+            file.write('  <tr>\n')
+            file.write('    <td>{0}</td>\n'.format(ins[i]))
+            file.write('    <td>{0}</td>\n'.format(x.get()))
+            file.write('  </tr>\n')
             i+=1
         file.write('</table>\n<br>\n')
         file.write('<table>\n')
-        file.write('<tr>\n')
-        file.write('<th colspan="6">Applied Loads: (includes interior reactions)</th>\n')
-        file.write('</tr>\n')
-        file.write('<tr>\n<th>P,M, or W1 (kips/ft-kips/klf)</th>\n<th>W2 (klf)</th>\n<th>a (ft)</th>\n<th>b (ft)</th>\n<th>Location</th>\n<th>Load Type</th>\n</tr>\n')
+        file.write('  <tr>\n')
+        file.write('    <th colspan="6">Applied Loads: (includes interior reactions)</th>\n')
+        file.write('  </tr>\n')
+        file.write('  <tr>\n    <th>P,M, or W1 (kips/ft-kips/klf)</th>\n    <th>W2 (klf)</th>\n    <th>a (ft)</th>\n    <th>b (ft)</th>\n    <th>Location</th>\n    <th>Load Type</th>\n  </tr>\n')
 
         for load in self.loads_gui_select_var:
             if load[0].get() == 1:
-                file.write('<tr>\n')
-                file.write('<td>{0}</td>\n'.format(load[1].get()))
-                file.write('<td>{0}</td>\n'.format(load[2].get()))
-                file.write('<td>{0}</td>\n'.format(load[3].get()))
-                file.write('<td>{0}</td>\n'.format(load[4].get()))
-                file.write('<td>{0}</td>\n'.format(load[5].get()))
-                file.write('<td>{0}</td>\n'.format(load[6].get()))
-                file.write('</tr>\n')
+                file.write('  <tr>\n')
+                file.write('    <td>{0}</td>\n'.format(load[1].get()))
+                file.write('    <td>{0}</td>\n'.format(load[2].get()))
+                file.write('    <td>{0}</td>\n'.format(load[3].get()))
+                file.write('    <td>{0}</td>\n'.format(load[4].get()))
+                file.write('    <td>{0}</td>\n'.format(load[5].get()))
+                file.write('    <td>{0}</td>\n'.format(load[6].get()))
+                file.write('  </tr>\n')
 
         file.write('</table>\n<br>\n')
         file.write('<table>\n')
-        file.write('<tr>\n')
-        file.write('<th colspan="2">Results:</th>\n')
-        file.write('</tr>\n')
-        file.write('<tr>\n<td>Reaction Left (kips):</td>\n<td>{0:.4f}</td>\n</tr>\n'.format(self.reaction_left))
-        file.write('<tr>\n<td>Reaction Right (kips):</td>\n<td>{0:.4f}</td>\n</tr>\n'.format(self.reaction_right))
+        file.write('  <tr>\n')
+        file.write('    <th colspan="2">Results:</th>\n')
+        file.write('  </tr>\n')
+        file.write('  <tr>\n    <td>Reaction Left (kips):</td>\n    <td>{0:.4f}</td>\n  </tr>\n'.format(self.reaction_left))
+        file.write('  <tr>\n    <td>Reaction Right (kips):</td>\n    <td>{0:.4f}</td>\n  </tr>\n'.format(self.reaction_right))
         if self.lc == 0:
             pass
         else:
-            file.write('<tr>\n<td colspan="2"><u>Center Span Max/Min Moments (ft-kips):</u></td>\n</tr>\n')
+            file.write('  <tr>\n    <td colspan="2"><u>Center Span Max/Min Moments (ft-kips):</u></td>\n  </tr>\n')
             for x in self.zero_shear_loc:
                 v,m,s,d = self.analysisx(x)
-                file.write('<tr>\n<td>@{0:.4f} ft</td>\n<td>{1:.4f}</td>\n</tr>\n'.format(x,m[1]))
-            file.write('<tr>\n<td colspan="2"><u>Center Span Max/Min Deflections (in):</u></td>\n</tr>\n')
+                file.write('  <tr>\n    <td>@{0:.4f} ft</td>\n    <td>{1:.4f}</td>\n  </tr>\n'.format(x,m[1]))
+            file.write('  <tr>\n    <td colspan="2"><u>Center Span Max/Min Deflections (in):</u></td>\n  </tr>\n')
             E = float(self.E_ksi.get()) * 144        #144 is conversion from ksi to ksf - 12^2
             I = float(self.I_in4.get()) / 12.0**4    #covert from in^4 to ft^4
 
             for x in self.zero_slope_loc:
                 v,m,s,d = self.analysisx(x)
-                file.write('<tr>\n<td>@{0:.4f} ft</td>\n<td>{1:.4f}</td>\n</tr>\n'.format(x,(d[1]/(E*I))*12))
+                file.write('  <tr>\n    <td>@{0:.4f} ft</td>\n    <td>{1:.4f}</td>\n  </tr>\n'.format(x,(d[1]/(E*I))*12))
 
         file.write('</table>\n<br>\n</div>\n<br>\n')
         # Equations
         if self.lc == 0:
             pass
         else:
-            file.write('<h3>Center Span Piecewise Functions</h3>\n<br>\n{0}<br>\n'.format(ppbeam.PieceFunctionStringHTMLTable(self.piece_eq_center[0],'Shear (kips):')))
-            file.write('{0}<br>\n'.format(ppbeam.PieceFunctionStringHTMLTable(self.piece_eq_center[1],'Moment (kip-ft):')))
-            file.write('{0}<br>\n'.format(ppbeam.PieceFunctionStringHTMLTable(self.piece_eq_center[2],'EI*Slope (rads): [convert EI from inch to ft first]')))
-            file.write('{0}<br>\n'.format(ppbeam.PieceFunctionStringHTMLTable(self.piece_eq_center[3],'(EI/12)*Deflection (in):[convert EI from inch to ft first]')))
+            file.write('<h3>Center Span Piecewise Functions</h3>\n<br>\n<table><tr><td>{0}</td>\n'.format(ppbeam.PieceFunctionStringHTMLTable(self.piece_eq_center[0],'Shear (kips):')))
+            file.write('<td>{0}</td></tr>\n'.format(ppbeam.PieceFunctionStringHTMLTable(self.piece_eq_center[1],'Moment (kip-ft):')))
+            file.write('<tr><td>{0}</td>\n'.format(ppbeam.PieceFunctionStringHTMLTable(self.piece_eq_center[2],'EI*Slope (rads): [convert EI from inch to ft first]')))
+            file.write('<td>{0}</td></tr></table><br>\n'.format(ppbeam.PieceFunctionStringHTMLTable(self.piece_eq_center[3],'(EI/12)*Deflection (in):[convert EI from inch to ft first]')))
 
         file.write('<div style="width: 8in;">\n<canvas id="shear"></canvas>\n')
         file.write('<canvas id="moment"></canvas>\n')
@@ -1974,28 +1972,22 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
         file.write('<canvas id="deflection"></canvas>\n</div>\n')
         file.write('</div>\n')
 
-        file.write("<script>\nvar scatterShear = {\ndatasets: [{\n")
-        file.write("label: 'Shear',\nshowLine: true,\nlineTension: 0,\nborderColor: 'rgb(255, 0, 0)',\nbackgroundColor: 'rgba(255, 0, 0,0.2)',\npointRadius: 3,\npointBackgroundColor:'rgb(255,0,0)',\ndata: [\n")
+        file.write("<script>\nvar scatterShear = {\n    datasets: [{\n")
+        file.write("    label: 'Shear',\n   showLine: true,\n   lineTension: 0,\n   borderColor: 'rgb(255, 0, 0)',\n    backgroundColor: 'rgba(255, 0, 0,0.2)',\n   pointRadius: 3,\n   pointBackgroundColor:'rgb(255,0,0)',\n  data: [\n")
 
         #Shear
         i=0
         text = ''
         for x in self.xsl:
-            text = text+'{x: '
-            text = text+'{0:.3f},\ny: {1:.3f}'.format(x, self.shearl[i])
-            text = text+'},\n'
+            text = text+'{{x: {0:.3f}, y: {1:.3f}}},\n'.format(x, self.shearl[i])
             i+=1
         i=0
-        for x  in self.xsc:
-            text = text+'{x: '
-            text = text+'{0:.3f},\ny: {1:.3f}'.format(x, self.shearc[i])
-            text = text+'},\n'
+        for x in self.xsc:
+            text = text+'{{x: {0:.3f}, y: {1:.3f}}},\n'.format(x, self.shearc[i])
             i+=1
         i=0
-        for x  in self.xsr:
-            text = text+'{x: '
-            text = text+'{0:.3f},\ny: {1:.3f}'.format(x, self.shearr[i])
-            text = text+'},\n'
+        for x in self.xsr:
+            text = text+'{{x: {0:.3f}, y: {1:.3f}}},\n'.format(x, self.shearr[i])
             i+=1
         text = text[:-3]
         text = text + '}]'
@@ -2009,21 +2001,15 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
         i=0
         text = ''
         for x in self.xsl:
-            text = text+'{x: '
-            text = text+'{0:.3f},\ny: {1:.3f}'.format(x, self.momentl[i])
-            text = text+'},\n'
+            text = text+'{{x: {0:.3f}, y: {1:.3f}}},\n'.format(x, self.momentl[i])
             i+=1
         i=0
         for x  in self.xsc:
-            text = text+'{x: '
-            text = text+'{0:.3f},\ny: {1:.3f}'.format(x, self.momentc[i])
-            text = text+'},\n'
+            text = text+'{{x: {0:.3f}, y: {1:.3f}}},\n'.format(x, self.momentc[i])
             i+=1
         i=0
         for x  in self.xsr:
-            text = text+'{x: '
-            text = text+'{0:.3f},\ny: {1:.3f}'.format(x, self.momentr[i])
-            text = text+'},\n'
+            text = text+'{{x: {0:.3f}, y: {1:.3f}}},\n'.format(x, self.momentr[i])
             i+=1
         text = text[:-3]
         text = text + '}]'
@@ -2037,21 +2023,15 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
         i=0
         text = ''
         for x in self.xsl:
-            text = text+'{x: '
-            text = text+'{0:.5f},\ny: {1:.8f}'.format(x, self.slopel[i])
-            text = text+'},\n'
+            text = text+'{{x: {0:.3f}, y: {1:.8f}}},\n'.format(x, self.slopel[i])
             i+=1
         i=0
         for x  in self.xsc:
-            text = text+'{x: '
-            text = text+'{0:.5f},\ny: {1:.8f}'.format(x, self.slopec[i])
-            text = text+'},\n'
+            text = text+'{{x: {0:.3f}, y: {1:.8f}}},\n'.format(x, self.slopec[i])
             i+=1
         i=0
         for x  in self.xsr:
-            text = text+'{x: '
-            text = text+'{0:.5f},\ny: {1:.8f}'.format(x, self.sloper[i])
-            text = text+'},\n'
+            text = text+'{{x: {0:.3f}, y: {1:.8f}}},\n'.format(x, self.sloper[i])
             i+=1
         text = text[:-3]
         text = text + '}]'
@@ -2065,21 +2045,15 @@ https://github.com/buddyd16/Structural-Engineering/blob/master/LICENSE"""
         i=0
         text = ''
         for x in self.xsl:
-            text = text+'{x: '
-            text = text+'{0:.5f},\ny: {1:.5f}'.format(x, self.deltal[i])
-            text = text+'},\n'
+            text = text+'{{x: {0:.3f}, y: {1:.5f}}},\n'.format(x, self.deltal[i])
             i+=1
         i=0
         for x  in self.xsc:
-            text = text+'{x: '
-            text = text+'{0:.5f},\ny: {1:.5f}'.format(x, self.deltac[i])
-            text = text+'},\n'
+            text = text+'{{x: {0:.3f}, y: {1:.5f}}},\n'.format(x, self.deltac[i])
             i+=1
         i=0
         for x  in self.xsr:
-            text = text+'{x: '
-            text = text+'{0:.5f},\ny: {1:.5f}'.format(x, self.deltar[i])
-            text = text+'},\n'
+            text = text+'{{x: {0:.3f}, y: {1:.5f}}},\n'.format(x, self.deltar[i])
             i+=1
         text = text[:-3]
         text = text + '}]'
