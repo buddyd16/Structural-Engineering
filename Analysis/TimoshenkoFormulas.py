@@ -30,6 +30,41 @@ from numpy import zeros
 import numpy as np
 import math
 
+def fixedendmomentsTimoshenko(theta_0,theta_L, L, E, I, G, kA, fed=[1,1]):
+    '''
+    Given the the start and end cross section rotations
+    Return the end moments that produce equal and opposite rotations
+    such that the net rotation at the member ends are 0 ie Fixed
+    
+    Sign convention is clockwise moments are positive
+    
+    [-Theta_0, -Theta_L] = [M_0,M_1] * [(1/kA G L)+(L/3EI), (1/kA G L)-(L/6EI)
+                                        (1/kA G L)-(L/6EI), (1/kA G L)+(L/3EI)]
+    
+    Using Numpy Linear Algebra to solve the simultaneous equations
+    '''
+    
+    if fed[0] == 1 and fed[1] == 1:
+        s = np.array([[-1.0*theta_0],[-1.0*theta_L]])
+
+        ems = np.array([[(1.0/(kA*G*L))+(L/(3.0*E*I)) , (1.0/(kA*G*L))-(L/(6.0*E*I))],
+                        [(1.0/(kA*G*L))-(L/(6.0*E*I)) , (1.0/(kA*G*L))+(L/(3.0*E*I))]])
+
+        fem = np.linalg.solve(ems,s)
+
+    elif fed[0] == 1 and fed[1] == 0:
+        fel= (-1.0*theta_0) / ((1.0/(kA*G*L))+(L/(3.0*E*I)))
+        fem = np.array([[fel],[0]])
+
+    elif fed[0] == 0 and fed[1] == 1:
+        fer = (-1.0*theta_L) / ((1.0/(kA*G*L))+(L/(3.0*E*I)))
+        fem = np.array([[0],[fer]])
+
+    else:
+        fem = np.array([[0],[0]])
+
+    return fem
+
 class TimoshenkoBeam:
     def __init__(L, E, I, G, kA):
         '''
@@ -178,7 +213,7 @@ class PointLoad:
         x scaling only impacts the arrow head if arrows are
         selected to be included
         
-        arrows simply places to diagonal lines at the laad intersection with
+        arrows simply places two diagonal lines at the load intersection with
         the beam line.
         
         '''
@@ -443,7 +478,7 @@ class PointMoment:
         x scaling only impacts the arrow head if arrows are
         selected to be included
         
-        arrows simply places to diagonal lines at the laad intersection with
+        arrows simply places two diagonal lines at the load intersection with
         the beam line.
         
         '''

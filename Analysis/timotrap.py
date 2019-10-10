@@ -2,6 +2,7 @@
 from __future__ import division
 import numpy as np
 import math
+import TimoshenkoFormulas as timoforms
 
 class VariableLoad:
     def __init__(self, w1, w2, a, b, L, E, I, G, kA):
@@ -242,6 +243,7 @@ class VariableLoad:
     c < x < L:
     V = c3
     '''
+        
     def vx(self,x):
         
         # redefine variables from self. to local to
@@ -403,7 +405,26 @@ class VariableLoad:
             delta = 0     
         
         return delta   
+
+    def fef(self):
+        L = self.L
+        E = self.E
+        I = self.I
+        G = self.G
+        kA = self.kA
+
+        fem = timoforms.fixedendmomentsTimoshenko(self.thetax(0), self.thetax(L), L, E, I, G, kA, [1,1])
         
+        ML = fem[0][0]
+        MR = fem[1][0]
+        
+        mo = timoforms.PointMoment(ML,0,L,E,I,G,kA)
+        ml = timoforms.PointMoment(MR,L,L,E,I,G,kA)
+        
+        RL = self.RL + mo.rl + ml.rl
+        RR = self.RR + mo.rr + ml.rr
+        
+        return [RL,ML,RR,MR]
 
 
 
@@ -422,6 +443,8 @@ kA = 1.34 * 1/math.pow(12,2)
 G = E /(2+(2*0.3))
 
 load = VariableLoad(w1, w2, a, b, L, E, I, G, kA)
+
+fef = load.fef()
 
 res0 = [load.vx(0),load.mx(0),load.thetax(0),load.deltax(0)*12.0]
 res2 = [load.vx(2),load.mx(2),load.thetax(2),load.deltax(2)*12.0]
