@@ -368,7 +368,7 @@ class Master_window:
                 flexure_string = flexure_string + 'h/tw = {0}\n'.format(W[35])
                 shear_string = shear_string + 'h/tw = {0}\n'.format(W[35])
                 Iy = float(W[42])
-                flexure_string = flexure_string + 'Iy = {0}\n'.format(W[35])
+                flexure_string = flexure_string + 'Iy = {0}\n'.format(W[42])
                 
                 zy = float(W[43])
                 flexure_weak_string = flexure_weak_string + '{1}\nZy = {0}\n'.format(W[43], shape)
