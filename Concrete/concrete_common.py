@@ -113,13 +113,13 @@ def stress_strain_steel(fy, yield_strain, Es, strain):
     if Es == 0:
         if abs(strain) >= yield_strain:
             return (strain/abs(strain)) * fy
-    
+
         else:
-            return (strain*fy)/yield_strain       
+            return (strain*fy)/yield_strain
     else:
         if abs(strain)*Es >= yield_strain*Es:
             return (strain/abs(strain)) * fy
-    
+
         else:
             return (strain*Es)
 
@@ -155,53 +155,41 @@ def strain_at_depth(eu,neutral_axis_depth,depth_of_interest):
 
     return e
 
-def plastic_center(bars_x=[1], bars_y=[1], fy=60000, As=[0.31], fc=3000, eu=0.003, k=0.85, conc_area=1, conc_centroid=[0,0]):
+def plastic_center(bars_x=[1], bars_y=[1], fy=60000, As=[0.31], fc_input=3000, eu=0.003, k=0.85, conc_area=1, conc_centroid=[0,0]):
     '''
-    given the ulitmate strain, f'c (28-day) strength and k for concrete
+    given the ulitmate strain, f'c (28-day) strength
     return a the plastic centroid for the three stress-strain equations
     of the concrete
 
-    accounting for the bar area subtracting from the concrete area by (fy/fc@eu - 1)
+    accounting for the bar area subtracting from the concrete area by (fy/fc - 1)
     similar approach to transformed sections using n = Es/Ec
     '''
 
-    fc_collins = stress_strain_collins_et_all(fc,eu,eu)
-    fc_desayi = stress_strain_desayi_krishnan(fc,eu,k,eu)
-    fc_whitney = stress_strain_whitney(fc,eu,eu)
 
-    fc = [fc_collins, fc_desayi, fc_whitney[0]]
+    fc = fc_input
 
-    cc = [i*conc_area for i in fc]
-    cc_mx = [i*conc_centroid[1] for i in cc]
-    cc_my = [i*conc_centroid[0] for i in cc]
+    cc = fc*conc_area
+    cc_mx = cc*conc_centroid[1]
+    cc_my = cc*conc_centroid[0]
 
-    C = []
-    C_mx = []
-    C_my = []
-    cb = []
-    cb_mx = []
-    cb_my = []
-    pc = []
+    cb = [i * (fy-fc) for i in As]
 
-    count = 0
-    for c in fc:
-        cb.append([i * (fy/c  - 1) for i in As])
+    C = cc + sum(cb)
 
-        C.append(cc[count] + sum(cb[-1]))
+    cb_mx = [(cb[i] * bars_y[i]) for i in range(len(bars_x))]
+    cb_my = [(cb[i] * bars_x[i]) for i in range(len(bars_x))]
 
-        cb_mx.append([(cb[-1][i] * bars_y[i]) for i in range(len(bars_x))])
-        cb_my.append([(cb[-1][i] * bars_x[i]) for i in range(len(bars_x))])
+    C_mx = cc_mx+sum(cb_mx)
+    C_my = cc_my+sum(cb_my)
 
-        C_mx.append(cc_mx[count]+sum(cb_mx[-1]))
-        C_my.append(cc_my[count]+sum(cb_my[-1]))
+    yp = C_mx/C
+    xp = C_my/C
 
-        yp = C_mx[-1]/C[-1]
-        xp = C_my[-1]/C[-1]
+    pc = [xp,yp]
 
-        pc.append([xp,yp])
-
-        count +=1
-
+    print cb_mx
+    print cb_my
+    print pc
     return pc,[fc,cc,cc_mx,cc_my,cb,cb_mx,cb_my,C,C_mx,C_my]
 
 
@@ -210,8 +198,8 @@ def plastic_center(bars_x=[1], bars_y=[1], fy=60000, As=[0.31], fc=3000, eu=0.00
 # assume a 12"x24" section with the na located at 16"
 # above the base. The section if oriented with the 24"
 # vertical.
-b=12
-h=24
+b=20
+h=30
 #na = 12
 ##lets create a list of y dstances from the top lets say 1 per 0.25"
 #count = int(24/0.25)+1
@@ -240,11 +228,11 @@ eu = 0.003
 es = 0.002
 k = 0.85
 # lets add a non-symetric steel layout
-# with (3)#5 bars in the bottom and (2)#5 bars at the top
+# with (2)#8 bars in the bottom and (3)#8 bars at the top
 # cover = 2" to each corner bar
-xb = [0+2.5,b-2.5,0+2.5,b-2.5]
-yb = [2.5,2.5,h-2.5,h-2.5]
-ab = [0.79]*len(xb)
+xb = [4,16,16,10,4]
+yb = [4,4,26,26,26]
+ab = [1.27]*len(xb)
 
 acm = (b*h)-sum(ab)
 P_max = 0.8*0.65*((0.85*fc*acm)+(fy*sum(ab)))/1000.0
@@ -257,9 +245,10 @@ yc = h/2.0
 
 pc, pc_backup = plastic_center(xb,yb,fy,ab,fc,eu,k,b*h,[b/2.0,h/2.0])
 
-yc_collins = pc[0][1]
-yc_desayi = pc[1][1]
-yc_whitney = pc[2][1]
+yc_collins = pc[1]
+yc_desayi = pc[1]
+yc_whitney = pc[1]
+
 
 # Define some empty lists to dump data into for plotting
 P_collins_plot = []
@@ -273,12 +262,10 @@ aci_reduction = []
 e_checks = []
 
 #list neutral axis depths
-count = int((h+6)/0.288)
-nas = [(h+6)-(i*0.288) for i in range(0,count-1)]
+step = h/100.0
+nas = [h-(i*step) for i in range(0,99)]
 
-nas.extend([1e-10])
-
-#nas = [24]
+#nas = [28.235]
 
 for na in nas:
     # determine the bar strains and stresses
@@ -388,7 +375,7 @@ for na in nas:
     p_collinsy = h-p_collinsy
     p_desayiy = h-p_desayiy
 
-    collins_momentarm = p_collinsy -  yc
+    collins_momentarm = p_collinsy - yc
     desayi_momentarm = p_desayiy - yc
 
     # because the shape is square the surface slice for both Collins and Desayi
@@ -415,12 +402,12 @@ for na in nas:
     #Sum Forces
     P_bars = sum(bforce)
     p_bars_neg = [sum(bforce_collins),sum(bforce_desayi),sum(bforce_whitney)]
-    
+
     Axial_collins = P_bars + C_collins - p_bars_neg[0]
     Axial_desayi = P_bars + C_desayi - p_bars_neg[1]
-    
+
     Axial_whitney = P_bars + C_whitney - p_bars_neg[2]
-    
+
     # Concrete Moments
     M_collins = C_collins*collins_momentarm
     M_desayi = C_desayi*desayi_momentarm
@@ -435,6 +422,12 @@ for na in nas:
     Mx_collins = m_bars_collins + M_collins - m_bars_neg[0]
     Mx_desayi = m_bars_desayi + M_desayi - m_bars_neg[1]
     Mx_whitney = m_bars_whitney + M_whitney - m_bars_neg[2]
+
+    # Moments from Eccentricy of Axial applied at geometric center to
+    # plastic center
+    Mx_collins += Axial_collins * (yc - yc_collins)
+    Mx_desayi += Axial_desayi * (yc - yc_desayi)
+    Mx_whitney += Axial_whitney * (yc - yc_whitney)
 
     # Determine the centroid of the eccentricity of the axial load
     e_collins = Mx_collins / Axial_collins
@@ -514,5 +507,3 @@ plt.tight_layout()
 
 plt.show()
 #----#
-
-print stress_strain_steel(60000,0.002,Es,0.001)
