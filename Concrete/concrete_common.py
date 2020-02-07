@@ -28,6 +28,32 @@ from __future__ import division
 import math
 import matplotlib.pyplot as plt
 
+def stress_strain_pca(fprimec, ultimate_strain, concrete_modulus, strain):
+    '''
+    PCA Stress-Strain Relationship
+    formula presented in the PCA notes to ACI 318-05
+    '''
+    
+    e = strain
+    Ec = concrete_modulus
+    eu = ultimate_strain
+    fc = fprimec
+    
+    eo = (2*0.85*fc)/(Ec)
+    
+    if e <= 0:
+        stress = 0
+    
+    elif 0<=e and e<=eo:
+        stress = 0.85*fc*((2*(e/eo))-((e/eo)*(e/eo)))
+    
+    elif e<=eu:
+        stress = 0.85*fc
+    else:
+        stress = 0
+    
+    return stress
+    
 def stress_strain_desayi_krishnan(fprimec, ultimate_strain, k, strain):
     '''
     method for a parabolic stress-strain relationship for concrete in compression
@@ -41,7 +67,10 @@ def stress_strain_desayi_krishnan(fprimec, ultimate_strain, k, strain):
     '''
     if strain <=0:
         return 0
-
+    
+    elif strain > ultimate_strain:
+        return 0
+        
     else:
         fo = fprimec
 
@@ -59,7 +88,7 @@ def stress_strain_desayi_krishnan(fprimec, ultimate_strain, k, strain):
 
         f = (E*strain) / (1+math.pow(strain/eo,2))
 
-        return f
+        return f*0.85
 
 def stress_strain_collins_et_all(fprimec, ultimate_strain, strain):
     '''
@@ -69,7 +98,9 @@ def stress_strain_collins_et_all(fprimec, ultimate_strain, strain):
     '''
     if strain <=0:
         return 0
-
+    elif strain > ultimate_strain:
+        return 0
+        
     else:
         k = 0.67 + (fprimec / 9000.0) # for PSI units
         n = 0.8 + (fprimec / 2500.0) # for PSI units
@@ -84,7 +115,7 @@ def stress_strain_collins_et_all(fprimec, ultimate_strain, strain):
         else:
             f = ((e) * (n / (n-1+math.pow(e,n*k)))) * fprimec
 
-        return f
+        return f*0.85
 
 def stress_strain_whitney(fprimec, ultimate_strain, strain):
     '''
@@ -101,9 +132,12 @@ def stress_strain_whitney(fprimec, ultimate_strain, strain):
     if strain <= (ultimate_strain - (ultimate_strain*beta1)):
         return [0, beta1]
 
-    else:
+    elif strain <= ultimate_strain:
         return [0.85*fprimec, beta1]
-
+        
+    else:
+        return [0, beta1]
+        
 def stress_strain_steel(fy, yield_strain, Es, strain):
     '''
     Linear stress strain definition that will return
@@ -113,13 +147,13 @@ def stress_strain_steel(fy, yield_strain, Es, strain):
     if Es == 0:
         if abs(strain) >= yield_strain:
             return (strain/abs(strain)) * fy
-
+    
         else:
-            return (strain*fy)/yield_strain
+            return (strain*fy)/yield_strain       
     else:
-        if abs(strain)*Es >= yield_strain*Es:
+        if abs(strain)*Es >= fy:
             return (strain/abs(strain)) * fy
-
+    
         else:
             return (strain*Es)
 
@@ -155,41 +189,54 @@ def strain_at_depth(eu,neutral_axis_depth,depth_of_interest):
 
     return e
 
-def plastic_center(bars_x=[1], bars_y=[1], fy=60000, As=[0.31], fc_input=3000, eu=0.003, k=0.85, conc_area=1, conc_centroid=[0,0]):
+def plastic_center(bars_x=[1], bars_y=[1], fy=60000, As=[0.31], fc=3000, eu=0.003, k=0.85, conc_area=1, conc_centroid=[0,0]):
     '''
-    given the ulitmate strain, f'c (28-day) strength
+    given the ulitmate strain, f'c (28-day) strength and k for concrete
     return a the plastic centroid for the three stress-strain equations
     of the concrete
 
-    accounting for the bar area subtracting from the concrete area by (fy/fc - 1)
+    accounting for the bar area subtracting from the concrete area by (fy/fc@eu - 1)
     similar approach to transformed sections using n = Es/Ec
     '''
 
+    fc_collins = stress_strain_collins_et_all(fc,eu,eu)
+    fc_desayi = stress_strain_desayi_krishnan(fc,eu,k,eu)
+    fc_whitney = stress_strain_whitney(fc,eu,eu)
 
-    fc = fc_input
+    fc = [fc_collins, fc_desayi, fc_whitney[0]]
 
-    cc = fc*conc_area
-    cc_mx = cc*conc_centroid[1]
-    cc_my = cc*conc_centroid[0]
+    cc = [i*conc_area for i in fc]
+    cc_mx = [i*conc_centroid[1] for i in cc]
+    cc_my = [i*conc_centroid[0] for i in cc]
 
-    cb = [i * (fy-fc) for i in As]
+    C = []
+    C_mx = []
+    C_my = []
+    cb = []
+    cb_mx = []
+    cb_my = []
+    pc = []
 
-    C = cc + sum(cb)
+    count = 0
+    for c in fc:
+        cb.append([i * (fy-c) for i in As])
 
-    cb_mx = [(cb[i] * bars_y[i]) for i in range(len(bars_x))]
-    cb_my = [(cb[i] * bars_x[i]) for i in range(len(bars_x))]
+        C.append(cc[count] + sum(cb[-1]))
 
-    C_mx = cc_mx+sum(cb_mx)
-    C_my = cc_my+sum(cb_my)
+        cb_mx.append([(cb[-1][i] * bars_y[i]) for i in range(len(bars_x))])
+        cb_my.append([(cb[-1][i] * bars_x[i]) for i in range(len(bars_x))])
 
-    yp = C_mx/C
-    xp = C_my/C
 
-    pc = [xp,yp]
+        C_mx.append(cc_mx[count]+sum(cb_mx[-1]))
+        C_my.append(cc_my[count]+sum(cb_my[-1]))
 
-    print cb_mx
-    print cb_my
-    print pc
+        yp = C_mx[-1]/C[-1]
+        xp = C_my[-1]/C[-1]
+
+        pc.append([xp,yp])
+
+        count +=1
+    
     return pc,[fc,cc,cc_mx,cc_my,cb,cb_mx,cb_my,C,C_mx,C_my]
 
 
@@ -222,8 +269,9 @@ h=30
 # notice units here axial force will be in pounds
 # and moment will be in in-lbs
 fc = 5000
+Ec = 57000*math.sqrt(fc)
 fy = 60000
-Es = 0
+Es = 29000000
 eu = 0.003
 es = 0.002
 k = 0.85
@@ -245,9 +293,15 @@ yc = h/2.0
 
 pc, pc_backup = plastic_center(xb,yb,fy,ab,fc,eu,k,b*h,[b/2.0,h/2.0])
 
-yc_collins = pc[1]
-yc_desayi = pc[1]
-yc_whitney = pc[1]
+#yc_collins = pc[0][1]
+#yc_desayi = pc[0][1]
+#yc_whitney = pc[0][1]
+#yc_pca = pc[0][1]
+
+yc_collins = yc
+yc_desayi = yc
+yc_whitney = yc
+yc_pca = yc
 
 
 # Define some empty lists to dump data into for plotting
@@ -257,15 +311,19 @@ P_desayi_plot = []
 M_desayi_plot = []
 P_whitney_plot = []
 M_whitney_plot = []
+P_pca_plot = []
+M_pca_plot = []
 aci_reduction = []
 
 e_checks = []
 
 #list neutral axis depths
-step = h/100.0
-nas = [h-(i*step) for i in range(0,99)]
+step = (h+400)/500.0
+nas = [(h+400)-(i*step) for i in range(0,499)]
 
-#nas = [28.235]
+nas.append(0.000001)
+print([nas[0],nas[-1]])
+#nas = [400]
 
 for na in nas:
     # determine the bar strains and stresses
@@ -274,10 +332,10 @@ for na in nas:
     # also remember we need the bar depth
     # so we need H-y
     b_depths = [h-j for j in yb]
-    if na < h:
+    if na > 0:
         bstrains = [strain_at_depth(eu, na, j) for j in b_depths]
     else:
-        bstrains = [eu]*len(b_depths)
+        bstrains = [-0.005]*len(b_depths)
 
     bstresses = [stress_strain_steel(fy, es, Es, i) for i in bstrains]
 
@@ -285,11 +343,11 @@ for na in nas:
     if b_strain_phi > -0.002:
         aci = 0.65
 
-    elif b_strain_phi > -0.005:
-        aci = 0.65+((abs(b_strain_phi)-0.002)*(250/3.0))
+    elif b_strain_phi <= -0.005:
+        aci = 0.9
 
     else:
-        aci = 0.9
+        aci = 0.65-((b_strain_phi+0.002)*(250/3.0))
 
     aci_reduction.append(aci)
 
@@ -302,6 +360,8 @@ for na in nas:
     bforce_collins = [(q*stress_strain_collins_et_all(fc,eu,j)) if i>0 else 0 for i,j,q in zip(bforce,bstrains,ab)]
     bforce_desayi = [(q*stress_strain_desayi_krishnan(fc,eu,k,j)) if i>0 else 0  for i,j,q in zip(bforce,bstrains,ab)]
     bforce_whitney = [(q*stress_strain_whitney(fc,eu,j)[0]) if i>0 else 0  for i,j,q in zip(bforce,bstrains,ab)]
+    bforce_pca = [(q*stress_strain_pca(fc,eu,Ec,j)) if i>0 else 0  for i,j,q in zip(bforce,bstrains,ab)]
+
     #bforce_whitney = [0]*len(ab)
 
     # Bar Momments - using right hand rule tensile forces below
@@ -314,14 +374,17 @@ for na in nas:
     bmoment_desayi = [i*j for i,j in zip(bforce,bmomentarm_desayi)]
     bmomentarm_whitney = [j-yc_whitney for j in yb]
     bmoment_whitney = [i*j for i,j in zip(bforce,bmomentarm_whitney)]
+    bmomentarm_pca = [j-yc_pca for j in yb]
+    bmoment_pca = [i*j for i,j in zip(bforce,bmomentarm_pca)]
 
     bnegmoment_collins = [i*j for i,j in zip(bforce_collins,bmomentarm_collins)]
     bnegmoment_desayi = [i*j for i,j in zip(bforce_desayi,bmomentarm_desayi)]
     bnegmoment_whitney = [i*j for i,j in zip(bforce_whitney,bmomentarm_whitney)]
+    bnegmoment_pca = [i*j for i,j in zip(bforce_pca,bmomentarm_pca)]
 
     # Concrete force
-    # lets get a list of 25 points between the NA
-    # and the top of the beam
+    # lets get a list of 200 points between the NA
+    # and the top of the shape
     iter_points = 200
     if 0 < na < h:
         yce = [0+(na/iter_points*i) for i in range(0,iter_points+1)]
@@ -344,6 +407,7 @@ for na in nas:
     # Get the stress at each strain for the three stress-strain functions
     cs_collins = [stress_strain_collins_et_all(fc,eu,i) for i in ce]
     cs_desayi = [stress_strain_desayi_krishnan(fc,eu,k,i) for i in ce]
+    cs_pca = [stress_strain_pca(fc,eu,Ec,i) for i in ce]
 
     # to be able to easily the area and center of the 2 parabolic distributions
     # lets close of there shape
@@ -352,6 +416,7 @@ for na in nas:
     yce.append(yce[0])
     cs_collins.extend([0,0,cs_collins[0]])
     cs_desayi.extend([0,0,cs_desayi[0]])
+    cs_pca.extend([0,0,cs_pca[0]])
 
     #plt.close('all')
     #plt.plot(yce,cs_collins)
@@ -369,29 +434,39 @@ for na in nas:
         p_desayiy = 0
     else:
         p_desayiy = sum([(yce[i]+yce[i+1])*((yce[i]*cs_desayi[i+1])-(yce[i+1]*cs_desayi[i])) for i in range(len(yce[:-1]))])/(6*p_desayi)
+    
+    p_pca = sum([(yce[i]*cs_pca[i+1])-(yce[i+1]*cs_pca[i]) for i in range(len(yce[:-1]))])/2.0
+    if p_pca == 0:
+        p_pcay = 0
+    else:
+        p_pcay = sum([(yce[i]+yce[i+1])*((yce[i]*cs_pca[i+1])-(yce[i+1]*cs_pca[i])) for i in range(len(yce[:-1]))])/(6*p_pca)
 
     # note the y values are from the top of the beam down
     # convert them back to there normal coordinate
     p_collinsy = h-p_collinsy
     p_desayiy = h-p_desayiy
+    p_pcay = h-p_pcay
 
     collins_momentarm = p_collinsy - yc
     desayi_momentarm = p_desayiy - yc
+    pca_momentarm = p_pcay - yc
 
     # because the shape is square the surface slice for both Collins and Desayi
     # describe the volume for the full width so the total force is the area of the
     # surface slice times the width of the colmn **note units used so far
     C_collins = p_collins*b
     C_desayi = p_desayi*b
+    C_pca = p_pca*b
+
 
     # since the whitney block is rectangular all we need is beta1 value
     # and the peak stress
     cs_whitney = stress_strain_whitney(fc,eu,eu)
 
     # the whitney block applies 0.85F'c over beta1*c
-    if 0 < cs_whitney[1]*na < h:
+    if cs_whitney[1]*na < h:
         C_whitney = cs_whitney[0]*cs_whitney[1]*na*b
-        whitneyy = cs_whitney[1]*(na) / 2
+        whitneyy = cs_whitney[1]*(na) / 2.0
     else:
         C_whitney = cs_whitney[0]*h*b
         whitneyy = (h) / 2
@@ -401,40 +476,47 @@ for na in nas:
 
     #Sum Forces
     P_bars = sum(bforce)
-    p_bars_neg = [sum(bforce_collins),sum(bforce_desayi),sum(bforce_whitney)]
-
+    p_bars_neg = [sum(bforce_collins),sum(bforce_desayi),sum(bforce_whitney),sum(bforce_pca)]
+    
     Axial_collins = P_bars + C_collins - p_bars_neg[0]
     Axial_desayi = P_bars + C_desayi - p_bars_neg[1]
-
+    
     Axial_whitney = P_bars + C_whitney - p_bars_neg[2]
-
+    
+    Axial_pca = P_bars + C_pca - p_bars_neg[3]
+    
     # Concrete Moments
     M_collins = C_collins*collins_momentarm
     M_desayi = C_desayi*desayi_momentarm
     M_whitney = C_whitney*whitney_momentarm
+    M_pca = C_pca*pca_momentarm
 
     m_bars_collins = sum(bmoment_collins)
     m_bars_desayi = sum(bmoment_desayi)
     m_bars_whitney = sum(bmoment_whitney)
+    m_bars_pca = sum(bmoment_pca)
 
-    m_bars_neg = [sum(bnegmoment_collins), sum(bnegmoment_desayi), sum(bnegmoment_whitney)]
+    m_bars_neg = [sum(bnegmoment_collins), sum(bnegmoment_desayi), sum(bnegmoment_whitney), sum(bnegmoment_pca)]
 
     Mx_collins = m_bars_collins + M_collins - m_bars_neg[0]
     Mx_desayi = m_bars_desayi + M_desayi - m_bars_neg[1]
     Mx_whitney = m_bars_whitney + M_whitney - m_bars_neg[2]
-
+    Mx_pca = m_bars_pca + M_pca - m_bars_neg[3]
+    
     # Moments from Eccentricy of Axial applied at geometric center to
     # plastic center
-    Mx_collins += Axial_collins * (yc - yc_collins)
-    Mx_desayi += Axial_desayi * (yc - yc_desayi)
-    Mx_whitney += Axial_whitney * (yc - yc_whitney)
-
+    Mx_collins += Axial_collins * (yc-yc_collins)
+    Mx_desayi += Axial_desayi * (yc-yc_desayi)
+    Mx_whitney += Axial_whitney * (yc-yc_whitney)
+    Mx_pca += Axial_pca *(yc-yc_pca)
+    
     # Determine the centroid of the eccentricity of the axial load
     e_collins = Mx_collins / Axial_collins
     e_desayi = Mx_desayi / Axial_desayi
     e_whitney = Mx_whitney / Axial_whitney
+    e_pca = Mx_pca / Axial_pca
 
-    e_checks.append([e_collins,e_desayi,e_whitney])
+    e_checks.append([e_collins,e_desayi,e_whitney,e_pca])
 
     P_collins_plot.append(Axial_collins/1000.0)
     M_collins_plot.append(Mx_collins/(1000*12.0))
@@ -442,23 +524,25 @@ for na in nas:
     M_desayi_plot.append(Mx_desayi/(1000*12.0))
     P_whitney_plot.append(Axial_whitney/1000)
     M_whitney_plot.append(Mx_whitney/(1000*12.0))
+    P_pca_plot.append(Axial_pca/1000)
+    M_pca_plot.append(Mx_pca/(1000*12.0))
 
 
 plt.close('all')
 
-ax5 = plt.subplot2grid((4, 2), (0, 0), rowspan=4)
-ax1 = plt.subplot2grid((4, 2), (0, 1))
-ax2 = plt.subplot2grid((4, 2), (1, 1))
-ax3 = plt.subplot2grid((4, 2), (2, 1))
-ax4 = plt.subplot2grid((4, 2), (3, 1))
+ax5 = plt.subplot2grid((2, 2), (0, 0), rowspan=2)
+ax1 = plt.subplot2grid((2, 2), (0, 1))
+ax2 = plt.subplot2grid((2, 2), (1, 1))
 ax5.plot(M_collins_plot,P_collins_plot,'r--')
 ax5.plot([i*j for i,j in zip(M_collins_plot,aci_reduction)],[i*j if i<P_max else P_max*j for i,j in zip(P_collins_plot,aci_reduction)],'r-')
 ax5.plot(M_desayi_plot,P_desayi_plot,'g--')
 ax5.plot([i*j for i,j in zip(M_desayi_plot,aci_reduction)],[i*j if i<P_max else P_max*j for i,j in zip(P_desayi_plot,aci_reduction)],'g-')
 ax5.plot(M_whitney_plot,P_whitney_plot,'b--')
 ax5.plot([i*j for i,j in zip(M_whitney_plot,aci_reduction)],[i*j if i<P_max else P_max*j for i,j in zip(P_whitney_plot,aci_reduction)],'b-')
+ax5.plot(M_pca_plot,P_pca_plot,'y--')
+ax5.plot([i*j for i,j in zip(M_pca_plot,aci_reduction)],[i*j if i<P_max else P_max*j for i,j in zip(P_pca_plot,aci_reduction)],'y-')
 ax5.plot([0,max(M_desayi_plot)],[0,0],'k-')
-string = 'Concrete P-Mx - 12x24 - fc = 5000 - (2)#8 T&B'
+string = 'P-M - 20x30 - fc = 5000 - (5)#10'
 ax5.set_title(string)
 ax5.minorticks_on()
 ax5.grid(b=True, which='major', color='k', linestyle='-', alpha=0.5)
@@ -475,9 +559,14 @@ ax5.grid(b=True, which='minor', color='k', linestyle='-', alpha=0.2)
 x = [-0.004+(i*0.00005) for i in range(0,161)]
 y = [stress_strain_steel(60000, 0.002, Es, i) for i in x]
 #
-y2 = [stress_strain_collins_et_all(4500,0.003,i) for i in x]
-y3 = [stress_strain_desayi_krishnan(4500,0.003,0.85,i) for i in x]
-y4 = [stress_strain_whitney(4500,0.003,i)[0] for i in x]
+y2 = [stress_strain_collins_et_all(fc,0.003,i) for i in x]
+y3 = [stress_strain_desayi_krishnan(fc,0.003,0.85,i) for i in x]
+y4 = [stress_strain_whitney(fc,0.003,i)[0] for i in x]
+y5 = [stress_strain_pca(fc,0.003,Ec,i) for i in x]
+y6 = [i/0.85 for i in y2]
+y7 = [i/0.85 for i in y3]
+y8 = [i/0.85 for i in y5]
+y9 = [i/0.85 for i in y4]
 #
 #plt.close('all')
 #f, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1)
@@ -486,24 +575,21 @@ ax1.plot(x, [0]*len(x),'k-')
 ax1.set_title('Steel Stress-Strain')
 ax1.set_ylim([-70000,70000])
 ax1.set_xlim([-0.005,0.005])
-ax2.plot(x, y2, 'r-')
+ax2.plot(x, y6, 'r--')
+ax2.plot(x, y2, 'r-', label='Concrete Stress-Strain (Collins)')
+ax2.plot(x, y7, 'g--')
+ax2.plot(x, y3, 'g-', label='Concrete Stress-Strain (Desayi & Krishnan)')
+ax2.plot(x, y9, 'b--')
+ax2.plot(x, y4, 'b-', label='Concrete Stress-Strain (Whitney ACI318)')
+ax2.plot(x, y8, 'y--')
+ax2.plot(x, y5, 'y-', label='Concrete Stress-Strain (PCA Notes on ACI318-05)')
 ax2.plot(x, [0]*len(x),'k-')
-ax2.set_title('Concrete Stress-Strain (Collins)')
-ax2.set_ylim([-1000,5000])
-ax2.set_xlim([-0.005,0.005])
-ax3.plot(x, y3, 'g-')
-ax3.plot(x, [0]*len(x),'k-')
-ax3.set_title('Concrete Stress-Strain (Desayi & Krishnan)')
-ax3.set_ylim([-1000,5000])
-ax3.set_xlim([-0.005,0.005])
-ax4.plot(x, y4, 'b-')
-ax4.plot(x, [0]*len(x),'k-')
-ax4.set_title('Concrete Stress-Strain (Whitney ACI318)')
-ax4.set_ylim([-1000,5000])
-ax4.set_xlim([-0.005,0.005])
+ax2.set_title('Concrete Stress-Strain Curves - Dashed Lines are curve/0.85')
+ax2.set_ylim([-1000,(fc+1000)])
+ax2.set_xlim([-0.001,0.005])
+#ax2.legend()
 
-
-plt.tight_layout()
+#plt.tight_layout()
 
 plt.show()
 #----#
