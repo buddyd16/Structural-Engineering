@@ -13,7 +13,7 @@ Currently and alpha level program. Load combinations have not been implemented i
 Backend solver utilizes moment distribution. By default only the columns down provide vertical suppot and the solver performs a 2-pass moment distribution where after pass 1 the beam reactions are applied to the columns down and the columns are shortened by PL/AE pass 2 determines the fixed end moments created by the column shortening and then performs the distrubtion of those moments.
 
 In action:
-![Frame_2D.gif](images/frame_2d_windows.gif)
+[Frame_2D.gif](images/frame_2d_windows.gif)
 
 ## Strap Beam - strap_beam_gui.py
 Tkinter GUI based Python Program
@@ -22,7 +22,7 @@ requires the analysis folder and contained py files and the concrete folder and 
 Currently an alpha level program there are several validation checks not being performed such as number of bars required in the strap actually fitting in the strap, etc.  No handling of foundation uplift base assumption of the program is positive bearing.
 
 In action:
-![Strap Beam gif](images/strap_gif.gif)
+[Strap Beam gif](images/strap_gif.gif)
 
 
 ## Concrete T beam - depends on concrete_beam_classes in the same directory
@@ -43,7 +43,7 @@ Can be used to verify frame or fixed beam FEM results by applying point end mome
 
 
 In action:
-![Simple Beam gif](images/simple_gif.gif)
+[Simple Beam gif](images/simple_gif.gif)
 
 ## Three Moment Method
 ### Reworking to use the pin-pin class file and directly compute slope and deflection rather than rely on approx. integration. Also adding in point moments as a load type.
