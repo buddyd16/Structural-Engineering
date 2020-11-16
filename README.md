@@ -26,11 +26,13 @@ In action:
 
 
 ## Concrete T beam - depends on concrete_beam_classes in the same directory
+** L and Asymetric T's give the wrong solution, program does not rotate the neutral axis so the reported capacity has a hidden My component **
 Tkinter GUI based Python program.
 Provides various code defined capacities based on strain compatibility. Currently based on ACI 318-08. Calculates elevation
 of various steel reinf. layers based on clearance and spacing requirements per ACI 318-08.
 
 ## Concrete T Beam Any Steel - depends on concrete_beam_classes in the same directory
+** L and Asymetric T's give the wrong solution, program does not rotate the neutral axis so the reported capacity has a hidden My component **
 Tkinter GUI based Python program
 Provides various code defined capacities based on strain compatibility. Allows for user assigned elevations of steel reinforcement
 layers. Does not check or provide for min spacing of tension layer bars nor maximum amount of bars that fit in a layer.
