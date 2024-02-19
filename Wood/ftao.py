@@ -79,6 +79,7 @@ if __name__ == "__main__":
     openings = [6.0, 2]  # List of Opening Widths
 
     # Inputs for Deflection
+    Cd = 4.0
     E_psi = 1600000  # Elastic Modulus of the end posts
     A_sqin = 16.5  # Area of the end posts
     Gt_lbpin = 83500  # Shear Stiffness through the depth of the sheathing
@@ -479,10 +480,14 @@ if __name__ == "__main__":
             print(f"delta - hold down term = {delta.get('delta_holddown'):.3f} in")
             print(f"delta{i+1} = {delta.get('delta'):.3f} in")
 
+        percent_drift = (Cd*sum(pier_deflections_four_term)/len(pier_deflections_four_term))/(Hwall_ft*12)
+        delta_h_over = 1/percent_drift
         print("-" * tick_count)
         print(
             f"Average of 4-Term Deflections = {sum(pier_deflections_four_term)/len(pier_deflections_four_term):.3f} in"
         )
+        print(f"% Drift  = (Cd * Delta) / (Hwall * 12): {percent_drift:.4f} %")
+        print(f"Drift Ratio = (Hwall * 12) / (Cd * Delta)  = H/{delta_h_over:.1f}")
         print("*" * tick_count)
 
         if not errors:
@@ -506,6 +511,8 @@ if __name__ == "__main__":
             print(
                 f"***  Average of 4-Term Deflections = {sum(pier_deflections_four_term)/len(pier_deflections_four_term):.3f} in"
             )
+            print(f"***  % Drift  = (Cd * Delta) / (Hwall * 12): {percent_drift:.4f} %")
+            print(f"***  Drift Ratio = (Hwall * 12) / (Cd * Delta)  = H/{delta_h_over:.1f}")
             print("***")
             print("*" * tick_count)
 
@@ -542,11 +549,11 @@ if __name__ == "__main__":
                 svg_string.append(f'<rect width="{j}" height="{Hwall_ft}" x="{px}" y="0" fill="yellow" stroke="black" stroke-width="{3/64}"/>')
                 svg_string.append(f'<line x1="{px}" y1="{hb_ft}" x2="{j+px}" y2="{hb_ft}" stroke="black" stroke-width="{3/64}" stroke-dasharray="0.125,0.25" />')
                 svg_string.append(f'<line x1="{px}" y1="{hb_ft+ho_ft}" x2="{j+px}" y2="{hb_ft+ho_ft}" stroke="black" stroke-width="{3/64}" stroke-dasharray="0.125,0.25" />')
-                svg_string.append(f'<text x="{text_x}" y="{-1*text_y}" fill="black" dominant-baseline="central" text-anchor="middle" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> {pier_shears_plf[i]:.3f} plf </text>')
+                svg_string.append(f'<text x="{text_x}" y="{-1*text_y}" fill="black" dominant-baseline="central" text-anchor="middle" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> {pier_shears_plf[i]:.1f} plf </text>')
                 text_y = hb_ft/2
-                svg_string.append(f'<text x="{text_x}" y="{-1*text_y}" fill="black" dominant-baseline="central" text-anchor="middle" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> {corner_unit_shears_plf[i]:.3f} plf </text>')
+                svg_string.append(f'<text x="{text_x}" y="{-1*text_y}" fill="black" dominant-baseline="central" text-anchor="middle" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> {corner_unit_shears_plf[i]:.1f} plf </text>')
                 text_y = hb_ft + ho_ft + (ha_ft/2)
-                svg_string.append(f'<text x="{text_x}" y="{-1*text_y}" fill="black" dominant-baseline="central" text-anchor="middle" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> {corner_unit_shears_plf[i]:.3f} plf </text>')
+                svg_string.append(f'<text x="{text_x}" y="{-1*text_y}" fill="black" dominant-baseline="central" text-anchor="middle" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> {corner_unit_shears_plf[i]:.1f} plf </text>')
             # Openings
             for i,j in enumerate(openings):
 
@@ -559,24 +566,24 @@ if __name__ == "__main__":
                 
                 text_x = ox + (j/2)
                 text_y = hb_ft/2
-                svg_string.append(f'<text x="{text_x}" y="{-1*text_y}" fill="black" dominant-baseline="central" text-anchor="middle" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> {opening_shears_plf[i]:.3f} plf </text>')
+                svg_string.append(f'<text x="{text_x}" y="{-1*text_y}" fill="black" dominant-baseline="central" text-anchor="middle" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> {opening_shears_plf[i]:.1f} plf </text>')
                 text_y = hb_ft + ho_ft + (ha_ft/2)
-                svg_string.append(f'<text x="{text_x}" y="{-1*text_y}" fill="black" dominant-baseline="central" text-anchor="middle" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> {opening_shears_plf[i]:.3f} plf </text>')
+                svg_string.append(f'<text x="{text_x}" y="{-1*text_y}" fill="black" dominant-baseline="central" text-anchor="middle" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> {opening_shears_plf[i]:.1f} plf </text>')
 
                 force_left_text = corner_forces_lbs[i][0]
                 force_right_text = corner_forces_lbs[i][1]
-                text_x = ox
+                text_x = ox - 0.125
                 text_y = hb_ft + (3/16)
-                svg_string.append(f'<text x="{text_x}" y="{-1*text_y}" fill="blue" dominant-baseline="central" text-anchor="middle" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> {force_left_text:.3f} lbs </text>')
-                text_x = ox
+                svg_string.append(f'<text x="{text_x}" y="{-1*text_y}" fill="blue" dominant-baseline="central" text-anchor="end" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> {force_left_text:.1f} lbs </text>')
+                text_x = ox - 0.125
                 text_y = hb_ft + ho_ft - (3/16)
-                svg_string.append(f'<text x="{text_x}" y="{-1*text_y}" fill="blue" dominant-baseline="central" text-anchor="middle" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> {force_left_text:.3f} lbs </text>')
-                text_x = ox + j
+                svg_string.append(f'<text x="{text_x}" y="{-1*text_y}" fill="blue" dominant-baseline="central" text-anchor="end" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> {force_left_text:.1f} lbs </text>')
+                text_x = ox + j + 0.125
                 text_y = hb_ft + (3/16)
-                svg_string.append(f'<text x="{text_x}" y="{-1*text_y}" fill="blue" dominant-baseline="central" text-anchor="middle" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> {force_right_text:.3f} lbs </text>')
-                text_x = ox + j
+                svg_string.append(f'<text x="{text_x}" y="{-1*text_y}" fill="blue" dominant-baseline="central" text-anchor="start" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> {force_right_text:.1f} lbs </text>')
+                text_x = ox + j + 0.125
                 text_y = hb_ft + ho_ft - (3/16)
-                svg_string.append(f'<text x="{text_x}" y="{-1*text_y}" fill="blue" dominant-baseline="central" text-anchor="middle" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> {force_right_text:.3f} lbs </text>')
+                svg_string.append(f'<text x="{text_x}" y="{-1*text_y}" fill="blue" dominant-baseline="central" text-anchor="start" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> {force_right_text:.1f} lbs </text>')
             
             svg_string.append("</g>")
             svg_string.append("</svg>")
