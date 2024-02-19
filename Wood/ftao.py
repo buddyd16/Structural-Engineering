@@ -20,11 +20,11 @@ def wsp_nail_slip_en(nail, vn, moisture_content, structural1=True):
             en = math.pow(vn / 769, 3.276)
     else:
         en = 10
-    
+
     if not structural1:
         # SDPWS 2021 Table C4.2.3D - Footnote 1
         # The slip shall be increased by 20 percent when plywood or OSB is not Structural I.
-        en = 1.20*en
+        en = 1.20 * en
 
     return en
 
@@ -63,27 +63,34 @@ if __name__ == "__main__":
     warnings = []
     tick_count = 100
 
+    #### BEGIN INPUTS ####
+    ######################
+
     # Inputs -- For Analysis
-    V_lbs = 5000        # Shear for force analysis
-    Vdelta_lbs = 5000   # Shear for Deformation Analysis
-    Hwall_ft = 10.67    # Total height of Wall Panel
+    V_lbs = 12470.4  # Shear for force analysis
+    Vdelta_lbs = 12470.4  # Shear for Deformation Analysis
+    Hwall_ft = 10.67  # Total height of Wall Panel
+    endchord_above_lbs = 5275.24  # Chord Force from Wall Panel Above Current Panel
 
-    hb_ft = 1.33    # Sill Height of Openings
-    ho_ft = 6.90    # Height of Openings
+    hb_ft = 1.34  # Sill Height of Openings
+    ho_ft = 6.32  # Height of Openings
 
-    piers = [3.01, 2, 5.9, 4.33]    # List of Pier Widths
-    openings = [2.67, 4, 4]         # List of Opening Widths
+    piers = [4.82, 4.5, 11.68, 4.52, 4.73]  # List of Pier Widths
+    openings = [2.67, 4, 4, 2.73]  # List of Opening Widths
 
     # Inputs for Deflection
-    E_psi = 1400000             # Elastic Modulus of the end posts
-    A_sqin = 24.75              # Area of the end posts
-    Gt_lbpin = 83500            # Shear Stiffness through the depth of the sheathing
-    nail = "8d"                 # nail size as a string 6d, 8d, or 10d no others supported.
-    nail_spacing_in = 6         # nail spacing
-    moisture_content = 19       # moisture content of lumber used for nail slip calc, typically 19 or less
-    hdcapacity_lbs = 3500       # Hold Down Capacity as provided by the manufacturer
-    hddelta_in = 0.167          # Hold Down Deformation at capacity as provided by the manufacturer
-    holddown_data = [hdcapacity_lbs, hddelta_in] # Hold Down Data as List for input into deformation function
+    E_psi = 1400000  # Elastic Modulus of the end posts
+    A_sqin = 33.0  # Area of the end posts
+    Gt_lbpin = 83500  # Shear Stiffness through the depth of the sheathing
+    nail = "8d"  # nail size as a string 6d, 8d, or 10d no others supported.
+    nail_spacing_in = 6  # nail spacing
+    moisture_content = 19  # moisture content of lumber used for nail slip calc, typically 19 or less
+    hdcapacity_lbs = 9610  # Hold Down Capacity as provided by the manufacturer
+    hddelta_in = 0.137  # Hold Down Deformation at capacity as provided by the manufacturer
+    holddown_data = [hdcapacity_lbs, hddelta_in]  # Hold Down Data as List for input into deformation function
+
+    #### END INPUTS ####
+    ######################
 
     if len(piers) != len(openings) + 1:
         errors.append(
@@ -98,6 +105,7 @@ if __name__ == "__main__":
     print("-" * tick_count)
     print("Inputs and Geometry:")
     print(f"Applied Shear, V: {V_lbs:.3f} lbs")
+    print(f"Chord Force from Above, Habove = {endchord_above_lbs:.3f} lbs")
     print(f"Wall Panel Height, Hw: {Hwall_ft:.3f} ft")
     print(f"Opening Sill Height, Hb: {hb_ft:.3f} ft")
     print(f"Opening Height, Ho: {ho_ft:.3f} ft")
@@ -147,18 +155,22 @@ if __name__ == "__main__":
     # If no errors continue into the analysis otherwise print the errors
     if not errors:
         # Compute the Hold Down Force V*H/L
-        hd_force_lbs = V_lbs * Hwall_ft * (1 / Lwall_ft)
+        hd_force_lbs = ((V_lbs * Hwall_ft) + (endchord_above_lbs * Lwall_ft)) * (
+            1 / Lwall_ft
+        )
         print("-" * tick_count)
         print(f"Hold Down Force, H: {hd_force_lbs:.3f} lbs")
         # Compute vertical unit shears @ section cuts of each window
         # assumes unit shear is equivalent in the top and bottom section
         # and via statics Sum of Unit shears = hold down force
-        opening_shears_plf = [hd_force_lbs / (ha_ft + hb_ft) for i in openings]
+        opening_shears_plf = [
+            (hd_force_lbs - endchord_above_lbs) / (ha_ft + hb_ft) for i in openings
+        ]
 
         print("-" * tick_count)
         print("Opening Unit Shears:")
         for i, j in enumerate(opening_shears_plf):
-            print(f"va{i+1} = vb{i+1} = H / Ha+Hb = {j:.3f} plf")
+            print(f"va{i+1} = vb{i+1} = (H - Habove) / Ha+Hb = {j:.3f} plf")
 
         # Compute opening boundary forces = opening unit shear * opening width
         opening_boundary_force_lbs = [
@@ -231,8 +243,13 @@ if __name__ == "__main__":
         )
         print(f"check that pier shears match applied load:")
         print(f"Sum of Pier Shears = {check_pier_shear_lbs:.3f} lbs")
-        print(f"V = {V_lbs:.3f} lb")
+        print(f"V = {V_lbs:.3f} lbs")
         print(f"Validated: {math.isclose(check_pier_shear_lbs,V_lbs)}")
+
+        if not math.isclose(check_pier_shear_lbs, V_lbs):
+            errors.append(
+                f"Sum of Pier Shears, {check_pier_shear_lbs:.3f} lbs does not match applied load {V_lbs:.3f} lbs"
+            )
 
         # Resistance to Corner Forces
         resisting_forces_lbs = [j * pier_shears_plf[i] for i, j in enumerate(piers)]
@@ -281,6 +298,7 @@ if __name__ == "__main__":
             if i == 0:
                 fleft += corner_unit_shears_plf[i] * (ha_ft + hb_ft)
                 fleft += pier_shears_plf[i] * ho_ft
+                fleft += endchord_above_lbs
 
                 fright += opening_shears_plf[i] * (ha_ft + hb_ft)
                 fright -= corner_unit_shears_plf[i] * (ha_ft + hb_ft)
@@ -289,6 +307,7 @@ if __name__ == "__main__":
             elif i == len(piers) - 1:
                 fright += corner_unit_shears_plf[i] * (ha_ft + hb_ft)
                 fright += pier_shears_plf[i] * ho_ft
+                fright += endchord_above_lbs
 
                 fleft += opening_shears_plf[i - 1] * (ha_ft + hb_ft)
                 fleft -= corner_unit_shears_plf[i] * (ha_ft + hb_ft)
@@ -310,12 +329,27 @@ if __name__ == "__main__":
         for i, j in enumerate(check_vertical_shears_lbs):
             if i != 0 and j != check_vertical_shears_lbs[-1]:
                 print(f"Line {i} sums to {j:.3f} lbs = 0 lbs: {math.isclose(j+1, 1)}")
+                if not math.isclose(j + 1, 1):
+                    errors.append(
+                        f"Check of Vertical Shear Line {i} Failes, Line {i} sums to {j:.3f} lbs but should be 0 lbs"
+                    )
             else:
                 print(
                     f"Line {i} sums to {j:.3f} lbs = hold down force of {hd_force_lbs:.3f} lbs: {math.isclose(j, hd_force_lbs)}"
                 )
 
+                if not math.isclose(j, hd_force_lbs):
+                    errors.append(
+                        f"Check of Vertical Shear Line {i} Failed, Line {i} sums to {j:.3f} lbs but should be hold down force of {hd_force_lbs:.3f} lbs"
+                    )
+
         # Required shear capacity
+        unadjusted_required_unit_shear_plf = max(
+            max(opening_shears_plf),
+            max([abs(i) for i in corner_unit_shears_plf]),
+            max([i for i in pier_shears_plf]),
+        )
+
         method1_required_unit_shear_plf = max(
             max(opening_shears_plf),
             max([abs(i) for i in corner_unit_shears_plf]),
@@ -330,10 +364,13 @@ if __name__ == "__main__":
 
         print("-" * tick_count)
         print(
-            f"Required Sheathing Capacity for Method 1 Adjsustment: {method1_required_unit_shear_plf:.3f} plf"
+            f"Required Sheathing Capacity with no adjustment: {unadjusted_required_unit_shear_plf:.3f} plf"
         )
         print(
-            f"Required Sheathing Capacity for Method 2 Adjsustment: {method2_required_unit_shear_plf:.3f} plf"
+            f"Required Sheathing Capacity for Method 1 Adjustment: {method1_required_unit_shear_plf:.3f} plf"
+        )
+        print(
+            f"Required Sheathing Capacity for Method 2 Adjustment: {method2_required_unit_shear_plf:.3f} plf"
         )
 
         # Required Strap Force
@@ -348,7 +385,7 @@ if __name__ == "__main__":
 
         # 4 Term Deflection
         pier_deflections_four_term = []
-        
+
         unit_shear_delta_plf = Vdelta_lbs / Lwall_ft
 
         # Effective Height of Piers away from end is the height
@@ -357,25 +394,29 @@ if __name__ == "__main__":
         heff_ft = Hwall_ft - hb_ft
 
         # Deflection to the Right
-        for i,j in enumerate(piers):
+        for i, j in enumerate(piers):
 
             if i == 0:
                 Leff = j + opening_tributaries_ft[i][0]
-            elif i == len(piers)-1:
-                Leff = j + opening_tributaries_ft[i-1][1]
-                heff_ft += hb_ft # For load from left last pier should be full height
+            elif i == len(piers) - 1:
+                Leff = j + opening_tributaries_ft[i - 1][1]
+                heff_ft += hb_ft  # For load from left last pier should be full height
             else:
-                Leff = j + opening_tributaries_ft[i][0] + opening_tributaries_ft[i-1][1]
-            
+                Leff = (
+                    j + opening_tributaries_ft[i][0] + opening_tributaries_ft[i - 1][1]
+                )
+
             Leff = Leff / j
-            v_pier = unit_shear_delta_plf*Leff
-            v_nail = (nail_spacing_in/12)*v_pier
-            en_in = wsp_nail_slip_en(nail,v_nail, moisture_content)
-            delta = four_term_deflection(v_pier,heff_ft,E_psi,A_sqin,j,Gt_lbpin,en_in,holddown_data)
-            
+            v_pier = unit_shear_delta_plf * Leff
+            v_nail = (nail_spacing_in / 12) * v_pier
+            en_in = wsp_nail_slip_en(nail, v_nail, moisture_content)
+            delta = four_term_deflection(
+                v_pier, heff_ft, E_psi, A_sqin, j, Gt_lbpin, en_in, holddown_data
+            )
+
             pier_deflections_four_term.append(delta.get("delta"))
 
-            print("-"*tick_count)
+            print("-" * tick_count)
             print(f"Pier{i+1} Right Deflection Contribution:")
             print(f"v,pier{i+1} = {v_pier:.3f} plf")
             print(f"H,eff{i+1} = {heff_ft:.3f} ft")
@@ -394,26 +435,32 @@ if __name__ == "__main__":
         heff_ft = Hwall_ft
 
         # Deflection to the Left
-        for i,j in enumerate(piers):
+        for i, j in enumerate(piers):
 
             if i == 0:
-                Leff = j + opening_tributaries_ft[i][0] 
-            elif i == len(piers)-1:
-                Leff = j + opening_tributaries_ft[i-1][1]
+                Leff = j + opening_tributaries_ft[i][0]
+            elif i == len(piers) - 1:
+                Leff = j + opening_tributaries_ft[i - 1][1]
             else:
                 if i == 1:
-                    heff_ft -= hb_ft # reduce pier height after first pier but not again
-                Leff = j + opening_tributaries_ft[i][0] + opening_tributaries_ft[i-1][1]
-            
+                    heff_ft -= (
+                        hb_ft  # reduce pier height after first pier but not again
+                    )
+                Leff = (
+                    j + opening_tributaries_ft[i][0] + opening_tributaries_ft[i - 1][1]
+                )
+
             Leff = Leff / j
-            v_pier = unit_shear_delta_plf*Leff
-            v_nail = (nail_spacing_in/12)*v_pier
-            en_in = wsp_nail_slip_en(nail,v_nail, moisture_content)
-            delta = four_term_deflection(v_pier,heff_ft,E_psi,A_sqin,j,Gt_lbpin,en_in,holddown_data)
-            
+            v_pier = unit_shear_delta_plf * Leff
+            v_nail = (nail_spacing_in / 12) * v_pier
+            en_in = wsp_nail_slip_en(nail, v_nail, moisture_content)
+            delta = four_term_deflection(
+                v_pier, heff_ft, E_psi, A_sqin, j, Gt_lbpin, en_in, holddown_data
+            )
+
             pier_deflections_four_term.append(delta.get("delta"))
 
-            print("-"*tick_count)
+            print("-" * tick_count)
             print(f"Pier{i+1} Left Deflection Contribution:")
             print(f"v,pier{i+1} = {v_pier:.3f} plf")
             print(f"H,eff{i+1} = {heff_ft:.3f} ft")
@@ -425,24 +472,40 @@ if __name__ == "__main__":
             print(f"delta - hold down term = {delta.get('delta_holddown'):.3f} in")
             print(f"delta{i+1} = {delta.get('delta'):.3f} in")
 
-        print("-"*tick_count)
-        print(f"Average of 4-Term Deflections = {sum(pier_deflections_four_term)/len(pier_deflections_four_term):.3f} in")
-        print("*"*tick_count)
-        print("***")
-        print("***  ---- Summary Results ----")
+        print("-" * tick_count)
         print(
-            f"***  Required Sheathing Capacity for Method 1 Adjsustment: {method1_required_unit_shear_plf:.3f} plf"
+            f"Average of 4-Term Deflections = {sum(pier_deflections_four_term)/len(pier_deflections_four_term):.3f} in"
         )
-        print(
-            f"***  Required Sheathing Capacity for Method 2 Adjsustment: {method2_required_unit_shear_plf:.3f} plf"
-        )
-        print(f"***  Required Strap Force: {required_strap_force_lbs:.3f} lbs")
+        print("*" * tick_count)
 
-        print(f"***  Required Hold Down Force: {hd_force_lbs:.3f} lbs")
-        print(f"***  Required Wall Anchorage Unit Shear: {basic_unit_shear_plf:.3f} plf")
-        print(f"***  Average of 4-Term Deflections = {sum(pier_deflections_four_term)/len(pier_deflections_four_term):.3f} in")
-        print("***")
-        print("*"*tick_count)
+        if not errors:
+            print("***")
+            print("***  ---- Summary Results ----")
+            print(
+                f"***  Required Sheathing Capacity with no adjustment: {unadjusted_required_unit_shear_plf:.3f} plf"
+            )
+            print(
+                f"***  Required Sheathing Capacity for Method 1 [2*Lpi/ho] Adjustment: {method1_required_unit_shear_plf:.3f} plf"
+            )
+            print(
+                f"***  Required Sheathing Capacity for Method 2 [1.25 - (0.125*ho/Lpi)] Adjustment: {method2_required_unit_shear_plf:.3f} plf"
+            )
+            print(f"***  Required Strap Force: {required_strap_force_lbs:.3f} lbs")
+
+            print(f"***  Required Hold Down Force: {hd_force_lbs:.3f} lbs")
+            print(
+                f"***  Required Wall Anchorage Unit Shear: {basic_unit_shear_plf:.3f} plf"
+            )
+            print(
+                f"***  Average of 4-Term Deflections = {sum(pier_deflections_four_term)/len(pier_deflections_four_term):.3f} in"
+            )
+            print("***")
+            print("*" * tick_count)
+        else:
+            print("----BEGIN ERRORS-----")
+            for error in errors:
+                print(error)
+            print("----END ERRORS-----")
 
     else:
         print("----BEGIN ERRORS-----")
