@@ -1,5 +1,5 @@
 import math
-
+import os
 
 def wsp_nail_slip_en(nail, vn, moisture_content, structural1=True):
     # SDPWS 2021 Table C4.2.3D
@@ -105,6 +105,7 @@ if __name__ == "__main__":
     print("-" * tick_count)
     print("Inputs and Geometry:")
     print(f"Applied Shear, V: {V_lbs:.3f} lbs")
+    print(f"Applied Shear For Deflection, Vdelta: {Vdelta_lbs:.3f} lbs")
     print(f"Chord Force from Above, Habove = {endchord_above_lbs:.3f} lbs")
     print(f"Wall Panel Height, Hw: {Hwall_ft:.3f} ft")
     print(f"Opening Sill Height, Hb: {hb_ft:.3f} ft")
@@ -120,10 +121,12 @@ if __name__ == "__main__":
     print(f"Total Wall Panel Length, L: {Lwall_ft:.3f} ft")
 
     # Compute aspect ratios
-    # min pier of 2 ft required, set ar = 1000
+    # min pier of 2 ft required
     pier_ar = [ho_ft / i for i in piers]
 
     for i, j in enumerate(pier_ar):
+        if piers[i] < 2.0:
+            errors.append(f"Pier {i+1} length < 2.0 ft")
         if j > 3.5:
             errors.append(f"pier {i+1} aspect ratio of {j} exceeds 3.5:1 maximum.")
 
@@ -162,7 +165,7 @@ if __name__ == "__main__":
         print(f"Hold Down Force, H: {hd_force_lbs:.3f} lbs")
         # Compute vertical unit shears @ section cuts of each window
         # assumes unit shear is equivalent in the top and bottom section
-        # and via statics Sum of Unit shears = hold down force
+        # and via statics Sum of Unit shears = hold down force - end chord above force
         opening_shears_plf = [
             (hd_force_lbs - endchord_above_lbs) / (ha_ft + hb_ft) for i in openings
         ]
@@ -384,6 +387,9 @@ if __name__ == "__main__":
         print(f"Required Wall Anchorage Unit Shear: {basic_unit_shear_plf:.3f} plf")
 
         # 4 Term Deflection
+        print("-" * tick_count)
+        print("4-Term Deflection Analysis: ")
+        
         pier_deflections_four_term = []
 
         unit_shear_delta_plf = Vdelta_lbs / Lwall_ft
@@ -501,6 +507,86 @@ if __name__ == "__main__":
             )
             print("***")
             print("*" * tick_count)
+
+            # SVG Generation
+            svg_x = 1600
+            svg_y = 600
+            svg_string = [f'<svg xmlns="http://www.w3.org/2000/svg" id="svgPrimary" width="{svg_x}" height="{svg_y}">']
+            # Transformation matrix for svg to reorient axis and scale to fit
+            
+            svg_dx = Lwall_ft
+            svg_dy = Hwall_ft
+
+            scalex = (svg_x - 20)/svg_dx
+            scaley = (svg_y - 20)/svg_dy
+            svg_scale = min(scalex,scaley)
+
+            svg_tx = 10
+            svg_ty = 10 + (svg_dy*svg_scale)
+            
+            tmatrix = f'<g id="svgViewport" transform="matrix({svg_scale},0,0,{-1*svg_scale},{svg_tx},{svg_ty})">'
+
+            svg_string.append(tmatrix)
+
+            # Piers
+            for i,j in enumerate(piers):
+                # pier x
+                if i == 0:
+                    px = 0
+                else:
+                    px = sum(piers[:i])+sum(openings[:i])
+
+                text_x = px+(j/2)
+                text_y = Hwall_ft/2
+                svg_string.append(f'<rect width="{j}" height="{Hwall_ft}" x="{px}" y="0" fill="yellow" stroke="black" stroke-width="{3/64}"/>')
+                svg_string.append(f'<line x1="{px}" y1="{hb_ft}" x2="{j+px}" y2="{hb_ft}" stroke="black" stroke-width="{3/64}" stroke-dasharray="0.125,0.25" />')
+                svg_string.append(f'<line x1="{px}" y1="{hb_ft+ho_ft}" x2="{j+px}" y2="{hb_ft+ho_ft}" stroke="black" stroke-width="{3/64}" stroke-dasharray="0.125,0.25" />')
+                svg_string.append(f'<text x="{text_x}" y="{-1*text_y}" fill="black" dominant-baseline="central" text-anchor="middle" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> {pier_shears_plf[i]:.3f} plf </text>')
+                text_y = hb_ft/2
+                svg_string.append(f'<text x="{text_x}" y="{-1*text_y}" fill="black" dominant-baseline="central" text-anchor="middle" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> {corner_unit_shears_plf[i]:.3f} plf </text>')
+                text_y = hb_ft + ho_ft + (ha_ft/2)
+                svg_string.append(f'<text x="{text_x}" y="{-1*text_y}" fill="black" dominant-baseline="central" text-anchor="middle" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> {corner_unit_shears_plf[i]:.3f} plf </text>')
+            # Openings
+            for i,j in enumerate(openings):
+
+                ox = sum(piers[:i]) + piers[i] + sum(openings[:i])
+
+                # Bottom Panel
+                svg_string.append(f'<rect width="{j}" height="{hb_ft}" x="{ox}" y="0" fill="yellow" stroke="black" stroke-width="{3/64}"/>')
+                # Top Panel
+                svg_string.append(f'<rect width="{j}" height="{ha_ft}" x="{ox}" y="{hb_ft+ho_ft}" fill="yellow" stroke="black" stroke-width="{3/64}"/>')
+                
+                text_x = ox + (j/2)
+                text_y = hb_ft/2
+                svg_string.append(f'<text x="{text_x}" y="{-1*text_y}" fill="black" dominant-baseline="central" text-anchor="middle" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> {opening_shears_plf[i]:.3f} plf </text>')
+                text_y = hb_ft + ho_ft + (ha_ft/2)
+                svg_string.append(f'<text x="{text_x}" y="{-1*text_y}" fill="black" dominant-baseline="central" text-anchor="middle" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> {opening_shears_plf[i]:.3f} plf </text>')
+
+                force_left_text = corner_forces_lbs[i][0]
+                force_right_text = corner_forces_lbs[i][1]
+                text_x = ox
+                text_y = hb_ft + (3/16)
+                svg_string.append(f'<text x="{text_x}" y="{-1*text_y}" fill="blue" dominant-baseline="central" text-anchor="middle" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> {force_left_text:.3f} lbs </text>')
+                text_x = ox
+                text_y = hb_ft + ho_ft - (3/16)
+                svg_string.append(f'<text x="{text_x}" y="{-1*text_y}" fill="blue" dominant-baseline="central" text-anchor="middle" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> {force_left_text:.3f} lbs </text>')
+                text_x = ox + j
+                text_y = hb_ft + (3/16)
+                svg_string.append(f'<text x="{text_x}" y="{-1*text_y}" fill="blue" dominant-baseline="central" text-anchor="middle" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> {force_right_text:.3f} lbs </text>')
+                text_x = ox + j
+                text_y = hb_ft + ho_ft - (3/16)
+                svg_string.append(f'<text x="{text_x}" y="{-1*text_y}" fill="blue" dominant-baseline="central" text-anchor="middle" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> {force_right_text:.3f} lbs </text>')
+            
+            svg_string.append("</g>")
+            svg_string.append("</svg>")
+
+            svg_file = open(os.path.join(os.path.dirname(os.path.realpath(__file__)),"ftao.svg"), "w")
+            for i in svg_string:
+                svg_file.write(i+"\n")
+
+            svg_file.close()
+
+            
         else:
             print("----BEGIN ERRORS-----")
             for error in errors:
