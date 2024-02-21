@@ -30,7 +30,7 @@ def wsp_nail_slip_en(nail, vn, moisture_content, structural1=True):
 
 
 def four_term_deflection(
-    V_plf, H_ft, E_psi, A_sqin, b_ft, Gt_lbpin, en_in, holddown_data
+    V_plf, H_ft, E_psi, A_sqin, b_ft, Gt_lbpin, en_in, holddown_data, additional_end_chord_force_lbs=0
 ):
 
     # Term 1 Bending Deflection - 8 v h^3 / E A b
@@ -43,7 +43,7 @@ def four_term_deflection(
     delta_fastener_in = 0.75 * H_ft * en_in
 
     # Term 4 - Hold-Down Deformation - da h/b
-    da = (holddown_data[1] * V_plf * H_ft) / holddown_data[0]
+    da = (holddown_data[1] * ((V_plf * H_ft)+additional_end_chord_force_lbs))/ holddown_data[0]
     delta_holddown_in = da * (H_ft / b_ft)
 
     delta_in = delta_bending_in + delta_shear_in + delta_fastener_in + delta_holddown_in
@@ -66,30 +66,58 @@ if __name__ == "__main__":
     #### BEGIN INPUTS ####
     ######################
 
-    # Inputs -- For Analysis
-    V_lbs = 12470.4  # Shear for force analysis
-    Vdelta_lbs = 12470.4  # Shear for Deformation Analysis
+    '''
+    ## APA T555 Inputs ##
+
+    V_lbs = 3750  # Shear for force analysis
+    Vdelta_lbs = 5357  # Shear for Deformation Analysis
+    Hwall_ft = 8  # Total height of Wall Panel
+    endchord_above_lbs = 0  # Chord Force from Wall Panel Above Current Panel
+
+    hb_ft = 4  # Sill Height of Openings
+    ho_ft = 2.67  # Height of Openings
+
+    piers = [4,4,3.5]  # List of Pier Widths
+    openings = [6,2]  # List of Opening Widths
+
+    Cd = 4.0
+    E_psi = 1600000  # Elastic Modulus of the end posts
+    A_sqin = 16.5  # Area of the end posts
+    Gt_lbpin = 83500  # Shear Stiffness through the depth of the sheathing
+    nail = "8d"  # nail size as a string 6d, 8d, or 10d no others supported.
+    nail_spacing_in = 4  # nail spacing
+    moisture_content = 19  # moisture content of lumber used for nail slip calc, typically 19 or less
+    hdcapacity_lbs = 2145  # Hold Down Capacity as provided by the manufacturer
+    hddelta_in = 0.128  # Hold Down Deformation at capacity as provided by the manufacturer
+    holddown_data = [hdcapacity_lbs, hddelta_in]  # Hold Down Data as List for input into deformation function
+    Structural1 = False
+    
+    ## END APA T555 Inputs ##
+    '''
+    # Inputs For Analysis
+    V_lbs = 4117.2  # Shear for force analysis
+    Vdelta_lbs = 4117.2  # Shear for Deformation Analysis
     Hwall_ft = 10.67  # Total height of Wall Panel
-    endchord_above_lbs = 5275.24  # Chord Force from Wall Panel Above Current Panel
+    endchord_above_lbs = 1155  # Chord Force from Wall Panel Above Current Panel
 
     hb_ft = 1.34  # Sill Height of Openings
     ho_ft = 6.32  # Height of Openings
 
-    piers = [4.82, 4.5, 11.68,4.52,4.73]  # List of Pier Widths
-    openings = [2.67,4,4,2.73]  # List of Opening Widths
+    piers = [5,7.33,5.02]  # List of Pier Widths
+    openings = [7.33,7.33]  # List of Opening Widths
 
     # Inputs for Deflection
     Cd = 1.0
     E_psi = 1400000  # Elastic Modulus of the end posts
-    A_sqin = 33  # Area of the end posts
+    A_sqin = 16.5  # Area of the end posts
     Gt_lbpin = 83500  # Shear Stiffness through the depth of the sheathing
     nail = "8d"  # nail size as a string 6d, 8d, or 10d no others supported.
     nail_spacing_in = 6  # nail spacing
     moisture_content = 19  # moisture content of lumber used for nail slip calc, typically 19 or less
-    hdcapacity_lbs = 9610  # Hold Down Capacity as provided by the manufacturer
-    hddelta_in = 0.137  # Hold Down Deformation at capacity as provided by the manufacturer
+    hdcapacity_lbs = 3285  # Hold Down Capacity as provided by the manufacturer
+    hddelta_in = 0.114  # Hold Down Deformation at capacity as provided by the manufacturer
     holddown_data = [hdcapacity_lbs, hddelta_in]  # Hold Down Data as List for input into deformation function
-    Structural1 = False
+    Structural1 = True
 
     #### END INPUTS ####
     ######################
@@ -406,20 +434,23 @@ if __name__ == "__main__":
 
             if i == 0:
                 Leff = j + opening_tributaries_ft[i][0]
+                hd_add = endchord_above_lbs
             elif i == len(piers) - 1:
                 Leff = j + opening_tributaries_ft[i - 1][1]
                 heff_ft += hb_ft  # For load from left last pier should be full height
+                hd_add = 0
             else:
                 Leff = (
                     j + opening_tributaries_ft[i][0] + opening_tributaries_ft[i - 1][1]
                 )
+                hd_add = 0
 
             Leff = Leff / j
             v_pier = unit_shear_delta_plf * Leff
             v_nail = (nail_spacing_in / 12) * v_pier
             en_in = wsp_nail_slip_en(nail, v_nail, moisture_content, Structural1)
             delta = four_term_deflection(
-                v_pier, heff_ft, E_psi, A_sqin, j, Gt_lbpin, en_in, holddown_data
+                v_pier, heff_ft, E_psi, A_sqin, j, Gt_lbpin, en_in, holddown_data, hd_add
             )
 
             pier_deflections_four_term.append(delta.get("delta"))
@@ -447,8 +478,10 @@ if __name__ == "__main__":
 
             if i == 0:
                 Leff = j + opening_tributaries_ft[i][0]
+                hd_add = 0
             elif i == len(piers) - 1:
                 Leff = j + opening_tributaries_ft[i - 1][1]
+                hd_add = endchord_above_lbs
             else:
                 if i == 1:
                     heff_ft -= (
@@ -457,13 +490,14 @@ if __name__ == "__main__":
                 Leff = (
                     j + opening_tributaries_ft[i][0] + opening_tributaries_ft[i - 1][1]
                 )
+                hd_add = 0
 
             Leff = Leff / j
             v_pier = unit_shear_delta_plf * Leff
             v_nail = (nail_spacing_in / 12) * v_pier
             en_in = wsp_nail_slip_en(nail, v_nail, moisture_content, Structural1)
             delta = four_term_deflection(
-                v_pier, heff_ft, E_psi, A_sqin, j, Gt_lbpin, en_in, holddown_data
+                v_pier, heff_ft, E_psi, A_sqin, j, Gt_lbpin, en_in, holddown_data, hd_add
             )
 
             pier_deflections_four_term.append(delta.get("delta"))
@@ -552,6 +586,10 @@ if __name__ == "__main__":
             svg_string.append(f'<line x1="{Lwall_ft+3}" y1="{-(3/16)}" x2="{Lwall_ft+3}" y2="{2-(3/16)}" stroke="black" stroke-width="{3/64}" marker-end="url(#arrow)" />')
             svg_string.append(f'<text x="{Lwall_ft+2.75}" y="{-1*(3/16)}" fill="blue" dominant-baseline="central" text-anchor="end" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> HD: {hd_force_lbs:.1f} lbs </text>')
             
+            svg_string.append(f'<line x1="{(Lwall_ft/2) + 3 - (Lwall_ft/6)}" y1="{2-(3/8)}" x2="{(Lwall_ft/2) + 3 + (Lwall_ft/6)}" y2="{2-(3/8)}" stroke="black" stroke-width="{3/64}" marker-start="url(#arrow)" />')
+            svg_string.append(f'<text x="{Lwall_ft/2 + 3}" y="{-1*(2-(3/8)-(5/16))}" fill="blue" dominant-baseline="central" text-anchor="middle" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> Required Wall Anchorage Unit Shear: {basic_unit_shear_plf:.3f} plf </text>')
+            svg_string.append(f'<text x="{Lwall_ft/2 + 3}" y="{-1*(2-(6/8)-(7/16))}" fill="blue" dominant-baseline="central" text-anchor="middle" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> Average of 4-Term Deflections = {sum(pier_deflections_four_term)/len(pier_deflections_four_term):.3f} in  - H/{delta_h_over:.1f} or {percent_drift:.4f}%</text>')
+
             # Piers
             for i,j in enumerate(piers):
                 # pier x
@@ -565,7 +603,9 @@ if __name__ == "__main__":
                 svg_string.append(f'<rect width="{j}" height="{Hwall_ft}" x="{px}" y="2" fill="yellow" stroke="black" stroke-width="{3/64}"/>')
                 svg_string.append(f'<line x1="{px}" y1="{hb_ft + 2}" x2="{j+px}" y2="{hb_ft + 2}" stroke="black" stroke-width="{3/64}" stroke-dasharray="0.125,0.25" />')
                 svg_string.append(f'<line x1="{px}" y1="{hb_ft+ho_ft + 2}" x2="{j+px}" y2="{hb_ft+ho_ft + 2}" stroke="black" stroke-width="{3/64}" stroke-dasharray="0.125,0.25" />')
-                svg_string.append(f'<text x="{text_x}" y="{-1*(text_y+2)}" fill="black" dominant-baseline="central" text-anchor="middle" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> {pier_shears_plf[i]:.1f} plf </text>')
+                svg_string.append(f'<text x="{text_x}" y="{-1*(text_y+2+(3/8))}" fill="black" dominant-baseline="central" text-anchor="middle" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> {pier_shears_plf[i]:.1f} plf </text>')
+                svg_string.append(f'<text x="{text_x}" y="{-1*(text_y+2)}" fill="black" dominant-baseline="central" text-anchor="middle" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> Method 1: {pier_shears_plf[i]/method1_af[i]:.1f} plf </text>')
+                svg_string.append(f'<text x="{text_x}" y="{-1*(text_y+2-(3/8))}" fill="black" dominant-baseline="central" text-anchor="middle" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> Method 2: {pier_shears_plf[i]/method2_af[i]:.1f} plf </text>')
                 text_y = hb_ft/2
                 svg_string.append(f'<text x="{text_x}" y="{-1*(text_y+2)}" fill="black" dominant-baseline="central" text-anchor="middle" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> {corner_unit_shears_plf[i]:.1f} plf </text>')
                 text_y = hb_ft + ho_ft + (ha_ft/2)
