@@ -100,7 +100,7 @@ if __name__ == "__main__":
     Hwall_ft = 10.67  # Total height of Wall Panel
     endchord_above_lbs = 1155  # Chord Force from Wall Panel Above Current Panel
 
-    hb_ft = 1.34  # Sill Height of Openings
+    hb_ft = 0  # Sill Height of Openings
     ho_ft = 6.32  # Height of Openings
 
     piers = [5,7.33,5.02]  # List of Pier Widths
@@ -127,7 +127,7 @@ if __name__ == "__main__":
             f"Pier count not consistent with openings, # piers should be {len(openings)+1} but is {len(piers)}"
         )
 
-    if hb_ft <= 0"
+    if hb_ft <= 0 :
         errors.append(f"Sill height, hb, of {hb_ft} ft must be greater than 0")
 
     # Basic computed values
