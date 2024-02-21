@@ -127,6 +127,9 @@ if __name__ == "__main__":
             f"Pier count not consistent with openings, # piers should be {len(openings)+1} but is {len(piers)}"
         )
 
+    if hb_ft <= 0"
+        errors.append(f"Sill height, hb, of {hb_ft} ft must be greater than 0")
+
     # Basic computed values
     ha_ft = Hwall_ft - hb_ft - ho_ft  # height above opening
     Lwall_ft = sum(piers) + sum(openings)  # total wall length
@@ -551,8 +554,9 @@ if __name__ == "__main__":
             print("*" * tick_count)
 
             # SVG Generation
-            svg_x = 1600
-            svg_y = 600
+            svg_x = 1024
+            svg_y = 768
+            panel_color = "darkkhaki"
             svg_string = [f'<svg xmlns="http://www.w3.org/2000/svg" id="svgPrimary" width="{svg_x}" height="{svg_y}">']
             # Transformation matrix for svg to reorient axis and scale to fit
             svg_string.append('<defs><marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" /></marker></defs>')
@@ -600,10 +604,10 @@ if __name__ == "__main__":
 
                 text_x = px+(j/2)
                 text_y = hb_ft + (ho_ft/2)
-                svg_string.append(f'<rect width="{j}" height="{Hwall_ft}" x="{px}" y="2" fill="yellow" stroke="black" stroke-width="{3/64}"/>')
+                svg_string.append(f'<rect width="{j}" height="{Hwall_ft}" x="{px}" y="2" fill="{panel_color}" stroke="black" stroke-width="{3/64}"/>')
                 svg_string.append(f'<line x1="{px}" y1="{hb_ft + 2}" x2="{j+px}" y2="{hb_ft + 2}" stroke="black" stroke-width="{3/64}" stroke-dasharray="0.125,0.25" />')
                 svg_string.append(f'<line x1="{px}" y1="{hb_ft+ho_ft + 2}" x2="{j+px}" y2="{hb_ft+ho_ft + 2}" stroke="black" stroke-width="{3/64}" stroke-dasharray="0.125,0.25" />')
-                svg_string.append(f'<text x="{text_x}" y="{-1*(text_y+2+(3/8))}" fill="black" dominant-baseline="central" text-anchor="middle" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> {pier_shears_plf[i]:.1f} plf </text>')
+                svg_string.append(f'<text x="{text_x}" y="{-1*(text_y+2+(3/8))}" fill="black" dominant-baseline="central" text-anchor="middle" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> Analysis: {pier_shears_plf[i]:.1f} plf </text>')
                 svg_string.append(f'<text x="{text_x}" y="{-1*(text_y+2)}" fill="black" dominant-baseline="central" text-anchor="middle" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> Method 1: {pier_shears_plf[i]/method1_af[i]:.1f} plf </text>')
                 svg_string.append(f'<text x="{text_x}" y="{-1*(text_y+2-(3/8))}" fill="black" dominant-baseline="central" text-anchor="middle" font-size="{3/8}" font-weight="bold" transform="scale(1,-1)"> Method 2: {pier_shears_plf[i]/method2_af[i]:.1f} plf </text>')
                 text_y = hb_ft/2
@@ -616,9 +620,9 @@ if __name__ == "__main__":
                 ox = sum(piers[:i]) + piers[i] + sum(openings[:i])+3
 
                 # Bottom Panel
-                svg_string.append(f'<rect width="{j}" height="{hb_ft}" x="{ox}" y="2" fill="yellow" stroke="black" stroke-width="{3/64}"/>')
+                svg_string.append(f'<rect width="{j}" height="{hb_ft}" x="{ox}" y="2" fill="{panel_color}" stroke="black" stroke-width="{3/64}"/>')
                 # Top Panel
-                svg_string.append(f'<rect width="{j}" height="{ha_ft}" x="{ox}" y="{hb_ft+ho_ft+2}" fill="yellow" stroke="black" stroke-width="{3/64}"/>')
+                svg_string.append(f'<rect width="{j}" height="{ha_ft}" x="{ox}" y="{hb_ft+ho_ft+2}" fill="{panel_color}" stroke="black" stroke-width="{3/64}"/>')
                 
                 text_x = ox + (j/2)
                 text_y = hb_ft/2
