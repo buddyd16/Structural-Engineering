@@ -100,7 +100,7 @@ if __name__ == "__main__":
     Hwall_ft = 10.67  # Total height of Wall Panel
     endchord_above_lbs = 1155  # Chord Force from Wall Panel Above Current Panel
 
-    hb_ft = 0  # Sill Height of Openings
+    hb_ft = 1.33  # Sill Height of Openings
     ho_ft = 6.32  # Height of Openings
 
     piers = [5,7.33,5.02]  # List of Pier Widths
@@ -129,6 +129,8 @@ if __name__ == "__main__":
 
     if hb_ft <= 0 :
         errors.append(f"Sill height, hb, of {hb_ft} ft must be greater than 0")
+    if hb_ft+ho_ft >= Hwall_ft-0.5:
+        errors.append(f"Opening too large")
 
     # Basic computed values
     ha_ft = Hwall_ft - hb_ft - ho_ft  # height above opening
