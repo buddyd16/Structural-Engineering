@@ -482,11 +482,19 @@ class t_beam:
             steel_strain.append(0.003*((bars_d_array[i]/c_in)-1))
             fs = steel_strain[i] * Es_psi
             if fs < -1*fy_psi or fs > fy_psi:
-                steel_stress.append((fs/abs(fs))*fy_psi)
-                steel_tension_force_layer_lbs.append(((fs/abs(fs))*fy_psi)*bars_as_array[i])
+                if fs<0:
+                    steel_stress.append((fs/abs(fs))*fy_psi)
+                    steel_tension_force_layer_lbs.append((((fs/abs(fs))*fy_psi)+0.85*self.f_prime_c_psi)*bars_as_array[i])
+                else:
+                    steel_stress.append((fs/abs(fs))*fy_psi)
+                    steel_tension_force_layer_lbs.append(((fs/abs(fs))*fy_psi)*bars_as_array[i])
             else:
-                steel_stress.append(fs)
-                steel_tension_force_layer_lbs.append(fs*bars_as_array[i])
+                if fs<0:
+                    steel_stress.append(fs)
+                    steel_tension_force_layer_lbs.append((fs+0.85*self.f_prime_c_psi)*bars_as_array[i])
+                else:
+                    steel_stress.append(fs)
+                    steel_tension_force_layer_lbs.append(fs*bars_as_array[i])
 
         steel_tension_force_lbs = sum(steel_tension_force_layer_lbs)
 
@@ -527,8 +535,8 @@ class t_beam:
             else:
                 a = c
             loop+=1
-            print tension_c
-            print pna
+            print(tension_c)
+            print(pna)
         return pna
 
     def moment_capacity_inlbs(self,bars_as_array,bars_d_array,bars_cg,c_in,fy_psi,Es_psi):
