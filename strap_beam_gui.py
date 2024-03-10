@@ -30,11 +30,11 @@ import Analysis.pin_pin_beam_equations_classes as ppbeam
 import Concrete.concrete_beam_classes as concbeam
 from numpy import zeros
 import numpy as np
-import Tkinter as tk
-import tkMessageBox
-import ttk
-import tkFont
-import tkFileDialog
+import tkinter as tk
+import tkinter.ttk as ttk
+import tkinter.font as tkFont
+import tkinter.messagebox as tkMessageBox
+import tkinter.filedialog as tkFileDialog
 
 class main_window:
 
