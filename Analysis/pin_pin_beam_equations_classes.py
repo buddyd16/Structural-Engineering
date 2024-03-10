@@ -139,11 +139,12 @@ def poly_eval(c_list,x):
     return res
 
 class no_load:
-    def __init__(self, L):
+    def __init__(self, L, case='D'):
         self.p = 0
         self.rl = 0
         self.rr = 0
         self.L = L
+        self.case =case
 
         self.kind = 'NL'
 
@@ -179,48 +180,48 @@ class no_load:
 
         return [v,m,eis,eid],[vs,ms,eiss,eids]
 
-    def fef(self):
+    def fef(self,loadfactor=1):
         # Fixed End Forces
-        RL = 0
-        RR = 0
-        ML = 0
-        MR = 0
+        RL = 0*loadfactor
+        RR = 0*loadfactor
+        ML = 0*loadfactor
+        MR = 0*loadfactor
 
         return [RL,ML,RR,MR]
 
-    def v(self,x):
+    def v(self,x,loadfactor=1):
         iters = len(x)
         v=zeros(iters)
         return v
 
-    def m(self,x):
+    def m(self,x,loadfactor=1):
         iters = len(x)
         m=zeros(iters)
         return m
 
-    def eis(self,x):
+    def eis(self,x,loadfactor=1):
         iters = len(x)
         eis=zeros(iters)
         return eis
 
-    def eid(self,x):
+    def eid(self,x,loadfactor=1):
         iters = len(x)
         eid=zeros(iters)
         return eid
 
-    def vx(self,x):
+    def vx(self,x,loadfactor=1):
         v = 0
         return v
 
-    def mx(self,x):
+    def mx(self,x,loadfactor=1):
         m = 0
         return m
 
-    def eisx(self,x):
+    def eisx(self,x,loadfactor=1):
         eisx = 0
         return eisx
 
-    def eidx(self,x):
+    def eidx(self,x,loadfactor=1):
         eid = 0
         return eid
 
@@ -248,8 +249,8 @@ class pl:
 
         arrow_height = self.p/6.0
         #30 degree arrow
-        arrow_plus= self.a+(arrow_height*math.tan(math.radians(30)))
-        arrow_minus= self.a-(arrow_height*math.tan(math.radians(30)))
+        arrow_plus= self.a+(arrow_height*math.tan(math.radians(15)))
+        arrow_minus= self.a-(arrow_height*math.tan(math.radians(15)))
 
         self.x_graph=[arrow_minus,self.a,arrow_plus,self.a,self.a]
         self.y_graph=[arrow_height,0,arrow_height,0,self.p]
@@ -258,8 +259,8 @@ class pl:
         if arrows == 1:
             arrow_height = (self.p/6.0)
             #30 degree arrow
-            arrow_plus= (self.a+(arrow_height*math.tan(math.radians(30))))
-            arrow_minus= (self.a-(arrow_height*math.tan(math.radians(30))))
+            arrow_plus= (self.a+(arrow_height*math.tan(math.radians(15))))
+            arrow_minus= (self.a-(arrow_height*math.tan(math.radians(15))))
 
             x=[arrow_minus,self.a,arrow_plus,self.a,self.a]
             x = [i*x_scale for i in x]
@@ -419,7 +420,7 @@ class point_moment:
         r = (self.ma/2.0)
         arrow_height = r/6.0
         #30 degree arrow
-        arrow_minus= (arrow_height*math.tan(math.radians(30)))
+        arrow_minus= (arrow_height*math.tan(math.radians(15)))
 
         if self.ma <0:
             self.x_graph = [self.a,self.a,self.a]
@@ -457,7 +458,7 @@ class point_moment:
         if arrows == 1:
             arrow_height = r/6.0
             #30 degree arrow
-            arrow_minus= (arrow_height*math.tan(math.radians(30)))
+            arrow_minus= (arrow_height*math.tan(math.radians(15)))
 
             if self.ma <0:
                 x = [self.a,self.a,self.a]
@@ -675,10 +676,10 @@ class udl:
 
         arrow_height = self.w1/12.0
         #30 degree arrow
-        arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(30)))
-        arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(30)))
-        arrow_plus_end= self.b+(arrow_height*math.tan(math.radians(30)))
-        arrow_minus_end= self.b-(arrow_height*math.tan(math.radians(30)))
+        arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(15)))
+        arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(15)))
+        arrow_plus_end= self.b+(arrow_height*math.tan(math.radians(15)))
+        arrow_minus_end= self.b-(arrow_height*math.tan(math.radians(15)))
 
         self.x_graph=[arrow_minus_start,self.a,arrow_plus_start,self.a,self.a,self.b,self.b,arrow_minus_end,self.b,arrow_plus_end]
         self.y_graph=[arrow_height,0,arrow_height,0,self.w1,self.w1,0,arrow_height,0,arrow_height]
@@ -689,10 +690,10 @@ class udl:
         if arrows == 1:
             arrow_height = self.w1/6.0
             #30 degree arrow
-            arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(30)))
-            arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(30)))
-            arrow_plus_end= self.b+(arrow_height*math.tan(math.radians(30)))
-            arrow_minus_end= self.b-(arrow_height*math.tan(math.radians(30)))
+            arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(15)))
+            arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(15)))
+            arrow_plus_end= self.b+(arrow_height*math.tan(math.radians(15)))
+            arrow_minus_end= self.b-(arrow_height*math.tan(math.radians(15)))
 
             x=[arrow_minus_start,self.a,arrow_plus_start,self.a,self.a,self.b,self.b,arrow_minus_end,self.b,arrow_plus_end]
             x = [i*x_scale for i in x]
@@ -892,10 +893,10 @@ class trap:
         arrow_height = self.w1/6.0
         arrow_height2 = self.w2/6.0
         #30 degree arrow
-        arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(30)))
-        arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(30)))
-        arrow_plus_end= self.b+(arrow_height2*math.tan(math.radians(30)))
-        arrow_minus_end= self.b-(arrow_height2*math.tan(math.radians(30)))
+        arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(15)))
+        arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(15)))
+        arrow_plus_end= self.b+(arrow_height2*math.tan(math.radians(15)))
+        arrow_minus_end= self.b-(arrow_height2*math.tan(math.radians(15)))
 
         self.x_graph=[arrow_minus_start,self.a,arrow_plus_start,self.a,self.a,self.b,self.b,arrow_minus_end,self.b,arrow_plus_end]
         self.y_graph=[arrow_height,0,arrow_height,0,self.w1,self.w2,0,arrow_height2,0,arrow_height2]
@@ -907,10 +908,10 @@ class trap:
             arrow_height = self.w1/6.0
             arrow_height2 = self.w2/6.0
             #30 degree arrow
-            arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(30)))
-            arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(30)))
-            arrow_plus_end= self.b+(arrow_height2*math.tan(math.radians(30)))
-            arrow_minus_end= self.b-(arrow_height2*math.tan(math.radians(30)))
+            arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(15)))
+            arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(15)))
+            arrow_plus_end= self.b+(arrow_height2*math.tan(math.radians(15)))
+            arrow_minus_end= self.b-(arrow_height2*math.tan(math.radians(15)))
 
             x=[arrow_minus_start,self.a,arrow_plus_start,self.a,self.a,self.b,self.b,arrow_minus_end,self.b,arrow_plus_end]
             x = [i*x_scale for i in x]
@@ -1313,8 +1314,8 @@ class cant_right_point:
 
         arrow_height = self.p/6.0
         #30 degree arrow
-        arrow_plus= self.a+(arrow_height*math.tan(math.radians(30)))
-        arrow_minus= self.a-(arrow_height*math.tan(math.radians(30)))
+        arrow_plus= self.a+(arrow_height*math.tan(math.radians(15)))
+        arrow_minus= self.a-(arrow_height*math.tan(math.radians(15)))
 
         self.x_graph=[arrow_minus,self.a,arrow_plus,self.a,self.a]
         self.y_graph=[arrow_height,0,arrow_height,0,self.p]
@@ -1324,8 +1325,8 @@ class cant_right_point:
         if arrows == 1:
             arrow_height = self.p/6.0
             #30 degree arrow
-            arrow_plus= self.a+(arrow_height*math.tan(math.radians(30)))
-            arrow_minus= self.a-(arrow_height*math.tan(math.radians(30)))
+            arrow_plus= self.a+(arrow_height*math.tan(math.radians(15)))
+            arrow_minus= self.a-(arrow_height*math.tan(math.radians(15)))
 
             x=[arrow_minus,self.a,arrow_plus,self.a,self.a]
             x = [i*x_scale for i in x]
@@ -1495,7 +1496,7 @@ class cant_right_point_moment:
         r = (self.ma/2.0)
         arrow_height = r/6.0
         #30 degree arrow
-        arrow_minus= (arrow_height*math.tan(math.radians(30)))
+        arrow_minus= (arrow_height*math.tan(math.radians(15)))
 
         if self.ma <0:
             self.x_graph = [self.a,self.a,self.a]
@@ -1531,7 +1532,7 @@ class cant_right_point_moment:
         if arrows == 1:
             arrow_height = r/6.0
             #30 degree arrow
-            arrow_minus= (arrow_height*math.tan(math.radians(30)))
+            arrow_minus= (arrow_height*math.tan(math.radians(15)))
 
             if self.ma <0:
                 x= [self.a,self.a,self.a]
@@ -1721,10 +1722,10 @@ class cant_right_udl:
 
         arrow_height = self.w1/12.0
         #30 degree arrow
-        arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(30)))
-        arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(30)))
-        arrow_plus_end= self.b+(arrow_height*math.tan(math.radians(30)))
-        arrow_minus_end= self.b-(arrow_height*math.tan(math.radians(30)))
+        arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(15)))
+        arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(15)))
+        arrow_plus_end= self.b+(arrow_height*math.tan(math.radians(15)))
+        arrow_minus_end= self.b-(arrow_height*math.tan(math.radians(15)))
 
         self.x_graph=[arrow_minus_start,self.a,arrow_plus_start,self.a,self.a,self.b,self.b,arrow_minus_end,self.b,arrow_plus_end]
         self.y_graph=[arrow_height,0,arrow_height,0,self.w1,self.w1,0,arrow_height,0,arrow_height]
@@ -1733,10 +1734,10 @@ class cant_right_udl:
         if arrows == 1:
             arrow_height = self.w1/12.0
             #30 degree arrow
-            arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(30)))
-            arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(30)))
-            arrow_plus_end= self.b+(arrow_height*math.tan(math.radians(30)))
-            arrow_minus_end= self.b-(arrow_height*math.tan(math.radians(30)))
+            arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(15)))
+            arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(15)))
+            arrow_plus_end= self.b+(arrow_height*math.tan(math.radians(15)))
+            arrow_minus_end= self.b-(arrow_height*math.tan(math.radians(15)))
 
             x=[arrow_minus_start,self.a,arrow_plus_start,self.a,self.a,self.b,self.b,arrow_minus_end,self.b,arrow_plus_end]
             x = [i*x_scale for i in x]
@@ -1967,10 +1968,10 @@ class cant_right_trap:
         arrow_height = self.w1/6.0
         arrow_height2 = self.w2/6.0
         #30 degree arrow
-        arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(30)))
-        arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(30)))
-        arrow_plus_end= self.b+(arrow_height2*math.tan(math.radians(30)))
-        arrow_minus_end= self.b-(arrow_height2*math.tan(math.radians(30)))
+        arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(15)))
+        arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(15)))
+        arrow_plus_end= self.b+(arrow_height2*math.tan(math.radians(15)))
+        arrow_minus_end= self.b-(arrow_height2*math.tan(math.radians(15)))
 
         self.x_graph=[arrow_minus_start,self.a,arrow_plus_start,self.a,self.a,self.b,self.b,arrow_minus_end,self.b,arrow_plus_end]
         self.y_graph=[arrow_height,0,arrow_height,0,self.w1,self.w2,0,arrow_height2,0,arrow_height2]
@@ -1980,10 +1981,10 @@ class cant_right_trap:
             arrow_height = self.w1/6.0
             arrow_height2 = self.w2/6.0
             #30 degree arrow
-            arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(30)))
-            arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(30)))
-            arrow_plus_end= self.b+(arrow_height2*math.tan(math.radians(30)))
-            arrow_minus_end= self.b-(arrow_height2*math.tan(math.radians(30)))
+            arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(15)))
+            arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(15)))
+            arrow_plus_end= self.b+(arrow_height2*math.tan(math.radians(15)))
+            arrow_minus_end= self.b-(arrow_height2*math.tan(math.radians(15)))
 
             x=[arrow_minus_start,self.a,arrow_plus_start,self.a,self.a,self.b,self.b,arrow_minus_end,self.b,arrow_plus_end]
             x = [i*x_scale for i in x]
@@ -2313,8 +2314,8 @@ class cant_left_point:
 
         arrow_height = self.p/6.0
         #30 degree arrow
-        arrow_plus= self.a+(arrow_height*math.tan(math.radians(30)))
-        arrow_minus= self.a-(arrow_height*math.tan(math.radians(30)))
+        arrow_plus= self.a+(arrow_height*math.tan(math.radians(15)))
+        arrow_minus= self.a-(arrow_height*math.tan(math.radians(15)))
 
         self.x_graph=[arrow_minus,self.a,arrow_plus,self.a,self.a]
         self.y_graph=[arrow_height,0,arrow_height,0,self.p]
@@ -2323,8 +2324,8 @@ class cant_left_point:
         if arrows == 1:
             arrow_height = self.p/6.0
             #30 degree arrow
-            arrow_plus= self.a+(arrow_height*math.tan(math.radians(30)))
-            arrow_minus= self.a-(arrow_height*math.tan(math.radians(30)))
+            arrow_plus= self.a+(arrow_height*math.tan(math.radians(15)))
+            arrow_minus= self.a-(arrow_height*math.tan(math.radians(15)))
 
             x=[arrow_minus,self.a,arrow_plus,self.a,self.a]
             x = [i*x_scale for i in x]
@@ -2483,7 +2484,7 @@ class cant_left_point_moment:
         r = (self.ma/2.0)
         arrow_height = r/6.0
         #30 degree arrow
-        arrow_minus= (arrow_height*math.tan(math.radians(30)))
+        arrow_minus= (arrow_height*math.tan(math.radians(15)))
 
         if self.ma <0:
             self.x_graph = [self.a,self.a,self.a]
@@ -2519,7 +2520,7 @@ class cant_left_point_moment:
         if arrows == 1:
             arrow_height = r/6.0
             #30 degree arrow
-            arrow_minus= (arrow_height*math.tan(math.radians(30)))
+            arrow_minus= (arrow_height*math.tan(math.radians(15)))
 
             if self.ma <0:
                 x= [self.a,self.a,self.a]
@@ -2709,10 +2710,10 @@ class cant_left_udl:
 
         arrow_height = self.w1/12.0
         #30 degree arrow
-        arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(30)))
-        arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(30)))
-        arrow_plus_end= self.b+(arrow_height*math.tan(math.radians(30)))
-        arrow_minus_end= self.b-(arrow_height*math.tan(math.radians(30)))
+        arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(15)))
+        arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(15)))
+        arrow_plus_end= self.b+(arrow_height*math.tan(math.radians(15)))
+        arrow_minus_end= self.b-(arrow_height*math.tan(math.radians(15)))
 
         self.x_graph=[arrow_minus_start,self.a,arrow_plus_start,self.a,self.a,self.b,self.b,arrow_minus_end,self.b,arrow_plus_end]
         self.y_graph=[arrow_height,0,arrow_height,0,self.w1,self.w1,0,arrow_height,0,arrow_height]
@@ -2721,10 +2722,10 @@ class cant_left_udl:
         if arrows == 1:
             arrow_height = self.w1/12.0
             #30 degree arrow
-            arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(30)))
-            arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(30)))
-            arrow_plus_end= self.b+(arrow_height*math.tan(math.radians(30)))
-            arrow_minus_end= self.b-(arrow_height*math.tan(math.radians(30)))
+            arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(15)))
+            arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(15)))
+            arrow_plus_end= self.b+(arrow_height*math.tan(math.radians(15)))
+            arrow_minus_end= self.b-(arrow_height*math.tan(math.radians(15)))
 
             x=[arrow_minus_start,self.a,arrow_plus_start,self.a,self.a,self.b,self.b,arrow_minus_end,self.b,arrow_plus_end]
             x = [i*x_scale for i in x]
@@ -2974,10 +2975,10 @@ class cant_left_trap:
         arrow_height = self.w1/6.0
         arrow_height2 = self.w2/6.0
         #30 degree arrow
-        arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(30)))
-        arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(30)))
-        arrow_plus_end= self.b+(arrow_height2*math.tan(math.radians(30)))
-        arrow_minus_end= self.b-(arrow_height2*math.tan(math.radians(30)))
+        arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(15)))
+        arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(15)))
+        arrow_plus_end= self.b+(arrow_height2*math.tan(math.radians(15)))
+        arrow_minus_end= self.b-(arrow_height2*math.tan(math.radians(15)))
 
         self.x_graph=[arrow_minus_start,self.a,arrow_plus_start,self.a,self.a,self.b,self.b,arrow_minus_end,self.b,arrow_plus_end]
         self.y_graph=[arrow_height,0,arrow_height,0,self.w1,self.w2,0,arrow_height2,0,arrow_height2]
@@ -2987,10 +2988,10 @@ class cant_left_trap:
             arrow_height = self.w1/6.0
             arrow_height2 = self.w2/6.0
             #30 degree arrow
-            arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(30)))
-            arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(30)))
-            arrow_plus_end= self.b+(arrow_height2*math.tan(math.radians(30)))
-            arrow_minus_end= self.b-(arrow_height2*math.tan(math.radians(30)))
+            arrow_plus_start= self.a+(arrow_height*math.tan(math.radians(15)))
+            arrow_minus_start= self.a-(arrow_height*math.tan(math.radians(15)))
+            arrow_plus_end= self.b+(arrow_height2*math.tan(math.radians(15)))
+            arrow_minus_end= self.b-(arrow_height2*math.tan(math.radians(15)))
 
             x=[arrow_minus_start,self.a,arrow_plus_start,self.a,self.a,self.b,self.b,arrow_minus_end,self.b,arrow_plus_end]
             x = [i*x_scale for i in x]
